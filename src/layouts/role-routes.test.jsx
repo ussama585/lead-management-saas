@@ -1,0 +1,40 @@
+import React from 'react';
+import { Route, matchRoutes } from 'react-router-dom';
+import { describe, expect, it } from 'vitest';
+import { createRoleRoutes } from './role-routes.jsx';
+import { getRoleHome, getRolePath, USER_TYPES } from '../pages/auth/role-home.js';
+import { canAccessRoute } from '../pages/auth/role-access.js';
+
+const Guard = () => null;
+const routes = <>
+  <Route path='/admin/leads/:id' element={<Guard allowedRoles={['admin']} />} />
+  <Route path='/data-leads' element={<Guard allowedRoles={USER_TYPES} />} />
+  <Route path='/settings' element={<Guard allowedRoles={USER_TYPES} />} />
+  <Route path='/super-admin/companies' element={<Guard allowedRoles={['super_admin']} />} />
+</>;
+
+// Match the same direct Route children used by the application.
+const children = routes.props.children;
+describe('role-specific URLs', () => {
+  it.each(USER_TYPES)('registers shared pages under the %s prefix', role => {
+    const definitions = createRoleRoutes(children, role).map(route => route.props);
+    expect(matchRoutes(definitions, `${getRoleHome(role)}/data-leads`)).not.toBeNull();
+    expect(matchRoutes(definitions, `${getRoleHome(role)}/settings`)).not.toBeNull();
+    expect(getRolePath(role, '/data-leads')).toBe(`${getRoleHome(role)}/data-leads`);
+  });
+  it('matches company admin detail URLs with their parameters', () => {
+    const definitions = createRoleRoutes(children, 'company_admin').map(route => route.props);
+    expect(matchRoutes(definitions, '/company-admin/leads/42')[0].params.id).toBe('42');
+    expect(getRolePath('company_admin', '/admin/leads/42')).toBe('/company-admin/leads/42');
+  });
+  it('keeps canonical URLs stable and supports the legacy admin role', () => {
+    expect(getRolePath('company_admin', '/company-admin/leads/42')).toBe('/company-admin/leads/42');
+    expect(getRolePath('admin', '/admin/settings')).toBe('/super-admin/settings');
+  });
+  it('rejects other role prefixes and does not register Companies for company admins', () => {
+    expect(canAccessRoute('company_admin', ['admin'], '/super-admin/leads/1')).toBe(false);
+    expect(canAccessRoute('super_admin', ['admin'], '/company-admin/settings')).toBe(false);
+    const paths = createRoleRoutes(children, 'company_admin').map(route => route.props.path);
+    expect(paths).not.toContain('/company-admin/companies');
+  });
+});

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import AdminShell from './admin-shell.jsx';
 import useUserStore from '../pages/shared/store/user-store.js';
-import { getRoleHome } from '../pages/auth/role-home.js';
+import { getRoleHome, getRolePath } from '../pages/auth/role-home.js';
 import { getLayoutRole, canAccessMenu, isSuperAdmin } from '../pages/auth/role-access.js';
 import api from '../pages/shared/services/api.js';
 import { getProjectPaymentCount, getSidebarStats } from '../pages/shared/services/headhunting.js';
@@ -20,10 +20,12 @@ import {
   FileText as FileTextOutlined, Building2,
 } from 'lucide-react';
 
-export default function AppLayout({ children }) {
-  const { user: signedInUser } = useUserStore();
+export default function AppLayout({ children, role }) {
+  const { user: storedUser } = useUserStore();
+  const signedInUser = { ...storedUser, user_type: role || storedUser?.user_type };
   const user = { ...signedInUser, user_type: getLayoutRole(signedInUser?.user_type) };
-  const navigate = useNavigate();
+  const routerNavigate = useNavigate();
+  const navigate = path => routerNavigate(getRolePath(signedInUser?.user_type, path));
   const location = useLocation();
   const isFollowUpBadgeEnabled =
     user?.user_type === 'admin' ||
@@ -177,7 +179,7 @@ export default function AppLayout({ children }) {
   };
 
 
-  const selectedKey = getMenuKeyFromPath(location.pathname);
+  const selectedKey = getMenuKeyFromPath(location.pathname.replace(/^\/(super-admin|company-admin)(?=\/|$)/, '/admin'));
   const userTypeMapping = {
     admin: 'admin',
     sales_executive: 'sales-executive',

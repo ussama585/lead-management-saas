@@ -61,7 +61,7 @@ describe('role navigation after the shadcn migration', () => {
     expect(shell.menuItems.map(item => item.label)).toContain('User Management');
     expect(shell.menuItems.some(item => item.label === 'Settings')).toBe(true);
     shell.onSelect({ key: '2' });
-    expect(state.navigate).toHaveBeenCalledWith('/admin/user-management');
+    expect(state.navigate).toHaveBeenCalledWith(`/${role.replaceAll('_', '-')}/user-management`);
   });
   it('ignores attempts to select a hidden administrative menu item', () => {
     const shell = render('sales_executive');
@@ -75,7 +75,7 @@ describe('role navigation after the shadcn migration', () => {
     expect(shell.badges['17']).toBe(4);
     expect(shell.badges['25']).toBeUndefined();
     shell.onSelect({ key: '21' });
-    expect(state.navigate).toHaveBeenCalledWith('/admin/settings');
+    expect(state.navigate).toHaveBeenCalledWith('/super-admin/settings');
   });
   it.each(['sales_manager', 'sales_executive', 'recruitment_manager', 'recruitment_executive', 'accountant', 'marketing_manager', 'project_manager'])('does not expose admin settings or user management to %s', role => {
     const shell = render(role);

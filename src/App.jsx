@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { canAccessRoute } from './pages/auth/role-access.js';
-import { getRoleHome, USER_TYPES } from './pages/auth/role-home.js';
+import { getRoleHome, getRolePath, USER_TYPES } from './pages/auth/role-home.js';
 import './assets/styles/app.css';
 import './assets/styles/legacy/global.generated.css'
 // import "bootstrap/dist/css/bootstrap.css";
@@ -34,7 +34,11 @@ import TargetDetail from './pages/users/pages/targets/target-detail-page.jsx';
 import AdminTargetListing from './pages/users/pages/targets/target-listing-page.jsx';
 import TargetListingForExecutive from './pages/sales-executive/target-listing-page.jsx';
 import NotFoundPage from './pages/auth/pages/not-found-page.jsx'
-import AppLayout from './layouts/app-layout.jsx';
+import SuperAdminLayout from './layouts/app-layout-super-admin.jsx';
+import CompanyAdminLayout from './layouts/app-layout-company-admin.jsx';
+import SalesManagerLayout from './layouts/app-layout-sales-manager.jsx';
+import SalesExecutiveLayout from './layouts/app-layout-sales-executive.jsx';
+import RoleRoutes from './layouts/role-routes.jsx';
 import AppLayoutDataEntryExecutive from './layouts/app-layout-data-entry-executive.jsx';
 
 import HeadhuntingForAdmin from './pages/clients/pages/clients/headhunting-client.jsx';
@@ -123,11 +127,13 @@ import DeliverablesPage from './pages/deliverables/pages/deliverables-page.jsx';
 
 function ProtectedRoute({ element, allowedRoles }) {
   const { user } = useUserStore();
-  const { pathname } = useLocation();
+  const { pathname, search, hash } = useLocation();
   if (!user?.user_type || !getRoleHome(user.user_type)) return <Navigate to="/" replace />;
   if (!canAccessRoute(user.user_type, allowedRoles, pathname)) {
     return <div role="alert" className="p-6"><h1>Access denied</h1><p>Your role does not have permission to open this page.</p><a href={getRoleHome(user.user_type)}>Return to your dashboard</a></div>;
   }
+  const target = getRolePath(user.user_type, pathname);
+  if (target !== pathname) return <Navigate to={`${target}${search}${hash}`} replace />;
   return element;
 }
 
@@ -157,11 +163,16 @@ function App() {
   const getLayout = (element) => {
     if (!user?.user_type || !getRoleHome(user.user_type)) return element;
     
-    if (user.user_type === 'data_entry_executive') {
-      return <AppLayoutDataEntryExecutive>{element}</AppLayoutDataEntryExecutive>;
-    }
-    
-    return <AppLayout>{element}</AppLayout>;
+    const layouts = {
+      admin: SuperAdminLayout,
+      super_admin: SuperAdminLayout,
+      company_admin: CompanyAdminLayout,
+      sales_manager: SalesManagerLayout,
+      sales_executive: SalesExecutiveLayout,
+      data_entry_executive: AppLayoutDataEntryExecutive,
+    };
+    const Layout = layouts[user.user_type];
+    return Layout ? <Layout>{element}</Layout> : element;
   };
 
   return (
@@ -171,7 +182,7 @@ function App() {
           <>
           <ScrollToTop />
           {/* Routes wrapped with the layout */}
-          <Routes>
+          <RoleRoutes role={user?.user_type}>
             {/* Admin Routes */}
             <Route path="/settings" element={<ProtectedRoute element={<AdminSettingsPage />} allowedRoles={USER_TYPES} />} />
             <Route path="/super-admin/companies" element={<ProtectedRoute element={<CompaniesPage />} allowedRoles={['super_admin']} />} />
@@ -398,7 +409,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
             
             
-          </Routes>
+          </RoleRoutes>
           </>
         )
       ) : (

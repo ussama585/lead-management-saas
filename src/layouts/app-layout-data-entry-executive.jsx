@@ -10,6 +10,6 @@ const menuItems = [
 export default function DataEntryLayout({ children }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const selectedKey = pathname === '/settings' ? '21' : pathname.includes('/leads-table') ? '2' : pathname.includes('/add-update-lead') ? '3' : '1';
+  const selectedKey = pathname.endsWith('/settings') ? '21' : pathname.includes('/leads-table') ? '2' : pathname.includes('/add-update-lead') ? '3' : '1';
   return <AdminShell menuItems={menuItems} selectedKey={selectedKey} onSelect={({ key }) => navigate(menuItems.find(item => item.key === key).path)}>{children}</AdminShell>;
 }

@@ -46,6 +46,8 @@ export function getLayoutRole(role) {
 
 export function canAccessRoute(role, allowedRoles = [], pathname = '') {
   if (!getRoleHome(role)) return false;
+  const prefix = pathname.match(/^\/(super-admin|company-admin|sales-manager|sales-executive|data-entry-executive)(?=\/|$)/)?.[0];
+  if (prefix && prefix !== getRoleHome(role)) return false;
   if (/^\/(?:super-admin|admin)\/companies(?:\/|$)/.test(pathname) && !isSuperAdmin(role)) return false;
   if (isSuperAdmin(role) && SUPER_ADMIN_REMOVED_PATHS.some(pattern => pattern.test(pathname))) return false;
   return allowedRoles.includes(role) ||

@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger, useSidebar } from '@/components/ui/sidebar.jsx';
 import { Separator } from '@/components/ui/separator.jsx';
 import useUserStore from '@/pages/shared/store/user-store.js';
+import { getRolePath } from '@/pages/auth/role-home.js';
 import { isSuperAdmin } from '@/pages/auth/role-access.js';
 import ThemeSwitcher from '@/components/theme-switcher.jsx';
 import ChangePasswordDialog from '@/components/change-password-dialog.jsx';
@@ -73,7 +74,7 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
     <SidebarInset>
       <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b bg-background px-4'>
         <SidebarTrigger /><Separator orientation='vertical' className='h-4' />
-        <span className='text-sm font-medium'>{location.pathname === '/settings' ? 'Settings' : active?.label || 'Workspace'}</span>
+        <span className='text-sm font-medium'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Workspace'}</span>
         <div className='ml-auto'><ThemeSwitcher /></div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -84,7 +85,7 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
           <DropdownMenuContent side='bottom' align='end' className='min-w-56'>
             <DropdownMenuLabel><div>{user?.name}</div><div className='text-xs font-normal text-muted-foreground'>{user?.email}</div></DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => navigate('/settings')}><Settings />Settings</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate(getRolePath(user?.user_type, '/settings'))}><Settings />Settings</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => setPasswordOpen(true)}><KeyRound />Reset password</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={logout}><LogOut />Log out</DropdownMenuItem>
