@@ -1,0 +1,24 @@
+.approval-status-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.approval-status-tabs__button {
+  background: #fff;
+  color: #3e6a9f;
+  border: 1.5px solid #3e6a9f;
+  border-radius: 6px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.approval-status-tabs__button--active {
+  background: #3e6a9f;
+  color: #fff;
+}

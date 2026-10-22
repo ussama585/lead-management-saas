@@ -1,0 +1,40 @@
+.skill-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  max-width: 300px; /* Set maximum width for the card */
+  width: 100%; /* Allow it to be responsive */
+  overflow: hidden; /* Hides overflowing text */
+}
+
+.skill-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  white-space: normal; /* Allow text to wrap */
+}
+
+.skill-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 5px;
+}
+
+.skill-info p {
+  font-size: 14px;
+  margin: 0;
+  font-weight: 400;
+  white-space: normal; /* Allow text to wrap */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .skill-card {
+    max-width: 90%; /* Adjust card width for smaller screens */
+  }
+}

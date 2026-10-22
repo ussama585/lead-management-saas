@@ -1,0 +1,19 @@
+/**
+ * Ant Design table "remarks / old remarks" comment icons — shared size with website-leads (18px).
+ * Use on <CommentOutlined className="table-remarks-icon table-remarks-icon--filled|..." />.
+ */
+
+.table-remarks-icon:is(.anticon, .lucide) {
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.table-remarks-icon--filled {
+  color: #1890ff;
+}
+
+.table-remarks-icon--empty,
+.table-remarks-icon--muted {
+  color: #aaa;
+}

@@ -1,0 +1,42 @@
+/* File-specific rules only; shared layout/utility classes live in common.css */
+
+.saas-client-modal__create-btn {
+  background: #3e6a9f;
+  border-color: #3e6a9f;
+}
+
+.saas-client-modal__loading {
+  text-align: center;
+  padding: 24px;
+}
+
+.saas-client-modal__loading-icon {
+  font-size: 28px;
+  color: #3e6a9f;
+}
+
+.saas-client-modal__loading-text {
+  margin-top: 12px;
+  color: #666;
+}
+
+.saas-client-modal__intro {
+  margin-bottom: 16px;
+  color: #666;
+}
+
+.saas-client-modal__alert {
+  margin-bottom: 16px;
+}
+
+.saas-client-modal__field {
+  margin-bottom: 12px;
+}
+
+.saas-client-modal__field-label {
+  color: #3e6a9f;
+}
+
+.saas-client-modal__select-full {
+  width: 100%;
+}

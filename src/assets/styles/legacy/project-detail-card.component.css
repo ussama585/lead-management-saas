@@ -1,0 +1,18 @@
+/* File-specific rules only; shared detail-card__* layout lives in common.css */
+
+.project-detail-card__approval-value {
+  color: var(--approval-fg, #3e6a9f);
+  font-weight: 600;
+}
+
+.project-detail-card__approval-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.project-detail-card__remarks-icon {
+  cursor: pointer;
+  color: var(--remarks-icon-fg, #ccc);
+  font-size: 18px;
+}

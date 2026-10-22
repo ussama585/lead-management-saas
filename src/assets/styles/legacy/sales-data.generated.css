@@ -1,0 +1,56 @@
+.sales-data .ant-input {
+  border-color: #000 !important;
+  color: #000 !important;
+}
+.sales-data .ant-input:focus, .sales-data .ant-input:hover {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(41, 81, 130, 0.2);
+}
+.sales-data .ant-picker {
+  border-color: #000 !important;
+  color: #000 !important;
+}
+.sales-data .ant-picker:hover, .sales-data .ant-picker.ant-picker-focused {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(41, 81, 130, 0.2);
+}
+.sales-data .ant-picker .ant-picker-input > input {
+  color: #000 !important;
+}
+.sales-data .ant-select-selector {
+  border-color: #000 !important;
+  color: #000 !important;
+}
+.sales-data .ant-select-selector:hover, .sales-data .ant-select-selector.ant-select-focused {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(41, 81, 130, 0.2);
+}
+.sales-data .ant-select-item-option-selected {
+  color: #000;
+}
+.sales-data .ant-select-single .ant-select-selector .ant-select-selection-item {
+  color: #000 !important;
+}
+.sales-data .project-button {
+  background-color: #3e6a9f;
+}
+.sales-data .project-button:hover {
+  background-color: #295182 !important;
+  color: #fff !important;
+}
+.sales-data .default-btn-look {
+  background-color: initial !important;
+  color: initial !important;
+}
+.sales-data .default-btn-look:hover {
+  background-color: initial !important;
+  color: initial !important;
+}
+.sales-data .form-section-mg-bottom {
+  margin-bottom: 48px;
+}
+@media (max-width: 768px) {
+  .sales-data .form-section-mg-bottom {
+    margin-bottom: 12px;
+  }
+}

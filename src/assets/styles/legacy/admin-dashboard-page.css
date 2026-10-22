@@ -1,0 +1,381 @@
+/* AdminDashboard.css */
+
+.dashboard-container {
+    padding: 6px;
+    background-color: white;
+    max-width: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    box-sizing: border-box;
+  }
+
+  .executive-section-tab {
+    cursor: pointer;
+  }
+
+  .dashboard-container .admin-dashboard-section-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .dashboard-container .admin-dashboard-section-heading {
+    margin: 16px 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* Follow-ups listing: same pill style as admin dashboard section tabs (non-fixed) */
+  .follow-up-page .follow-up-section-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    row-gap: 10px;
+    padding: 0 0 12px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e8e8e8;
+    background: #fff;
+  }
+
+  .follow-up-page.dashboard-container {
+    padding: 0;
+  }
+
+  .follow-up-page .follow-up-content .table-wrapper {
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  .follow-up-page .ant-tabs-nav {
+    margin-bottom: 0 !important;
+  }
+
+  /* Follow-ups table: primary action matching Add New Job */
+  .follow-up-page .follow-up-view-lead-btn {
+    margin: 0;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 5px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .follow-up-page .follow-up-view-lead-btn:hover:not(:disabled) {
+    background: #355d8a;
+    color: #fff;
+  }
+
+  .follow-up-page .follow-up-view-lead-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  /* Project manager job follow-ups: flush layout under breadcrumb */
+  .pm-follow-up-tabs.ant-tabs-top {
+    margin: 0 !important;
+  }
+
+  .pm-follow-up-tabs .ant-tabs-content-holder {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+  }
+
+  .pm-follow-up-tabs .ant-tabs-tabpane {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .follow-up-page .follow-up-content p {
+    color: var(--primary);
+  }
+
+  .follow-up-page .ant-tabs-card .ant-tabs-tab {
+    color: var(--primary);
+  }
+
+  .follow-up-page .ant-tabs-card .ant-tabs-tab-active {
+    background: var(--primary) !important;
+  }
+
+  .follow-up-page .ant-tabs-card .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #fff !important;
+  }
+
+  /* Same tab theme for marketing manager dashboard */
+  .marketing-dashboard-page .ant-tabs-card .ant-tabs-tab {
+    color: var(--primary);
+  }
+
+  .marketing-dashboard-page .ant-tabs-card .ant-tabs-tab-active {
+    background: var(--primary) !important;
+  }
+
+  .marketing-dashboard-page .ant-tabs-card .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #fff !important;
+  }
+
+  /* Main stats page tabs (match compact segmented look) */
+  .marketing-main-stats-tabs {
+    padding: 6px 8px 10px;
+  }
+
+  .marketing-main-stats-tabs .ant-tabs-nav {
+    margin-bottom: 10px !important;
+  }
+
+  .marketing-main-stats-tabs .ant-tabs-nav::before {
+    border-bottom-color: #d9d9d9 !important;
+  }
+
+  .marketing-main-stats-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+    padding: 8px 14px !important;
+    border: 1px solid #d9d9d9 !important;
+    border-bottom: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    background: #ffffff !important;
+    color: var(--primary) !important;
+    font-weight: 500;
+  }
+
+  .marketing-main-stats-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    box-shadow: none;
+  }
+
+  .marketing-main-stats-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #ffffff !important;
+    font-weight: 600;
+  }
+
+  .marketing-main-stats-tabs .ant-tabs-content-holder {
+    padding-top: 6px;
+  }
+
+  .metrics-container {
+    display: flex;
+    gap: 10px;
+    padding: 0 6px;
+    margin-bottom: 10px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 1100px) {
+    .metrics-container {
+      flex-wrap: wrap;
+      flex-direction: column-reverse;
+    }
+  }
+  
+  /* Metrics Cards Section with CSS Grid */
+  .metrics-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important; /* Set exactly 3 cards per row */
+    gap: 10px;
+    margin: 0 auto; /* Center the grid within the container */
+    padding: 0 10px; /* Reduce padding to prevent overflow */
+    flex-wrap: unset !important; /* Override any flexbox styles */
+    max-width: 100%; /* Ensure grid doesn't exceed container width */
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+
+  /* Make cards responsive within the grid */
+ .metrics-grid .ant-card {
+    height: 120px !important;
+}
+  /* Ensure card content doesn't overflow */
+  .metrics-grid .ant-card-body {
+    padding: 10px 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Make text responsive */
+  .metrics-grid .ant-typography {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .metrics-grid > * {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+  
+  
+  /* Media query to adjust the grid for smaller screens */
+  @media (max-width: 1200px) {
+    .metrics-grid {
+      grid-template-columns: repeat(2, 1fr) !important; /* Adjust to 2 columns for medium screens */
+      gap: 12px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .metrics-grid {
+      grid-template-columns: repeat(1, 1fr) !important; /* Adjust to 1 column for smaller screens */
+      gap: 10px;
+    }
+  }
+  
+
+
+.metrics-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Set exactly 3 cards per row */
+  row-gap: 10px;
+  column-gap: 10px;
+}
+
+.refetch-wrapper {
+  display: flex;
+  justify-content: end;
+  margin-bottom: 15px;
+
+  .refetch-button {
+    background-color: var(--primary);
+
+    &:hover {
+      background-color: #295182 !important;
+      color: #fff !important;
+    }
+  }
+}
+  
+
+  
+  /* Stat cards fill the available width and stack on narrow screens. */
+  .admin-stat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .admin-stat-cards-grid > * {
+    min-width: 0;
+  }
+  @media (max-width: 1100px) {
+    .admin-stat-cards-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1100px) and (max-width: 1500px) {
+    .admin-stat-cards-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 600px) {
+    .admin-stat-cards-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Chart Section - compact spacing */
+  .chart-container {
+    width: 100%;
+    margin-top: 2px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dashboard-container [class$="-chart-container"] {
+    padding: 10px 14px;
+  }
+  .dashboard-container [class$="-chart-header"] {
+    margin-bottom: 8px;
+  }
+
+  /* Chart controls: spacing between date range and dropdowns, equal height */
+  .dashboard-container [class$="-chart-dropdown"],
+  .dashboard-container [class$="-chart-dropdowns"],
+  .dashboard-container [class$="-chart-header"] [class$="-dropdowns"] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .dashboard-container [class$="-chart-dropdown"] .date-range-trigger,
+  .dashboard-container [class$="-chart-dropdowns"] .date-range-trigger,
+  .dashboard-container [class$="-chart-header"] [class$="-dropdowns"] .date-range-trigger {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  .dashboard-container [class$="-chart-dropdown"] .ant-select,
+  .dashboard-container [class$="-chart-dropdowns"] .ant-select,
+  .dashboard-container [class$="-chart-header"] [class$="-dropdowns"] .ant-select {
+    min-height: 32px;
+  }
+  .dashboard-container [class$="-chart-dropdown"] .ant-select-selector,
+  .dashboard-container [class$="-chart-dropdowns"] .ant-select-selector,
+  .dashboard-container [class$="-chart-header"] [class$="-dropdowns"] .ant-select-selector {
+    min-height: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box;
+  }
+
+  /* Make the System Leads trend section span full width */
+  .system-leads-trend-section {
+    width: 100%;
+    margin-top: 0;
+    padding: 0;
+  }
+
+  .system-leads-trend-section .line-chart-container,
+  .system-leads-trend-section .bar-chart-container {
+    width: 100%;
+  }
+
+
+/* Dual chart row: Overall Lead Conversion Rate + Lead Status Distribution in one row */
+.dual-chart-row {
+  align-items: stretch;
+  margin-bottom: 0;
+  gap: 8px;
+}
+
+.dual-chart-col {
+  display: flex;
+  min-width: 0;
+}
+
+.dual-chart-card-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Equal height cards */
+.dual-chart-col .overall-lead-conversion-rate-chart-container,
+.dual-chart-col .system-lead-funnel-overview-chart-container,
+.dual-chart-col .lead-status-distribution-chart-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 991px) {
+  .dual-chart-col .overall-lead-conversion-rate-chart-container,
+  .dual-chart-col .lead-status-distribution-chart-container {
+    min-height: 320px;
+  }
+}

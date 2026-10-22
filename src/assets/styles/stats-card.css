@@ -1,0 +1,89 @@
+.dashboard-stat-card[data-slot='card'] {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 150px;
+  height: 100%;
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 3px 5px rgb(15 23 42 / 10%);
+}
+
+.dashboard-stat-card__title[data-slot='card-title'] {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-stat-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 10%, var(--card));
+  color: var(--primary);
+}
+
+.dashboard-stat-card__icon svg,
+.dashboard-stat-card__icon img {
+  width: 36px !important;
+  height: 36px !important;
+  color: var(--primary) !important;
+  object-fit: contain;
+}
+
+.dashboard-stat-card__icon img { object-fit: contain; }
+.dashboard-stat-card__icon svg { stroke-width: 1.75; }
+
+.dashboard-stat-card__content[data-slot='card-content'] {
+  min-width: 0;
+  padding: 0;
+}
+
+.dashboard-stat-card__value {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-stat-card__trend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.dashboard-stat-card__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+}
+.dashboard-stat-card__badge--positive { background: #dcfce7; color: #15803d; }
+.dashboard-stat-card__badge--negative { background: #fee2e2; color: #b91c1c; }
+.dashboard-stat-card__badge--neutral { background: var(--muted); color: var(--muted-foreground); }
+.dark .dashboard-stat-card__badge--positive { background: #14532d; color: #86efac; }
+.dark .dashboard-stat-card__badge--negative { background: #7f1d1d; color: #fca5a5; }
+
+@media (max-width: 600px) {
+  .dashboard-stat-card[data-slot='card'] { padding: 20px; }
+}

@@ -1,0 +1,154 @@
+/* Styles specific to JobForm and its AddSkillToJobModal.
+   Prefer common.css primitives where possible; only truly file-specific
+   rules live here. Dynamic/data-driven values are passed via CSS custom
+   properties so no visual behavior changes. */
+
+/* AddSkillToJobModal */
+.job-form__modal-title {
+  color: #3e6a9f;
+  font-weight: 600;
+}
+
+.job-form__modal-done-btn {
+  background: #3e6a9f;
+  border-color: #3e6a9f;
+}
+
+.job-form__skill-label {
+  margin: 0 0 16px;
+}
+
+.job-form__skill-name {
+  text-decoration: underline;
+  color: #3e6a9f;
+}
+
+.job-form__experience-label {
+  color: #3e6a9f;
+}
+
+.job-form__experience-form-item {
+  margin-bottom: 16px;
+}
+
+/* Form layout */
+.job-form__fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.job-form__full-width {
+  width: 100%;
+}
+
+.job-form__working-days-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.job-form__working-days-select {
+  flex: 1;
+  min-width: 0;
+}
+
+.job-form__working-days-separator {
+  color: #666;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.job-form__working-days-selected {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #3e6a9f;
+  font-weight: 500;
+}
+
+/* Skills */
+.job-form__skills-count {
+  font-size: 12px;
+  margin-top: 4px;
+  color: var(--skills-count-fg, #3e6a9f);
+}
+
+.job-form__skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.job-form__skill-chip {
+  border: 1.5px solid #3e6a9f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-width: 180px;
+  max-width: 100%;
+  flex: 1 1 180px;
+  background: #fff;
+  position: relative;
+  word-break: break-word;
+}
+
+.job-form__skill-chip-name {
+  font-weight: 600;
+  color: #3e6a9f;
+  margin-bottom: 4px;
+  padding-right: var(--skill-chip-name-pr, 36px);
+  word-break: break-word;
+}
+
+.job-form__skill-chip-experience {
+  font-size: 13px;
+  color: #444;
+}
+
+.job-form__skill-chip-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.job-form__skill-chip-edit {
+  cursor: pointer;
+  color: #3e6a9f;
+}
+
+.job-form__skill-chip-remove {
+  cursor: pointer;
+  color: #ff4d4f;
+}
+
+/* Salary preview */
+.job-form__salary-preview {
+  background-color: #3e6a9f50;
+  display: inline;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+/* Validation summary */
+.job-form__validation-summary {
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+
+/* Submit button */
+.job-form__submit-btn {
+  margin-top: var(--submit-btn-mt, 16px);
+  margin-left: 16px;
+  margin-bottom: 24px;
+}
+
+.job-form__submit-btn--readonly {
+  background-color: #d9d9d9 !important;
+  border-color: #d9d9d9 !important;
+  color: #8c8c8c !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}

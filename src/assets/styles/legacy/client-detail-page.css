@@ -1,0 +1,239 @@
+/* Prevent horizontal overflow */
+.client-detail-container {
+  max-width: 100%;
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+/* Label Styles */
+.content-container {
+  padding: 20px 20px 0px 20px;
+}
+
+.content-right-div {
+ padding-left: 10px;
+ min-width: 50%;
+}
+
+.cards-container{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+.left-div, .right-div {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    flex-direction: column; /* Stack children vertically on smaller screens */
+  }
+}
+/* Stats Section - Card Layout (unchanged) */
+.stats-grid {
+  display: grid;
+  gap: 20px; /* Space between items */
+  grid-template-columns: repeat(3, 1fr); /* Default to 3 columns */
+}
+
+/* Medium screens (tablet) - reduce to 2 columns */
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small screens (mobile) - reduce to 1 column */
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.metrics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  
+}
+
+.custom-label {
+  color: #3E6A9F;
+  font-family: 'Inter', sans-serif;
+  font-weight: bold;
+}
+
+
+/* Prevent horizontal overflow */
+.client-detail-container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Main Content Container */
+.content-container {
+  padding: 20px;
+}
+
+/* Flexbox for User Details and Stats */
+.details-stats-container {
+  display: flex;
+  gap: 20px; /* Space between details and stats */
+  align-items: flex-start; /* Align items at the top */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.details-stats-container > * {
+  flex: 1;
+}
+
+/* User Detail Card */
+.details-stats-container > :first-child {
+  flex: 1; /* Take less space */
+  
+}
+
+/* Stats Section */
+.stats-grid {
+  flex: 2; /* Take more space */
+  display: grid;
+  gap: 20px; /* Space between items */
+  grid-template-columns: repeat(3, 1fr); /* Default to 3 columns */
+}
+
+/* Medium screens (tablet) - reduce to 2 columns */
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small screens (mobile) - reduce to 1 column and stack layout */
+@media (max-width: 600px) {
+  .details-stats-container {
+    flex-direction: column; /* Stack user details and stats vertically */
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+.select-section {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 16px;
+}
+
+.select-container{
+  margin-bottom: 15px;
+}
+
+/* Custom Select Styles (unchanged) */
+.custom-select .ant-select-selector {
+  border: 1px solid #3E6A9F !important;
+  color: #3E6A9F;
+  font-family: 'Inter', sans-serif;
+  padding: 20px 250px 20px 20px !important; /* Keep previous padding */
+}
+
+.custom-select .ant-select-arrow {
+  padding-top: 10px;
+  color: #3E6A9F;
+}
+
+/* Increase vertical padding for Select items */
+.custom-select .ant-select-item {
+  padding: 20px 8px !important; /* Keep previous padding */
+}
+
+.custom-select .ant-select-item-option:hover {
+  background-color: #3E6A9F !important;
+  color: white !important;
+}
+
+/* Stretch dropdown menu across X-axis */
+.custom-select .ant-select-dropdown {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
+/* Button Styling */
+.create-button {
+  padding: 18px 20px;
+  background-color: #3E6A9F;
+  color: white;
+  margin-top: 20px;
+}
+
+.create-button:hover {
+  background-color: #3E6A9F !important;
+  color: white !important;
+}
+
+/* Table Section */
+.table-container {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Prevent Ant Design buttons from applying unwanted styles */
+.ant-btn:hover {
+  background-color: transparent !important; /* Prevent background color change on hover */
+  color: inherit !important;
+  box-shadow: 0 4px 10px rgba(62, 106, 159, 0.5);
+}
+
+
+.lost-client-modal-content .modal-label{
+  color: #3E6A9F;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+
+.btn-section{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* gap: 10px; */
+  margin-top: 10px;
+}
+
+.btn-section{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* gap: 10px; */
+  margin-top: 10px;
+}
+
+.btn-section .custom-btn{
+  background-color: red !important;
+  padding: 20px 18px;
+  
+}
+
+/* Add higher specificity for hover styles */
+.btn-section .custom-btn.ant-btn-primary:hover {
+  background-color: red !important;
+  color: white !important;
+}
+
+/* Ensure the default hover styles do not interfere */
+.custom-btn:hover {
+  background-color: red !important;
+  color: white !important;
+}
+
+.modal-actions{
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+

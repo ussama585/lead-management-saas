@@ -1,0 +1,187 @@
+/* Shared primitives reused across detail cards, modals, and forms.
+   Keep text/font values identical to the previous inline styles so no
+   visual behavior changes when a component adopts these classes. */
+
+/* Flex layout helpers */
+.flex-row {
+  display: flex;
+  align-items: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-4 { gap: 4px; }
+.gap-6 { gap: 6px; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+
+/* Detail-card layout: header + label/value rows (used by client/project detail cards) */
+.detail-card {
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.detail-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.detail-card--centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.detail-card--error {
+  padding: 20px;
+  text-align: center;
+}
+
+.detail-card__error-text {
+  color: #ff4d4f;
+  margin: 0;
+}
+
+.detail-card__spinner {
+  font-size: 24px;
+}
+
+.detail-card__header {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.detail-card__title {
+  margin: 0;
+  color: #3e6a9f;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detail-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-card__body--roomy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 24px;
+}
+
+.detail-card__row--wrap {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.detail-card__row--divider {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.detail-card__label {
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-card__value {
+  color: #3e6a9f;
+  font-weight: 500;
+}
+
+.detail-card__value--strong {
+  font-weight: 600;
+}
+
+.detail-card__value-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Generic action button styled with the app brand color (Ant Design override) */
+.btn-brand {
+  background: var(--btn-brand-bg, #3e6a9f);
+  border-color: var(--btn-brand-border, #3e6a9f);
+  border-radius: 6px;
+  color: #ffffff;
+}
+
+.btn-brand-outline {
+  border-color: #3e6a9f;
+  color: #000000;
+}
+
+/* Status / approval pill, color supplied via CSS var */
+.status-pill {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f0f0f0;
+  color: var(--status-pill-fg, #666);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.inline-icon-info {
+  color: #ff4d4f;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.text-muted-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.text-brand-value {
+  color: #3e6a9f;
+  font-weight: 500;
+}
+
+.mt-0 { margin-top: 0; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-0 { margin-bottom: 0; }
+
+.select-fit-content {
+  width: fit-content;
+  min-width: 140px;
+}

@@ -1,0 +1,28 @@
+.container {
+    padding: 20px;
+    width: 100%;
+  }
+  
+  .stats-card-container {
+    margin-bottom: 20px;
+  }
+  
+  .stats-card-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .chart-container {
+    margin-bottom: 30px;
+  }
+  
+  .table-container {
+    padding-left: 0;
+  }
+  
+  .link-style {
+    color: #3e6a9f;
+    text-decoration: underline;
+    cursor: pointer; /* Optional: to indicate it's clickable */
+}
+  

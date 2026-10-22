@@ -1,0 +1,47 @@
+.follow-up-theme .form-label {
+  color: #3E6A9F !important;
+  font-weight: 600;
+}
+
+.follow-up-theme-checkbox .ant-checkbox-checked .ant-checkbox-inner,
+.follow-up-theme-checkbox .ant-checkbox-indeterminate .ant-checkbox-inner {
+  background-color: #3E6A9F !important;
+  border-color: #3E6A9F !important;
+}
+
+.follow-up-theme-checkbox .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.follow-up-theme-checkbox .ant-checkbox:hover .ant-checkbox-inner,
+.follow-up-theme-checkbox .ant-checkbox-input:focus + .ant-checkbox-inner {
+  border-color: #3E6A9F !important;
+}
+
+.follow-up-theme .ant-input:focus,
+.follow-up-theme .ant-input-focused {
+  border-color: #3E6A9F !important;
+  box-shadow: 0 0 0 2px rgba(62, 106, 159, 0.2) !important;
+}
+
+.follow-up-theme .ant-input-textarea-affix-wrapper.ant-input-outlined {
+  border-color: #3E6A9F !important;
+}
+
+.follow-up-theme .ant-input-textarea-affix-wrapper.ant-input-outlined:not(.ant-input-disabled):hover {
+  border-color: #3E6A9F !important;
+}
+
+.follow-up-theme .ant-input-textarea-affix-wrapper.ant-input-outlined.ant-input-affix-wrapper-focused,
+.follow-up-theme .ant-input-textarea-affix-wrapper.ant-input-outlined:focus-within {
+  border-color: #3E6A9F !important;
+  box-shadow: 0 0 0 2px rgba(62, 106, 159, 0.2) !important;
+}
+
+.follow-up-theme textarea.ant-input {
+  caret-color: #3E6A9F;
+}
+
+.follow-up-theme .text-red {
+  font-family: inherit !important;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 6px;
+}

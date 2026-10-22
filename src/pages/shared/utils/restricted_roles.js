@@ -1,0 +1,1 @@
+export const restrictedRoles = ['recruitment_manager', 'recruitment_executive', 'project_manager'];

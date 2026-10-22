@@ -1,0 +1,297 @@
+/* Resume filters responsive layout */
+
+.resume-filters-card {
+  width: 100%;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Shared inline filter rows (skills, experience, search) */
+.resume-filter-row-inline {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+/* On smaller screens, stack inputs vertically and make them full width */
+@media (max-width: 900px) {
+  .resume-filter-row-inline > * {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .resume-filter-row-inline .MuiAutocomplete-root,
+  .resume-filter-row-inline .MuiTextField-root,
+  .resume-filter-row-inline .MuiFormControl-root {
+    width: 100%;
+  }
+}
+
+/* On wider screens, keep first control flexible and allow compact auxiliary controls */
+@media (min-width: 901px) {
+  .resume-filter-row-inline > :first-child {
+    flex: 1 1 auto;
+  }
+}
+
+/* CvFilters component classes */
+.rf-autocomplete .MuiAutocomplete-inputRoot {
+  padding: 4px 8px;
+}
+
+.rf-tag-chip {
+  background-color: #3e6a9f !important;
+  border-color: #3e6a9f !important;
+  color: #fff !important;
+}
+
+.rf-tag-chip:hover {
+  background-color: #2e5a8f !important;
+}
+
+.rf-tag-chip .MuiChip-deleteIcon {
+  color: #fff !important;
+}
+
+.rf-section-spacing {
+  margin-bottom: 8px;
+}
+
+.rf-stack-1 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rf-label-title {
+  font-size: 12px !important;
+  color: #555 !important;
+  margin-bottom: 4px !important;
+  font-weight: 500 !important;
+}
+
+.rf-input-row {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #fff;
+  max-width: 800px;
+}
+
+.rf-autocomplete-inline {
+  flex: 1;
+  background-color: #fff;
+}
+
+.rf-autocomplete-inline .MuiOutlinedInput-root {
+  border-radius: 0;
+}
+
+.rf-autocomplete-inline .MuiOutlinedInput-root fieldset {
+  border: none;
+}
+
+.rf-autocomplete-inline .MuiAutocomplete-inputRoot {
+  padding: 4px 12px;
+}
+
+.rf-years-input {
+  background-color: #fff;
+}
+
+.rf-years-input .MuiInputBase-input {
+  padding: 8px;
+}
+
+.rf-years-input .MuiOutlinedInput-root {
+  border-radius: 0;
+  border-left: 1px solid #d9d9d9;
+}
+
+.rf-years-input .MuiOutlinedInput-root fieldset {
+  border: none;
+}
+
+.rf-add-btn {
+  white-space: nowrap;
+  border-radius: 0 !important;
+  border-left: 1px solid #d9d9d9 !important;
+  color: #3e6a9f !important;
+  font-weight: 600 !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+.rf-chip-grid {
+  margin-top: 8px !important;
+}
+
+.rf-exp-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px 6px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background-color: #f5f7f9;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.rf-exp-chip-label {
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  color: #333 !important;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rf-exp-chip-input {
+  width: 65px;
+}
+
+.rf-exp-chip-input .MuiInputBase-input {
+  padding: 2px 4px;
+  font-size: 12px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.rf-exp-chip-input .MuiOutlinedInput-root {
+  padding: 0;
+  height: 24px;
+}
+
+.rf-exp-chip-suffix {
+  font-size: 10px !important;
+  color: #666 !important;
+}
+
+.rf-exp-chip-remove {
+  width: 20px !important;
+  height: 20px !important;
+  margin-left: 4px !important;
+  color: #999 !important;
+}
+
+.rf-exp-chip-remove:hover {
+  color: #ff4d4f !important;
+  background-color: rgba(255, 77, 79, 0.1) !important;
+}
+
+.rf-search-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 600px;
+}
+
+.rf-search-label {
+  font-size: 12px !important;
+  color: #555 !important;
+  margin-bottom: 4px !important;
+}
+
+.rf-search-row {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #fff;
+  width: 100%;
+}
+
+.rf-search-input {
+  flex: 1;
+}
+
+.rf-search-input .MuiInputBase-input {
+  padding: 8px 12px;
+}
+
+.rf-search-input .MuiOutlinedInput-root {
+  border-radius: 0;
+}
+
+.rf-search-input .MuiOutlinedInput-root fieldset {
+  border: none;
+}
+
+.rf-search-type {
+  min-width: 130px;
+  max-width: 160px;
+}
+
+.rf-search-type .MuiOutlinedInput-root {
+  border-radius: 0;
+  border-left: 1px solid #d9d9d9;
+}
+
+.rf-search-type .MuiOutlinedInput-root fieldset {
+  border: none;
+}
+
+.rf-search-type .MuiAutocomplete-inputRoot {
+  padding: 4px 8px;
+}
+
+.rf-search-type .MuiAutocomplete-input {
+  text-align: left;
+}
+
+.rf-active-filters-wrap {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rf-active-filters-label {
+  color: #8c8c8c !important;
+  margin-right: 8px !important;
+}
+
+.rf-active-filter-chip {
+  background-color: #3e6a9f !important;
+  color: #fff !important;
+}
+
+.rf-active-filter-chip .MuiChip-deleteIcon {
+  color: #fff !important;
+}
+
+.rf-clear-all-btn {
+  color: #3e6a9f !important;
+  margin-left: 8px !important;
+  border: 1px solid #3e6a9f !important;
+  border-radius: 6px !important;
+  padding: 4px 12px !important;
+  min-width: auto !important;
+  text-transform: none !important;
+  box-shadow: none !important;
+}
+
+.rf-clear-all-btn:hover {
+  background-color: rgba(62, 106, 159, 0.08) !important;
+}
+
+.rf-clear-all-btn:disabled {
+  color: rgba(62, 106, 159, 0.45) !important;
+  border-color: rgba(62, 106, 159, 0.35) !important;
+}
+
+@media (max-width: 600px) {
+  .rf-years-input {
+    width: 100%;
+  }
+}
+
+@media (min-width: 600px) {
+  .rf-years-input {
+    width: 120px;
+  }
+}
+

@@ -1,0 +1,216 @@
+.lead-card{
+
+    border: 0.5px solid lightgray;
+    border-radius: 10px;
+    box-shadow: -1px 1px 30px 5px rgba(0, 0, 0, 0.01);
+    padding: 10px;
+
+    p, h2{
+      margin: 0;
+    }
+
+
+.basic-info{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .lead-info{
+        display: flex;
+        flex-direction: row;
+    }
+
+    .badge{
+        background-color: #3e6a9f;
+        border-radius: 5px;
+        padding: 5px 10px;
+        color: white;
+    }
+
+    .avatar {
+    width: 50px;
+    height: 50px;
+    background-color: #fdc800; /* Custom background */
+    color: white;
+    font-size: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+  }
+
+}
+
+hr{
+    opacity: 0.2;
+    margin: 10px 0
+}
+
+
+.lead-detail{
+    .grey{
+        color: grey
+    }
+    display: flex;
+    justify-content: space-between;
+
+    .div-2{
+        text-align: right;
+        margin-left: 10px;
+    }
+
+    #assigned-to{
+        margin-top: 5px;
+    }
+}
+
+.job-section {
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .job-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+
+    th,
+    td {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f5f8fa;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    tbody {
+      tr {
+        border-top: 1px solid #e0e0e0;
+
+        td {
+          background-color: #fff;
+          color: #111827;
+
+          // Optional hover effect
+          &:hover {
+            background-color: #f0f4ff;
+          }
+        }
+
+        &:last-child {
+          td:first-child {
+            border-bottom-left-radius: 10px;
+          }
+
+          td:last-child {
+            border-bottom-right-radius: 10px;
+          }
+        }
+      }
+    }
+
+    th:first-child {
+      border-top-left-radius: 10px;
+    }
+
+    th:last-child {
+      border-top-right-radius: 10px;
+    }
+  }
+}
+}
+
+
+.table-link{
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+
+.lead-job-page{
+
+  .container{
+    h1{
+      margin: 0;
+    }
+  }
+
+  .job-card{
+     border: 0.5px solid lightgray;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 5px;
+
+      .row{
+        display: flex;
+      }
+  }
+
+  .styled-input{
+    border: 1px solid #3e6a9f !important ;
+    width: 100%;
+  }
+
+  .dropdown{
+    width: 100%;
+  }
+
+  .styled-input::placeholder,
+  .styled-input[type="date"]::placeholder,
+  .styled-input[type="datetime-local"]::placeholder {
+    color: #bfbfbf !important; /* Light gray placeholder */
+    opacity: 1 !important;
+  }
+
+  /* Ant Design Select placeholder styling */
+  .ant-select .ant-select-selector .ant-select-selection-placeholder {
+    color: #bfbfbf !important;
+    opacity: 1 !important;
+  }
+
+  /* Ant Design Input placeholder styling */
+  .ant-input::placeholder {
+    color: #bfbfbf !important;
+    opacity: 1 !important;
+  }
+
+  /* Ant Design TextArea placeholder styling */
+  .ant-input-affix-wrapper .ant-input::placeholder,
+  textarea.ant-input::placeholder {
+    color: #bfbfbf !important;
+    opacity: 1 !important;
+  }
+
+  /* Ant Design DatePicker placeholder styling */
+  .ant-picker-input > input::placeholder {
+    color: #bfbfbf !important;
+    opacity: 1 !important;
+  }
+
+}
+
+
+.custom-button{
+  margin-top: 10px;
+  background-color: #3e6a9f;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+

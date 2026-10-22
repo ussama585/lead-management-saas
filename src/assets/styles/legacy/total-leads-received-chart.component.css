@@ -1,0 +1,68 @@
+.total-leads-received-chart-container {
+  width: 100%;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8e8e8;
+}
+
+.total-leads-received-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.total-leads-received-chart-title {
+  color: #333;
+  margin: 0;
+  font-size: 18px;
+}
+
+.total-leads-received-chart-subtitle {
+  color: #666;
+  margin: 4px 0 0 0;
+  font-size: 12px;
+}
+
+.total-leads-received-chart-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.total-leads-received-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f6f9fc 0%, #eef2f7 100%);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 6px solid #1890ff;
+}
+
+.total-leads-received-kpi-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1890ff;
+}
+
+.total-leads-received-kpi-label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.total-leads-received-chart-loading,
+.total-leads-received-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  color: #8c8c8c;
+  font-size: 14px;
+}

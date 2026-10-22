@@ -1,0 +1,13 @@
+/* Contract summary dropdown styling - match site-wide form controls */
+.contract-summary-form .contract-summary-select.ant-select .ant-select-selector {
+  border: 1px solid #3E6A9F !important;
+  border-radius: 6px !important;
+  padding: 4px 11px !important;
+  min-height: 40px !important;
+}
+
+.contract-summary-form .contract-summary-select.ant-select:hover .ant-select-selector,
+.contract-summary-form .contract-summary-select.ant-select-focused .ant-select-selector {
+  border-color: #40a9ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}

@@ -1,0 +1,307 @@
+/* One question row: card + “+” beside the focused card only */
+.google-form-question-row {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.google-form-question-row__card {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 960px;
+}
+
+.google-form-question-row__add {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  align-self: center;
+}
+
+.google-form-add-sidebar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #dadce0;
+  background: #fff;
+  color: #3e6a9f;
+  cursor: pointer;
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.25),
+    0 1px 3px 1px rgba(60, 64, 67, 0.12);
+  transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.google-form-add-sidebar__btn:hover {
+  background: #f1f6fb;
+  color: #2d5080;
+  box-shadow:
+    0 1px 3px rgba(60, 64, 67, 0.3),
+    0 4px 8px 3px rgba(60, 64, 67, 0.12);
+}
+
+.google-form-add-sidebar__btn:focus-visible {
+  outline: 2px solid #3e6a9f;
+  outline-offset: 2px;
+}
+
+/* Sticky submit only (no full-width bar) — sits below sticky blue breadcrumb */
+.google-form-sticky-save-wrap {
+  position: sticky;
+  top: 56px;
+  z-index: 900;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 0 auto;
+  padding: 0 0 16px;
+  background: transparent;
+  pointer-events: none;
+}
+
+.google-form-sticky-save-wrap > .ant-btn {
+  pointer-events: auto;
+}
+
+.floating-action-bar {
+    left: 240px;
+    transition: left 0.2s ease;
+  }
+  
+  /* Hide text on small screens, show only icons */
+  @media only screen and (max-width: 768px) {
+    .google-form-sticky-save-wrap .button-text {
+      display: none;
+    }
+
+    .floating-action-bar {
+      left: 0;
+      padding: 16px !important;
+    }
+  
+    .button-text {
+      display: none;
+    }
+  
+    .action-divider {
+      display: none !important;
+    }
+  
+    .floating-action-bar button,
+    .floating-action-bar .ant-btn {
+      padding: 12px !important;
+      min-width: auto !important;
+    }
+  }
+  
+  @media only screen and (max-width: 992px) {
+    .floating-action-bar {
+      left: 0;
+    }
+  }
+
+/* —— Google Forms–style question card —— */
+.gf-qcard-shell {
+  position: relative;
+  transform: scale(1);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 1;
+}
+
+.gf-qcard-shell--dragged {
+  transform: scale(0.98);
+  opacity: 0.65;
+}
+
+.gf-qcard {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.15);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.gf-qcard:hover {
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.22);
+}
+
+.gf-qcard--focused {
+  border-color: #c4c7c5;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.25);
+}
+
+.gf-qcard--dragover {
+  border-color: #1a73e8;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+}
+
+.gf-qcard-accent {
+  flex-shrink: 0;
+  width: 6px;
+  align-self: stretch;
+  background: #1a73e8;
+}
+
+.gf-qcard-inner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gf-qcard-drag-row {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 2px;
+}
+
+.gf-qcard-drag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: grab;
+  color: #5f6368;
+}
+
+.gf-qcard-drag-icon {
+  font-size: 20px !important;
+  color: #5f6368;
+}
+
+.gf-qcard-drag:hover {
+  background: #f1f3f4;
+}
+
+.gf-qcard-drag:active {
+  cursor: grabbing;
+}
+
+.gf-qcard-body {
+  padding: 0 24px 16px;
+}
+
+.gf-qcard-title-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gf-qcard-title-grow {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.gf-qcard-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.gf-qcard-icon-btn:hover {
+  background: #f1f3f4;
+}
+
+.gf-qcard-type-slot {
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.gf-qcard-options-slot {
+  margin-top: 8px;
+}
+
+.gf-qcard-options-error {
+  color: #d93025;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.gf-qcard-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 10px 16px 12px;
+  border-top: 1px solid #e0e0e0;
+  background: #fff;
+}
+
+.gf-qcard-footer-spacer {
+  flex: 1;
+}
+
+.gf-qcard-footer-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.gf-qcard-footer-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.gf-qcard-footer-icon:hover {
+  background: #f1f3f4;
+}
+
+.gf-qcard-footer-icon-svg {
+  font-size: 18px;
+  color: #5f6368;
+}
+
+.gf-qcard-footer-divider {
+  width: 1px;
+  height: 20px;
+  background: #dadce0;
+  margin: 0 8px 0 4px;
+}
+
+.gf-qcard-required-label {
+  font-size: 13px;
+  color: #5f6368;
+  margin-right: 4px;
+  user-select: none;
+}
+
+.gf-qcard-title-wrap {
+  width: 100%;
+}

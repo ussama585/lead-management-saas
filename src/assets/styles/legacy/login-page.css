@@ -1,0 +1,174 @@
+/* Full-page container */
+.login-page-container {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+}
+
+/* Left side styles */
+.login-page-left {
+    text-align: center;
+    padding: 20px;
+}
+
+.login-page-logo {
+    width: 40%;
+    /* Adjust width for better mobile display */
+    height: auto;
+}
+
+.login-page-hero-image {
+    width: 80%;
+    /* Adjust width for better mobile display */
+    height: auto;
+}
+
+/* Right side (Form) styles */
+.login-page-right {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.login-page-form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.ant-form-item {
+    margin-bottom: 12px;
+    /* Reduced from default 24px */
+}
+
+.ant-form {
+    margin-top: 30px;
+}
+
+/* Title styles */
+.login-page-title {
+    color: #3E6A9F !important;
+}
+
+/* Form labels */
+.login-page-label {
+    color: #3E6A9F;
+    font-weight: 600;
+}
+
+.required {
+    color: #3E6A9F;
+}
+
+
+.login-page-button {
+    padding: 18px 20px;
+    background-color: #3E6A9F;
+    color: white;
+    /* Set the text color */
+    margin-top: 10px;
+}
+
+.login-page-button:hover {
+    background-color: #3E6A9F !important;
+    /* Keep the same background color on hover */
+    color: white !important;
+    /* Keep the text color consistent */
+}
+
+/* To further ensure the hover styles do not change */
+.ant-btn.login-page-button:hover {
+    background-color: #3E6A9F !important;
+    /* Reaffirm the background color */
+    color: white !important;
+    /* Reaffirm the text color */
+}
+
+/* Optionally, remove any default Ant Design hover styles for buttons */
+.ant-btn:hover {
+    background-color: transparent !important;
+    /* Prevent default hover bg color change */
+    color: inherit !important;
+    /* Prevent default hover text color change */
+    box-shadow: 0 4px 10px rgba(62, 106, 159, 0.5);
+}
+
+
+
+.login-page-button:hover {
+    box-shadow: 0 4px 10px rgba(62, 106, 159, 0.5);
+    /* Slight shadow with same color */
+}
+
+/* Override Ant Design button hover effect */
+.ant-btn:hover {
+    background-color: #3E6A9F !important;
+}
+
+/* Forgot password */
+.login-page-forgot-password {
+    text-align: center;
+}
+
+.login-page-forgot-password .ant-typography {
+    color: #3E6A9F !important;
+    /* Override Ant Design color */
+}
+
+.login-page-forgot-password-link.ant-typography {
+    font-weight: bold !important;
+    /* Make 'Click here' bold */
+    color: #3E6A9F !important;
+    /* Set color */
+    text-decoration: none !important;
+    /* Remove underline */
+}
+
+.login-page-forgot-password-link.ant-typography:hover {
+    text-decoration: underline !important;
+    /* Optional: Add underline on hover */
+}
+
+.otp-form {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+
+    .otp-input {
+        width: 2em !important;
+        border-color: #3e6a9f;
+        padding-top: 5px;
+        border-radius: 5px;
+        margin: 45px 0 30px 0;
+    }
+}
+
+.otp-form-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.otp-form-footer {
+    display: flex;
+    justify-content: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .login-page-left {
+        padding: 10px;
+        /* Adjust padding for mobile */
+    }
+
+    .login-page-logo {
+        width: 80%;
+        /* Increase logo size on mobile */
+        margin-bottom: 15px;
+    }
+
+    .login-page-hero-image {
+        width: 90%;
+        /* Increase hero image size on mobile */
+        margin-bottom: 15px;
+    }
+}

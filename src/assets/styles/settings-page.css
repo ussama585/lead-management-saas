@@ -1,0 +1,37 @@
+.settings-page.dashboard-container { padding: 0 0 24px; background: transparent; overflow: visible; }
+.settings-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+  width: 100%;
+}
+.settings-navigation {
+  position: sticky;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 20px;
+  border-right: 1px solid var(--border);
+  min-height: 240px;
+}
+.settings-navigation .settings-navigation-item {
+  width: 100%;
+  min-height: 42px;
+  justify-content: flex-start;
+  text-align: left;
+  white-space: normal;
+}
+.settings-navigation .settings-navigation-item[aria-current='page'] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.settings-panel { min-width: 0; width: 100%; }
+.settings-panel > [data-slot='card'],
+.settings-panel > .ant-card { width: 100%; max-width: none; margin-bottom: 0; }
+.settings-panel .ant-table-wrapper { overflow-x: auto; }
+@media (max-width: 640px) {
+  .settings-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .settings-navigation { position: static; min-height: 0; padding: 0 0 16px; border-right: 0; border-bottom: 1px solid var(--border); }
+}

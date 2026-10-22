@@ -1,0 +1,19 @@
+/**
+ * Ant Design Modal body (and some global resets) can style ul/li in ways that make
+ * the first list item look smaller or gray. Force consistent body text for CV preview.
+ */
+.profile-cv-print-root ul > li,
+.profile-cv-print-root ul li {
+  font-size: 13px !important;
+  color: #000000 !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+}
+
+.profile-cv-print-modal .ant-modal-body .profile-cv-print-root ul > li,
+.profile-cv-print-modal .ant-modal-body .profile-cv-print-root ul li {
+  font-size: 13px !important;
+  color: #000000 !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+}

@@ -1,0 +1,119 @@
+.sales-manager-detail-container {
+  padding: 20px;
+}
+
+.content-container {
+
+  display: flex;
+  /* Use flexbox layout for the main content */
+
+  gap: 20px;
+  /* Add space between items */
+  /* Distribute space between the user card and stats grid */
+}
+
+.content-container .card {
+  height: max-content;
+}
+
+.user-detail-card {
+  flex: 1 1 300px;
+  /* Allow the user detail card to take up space, with a min-width of 300px */
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  /* Flexibly adjust columns based on screen width */
+  gap: 15px;
+  flex: 2 1 70%;
+  /* Take up 70% of available space */
+  padding: 30px 30px 70px 30px;
+}
+
+/* Optional: Styles for Stats Cards */
+.stats-card {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  /* Responsive column sizes */
+  grid-template-columns: repeat(3, minmax(250px, 1fr));
+  /* Set a max of 3 columns */
+  gap: 10px;
+  /* Equal spacing between rows and columns */
+  margin: 0 auto;
+  /* Center the grid within the container */
+  padding: 0 0px;
+  /* Prevent overflow on smaller screens */
+}
+
+
+@media (min-width: 1680px) {
+  .metrics-grid {
+    padding: 0 0px;
+    /* Removed padding */
+  }
+}
+
+/* Media query to adjust the grid for smaller screens */
+@media (max-width: 1488px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+    /* Adjust to 2 columns for medium screens */
+  }
+}
+
+@media (max-width: 705px) {
+  .metrics-grid {
+    grid-template-columns: repeat(1, minmax(250px, 1fr));
+    /* Adjust to 1 column for smaller screens */
+  }
+}
+
+/* Responsive adjustments for tablets and mobile screens */
+@media (max-width: 768px) {
+  .content-container {
+    flex-direction: column;
+    /* Stack content vertically on tablets */
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    /* Adjust grid columns for tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .content-container {
+    flex-direction: column;
+    /* Stack content vertically on mobile */
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    /* 1 column for mobile screens */
+  }
+}
+
+.link-style {
+  color: #3e6a9f;
+  text-decoration: underline;
+  cursor: pointer;
+  /* Optional: to indicate it's clickable */
+}

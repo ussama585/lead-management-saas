@@ -1,0 +1,400 @@
+/* ClientListing.css */
+.container {
+    padding: 20px;
+    width: 100%;
+}
+
+.link {
+    color: #3E6A9F;
+    text-decoration: underline;
+}
+
+  /* grid container for the metrics cards */
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    row-gap: 20px;
+    column-gap: 45px;
+  }
+
+  .metrics-container {
+    display: flex;
+     /* Space between metrics grid and select */
+    padding: 0 20px;
+    margin-bottom: 20px; /* Add spacing below if needed */
+  }
+
+  
+  .metrics-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Set exactly 3 cards per row */
+    row-gap: 10px;
+    column-gap: 10px;
+  }
+  
+  /* individual stats card container */
+  .stats-card-container {
+    margin-bottom: 20px;
+  }
+  
+  /* stats card icon */
+  .stats-card-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  /* chart container */
+  .chart-container {
+    margin-bottom: 30px;
+  }
+  
+  /* table container */
+  .table-container {
+    padding-left: 0;
+  }
+  
+  /* tabs container */
+  /* .client-tabs-container {
+    background-color: red;
+    
+  } */
+  
+  /* tabs styling */
+  /* .client-tabs {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+   */
+
+   .client-tabs-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   }
+
+  /* status tabs row */
+  .client-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  
+  .tab {
+    margin: 2px;
+    padding: 8px 16px;
+    border: 1px solid #e6e6e6;
+    background-color: transparent;
+    cursor: pointer;
+    color: #000;
+    font-weight: 500;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    width: fit-content;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    
+  }
+  
+  .active {
+    background-color: #8fbef8;
+    color: #fff;
+    border: 1px solid #8fbef8;
+  }
+
+  .link-style {
+    color: #3e6a9f;
+    text-decoration: underline;
+    cursor: pointer; /* Optional: to indicate it's clickable */
+}
+
+.ant-form-item-required::after {
+  content: '' !important; /* Remove asterisk */
+}
+  
+
+/* Custom OK button styling */
+.custom-ok-button {
+  background-color: #3E6A9F !important; /* Custom background color */
+  color: #ffffff !important;            /* White text */
+  border: none !important;
+}
+
+/* Disable hover, focus, and active effects for OK button */
+.custom-ok-button:hover,
+.custom-ok-button:focus,
+.custom-ok-button:active,
+.custom-ok-button.ant-btn-primary:hover,
+.custom-ok-button.ant-btn-primary:focus,
+.custom-ok-button.ant-btn-primary:active {
+  background-color: #3E6A9F !important; /* Keep same color */
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Custom Cancel button styling */
+.custom-cancel-button {
+  background-color: #EE0101 !important; /* Custom background color */
+  color: #ffffff !important;            /* White text */
+  border: none !important;
+}
+
+/* Disable hover, focus, and active effects for Cancel button */
+.custom-cancel-button:hover,
+.custom-cancel-button:focus,
+.custom-cancel-button:active,
+.custom-cancel-button.ant-btn:hover,
+.custom-cancel-button.ant-btn:focus,
+.custom-cancel-button.ant-btn:active {
+  background-color: #EE0101 !important; /* Keep same color */
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+.merge-modal-header{
+
+  padding: 10px 0px 0px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.merge-clients-container {
+  display: flex;
+  justify-content: space-between;
+  /* align-items: flex-start; */
+  padding: 10px;
+  
+  
+}
+
+.merge-client-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  color:#3E6A9F;
+  font-size: 18px;
+}
+
+.merge-client-item-icon {
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.merge-clients-divider {
+  width: 1px;
+  background-color: #d9d9d9; /* Light gray color */
+  margin: 0 20px; /* Adds spacing around the divider */
+  height: auto; /* Adjusts height to the parent container */
+}
+
+
+.merge-clients-select {
+ 
+  width: 200px;
+}
+
+.merge-clients-footer {
+  text-align: right;
+  margin-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 5px;
+}
+
+.custom-merge-btn{
+  background-color: #3E6A9F !important;
+  font-size: 16px !important;
+  padding: 18px 15px !important;
+}
+
+.custom-merge-btn .ant-btn.ant-btn-primary:hover,
+.custom-merge-btn .ant-btn.ant-btn-primary:focus,
+.custom-merge-btn .ant-btn.ant-btn-primary:active {
+  background-color: #31577A !important;
+  color: white !important;
+  border-color: #31577A !important;
+  box-shadow: none !important;
+}
+
+
+.lost-client-modal-title{
+  color: #3E6A9F;
+  font-size: 24px;
+  margin-left: 8px;
+}
+.lost-client-modal-content {
+  padding: 10px;
+}
+
+
+.lost-client-modal-text {
+  /* margin: 5px 0; */
+  font-size: 18px;
+}
+
+.lost-client-modal-text strong {
+  color: #3E6A9F;
+  font-size: 18px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Shared listing pages — executive stat cards, action bars (reuse across)   */
+/* -------------------------------------------------------------------------- */
+
+.listing-exec-overview {
+  margin: 16px 0;
+}
+
+.listing-exec-overview--inset {
+  margin: 16px;
+}
+
+.listing-exec-overview__title {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #3e6a9f;
+}
+
+.listing-exec-overview__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.listing-exec-card {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.listing-exec-card--selected {
+  border: 2px solid #3e6a9f;
+  background-color: #f0f8ff;
+  box-shadow: 0 2px 8px rgba(62, 106, 159, 0.25);
+}
+
+.listing-exec-card__title {
+  font-weight: 600;
+  color: #3e6a9f;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.listing-exec-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: #555;
+}
+
+.listing-action-bar-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+  margin-right: 16px;
+}
+
+/* Shared metrics for listing header buttons (warn + primary) */
+.listing-btn-warn,
+.listing-btn-primary {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 1px;
+  margin: 0;
+}
+
+.listing-btn-warn {
+  background-color: #fdc800;
+  color: #000;
+  border-color: #fdc800;
+}
+
+.listing-btn-warn:hover {
+  filter: brightness(0.97);
+}
+
+.listing-btn-primary {
+  background-color: #3e6a9f;
+  color: #fff;
+  border-color: #3e6a9f;
+}
+
+.listing-btn-primary:hover {
+  filter: brightness(1.06);
+}
+
+.listing-toolbar-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.listing-btn-warn--offset-top {
+  margin-top: 10px;
+}
+
+/* StatusTabs shell (shared with StatusTabs.jsx) */
+.status-tabs-shell {
+  margin-bottom: 0;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+/* Unified padded region: tabs, action buttons, and table share the same horizontal inset */
+.listing-page-content {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.listing-page-content > .listing-toolbar-flex {
+  margin-bottom: 8px;
+}
+
+.listing-page-content > .listing-toolbar-flex + .listing-action-bar-end {
+  margin-top: 4px;
+}
+
+.listing-page-content > .listing-action-bar-end + .table-container {
+  margin-top: 0;
+}
+
+.listing-page-content > .listing-action-bar-end {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* NewTableComponent .table-wrapper defaults to margin-top: 20px — flush to action bar on listing pages */
+.listing-page-content .table-wrapper {
+  margin-top: 0;
+}
+
+/* Brand-colored switch (e.g. Review toggle) to match site's primary blue */
+.sop-brand-switch.ant-switch-checked {
+  background-color: #3E6A9F !important;
+}

@@ -1,0 +1,107 @@
+/* File-specific rules only; shared flex/gap/margin utilities live in common.css */
+
+.upload-csv__container {
+  padding: 24px;
+}
+
+.upload-csv__loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.upload-csv__loading-text {
+  margin-top: 16px;
+  color: #666;
+}
+
+.upload-csv__actions {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.upload-csv__upload-btn {
+  margin-right: 8px;
+}
+
+.upload-csv__download-invalid-btn {
+  background: #ff4d4f;
+  border-color: #ff4d4f;
+  color: white;
+}
+
+.upload-csv__table-wrap {
+  overflow-x: auto;
+  margin-top: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.upload-csv__table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.upload-csv__table th {
+  border: 1px solid black;
+  padding: 4px;
+}
+
+.upload-csv__table td {
+  border: 1px solid black;
+  padding: 4px;
+}
+
+.upload-csv__cell--error {
+  color: red;
+}
+
+.upload-csv__row--error {
+  background: #fff1f0;
+}
+
+.upload-csv__modal-body {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.upload-csv__modal-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.upload-csv__stats-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.upload-csv__stat {
+  text-align: center;
+}
+
+.upload-csv__stat-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.upload-csv__stat-value--total {
+  color: #1890ff;
+}
+
+.upload-csv__stat-value--valid {
+  color: #52c41a;
+}
+
+.upload-csv__stat-value--invalid {
+  color: #ff4d4f;
+}
+
+.upload-csv__stat-label {
+  color: #666;
+}
+
+.upload-csv__invalid-note {
+  color: #ff4d4f;
+  font-size: 14px;
+}

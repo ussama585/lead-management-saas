@@ -1,0 +1,159 @@
+/* File-specific styles for resume-pdf-viewer.component.jsx.
+   Static layout/colors extracted from former inline styles; dynamic
+   per-render values remain inline via CSS custom properties. */
+
+.resume-pdf-viewer__pages-col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.resume-pdf-viewer__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f4fa;
+  border-bottom: 1px solid #dde3ee;
+  border-radius: 6px 6px 0 0;
+  flex-shrink: 0;
+}
+
+.resume-pdf-viewer__header-icon {
+  color: #dc2626;
+  font-size: 16px;
+}
+
+.resume-pdf-viewer__label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #1f3a61;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resume-pdf-viewer__page-count {
+  font-size: 11px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.resume-pdf-viewer__icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #3e6a9f;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+}
+
+.resume-pdf-viewer__icon-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.resume-pdf-viewer__download-icon {
+  font-size: 15px;
+}
+
+.resume-pdf-viewer__zoom-icon {
+  font-size: 14px;
+}
+
+.resume-pdf-viewer__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e8edf3;
+  flex-shrink: 0;
+}
+
+.resume-pdf-viewer__slider {
+  flex: 1;
+  margin: 0;
+}
+
+.resume-pdf-viewer__zoom-pct {
+  font-size: 11px;
+  color: #64748b;
+  min-width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.resume-pdf-viewer__pages-area {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  background: #f8fafc;
+  position: relative;
+}
+
+.resume-pdf-viewer__loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.resume-pdf-viewer__loading-spin-icon {
+  font-size: 28px;
+  color: #3e6a9f;
+}
+
+.resume-pdf-viewer__error {
+  text-align: center;
+  color: #dc2626;
+  padding: 24px;
+  font-size: 13px;
+}
+
+.resume-pdf-viewer__rendering-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+.resume-pdf-viewer__rendering-spin-icon {
+  font-size: 16px;
+  color: #3e6a9f;
+}
+
+.resume-pdf-viewer__empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.resume-pdf-viewer__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--resume-grid-cols, 1), 1fr);
+  gap: 12px;
+  height: 100%;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.resume-pdf-viewer__grid-item {
+  border: 1px solid #dde3ee;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  min-height: 0;
+}
+
+.resume-pdf-viewer__modal {
+  max-width: var(--resume-modal-max-width, 900px);
+  top: 2vh;
+}

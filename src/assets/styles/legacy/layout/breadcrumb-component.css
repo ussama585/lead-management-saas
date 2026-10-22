@@ -1,0 +1,37 @@
+/* BlueLine.css */
+.blue-line-container {
+    background-color: #3E6A9F;
+    padding: 0 22px;
+    color: white;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 64px; /* Sticks directly below the fixed/sticky TopBar (64px tall) */
+    z-index: 9; /* Below TopBar (z-index: 10) and Ant Design dropdowns/popovers (1050+) */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  .blue-line-link {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 0;
+    margin-left: 10px;
+    line-height: 1.5;
+    padding: 10px 0;
+  }
+  
+  .blue-line-icon {
+    margin-right: 8px;
+  }
+  
+.icon{
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: .2s;
+  }
+
+  .icon:hover{
+    font-size: 1.5rem;
+  }

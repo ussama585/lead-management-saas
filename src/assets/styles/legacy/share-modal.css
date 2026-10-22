@@ -1,0 +1,212 @@
+/* Styles specific to ShareModal that aren't covered by common.css primitives.
+   Values are copied verbatim from the previous inline styles so no visual
+   behavior changes when the component adopts these classes. */
+
+.share-modal__option-icon-glyph {
+  color: #666;
+  font-size: 20px;
+}
+
+.share-modal__loading-title-icon {
+  color: #3e6a9f;
+}
+
+.share-modal__loading-body {
+  text-align: center;
+}
+
+.share-modal__loading-icon-circle {
+  background: linear-gradient(135deg, #3e6a9f 0%, #5a8fcf 100%);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 4px 20px rgba(62, 106, 159, 0.3);
+}
+
+.share-modal__loading-spin {
+  color: white;
+}
+
+.share-modal__loading-heading {
+  margin-bottom: 8px;
+  color: #262626;
+}
+
+.share-modal__loading-subtext {
+  color: #666;
+  font-size: 14px;
+}
+
+.share-modal__loading-bar-track {
+  margin-top: 20px;
+  height: 4px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.share-modal__loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3e6a9f, #5a8fcf);
+  border-radius: 2px;
+  animation: share-modal-loadingBar 2s ease-in-out infinite;
+}
+
+@keyframes share-modal-loadingBar {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+.share-modal__title-section {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.share-modal__title-heading {
+  margin: 0 0 8px 0;
+  color: #262626;
+}
+
+.share-modal__cv-name-text {
+  display: block;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.share-modal__link-wrap {
+  margin-bottom: 12px;
+}
+
+.share-modal__link-label {
+  display: block;
+  color: #666;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.share-modal__link-input {
+  font-size: 12px;
+  color: #1890ff;
+  background: #f5f5f5;
+  border: 1px solid #d9d9d9;
+}
+
+.share-modal__description-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.share-modal__qr-section {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.share-modal__qr-card {
+  display: inline-block;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+}
+
+.share-modal__qr-card-body {
+  padding: 16px;
+}
+
+.share-modal__qr-image {
+  width: 120px;
+  height: 120px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
+
+.share-modal__qr-placeholder {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed #d9d9d9;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.share-modal__qr-placeholder-icon {
+  font-size: 36px;
+}
+
+.share-modal__qr-actions {
+  margin-top: 12px;
+}
+
+.share-modal__qr-actions-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #666;
+  font-size: 12px;
+}
+
+.share-modal__qr-action-btn {
+  font-size: 12px;
+}
+
+.share-modal__divider {
+  margin: 24px 0;
+}
+
+.share-modal__options-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.share-modal__options-heading {
+  margin: 0;
+  color: #262626;
+}
+
+.share-modal__options-subtext {
+  color: #666;
+  font-size: 13px;
+}
+
+.share-modal__option-tile {
+  text-align: center;
+  cursor: pointer;
+  padding: 16px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  transition: all 0.2s ease;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-modal__option-icon {
+  margin-bottom: 6px;
+}
+
+.share-modal__option-label {
+  font-weight: 500;
+  color: #262626;
+  font-size: 13px;
+}
+
+.share-modal__footer-note {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  background: #fafafa;
+  border-radius: 4px;
+}
+
+.share-modal__footer-note-text {
+  color: #666;
+  font-size: 12px;
+}

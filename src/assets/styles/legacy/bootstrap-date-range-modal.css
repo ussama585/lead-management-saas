@@ -1,0 +1,113 @@
+/* Bootstrap Date Range Modal Styles */
+
+.date-range-trigger {
+  border: 1px solid #3e6a9f;
+  border-radius: 999px;
+  font-size: 14px;
+  min-width: fit-content;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #3e6a9f;
+  box-shadow: 0 0 0 1px rgba(62, 106, 159, 0.05);
+}
+
+.date-range-trigger:hover {
+  border-color: #295182;
+  box-shadow: 0 0 0 1px rgba(41, 81, 130, 0.15);
+}
+
+.date-range-trigger.disabled {
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+}
+
+.bootstrap-modal-custom {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 64px);
+  z-index: 9999;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-dialog-custom {
+  max-width: 920px;
+  width: 100%;
+  margin: 1.75rem auto;
+}
+
+.modal-content-custom {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  line-height: 0;
+}
+
+.modal-close-icon {
+  font-size: 18px;
+  color: #2F3B52;
+  opacity: 0.7;
+}
+
+.modal-header-custom {
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+  padding: 12px 20px;
+}
+
+.modal-title-custom {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2F3B52;
+}
+
+.modal-body-custom {
+  background-color: #fff;
+  padding: 16px 20px;
+}
+
+.modal-footer-custom {
+  background: #fff;
+  border-top: 1px solid #e9ecef;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.custom-button-done {
+  border-radius: 8px;
+  padding: 6px 16px;
+}
+
+.custom-button-clear {
+  border-radius: 8px;
+  padding: 6px 16px;
+}

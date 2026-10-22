@@ -1,0 +1,126 @@
+/* Skeleton Loader Component Styles */
+
+.skeleton-card {
+  border-radius: 20px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.skeleton-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.skeleton-stats-card {
+  transition: all 0.3s ease;
+}
+
+.skeleton-stats-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.skeleton-list .ant-list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.skeleton-list .ant-list-item:last-child {
+  border-bottom: none;
+}
+
+.skeleton-table-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.skeleton-table-row:last-child {
+  border-bottom: none;
+}
+
+.skeleton-table-cell {
+  flex: 1;
+  padding: 0 8px;
+}
+
+.skeleton-table-cell:first-child {
+  padding-left: 0;
+}
+
+.skeleton-table-cell:last-child {
+  padding-right: 0;
+}
+
+.skeleton-chart {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.skeleton-chart-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border-radius: 8px;
+}
+
+/* Custom animation enhancements */
+.ant-skeleton-content .ant-skeleton-title,
+.ant-skeleton-content .ant-skeleton-paragraph > li {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.ant-skeleton-avatar {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .skeleton-stats-card {
+    width: 100% !important;
+    margin-bottom: 16px;
+  }
+
+  .skeleton-table-row {
+    flex-direction: column;
+  }
+
+  .skeleton-table-cell {
+    padding: 4px 0;
+  }
+}
+
+/* Dark theme support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .skeleton-card,
+  .skeleton-stats-card {
+    background: #262626;
+    border-color: #434343;
+  }
+
+  .skeleton-list .ant-list-item {
+    border-bottom-color: #434343;
+  }
+
+  .skeleton-table-row {
+    border-bottom-color: #434343;
+  }
+
+  .ant-skeleton-content .ant-skeleton-title,
+  .ant-skeleton-content .ant-skeleton-paragraph > li,
+  .ant-skeleton-avatar {
+    background: linear-gradient(90deg, #434343 25%, #595959 50%, #434343 75%);
+  }
+}

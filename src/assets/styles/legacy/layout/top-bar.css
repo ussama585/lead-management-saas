@@ -1,0 +1,180 @@
+/* TopBar Styles */
+
+/* Override Ant Design's Header */
+.topbar-header.ant-layout-header {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #E0E0E0 !important;
+    padding: 0 24px 0 8px !important;
+    height: 64px !important;
+    line-height: 64px !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    gap: 12px;
+    line-height: normal;
+}
+
+.topbar-sider-toggle {
+    flex-shrink: 0;
+    margin-left: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Flex layout for topbar */
+.topbar-space {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Removed the red background color */
+.topbar-space .ant-space {
+    background-color: transparent; /* Changed to transparent */
+}
+
+/* Override Button styles within Dropdown */
+.topbar-user-dropdown .ant-btn-text {
+    padding: 0 !important;
+}
+
+/* Avatar and username styling */
+.topbar-avatar {
+    vertical-align: middle !important;
+}
+
+.topbar-username {
+    display: block !important;
+    color: black !important;
+    
+}
+
+/* Custom styling for DownOutlined (dropdown arrow) */
+.topbar-downarrow {
+    color: black !important;
+    vertical-align: middle !important;
+    transition: transform 0.3s ease !important;
+    font-size: 9px !important; 
+}
+
+/* Notification Button styles */
+.topbar-notification-button {
+    background-color: white !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: background-color 0.3s, color 0.3s !important;
+}
+
+/* Override Notification Icon styles */
+.topbar-notification-button :is(.anticon, .lucide) {
+    font-size: 24px !important;
+    color: #696969 !important;
+    vertical-align: middle !important;
+}
+
+/* Change background and icon color on hover */
+.topbar-notification-button:hover {
+    background-color: #3E6A9F !important;
+    padding: 10px 5px !important;
+}
+
+.topbar-notification-button:hover :is(.anticon, .lucide) {
+    color: #3E6A9F !important;
+}
+
+/* Custom styling for the Menu items */
+.topbar-menu-item {
+    color: #3E6A9F !important;
+    border-radius: 10px !important;
+}
+.topbar-user-menu-item {
+    color: #3E6A9F !important;
+    border-radius: 10px !important;
+}
+.topbar-user-menu-email.ant-dropdown-menu-item {
+    color: #696969 !important;
+    font-size: 14px !important;
+    font-family: inherit !important;
+    cursor: default !important;
+    border-bottom: 1px solid #E0E0E0 !important;
+    border-radius: 0 !important;
+    opacity: 1 !important;
+}
+
+.topbar-user-dropdown.ant-btn:hover,
+.topbar-notification-button.ant-btn:hover {
+    background-color: white !important;
+}
+
+.topbar-sider-toggle.ant-btn:hover,
+.topbar-sider-toggle.ant-btn:focus {
+    background-color: #2E5A8F !important;
+    color: #ffffff !important;
+}
+/* Notification menu border override */
+.notification-menu {
+    border-color: #3E6A9F !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-radius: 8px !important;
+}
+
+.topbar-user-dropdown:hover,
+.topbar-user-dropdown:focus {
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* Styles for the View All menu item */
+/* Styles for the View All menu item */
+.topbar-menu-item {
+    padding: 10px 0; /* Add vertical padding for better spacing */
+    border-top: 1px solid #E0E0E0; /* Optional: Add a top border for separation */
+}
+
+/* Styles for the anchor inside the menu item */
+.topbar-menu-item a {
+    display: block; /* Ensure the anchor takes the full width */
+    text-align: center; /* Center align the text */
+    color: #3E6A9F; /* Set the text color */
+    font-weight: bold; /* Make the text bold */
+    font-size: 14px; /* Font size */
+    text-decoration: underline; /* Add underline to the text */
+    transition: color 0.3s ease; /* Smooth transition for color changes */
+}
+
+/* Change text color on hover */
+.topbar-menu-item a:hover {
+    color: #2d4f73; /* Darker shade on hover */
+}
+
+/* Optional: Add some margin below the last item in the menu */
+.notification-menu .topbar-menu-item:last-child {
+    margin-bottom: 10px; /* Space below the last menu item */
+}
+
+
+
+@media (max-width: 768px) {
+    /* Show the full name and arrow in larger screens */
+    .topbar-header.ant-layout-header {
+        padding: 0 10px 0 8px !important;
+    }
+
+    .topbar-username {
+        display: none !important;
+      }
+}

@@ -1,0 +1,32 @@
+.floating-action-bar {
+  left: 240px;
+  transition: left 0.2s ease;
+}
+
+/* Hide text on small screens, show only icons */
+@media only screen and (max-width: 768px) {
+  .floating-action-bar {
+    left: 0;
+    padding: 16px !important;
+  }
+
+  .button-text {
+    display: none;
+  }
+
+  .action-divider {
+    display: none !important;
+  }
+
+  .floating-action-bar button,
+  .floating-action-bar .ant-btn {
+    padding: 12px !important;
+    min-width: auto !important;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .floating-action-bar {
+    left: 0;
+  }
+}

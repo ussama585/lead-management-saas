@@ -1,0 +1,136 @@
+.donut-chart-card {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1; /* allow cards to stretch to fill column height */
+  height: 100%;
+}
+
+.donut-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.donut-chart-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #3e6a9f;
+}
+
+.donut-chart-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.donut-chart-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.donut-chart-filter-label {
+  font-size: 11px;
+  color: #888;
+  padding-left: 2px;
+}
+
+/* Make dashboard dropdowns look like rounded pills */
+.donut-chart-filters .ant-select-selector {
+  border-radius: 999px !important;
+  padding-inline: 12px 32px;
+  min-height: 32px;
+}
+
+.donut-chart-filters .ant-select-selection-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Small pill icon / dot before text */
+.donut-chart-filters .ant-select-selection-item::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #3e6a9f;
+}
+
+/* Make date range pickers match pill style */
+.donut-chart-filters .ant-picker {
+  border-radius: 999px !important;
+  padding-inline: 12px;
+  min-height: 32px;
+}
+
+.donut-chart-footer {
+  margin-top: auto; /* pin footer to bottom */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.donut-chart-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.donut-chart-footer-label {
+  font-size: 12px;
+  color: #888;
+}
+
+.donut-chart-footer .ant-picker {
+  border-radius: 999px !important;
+  padding-inline: 12px;
+  min-height: 32px;
+}
+
+.donut-chart-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.donut-chart-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: #f0f5ff;
+  color: #3e6a9f;
+  font-size: 12px;
+  border: 1px solid #d6e4ff;
+}
+
+@media (max-width: 768px) {
+  .donut-chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .donut-chart-filters {
+    width: 100%;
+  }
+}
+
+/* Stacked bar: total data labels sit on the Unique segment and block hover; let pointer events reach bars for tooltips */
+.duplicate-unique-chart .apexcharts-datalabels text,
+.duplicate-unique-chart .apexcharts-datalabels-group text {
+  pointer-events: none;
+}
+
+

@@ -1,0 +1,364 @@
+/* File-specific styles for proposal-modal.component.jsx.
+   Reusable primitives (flex/gap/detail-card/etc.) live in common.css.
+   Everything below preserves the exact previous inline-style values so
+   moving to classes does not change visual output. */
+
+/* Modal chrome */
+.proposal-modal__dialog {
+  max-width: 900px;
+}
+.proposal-modal__dialog.ant-modal {
+  top: 20px;
+}
+.proposal-modal__dialog .ant-modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Incomplete-fields hint banner shown above the document */
+.proposal-modal__hint {
+  margin: 10px 16px 0;
+  font-size: 12px;
+  color: #d46b08;
+}
+
+/* Header */
+.proposal-modal__title {
+  color: #3e6a9f;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Date row */
+.proposal-modal__date-row {
+  margin-bottom: 30px;
+}
+
+.proposal-modal__date-text {
+  text-align: right;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+.proposal-modal__date-input {
+  width: 160px;
+  vertical-align: middle;
+}
+
+/* Company info block */
+.proposal-modal__company-name {
+  color: #3e6a9f;
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.proposal-modal__tagline {
+  color: #3e6a9f;
+  margin-bottom: 18px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.proposal-modal__proposal-for {
+  color: #333;
+  margin-top: 10px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.proposal-modal__inline-input--company {
+  width: 280px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Introduction */
+.proposal-modal__greeting {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.proposal-modal__inline-input--salutation {
+  width: 200px;
+  display: inline-block;
+}
+
+.proposal-modal__body-text {
+  text-align: justify;
+  line-height: 1.8;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.proposal-modal__body-text--last {
+  text-align: justify;
+  line-height: 1.8;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.proposal-modal__inline-input--city {
+  width: 140px;
+  display: inline-block;
+}
+
+.proposal-modal__inline-strong--normal {
+  font-weight: normal;
+}
+
+.proposal-modal__inline-input--positions {
+  width: 70px;
+  display: inline-block;
+}
+
+/* Section headings / paragraphs (sections 1-5) */
+.proposal-modal__section-heading {
+  color: #000;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.proposal-modal__section-text {
+  margin-bottom: 15px;
+  font-size: 14px;
+  text-align: justify;
+  line-height: 1.8;
+}
+
+.proposal-modal__section-text--tight {
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-align: justify;
+  line-height: 1.8;
+}
+
+.proposal-modal__section-text--top {
+  text-align: justify;
+  line-height: 1.8;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+.proposal-modal__section-text--bottom-8 {
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-align: justify;
+  line-height: 1.8;
+}
+
+.proposal-modal__section-text--bottom-20 {
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: justify;
+  line-height: 1.8;
+}
+
+.proposal-modal__section-text--bottom-10 {
+  text-align: justify;
+  line-height: 1.8;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.proposal-modal__section-text--bottom-15 {
+  text-align: justify;
+  line-height: 1.8;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.proposal-modal__section-text--plain {
+  text-align: justify;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+/* Recruitment scope table (Section 1) */
+.proposal-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.proposal-modal__table-th--position {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #000;
+  font-size: 13px;
+  font-weight: bold;
+  width: 220px;
+}
+
+.proposal-modal__table-th--salary {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #000;
+  width: 160px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.proposal-modal__table-th--qty {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #000;
+  width: 120px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.proposal-modal__table-td--position {
+  padding: 8px;
+  border: 1px solid #000;
+  font-size: 13px;
+  width: 220px;
+}
+
+.proposal-modal__table-td--center {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #000;
+  font-size: 13px;
+}
+
+.proposal-modal__inline-input--full-width {
+  width: 100%;
+}
+
+/* Service offering (Section 2) */
+.proposal-modal__offering-list {
+  margin-left: 0;
+  font-size: 14px;
+}
+
+.proposal-modal__offering-block {
+  margin-bottom: 15px;
+}
+
+.proposal-modal__offering-heading {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.proposal-modal__offering-sublist {
+  margin-left: 45px;
+  line-height: 1.8;
+  list-style-type: disc;
+  font-size: 14px;
+}
+
+.proposal-modal__inline-input--replacement {
+  width: 120px;
+  display: inline-block;
+}
+
+.proposal-modal__inline-input--turnaround {
+  width: 200px;
+  display: inline-block;
+}
+
+/* Financial proposal (Section 3) */
+.proposal-modal__financial-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.proposal-modal__financial-label {
+  padding: 10px;
+  border: 1px solid #000;
+  font-weight: bold;
+  width: 40%;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.proposal-modal__financial-label--no-width {
+  padding: 10px;
+  border: 1px solid #000;
+  font-weight: bold;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.proposal-modal__financial-value {
+  padding: 10px;
+  border: 1px solid #000;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.proposal-modal__inline-input--charges {
+  width: 140px;
+}
+
+/* Section 4 & 5 lists */
+.proposal-modal__bullet-list {
+  line-height: 1.8;
+  margin-left: 20px;
+  font-size: 14px;
+  list-style-type: disc;
+}
+
+.proposal-modal__bullet-list--bottom-15 {
+  line-height: 1.8;
+  margin-left: 20px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  list-style-type: disc;
+}
+
+/* Signatures */
+.proposal-modal__signatures {
+  margin-top: 50px;
+  display: flex;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.proposal-modal__signature-col {
+  flex: 1;
+}
+
+.proposal-modal__signature-name {
+  margin-bottom: 3px;
+  font-size: 16px;
+}
+
+.proposal-modal__signature-designation {
+  margin-bottom: 3px;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.proposal-modal__signature-company {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.proposal-modal__signature-company--spaced {
+  margin-bottom: 40px;
+  font-size: 16px;
+}
+
+.proposal-modal__signature-img {
+  height: 40px;
+  margin-bottom: 8px;
+}
+
+.proposal-modal__signature-label {
+  font-size: 15px;
+}
+
+.proposal-modal__inline-input--signature {
+  max-width: 320px;
+}

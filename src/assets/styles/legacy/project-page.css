@@ -1,0 +1,126 @@
+/* Assigned projects / recruitment project listing (project-page.jsx) */
+
+.pp-assignment-panel {
+  margin: 16px 0;
+  padding: 16px;
+  background-color: #f0f8ff;
+  border-radius: 8px;
+  border: 1px solid rgba(62, 106, 159, 0.125);
+}
+
+.pp-assignment-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pp-assignment-panel__label {
+  color: #3e6a9f;
+  font-weight: 600;
+}
+
+.pp-select-assign-exec {
+  flex: 1;
+  max-width: fit-content;
+  cursor: pointer;
+}
+
+.pp-select-recruiter-min {
+  width: fit-content;
+  min-width: 150px;
+}
+
+.pp-icon-pdf {
+  font-size: 20px;
+  color: #d4380d;
+  cursor: pointer;
+}
+
+.pp-pm-remarks-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.pp-assign-scroll-wrap {
+  margin-top: 8px;
+}
+
+.pp-assign-scroll-box {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  padding: 8px;
+  background-color: #fafafa;
+}
+
+.pp-assign-item {
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+
+.pp-assign-item__title {
+  font-weight: 500;
+  color: #3e6a9f;
+}
+
+.pp-assign-item__meta {
+  font-size: 12px;
+  color: #666;
+}
+
+.pp-assign-item-fallback {
+  padding: 4px;
+  color: #999;
+  font-size: 12px;
+}
+
+.pp-form-block {
+  margin-bottom: 16px;
+}
+
+.pp-label-block {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.pp-modal-actions {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.pp-section-heading {
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.pp-remarks-list-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.pp-remark-title-strong {
+  font-weight: 600;
+}
+
+.pp-remark-meta {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #888;
+}
+
+.pp-pre-wrap {
+  white-space: pre-wrap;
+}
+
+.pp-modal-footer-actions {
+  margin-top: 12px;
+  text-align: right;
+}

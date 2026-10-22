@@ -1,0 +1,130 @@
+/* UserManagement.css */
+.client-tabs-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+ }
+
+ .ant-divider{
+  margin: 8px 0px !important;
+ }
+  
+  .tabs {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color: #000;
+    font-weight: 500;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  
+  .active {
+    background-color: #3E6A9F;
+    color: #fff;
+  }
+  
+  .tabs-1 {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(4, auto); /* Default: 4 columns */
+    justify-content: start; /* Prevents tabs from stretching to full width */
+  }
+  
+  @media (max-width: 1024px) {
+    .tabs {
+      grid-template-columns: repeat(3, auto); /* 3 columns for medium screens */
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .tabs {
+      grid-template-columns: repeat(2, auto); /* 2 columns for small screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .tabs {
+      grid-template-columns: repeat(1, auto); /* 1 column for mobile screens */
+      justify-content: center; /* Center align in mobile view */
+    }
+  }
+  
+  .tab-1 {
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color: #000;
+    font-weight: 500;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center; /* Centers text */
+    width: auto; /* Ensures tab width matches content size */
+  }
+  
+  
+  .createUserBtn {
+    padding: 10px 20px;
+    background-color: #3E6A9F;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Inter', sans-serif;
+  }
+  
+
+  .custom-delete-modal .ant-btn-primary {
+    background-color: #3E6A9F !important;
+    border-color: #3E6A9F !important;
+    box-shadow: none !important;
+  }
+  
+  .custom-delete-modal .ant-btn-primary:hover,
+  .custom-delete-modal .ant-btn-primary:focus {
+    background-color: #3E6A9F !important;
+    border-color: #3E6A9F !important;
+    box-shadow: none !important;
+    color: white !important;
+    box-shadow: 0 4px 10px rgba(62, 106, 159, 0.5);
+  }
+  
+  .custom-delete-modal .ant-btn-default {
+    box-shadow: none !important;
+  }
+  
+  .custom-delete-modal .ant-btn-default:hover,
+  .custom-delete-modal .ant-btn-default:focus {
+    box-shadow: none !important;
+    color: white !important;
+    box-shadow: 0 4px 10px rgba(62, 106, 159, 0.5);
+  }
+
+  .custom-disabled-button.ant-btn {
+    color: white !important; /* Use the desired color */
+    opacity: 0.5; /* Optional: Add opacity for the disabled look */
+    cursor: not-allowed;
+  }
+  
+  .custom-disabled-button.ant-btn:hover {
+    color: white !important; /* Ensure the color remains on hover */
+  }
+
+
+  .custom-delete-btn.ant-btn:hover{
+    color: black !important;
+  }

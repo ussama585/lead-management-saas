@@ -1,0 +1,19 @@
+/* Make selected text in Ant Design Select black */
+.ant-select-selection-item,
+.ant-select-selection-overflow-item {
+  color: #111 !important;
+}
+
+/* For multi-select tags */
+.ant-select-multiple .ant-select-selection-item {
+  color: #111 !important;
+}
+
+/* Make Ant Design Select search input text black */
+.ant-select-selection-search-input {
+  color: #000 !important;
+}
+
+.ant-select .ant-select-selection-search-input {
+  color: #000 !important;
+} 

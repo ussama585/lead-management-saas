@@ -1,0 +1,44 @@
+.lead-conversion-to-potential-chart-container {
+  width: 100%;
+  padding: 10px 20px ;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8e8e8;
+}
+
+.lead-conversion-to-potential-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.lead-conversion-to-potential-chart-title {
+  color: #333;
+  margin: 0;
+  font-size: 18px;
+}
+
+.lead-conversion-to-potential-chart-subtitle {
+  color: #666;
+  margin: 4px 0 0 0;
+  font-size: 12px;
+}
+
+.lead-conversion-to-potential-chart-dropdown {
+  display: flex;
+  align-items: center;
+}
+
+.lead-conversion-to-potential-chart-loading,
+.lead-conversion-to-potential-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #8c8c8c;
+  font-size: 14px;
+}

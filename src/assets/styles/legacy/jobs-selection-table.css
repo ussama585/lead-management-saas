@@ -1,0 +1,146 @@
+/* Styles specific to JobsSelectionTable. Static values only — values that
+   vary per-render stay inline via CSS custom properties (see component). */
+
+.jobs-selection-table__status-text {
+  padding: 8px 0;
+  color: #3e6a9f;
+}
+
+.jobs-selection-table__status-text--error {
+  padding: 8px 0;
+  color: #e53e3e;
+}
+
+.jobs-selection-table__wrap {
+  margin-bottom: 16px;
+}
+
+.jobs-selection-table__border {
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.jobs-selection-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.jobs-selection-table__header-row {
+  background-color: #f9fafb;
+}
+
+.jobs-selection-table__th {
+  border-right: 2px solid #d1d5db;
+  border-bottom: 2px solid #d1d5db;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  text-align: left;
+}
+
+.jobs-selection-table__th--last {
+  border-bottom: 2px solid #d1d5db;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  text-align: right;
+  width: 120px;
+}
+
+.jobs-selection-table__th--checkbox {
+  text-align: center;
+  width: 50px;
+}
+
+.jobs-selection-table__th--title {
+  width: 200px;
+}
+
+.jobs-selection-table__th--salary {
+  width: 200px;
+}
+
+.jobs-selection-table__th--charges {
+  text-align: right;
+  width: 150px;
+}
+
+.jobs-selection-table__th--discount {
+  text-align: right;
+  width: 150px;
+}
+
+.jobs-selection-table__th--after-discount {
+  text-align: right;
+  width: 150px;
+}
+
+.jobs-selection-table__th--resources {
+  text-align: center;
+  width: 100px;
+}
+
+.jobs-selection-table__row {
+  background-color: #ffffff;
+}
+
+.jobs-selection-table__td {
+  color: #111827;
+  border-right: 2px solid #d1d5db;
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.jobs-selection-table__td--checkbox {
+  width: 50px;
+  text-align: center;
+}
+
+.jobs-selection-table__td--title {
+  width: 180px;
+  font-weight: 500;
+}
+
+.jobs-selection-table__td--salary {
+  width: 200px;
+}
+
+.jobs-selection-table__td--input-cell {
+  width: 150px;
+  text-align: right;
+  padding: 8px 12px;
+}
+
+.jobs-selection-table__td--after-discount {
+  width: 150px;
+  text-align: right;
+}
+
+.jobs-selection-table__td--resources {
+  width: 100px;
+  text-align: center;
+}
+
+.jobs-selection-table__td--total {
+  width: 120px;
+  text-align: right;
+  font-weight: 500;
+  border-right: none;
+}
+
+.jobs-selection-table__cell-input {
+  width: 100%;
+  height: 32px;
+  font-size: 13px;
+  text-align: right;
+}
+
+.jobs-selection-table__error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 6px;
+}

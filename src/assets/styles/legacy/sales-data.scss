@@ -1,0 +1,77 @@
+.sales-data{
+
+    .ant-input {
+        border-color: #000 !important;
+        color: #000 !important;
+
+        &:focus,
+        &:hover {
+            border-color: #000 !important;
+            box-shadow: 0 0 0 2px rgba(41, 81, 130, 0.2); // optional glow effect
+        }
+    }
+
+    // DatePicker styling (input & calendar trigger)
+    .ant-picker {
+        border-color: #000 !important;
+        color: #000 !important;
+
+        &:hover,
+        &.ant-picker-focused {
+            border-color: #000 !important;
+            box-shadow: 0 0 0 2px rgba(41, 81, 130, 0.2);
+        }
+
+        .ant-picker-input > input {
+            color: #000 !important;
+        }
+    }
+
+    // Target Ant Design Select component
+    .ant-select-selector {
+        border-color: #000 !important;
+        color: #000 !important;
+
+        &:hover,
+        &.ant-select-focused {
+            border-color: #000 !important;
+            box-shadow: 0 0 0 2px rgba(41, 81, 130, 0.2);
+        }
+    }
+
+    // Optional: override selected text color in dropdown
+    .ant-select-item-option-selected {
+        // background-color: #e6f0ff;
+        color: #000;
+    }
+
+    // Default selected value text in Select
+    .ant-select-single .ant-select-selector .ant-select-selection-item {
+        color: #000 !important;
+    }
+
+    .project-button {
+        background-color: #3e6a9f;
+        &:hover {
+            background-color: #295182 !important;
+            color: #fff !important;
+        }
+    }
+
+    .default-btn-look {
+        background-color: initial !important;
+        color: initial !important;
+        &:hover {
+            background-color: initial !important;
+            color: initial !important;
+        }
+    }
+
+    .form-section-mg-bottom {
+        margin-bottom: 48px;
+        @media (max-width: 768px) {
+            margin-bottom: 12px;
+        }
+    }
+
+}

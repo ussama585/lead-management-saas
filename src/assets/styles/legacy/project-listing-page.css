@@ -1,0 +1,74 @@
+/* ProjectListing.css */
+.container {
+    padding: 20px;
+    width: 100%;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    row-gap: 20px;
+    column-gap: 45px;
+  }
+  
+  .statsCardContainer {
+    margin-bottom: 20px;
+  }
+  
+  .statsCardIcon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .chartContainer {
+    margin-bottom: 30px;
+  }
+  
+  .tableContainer {
+    padding-left: 0;
+  }
+  
+  .tabsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 2px solid #EDEDED;
+    gap: 10px;
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  
+  .tab {
+    padding: 8px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color: #000;
+    font-weight: 500;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    flex: 1 1 auto;
+  }
+  
+  .tab.active {
+    background-color: #3E6A9F;
+    color: #fff;
+  }
+  
+  .link {
+    color: #3E6A9F;
+    text-decoration: underline;
+  }
+  
+  .link-style {
+    color: #3e6a9f;
+    text-decoration: underline;
+    cursor: pointer; /* Optional: to indicate it's clickable */
+}
+  

@@ -1,0 +1,290 @@
+/* Styles specific to QuestionOptions.jsx not covered by common.css.
+   Values mirror the previous inline styles exactly so no visual change occurs. */
+
+/* Duplicate-options warning banner */
+.question-options__duplicate-warning {
+  font-size: 12px;
+  background-color: #FEF3C7;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+/* "Options" section label (non-google variant) */
+.question-options__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6B7280;
+  margin-bottom: 12px;
+}
+
+/* Date/Time selection label variant (darker color, used by date/time blocks) */
+.question-options__label--dark {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+/* Options list container, gap differs between google/default variant via CSS var */
+.question-options__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--options-list-gap, 12px);
+}
+
+/* Single option row, gap differs between google/default variant via CSS var */
+.question-options__option-row {
+  display: flex;
+  align-items: center;
+  gap: var(--option-row-gap, 12px);
+}
+
+/* Multiple choice / checkbox icon */
+.question-options__choice-icon {
+  font-size: var(--choice-icon-size, 20px);
+  color: var(--choice-icon-color, #D1D5DB);
+  flex-shrink: 0;
+}
+
+/* Dropdown numeric index label */
+.question-options__dropdown-index {
+  font-size: 14px;
+  color: #6B7280;
+  flex-shrink: 0;
+  min-width: 24px;
+  font-weight: 400;
+}
+
+/* Option text input - default (non-google) variant */
+.question-options__option-input {
+  flex: 1;
+  border-radius: 6px;
+  border: 1px solid #D1D5DB;
+  background-color: #FFFFFF;
+  font-size: 14px;
+  padding: 8px 12px;
+  outline: none;
+  cursor: text;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.question-options__option-input--empty {
+  border: 1px solid #EF4444;
+}
+
+/* Option text input - google variant (underline style) */
+.question-options__option-input--google {
+  flex: 1;
+  border: none;
+  border-bottom: 2px solid #e8eaed;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 10px 4px 8px 0;
+  outline: none;
+  cursor: text;
+  color: #202124;
+}
+
+.question-options__option-input--google.question-options__option-input--empty {
+  border: none;
+  border-bottom: 2px solid #d93025;
+}
+
+/* Remove-option button */
+.question-options__remove-btn {
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.question-options__remove-btn:hover {
+  color: #EF4444;
+}
+
+.question-options__remove-icon {
+  font-size: 18px;
+}
+
+/* Add-option button */
+.question-options__add-btn {
+  background: transparent;
+  border: none;
+  color: var(--add-btn-color, #3e6a9f);
+  font-size: var(--add-btn-font-size, 13px);
+  font-weight: var(--add-btn-font-weight, 500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--add-btn-margin-top, 12px);
+  padding: var(--add-btn-padding, 0);
+}
+
+.question-options__add-btn:hover {
+  color: var(--add-btn-hover-color, #2d5a8a);
+}
+
+.question-options__add-btn--google:hover {
+  text-decoration: underline;
+}
+
+/* Short answer / paragraph preview container */
+.question-options__text-preview {
+  background-color: var(--preview-bg, #F9FAFB);
+  padding: var(--preview-padding, 12px);
+  border-radius: var(--preview-radius, 6px);
+  border: var(--preview-border, 1px dashed #D1D5DB);
+}
+
+.question-options__text-preview--google {
+  border-bottom: 1px dashed #dadce0;
+}
+
+.question-options__short-answer-input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+  color: var(--short-answer-color, #9CA3AF);
+  font-style: italic;
+  padding: 0;
+  outline: none;
+  cursor: not-allowed;
+}
+
+.question-options__paragraph-textarea {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+  color: #9CA3AF;
+  font-style: italic;
+  padding: 0;
+  outline: none;
+  cursor: not-allowed;
+  resize: none;
+}
+
+/* File upload preview block */
+.question-options__file-upload {
+  text-align: center;
+  padding: 32px 24px;
+  border-radius: 8px;
+  border: 2px dashed #E5E7EB;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.question-options__file-upload-icon {
+  font-size: 48px;
+  color: #D1D5DB;
+  margin-bottom: 12px;
+}
+
+.question-options__file-upload-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6B7280;
+  margin-bottom: 4px;
+}
+
+.question-options__file-upload-subtitle {
+  font-size: 11px;
+  color: #9CA3AF;
+  margin-top: 4px;
+}
+
+/* Date/Time picker wrapper + picker itself */
+.question-options__picker-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.question-options__picker {
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  border: var(--picker-border, 1px solid #D1D5DB);
+  background-color: #FFFFFF;
+  font-size: 14px;
+  padding: 12px 16px;
+  outline: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.question-options__picker-suffix-icon {
+  color: var(--suffix-icon-color, #6B7280);
+  font-size: 16px;
+}
+
+/* Preview of selected date/time, absolutely positioned inside picker wrap */
+.question-options__picker-preview {
+  position: absolute;
+  right: 44px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #6B7280;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* Helper text under date/time picker */
+.question-options__helper-text {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.question-options__helper-icon {
+  font-size: 14px;
+}
+
+/* Error text under date/time picker */
+.question-options__error-text {
+  color: #EF4444;
+  font-size: 12px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.question-options__error-icon {
+  font-size: 14px;
+}
+
+/* Fallback "not implemented" block */
+.question-options__not-implemented {
+  text-align: center;
+  padding: 16px;
+  background-color: transparent;
+  border-radius: 8px;
+  border: 2px dashed #E5E7EB;
+}
+
+.question-options__not-implemented-text {
+  color: #9CA3AF;
+  font-size: 14px;
+  font-style: italic;
+}

@@ -1,0 +1,85 @@
+/* File-specific rules only; shared flex/gap/margin utilities live in common.css */
+
+.activate-project-content {
+  margin-top: 8px;
+}
+
+.activate-project-content__field {
+  margin-bottom: 16px;
+}
+
+.activate-project-content__label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.activate-project-content__required {
+  color: red;
+}
+
+.activate-project-content__full-width {
+  width: 100%;
+}
+
+.activate-project-content__loading {
+  color: #3e6a9f;
+  margin-bottom: 8px;
+}
+
+.activate-project-content__jobs-list {
+  width: 100%;
+  min-height: 40px;
+  max-height: 200px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+.activate-project-content__job-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.activate-project-content__job-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activate-project-content__job-title {
+  flex: 1;
+}
+
+.activate-project-content__vacancies-row {
+  padding-left: 32px;
+  color: #666;
+  font-size: 13px;
+}
+
+.activate-project-content__job-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-left: 32px;
+}
+
+.activate-project-content__empty {
+  color: #999;
+}
+
+.activate-project-content__error {
+  color: red;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.activate-project-content__recruiter-field {
+  margin-top: 16px;
+}

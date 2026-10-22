@@ -1,0 +1,18 @@
+.home-button {
+    padding: 18px 20px;
+    background-color: #3E6A9F;
+    color: white; /* Set the text color */
+    margin-top: 10px;
+  }
+  
+  .home-button:hover {
+    background-color: #3E6A9F !important; /* Keep the same background color on hover */
+    color: white !important; /* Keep the text color consistent */
+  }
+  
+
+
+.home-button:hover {
+    box-shadow: 0 4px 10px rgba(62, 106, 159, 0.5); /* Slight shadow with same color */
+}
+

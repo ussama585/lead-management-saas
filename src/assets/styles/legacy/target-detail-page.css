@@ -1,0 +1,267 @@
+.container {
+  padding: 20px;
+  width: 100%;
+}
+
+
+.createUserBtn {
+  padding: 10px 20px;
+  background-color: #3E6A9F;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+}
+
+
+/* App.css */
+
+/* Style for rounded modal */
+.rounded-modal .ant-modal-content {
+  border-radius: 20px;
+  padding: 20px;
+}
+
+/* Label color */
+.form-label {
+  color: #3E6A9F;
+  font-weight: 600;
+  font-size: small;
+  margin-bottom: -8px;
+}
+
+.ant-form-item .ant-form-item-label>label::after {
+  content: "";
+  position: relative;
+  margin-block: 0;
+  margin-inline-start: 2px;
+  margin-inline-end: 8px;
+}
+
+
+
+.custom-modal-title {
+  font-size: 24px;
+  /* Set the title size to make it larger */
+  color: #3E6A9F;
+  /* Set the color of the title */
+}
+
+.form-header h3 {
+
+  font-size: 17px;
+  /* Set the title size to make it larger */
+  color: #3E6A9F;
+  /* Set the color of the title */
+  font-weight: 500;
+}
+
+.form-header {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: -25px;
+  width: 100%;
+}
+
+.form-header .ant-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 80%;
+  /* Ensure row spans the full width */
+  margin-right: 0;
+  /* Remove extra margin */
+}
+
+/* Custom style for Save button */
+/* Target Ant Design buttons inside your modal */
+.custom-save-button.ant-btn-primary {
+  background-color: #3E6A9F !important;
+  /* Set the background color */
+  border-color: #3E6A9F !important;
+  /* Set the border color */
+  color: white !important;
+  /* Ensure text is white */
+}
+
+/* Remove hover, focus, and active states */
+.custom-save-button.ant-btn-primary:hover,
+.custom-save-button.ant-btn-primary:focus,
+.custom-save-button.ant-btn-primary:active {
+  background-color: #3E6A9F !important;
+  /* Ensure background stays same */
+  border-color: #3E6A9F !important;
+  /* Ensure border stays same */
+  color: white !important;
+  /* Ensure text stays same */
+  box-shadow: none !important;
+  /* Remove box shadow */
+}
+
+
+
+
+.custom-table .ant-table .left-align {
+  vertical-align: top !important;
+  text-align: center;
+  /* Ensures horizontal centering */
+  margin-bottom: 52px !important;
+}
+
+
+
+.custom-table .ant-table-thead>tr>th {
+  border: 0.25px solid black !important;
+  /* Set the borders for all table cells */
+}
+
+.custom-table .ant-table-container {
+  border: 0.25px solid black !important;
+  /* Ensures the outer container has a black border */
+}
+
+.custom-table .ant-table-tbody>tr>td {
+  border-left: 0.25px solid black !important;
+  border-right: 0.25px solid black !important;
+  border-bottom: 0.25px solid black !important;
+}
+
+
+.listing-container {
+  padding: 20px;
+
+}
+
+
+.btn-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding-bottom: 20px;
+
+  .week-selector {
+    display: flex;
+    align-items: center;
+
+    Button {
+      margin-left: 5px;
+    }
+  }
+
+}
+
+.btn-container h2 {
+  color: #3E6A9F;
+  font-weight: 600;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+
+
+
+/* Custom styles for DatePicker and Select components */
+
+/* Style for the DatePicker */
+.ant-picker {
+  border-color: #3E6A9F !important;
+  /* Set border color */
+  color: #3E6A9F !important;
+  /* Set font color */
+}
+
+.ant-picker-input>input {
+  color: #3E6A9F !important;
+  font-size: 12px !important;
+  padding: 1.25px !important;
+}
+
+.ant-picker-focused {
+  border-color: #3E6A9F !important;
+  /* Border color when DatePicker is focused */
+  box-shadow: 0 0 0 2px rgba(62, 106, 159, 0.2) !important;
+  /* Optional: add a shadow when focused */
+}
+
+/* Style for the Select component */
+.ant-select-selector {
+  border-color: #3E6A9F !important;
+  /* Set border color */
+  color: #3E6A9F !important;
+  /* Set font color */
+}
+
+.ant-select-selection-item {
+  color: #3E6A9F !important;
+  /* Set font color for selected item */
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: #3E6A9F !important;
+  /* Border color when Select is focused */
+  box-shadow: 0 0 0 2px rgba(62, 106, 159, 0.2) !important;
+  /* Optional: add a shadow when focused */
+}
+
+
+.new-target-modal-container {
+  padding: 0px 30px 30px 60px;
+}
+
+.new-target-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.new-target-modal-header-col {
+
+  color: #3E6A9F;
+}
+
+.new-target-modal-data-row {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+@media(max-width: 760px) {
+  .header-right-section {
+    flex-wrap: wrap;
+  }
+}
+
+@media(max-width: 350px) {
+  .header-container {
+    flex-wrap: wrap;
+  }
+}
+
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
+}
+
+.modal-body {
+
+
+  .field-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
+  }
+}

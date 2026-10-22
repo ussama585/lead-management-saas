@@ -1,0 +1,59 @@
+/* Remove scroll inside DatePicker time/date panels and avoid overflow */
+.date-picker-field-popup .ant-picker-panel-container {
+  overflow: visible;
+}
+
+/* Taller time panel so more hours/minutes are visible without scrolling */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content,
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content {
+  max-height: 540px;
+  min-height: 350px;
+  overflow: visible;
+}
+
+.date-picker-field-popup .ant-picker-content {
+  max-height: none;
+  overflow: visible;
+}
+
+.date-picker-field-popup .ant-picker-time-panel-column,
+.date-picker-field-popup .rc-picker-time-panel-column {
+  overflow: visible !important;
+  padding-bottom: 0;
+}
+
+.date-picker-field-popup .ant-picker-time-panel-column:hover,
+.date-picker-field-popup .rc-picker-time-panel-column:hover {
+  overflow: visible !important;
+}
+
+/* Hour column: display order 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5 (first column only) */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child,
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child {
+  display: flex;
+  flex-direction: column;
+}
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(1),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(1) { order: 7; }   /* 12 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(2),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(2) { order: 8; }   /* 1 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(3),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(3) { order: 9; }   /* 2 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(4),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(4) { order: 10; }  /* 3 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(5),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(5) { order: 11; }  /* 4 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(6),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(6) { order: 12; }  /* 5 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(7),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(7) { order: 1; }   /* 6 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(8),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(8) { order: 2; }   /* 7 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(9),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(9) { order: 3; }   /* 8 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(10),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(10) { order: 4; }  /* 9 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(11),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(11) { order: 5; }  /* 10 */
+.date-picker-field-popup .ant-picker-time-panel .ant-picker-content > .ant-picker-time-panel-column:first-child > li:nth-child(12),
+.date-picker-field-popup .rc-picker-time-panel .rc-picker-content > .rc-picker-time-panel-column:first-child > li:nth-child(12) { order: 6; }  /* 11 */

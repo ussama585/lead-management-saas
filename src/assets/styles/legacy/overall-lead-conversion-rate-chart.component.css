@@ -1,0 +1,54 @@
+.overall-lead-conversion-rate-chart-container {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8e8e8;
+  box-sizing: border-box;
+}
+
+.overall-lead-conversion-rate-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.overall-lead-conversion-rate-chart-title {
+  color: #333;
+  margin: 0;
+  font-size: 18px;
+}
+
+.overall-lead-conversion-rate-chart-subtitle {
+  color: #666;
+  margin: 4px 0 0 0;
+  font-size: 12px;
+}
+
+.overall-lead-conversion-rate-chart-dropdown {
+  display: flex;
+  align-items: center;
+}
+
+.overall-lead-conversion-rate-summary {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.overall-lead-conversion-rate-chart-loading,
+.overall-lead-conversion-rate-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  color: #8c8c8c;
+  font-size: 14px;
+}

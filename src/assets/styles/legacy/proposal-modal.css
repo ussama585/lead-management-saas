@@ -1,0 +1,116 @@
+.proposal-document {
+  background: white;
+  padding: 40px;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Inline editors in customize mode (still print cleanly in PDF capture) */
+.proposal-document .proposal-field-input.ant-input,
+.proposal-document .proposal-field-input.ant-input-number-input {
+  font-size: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+
+.proposal-document .proposal-field-input.ant-input {
+  padding: 2px 6px;
+  min-height: auto;
+}
+
+.proposal-document .proposal-customize-banner {
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 0 40px 16px;
+  font-size: 13px;
+  color: #1e40af;
+}
+
+.proposal-header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.company-info h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.company-info h3 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.proposal-section {
+  margin-bottom: 30px;
+}
+
+.proposal-section h3 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.proposal-section p {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.proposal-section ul,
+.proposal-section ol {
+  font-size: 14px;
+}
+
+.proposal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+.proposal-table th,
+.proposal-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.proposal-table th {
+  background-color: #3E6A9F;
+  color: white;
+  font-weight: bold;
+}
+
+.proposal-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.proposal-signatures {
+  margin-top: 40px;
+  page-break-inside: avoid;
+}
+
+.proposal-signatures > div {
+  min-height: 100px;
+}
+
+/* Print styles */
+@media print {
+  .proposal-document {
+    padding: 20px;
+  }
+  
+  .proposal-section {
+    page-break-inside: avoid;
+  }
+  
+  .proposal-table {
+    page-break-inside: avoid;
+  }
+}
+

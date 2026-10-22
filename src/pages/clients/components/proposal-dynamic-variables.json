@@ -1,0 +1,102 @@
+{
+  "description": "Dynamic variables for the Recruitment Proposal document. Pass these in proposalData (or API project-proposal response) to drive all yellow-highlighted / dynamic fields in ProposalModal.",
+  "proposalData": {
+    "date": "ISO date string, e.g. 2026-01-28T00:00:00Z → displayed as 'January 28th, 2026'",
+    "client": {
+      "company_name": "Client company name, e.g. 'SAS HOLDINGS GLOBAL'",
+      "contact_person_name": "Full name for signature block, e.g. 'Syed Arsam Shah'",
+      "salutation_name": "Optional. Name in salutation only, e.g. 'Arsam' for 'Dear Arsam,' (falls back to contact_person_first_name then contact_person_name)",
+      "contact_person_first_name": "Optional. Used as salutation name when salutation_name not set",
+      "contact_person_designation": "e.g. 'Director', 'Project Manager'",
+      "email": "Client email",
+      "phone_number": "Client phone",
+      "industry": "Optional",
+      "location": {
+        "city": "City for hiring needs, e.g. 'Lahore'",
+        "country": "e.g. 'Pakistan'"
+      }
+    },
+    "project": {
+      "pricing": {
+        "pricing_type": "e.g. '1 gross salary'",
+        "contract_currency": "e.g. 'PKR'",
+        "contract_subtotal_amount": "Numeric, optional for display",
+        "discount_amount": "Numeric, optional",
+        "discount_percentage": "Numeric, optional",
+        "contract_price": "Total contract amount (discounted)",
+        "mobilization_charges": "Upfront amount, e.g. 15000",
+        "remaining_payment": "Remaining amount after mobilization, e.g. 15000",
+        "discounted_service_charges_text": "Optional. If omitted, derived as '{currency} {contract_price} for one Resource.' or '... for N Resources.'"
+      }
+    },
+    "jobs": [
+      {
+        "job_title": "Position name, e.g. 'Cleaning Supervisor - Airbnb apartments'",
+        "number_of_vacancies": "Quantity, e.g. 1",
+        "location_city": "City for this role, e.g. 'Lahore'",
+        "salary_range": "Preformatted string, e.g. 'PKR 45,000 – 65,000'",
+        "min_salary": "Optional; used to build salary_range if salary_range not set",
+        "max_salary": "Optional; used to build salary_range if salary_range not set"
+      }
+    ],
+    "summary": {
+      "total_positions": "Sum of job quantities, e.g. 1",
+      "total_salary_range": "Optional; e.g. 'PKR 45,000 – 65,000' (total row in scope table)",
+      "total_amount": "Optional",
+      "currency": "Optional"
+    },
+    "search_o_pal_representative": {
+      "name": "e.g. 'Madeeha Nasim'",
+      "designation": "e.g. 'Head of Department'",
+      "company": "Optional, 'Search O Pal'"
+    },
+    "service_terms": {
+      "replacement_guarantee_duration": "e.g. '2 weeks'",
+      "turnaround_text": "e.g. '10-12 working days' (proposal doc); API key: turnaround_time"
+    }
+  },
+  "apiPayloadKeys": {
+    "proposal_date": "ISO date string for proposal date",
+    "proposal_city": "e.g. 'Lahore'",
+    "replacement_guarantee_duration": "e.g. '2 weeks'",
+    "turnaround_time": "e.g. '10-12 working days'"
+  },
+  "example": {
+    "date": "2026-01-28T00:00:00Z",
+    "client": {
+      "company_name": "SAS HOLDINGS GLOBAL",
+      "contact_person_name": "Syed Arsam Shah",
+      "contact_person_designation": "Director",
+      "location": { "city": "Lahore", "country": "Pakistan" }
+    },
+    "project": {
+      "pricing": {
+        "contract_currency": "PKR",
+        "contract_price": 30000,
+        "mobilization_charges": 15000,
+        "remaining_payment": 15000,
+        "discounted_service_charges_text": "PKR 30,000 for one Resource."
+      }
+    },
+    "jobs": [
+      {
+        "job_title": "Cleaning Supervisor - Airbnb apartments",
+        "number_of_vacancies": 1,
+        "location_city": "Lahore",
+        "salary_range": "PKR 45,000 – 65,000"
+      }
+    ],
+    "summary": {
+      "total_positions": 1,
+      "total_salary_range": "PKR 45,000 – 65,000"
+    },
+    "search_o_pal_representative": {
+      "name": "Madeeha Nasim",
+      "designation": "Head of Department"
+    },
+    "service_terms": {
+      "replacement_guarantee_duration": "2 weeks",
+      "turnaround_text": "10-12 working days"
+    }
+  }
+}

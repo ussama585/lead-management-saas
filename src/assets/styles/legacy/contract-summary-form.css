@@ -1,0 +1,120 @@
+/* Styles specific to ContractSummaryForm, extracted from inline styles.
+   Values are kept identical to the previous inline styles so no visual
+   behavior changes. Reuses common.css primitives where possible. */
+
+.contract-summary-form__remarks-only-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #3e6a9f;
+}
+
+.contract-summary-form__label-asterisk--brand {
+  color: #3e6a9f;
+}
+
+.contract-summary-form__textarea-full {
+  width: 100%;
+  resize: none;
+}
+
+.contract-summary-form__error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.contract-summary-form__error-text--tight {
+  color: red;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.contract-summary-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.contract-summary-form__field-block {
+  margin-bottom: 16px;
+}
+
+.contract-summary-form__field-header {
+  margin-bottom: 8px;
+}
+
+.contract-summary-form__field-label {
+  font-weight: 500;
+  color: #111827;
+  font-size: 13px;
+  margin-right: 16px;
+}
+
+.contract-summary-form__label-asterisk {
+  color: red;
+}
+
+.contract-summary-form__field-value {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 500;
+  padding: 2px 8px;
+  min-width: 40px;
+  text-align: right;
+}
+
+.contract-summary-form__divider {
+  border-bottom: 1px solid #d1d5db;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.contract-summary-form__block-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #111827;
+  font-size: 13px;
+}
+
+.contract-summary-form__select-full {
+  width: 100%;
+  height: 40px;
+}
+
+.contract-summary-form__input-full {
+  width: 100%;
+  height: 40px;
+}
+
+.contract-summary-form__summary-row {
+  margin-bottom: 8px;
+}
+
+.contract-summary-form__summary-row-inner {
+  margin-bottom: 4px;
+}
+
+.contract-summary-form__summary-label {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 500;
+}
+
+.contract-summary-form__summary-value {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.contract-summary-form__summary-value--strong {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 700;
+}
+
+.contract-summary-form__mobilization-block {
+  margin-bottom: 12px;
+}

@@ -1,0 +1,99 @@
+.pm-remarks-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pm-remarks-modal-title-text {
+  color: #1f3a61;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.pm-remarks-collapse {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pm-remarks-panel {
+  margin-bottom: 10px;
+  border-radius: 10px !important;
+  border: 1px solid #e4eaf2 !important;
+  background: #fff !important;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(62, 106, 159, 0.06);
+}
+
+.pm-remarks-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.pm-remarks-panel-title {
+  flex: 1;
+  font-weight: 600;
+  color: #1f3a61;
+  font-size: 13px;
+}
+
+.pm-remarks-count-badge {
+  font-size: 11px;
+  color: #fff;
+  background: #3e6a9f;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
+}
+
+.pm-remarks-empty {
+  color: #bbb;
+  font-style: italic;
+  margin: 4px 0 0;
+}
+
+.pm-remarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.pm-remark-item {
+  padding: 10px 14px;
+  border-radius: 7px;
+  background: #f8fafc;
+  border: 1px solid #e8edf3;
+}
+
+.pm-remark-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.pm-remark-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5a7a9f;
+  letter-spacing: 0.2px;
+}
+
+.pm-remark-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a9fb8;
+}
+
+.pm-remark-text {
+  margin: 0;
+  font-size: 13px;
+  color: #444;
+  line-height: 1.5;
+}

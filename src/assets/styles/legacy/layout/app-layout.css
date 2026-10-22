@@ -1,0 +1,304 @@
+/* Sidebar styles */
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+.sider-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  overflow: visible;
+  transition: width 0.3s ease;
+}
+
+@media only screen and (min-width: 993px) {
+  .sider-wrapper {
+    width: 240px;
+  }
+
+  .sider-wrapper.is-collapsed {
+    width: 80px;
+  }
+}
+
+.sider {
+  background-color: #ffffff;
+  position: relative !important;
+  box-shadow: 2px 0 10px rgba(62, 106, 159, 0.12);
+  padding: 8px 10px 10px;
+  overflow: auto;
+  height: 100vh;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  flex: 0 0 100% !important;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+
+.layout-main {
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+@media only screen and (min-width: 993px) {
+  .layout-main {
+    margin-left: 240px;
+  }
+
+  .layout-main.is-collapsed {
+    margin-left: 80px;
+  }
+}
+
+.layout-content {
+  background-color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.sider-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 0 10px;
+  margin-bottom: 4px;
+}
+
+.logo {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.logo img {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  transition: max-width 0.3s ease;
+}
+
+.sider-collapse-btn {
+  flex-shrink: 0;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  background-color: #3E6A9F !important;
+  color: #ffffff !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
+}
+
+.sider-collapse-btn:hover,
+.sider-collapse-btn:focus {
+  background-color: #2E5A8F !important;
+  color: #ffffff !important;
+}
+
+.sider-close-btn {
+  flex-shrink: 0;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  color: #ffffff !important;
+  font-size: 14px;
+  background-color: #3E6A9F !important;
+  border: none !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.sider-close-btn:hover {
+  background-color: #2E5A8F !important;
+  color: #ffffff !important;
+}
+
+.ant-menu{
+  border: none !important;
+}
+
+.ant-menu-item {
+  display: flex !important;
+  align-items: center !important;
+  background-color: transparent !important;
+  color: #3E6A9F !important;
+  transition: all 0.3s ease;
+}
+
+.ant-menu-item:hover, .ant-menu-item-selected {
+  background-color: #3E6A9F !important;
+  color: white !important;
+}
+
+.icon-selected {
+  filter: brightness(0) invert(1);
+  transition: all 0.3s ease;
+}
+
+.ant-menu-item:hover .icon-unselected {
+  filter: brightness(0) invert(1);
+}
+
+.ant-menu-item-selected:hover {
+  background-color: #3E6A9F !important;
+  color: white !important;
+}
+
+.ant-menu-item img {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+
+.sidebar-unread-badge {
+  margin-left: 8px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background-color: #faad14;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Desktop collapsed state */
+@media only screen and (min-width: 993px) {
+  .sider.ant-layout-sider-collapsed {
+    width: 80px !important;
+  }
+
+  .sider.ant-layout-sider-collapsed .sider-header {
+    justify-content: center;
+  }
+
+  .sider.ant-layout-sider-collapsed .logo {
+    text-align: center;
+  }
+
+  .sider.ant-layout-sider-collapsed .logo img {
+    max-width: 48px;
+    margin: 0 auto;
+  }
+
+  .sider.ant-layout-sider-collapsed .ant-menu-item {
+    justify-content: center !important;
+    padding: 0 !important;
+    padding-inline: 0 !important;
+    position: relative;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .sider.ant-layout-sider-collapsed .ant-menu-item .ant-menu-title-content {
+    display: none !important;
+    opacity: 0 !important;
+    width: 0 !important;
+  }
+
+  .sider.ant-layout-sider-collapsed .ant-menu-item :is(.anticon, .lucide) {
+    margin: 0 auto !important;
+    margin-inline-end: 0 !important;
+    margin-inline-start: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  /* Center the icon wrapper */
+  .sider.ant-layout-sider-collapsed .ant-menu-item > span.ant-menu-item-icon {
+    margin: 0 auto !important;
+    margin-inline-end: 0 !important;
+    margin-inline-start: 0 !important;
+  }
+
+  .sider.ant-layout-sider-collapsed .ant-menu-item-icon {
+    margin-inline-end: 0 !important;
+  }
+
+  /* Show badge as a dot in collapsed state */
+  .sider.ant-layout-sider-collapsed .sidebar-unread-badge {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    margin-left: 0;
+    min-width: 8px;
+    height: 8px;
+    padding: 0;
+    font-size: 0;
+  }
+
+}
+
+/* Tablet styles */
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+  .sider {
+    width: 80%;
+  }
+}
+
+/* Mobile styles */
+@media only screen and (max-width: 992px) {
+  .sider-wrapper {
+    position: static;
+    width: auto !important;
+    height: auto;
+    z-index: auto;
+  }
+
+  .sider {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 80% !important;
+    max-width: 300px !important;
+    min-width: 0 !important;
+    height: 100%;
+    z-index: 2000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sider.active {
+    transform: translateX(0);
+  }
+
+  .layout-main {
+    margin-left: 0 !important;
+  }
+
+  .layout-content {
+    z-index: 1;
+    position: relative;
+  }
+
+}
+
+/* Small mobile styles */
+@media only screen and (max-width: 576px) {
+  .sider {
+    width: 85%;
+    max-width: 280px;
+  }
+}

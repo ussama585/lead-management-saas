@@ -1,0 +1,57 @@
+/* TableComponent.css */
+
+.table-wrapper {
+    overflow-x: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+    border-radius: 8px; /* Set corner radius */
+    margin: 20px 0; /* Optional: add margin for spacing */
+    scrollbar-width: thin;
+    scrollbar-color: #3E6A9F #f5f5f5;
+}
+
+/* Force scrollbar visibility for WebKit browsers (Chrome, Safari, Edge) */
+.table-wrapper::-webkit-scrollbar,
+.table-wrapper *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    display: block !important;
+}
+
+.table-wrapper::-webkit-scrollbar-track,
+.table-wrapper *::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb,
+.table-wrapper *::-webkit-scrollbar-thumb {
+    background-color: #3E6A9F80;
+    border-radius: 8px;
+    border: 2px solid #f5f5f5;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover,
+.table-wrapper *::-webkit-scrollbar-thumb:hover {
+    background-color: #3E6A9F;
+}
+
+.table-cell {
+    padding: 5px 10px; /* Add padding to table cells */
+    font-weight: 400;
+}
+
+/* Alternating row colors */
+.table-body-row {
+    background-color: #EDEDED; /* Background color for even rows */
+}
+
+.table-body-row-odd {
+    background-color: #fff; /* Background color for odd rows */
+}
+
+/* Custom styles for the table header */
+.muiTableHeadCellProps {
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    text-align: center; /* Center-align headers */
+}

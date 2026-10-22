@@ -1,0 +1,212 @@
+/**
+ * Client listing table (createClientColumns / headhunting) — theme tokens + action icons.
+ */
+
+:root {
+  --sop-brand: #3e6a9f;
+  --sop-danger: #ff4d4f;
+  --sop-muted: #ccc;
+}
+
+/* Ant Design Status select — was inline width: fit-content */
+.table-client-status-select.ant-select,
+.table-client-status-select[class*='ant-select'] {
+  width: fit-content !important;
+}
+
+/* Client detail card: status select tinted by SaaS account (green / red) */
+.client-saas-status-select-wrap {
+  --saas-status-color: #8c8c8c;
+}
+
+.client-saas-status-select-wrap .ant-select .ant-select-selector {
+  border-color: color-mix(in srgb, var(--saas-status-color) 35%, white) !important;
+  color: var(--saas-status-color) !important;
+  background-color: color-mix(in srgb, var(--saas-status-color) 8%, white) !important;
+}
+
+.client-saas-status-select-wrap .ant-select .ant-select-selection-item {
+  color: var(--saas-status-color) !important;
+}
+
+.client-saas-status-select-wrap .ant-select .ant-select-arrow {
+  color: var(--saas-status-color) !important;
+}
+
+/* Read-only status pill; set --status-pill-fg to status hex */
+.client-table-status-pill {
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  min-width: 100px;
+  text-align: center;
+  color: var(--status-pill-fg, #8c8c8c);
+  background-color: color-mix(in srgb, var(--status-pill-fg, #8c8c8c) 8%, white);
+  border: 1px solid color-mix(in srgb, var(--status-pill-fg, #8c8c8c) 19%, white);
+}
+
+.table-icon-action:is(.anticon, .lucide) {
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.table-icon-action--edit,
+.table-icon-action--history {
+  color: var(--sop-brand);
+}
+
+.table-icon-action--edit:hover,
+.table-icon-action--history:hover {
+  filter: brightness(0.88);
+}
+
+.table-icon-action--delete {
+  color: var(--sop-danger);
+}
+
+.table-icon-action--delete:hover {
+  filter: brightness(0.92);
+}
+
+.table-icon-action--create {
+  color: var(--sop-brand);
+}
+
+.table-icon-action--create:not(.table-icon-action--disabled):hover {
+  filter: brightness(0.88);
+}
+
+.table-icon-action--disabled {
+  color: var(--sop-muted);
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.table-icon-cell-placeholder {
+  color: var(--sop-muted);
+  font-size: 16px;
+}
+
+.table-saas-client-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.MuiTableCell-root:has(.table-saas-client-cell) {
+  text-align: center !important;
+  min-width: 150px;
+}
+
+.MuiTableCell-root:has(.table-saas-client-cell) > div {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100%;
+}
+
+.table-saas-client-cell__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--sop-brand);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.table-saas-client-cell__action:hover {
+  filter: brightness(0.88);
+}
+
+.table-saas-client-cell__action .table-icon-action {
+  font-size: 16px;
+}
+
+.table-saas-client-cell__unavailable {
+  color: var(--sop-muted);
+  font-size: 12px;
+  opacity: 0.75;
+  white-space: nowrap;
+  min-width: 120px;
+  display: inline-block;
+}
+
+/* Brand-aligned Ant buttons / text (detail card, PM remarks modal, etc.) */
+.sop-brand-link.ant-btn.ant-btn-link {
+  color: var(--sop-brand);
+}
+
+.sop-brand-link.ant-btn.ant-btn-link:not(:disabled):hover,
+.sop-brand-link.ant-btn.ant-btn-link:not(:disabled):focus {
+  color: var(--sop-brand);
+  filter: brightness(0.92);
+}
+
+.sop-brand-primary.ant-btn.ant-btn-primary {
+  background: var(--sop-brand);
+  border-color: var(--sop-brand);
+}
+
+.sop-brand-primary.ant-btn.ant-btn-primary:not(:disabled):hover {
+  filter: brightness(0.92);
+}
+
+.sop-brand-text {
+  color: var(--sop-brand);
+}
+
+.sop-brand-textarea {
+  border-color: var(--sop-brand) !important;
+}
+
+.sop-brand-outline.ant-btn.ant-btn-default:not(:disabled) {
+  border-color: var(--sop-brand);
+  color: var(--sop-brand);
+  background: transparent;
+}
+
+.sop-brand-outline.ant-btn.ant-btn-default:not(:disabled):hover,
+.sop-brand-outline.ant-btn.ant-btn-default:not(:disabled):focus {
+  border-color: var(--sop-brand);
+  color: var(--sop-brand);
+  background: color-mix(in srgb, var(--sop-brand) 8%, white);
+}
+
+.sop-brand-table-link {
+  color: var(--sop-brand);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Centered circular loader (LoadingOutlined + Spin) — proposal modal, admin settings, etc. */
+.sop-branded-spin-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  min-height: 220px;
+}
+
+.sop-branded-spin-icon {
+  font-size: 40px;
+  color: var(--sop-brand);
+}
+
+.sop-branded-spin-text {
+  margin-top: 20px;
+  margin-bottom: 0;
+  font-size: 14px;
+  color: var(--sop-brand);
+}
