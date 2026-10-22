@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Check, RotateCcw } from 'lucide-react';
 import { useAppTheme } from './providers/app-theme-context.js';
-import { DEFAULT_PRIMARY_COLOR, normalizeThemeColor } from './providers/theme-color.js';
+import { DEFAULT_PRIMARY_COLOR, normalizeThemeColor, primaryTextColor } from './providers/theme-color.js';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card.jsx';
 import { Button } from './ui/button.jsx';
 import { Input } from './ui/input.jsx';
@@ -18,11 +18,19 @@ export default function AppearanceSettings() {
   const { user } = useUserStore();
   const { primaryColor, setPrimaryColor } = useAppTheme();
   const [draft, setDraft] = useState(primaryColor);
+  const pendingColor = useRef(null);
+  useEffect(() => () => clearTimeout(pendingColor.current), []);
   const validColor = normalizeThemeColor(draft);
   if (!isSuperAdmin(user?.user_type)) return null;
   function choose(color) {
+    clearTimeout(pendingColor.current);
     setDraft(color);
     setPrimaryColor(color);
+  }
+  function previewColor(color) {
+    setDraft(color);
+    clearTimeout(pendingColor.current);
+    pendingColor.current = setTimeout(() => setPrimaryColor(color), 180);
   }
   return <Card className='mb-6 max-w-[880px]'>
     <CardHeader><CardTitle>Appearance</CardTitle><CardDescription>Personalize your workspace. Changes apply immediately and are saved in this browser.</CardDescription></CardHeader>
@@ -38,13 +46,13 @@ export default function AppearanceSettings() {
       <div>
         <label htmlFor='theme-color-hex' className='mb-2 block text-sm font-medium'>Custom color</label>
         <div className='flex flex-wrap items-center gap-3'>
-          <input type='color' aria-label='Choose a custom primary color' value={primaryColor} onChange={event => choose(event.target.value)} className='h-10 w-12 cursor-pointer rounded border border-input bg-background p-1' />
-          <Input id='theme-color-hex' value={draft} maxLength={7} placeholder='#3E6A9F' className='w-32 font-sans' aria-invalid={!validColor} aria-describedby='theme-color-help' onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && validColor) choose(validColor); }} />
+          <input type='color' aria-label='Choose a custom primary color' value={validColor || primaryColor} onChange={event => previewColor(event.target.value)} className='h-10 w-12 cursor-pointer rounded border border-input bg-background p-1' />
+          <Input id='theme-color-hex' value={draft} maxLength={7} placeholder='#3E6A9F' className='w-32 font-sans' aria-invalid={!validColor} aria-describedby='theme-color-help' onChange={event => { clearTimeout(pendingColor.current); setDraft(event.target.value); }} onKeyDown={event => { if (event.key === 'Enter' && validColor) choose(validColor); }} />
           <Button disabled={!validColor} onClick={() => choose(validColor)}>Apply color</Button>
         </div>
         <p id='theme-color-help' className='mt-2 text-xs text-muted-foreground'>{validColor ? 'Enter a six-digit HEX color, then apply.' : 'Use a valid HEX color such as #3E6A9F.'}</p>
       </div>
-      <div className='rounded-lg border border-border bg-muted/30 p-4'>
+      <div className='rounded-lg border border-border bg-muted/30 p-4' style={validColor ? { '--primary': validColor, '--primary-foreground': primaryTextColor(validColor) } : undefined}>
         <p className='mb-3 text-sm font-medium'>Live preview</p>
         <div className='flex flex-wrap items-center gap-3'><Button>Primary button</Button><Button variant='outline'>Secondary button</Button><span className='rounded-md bg-primary px-3 py-1 text-xs text-primary-foreground'>Active</span></div>
       </div>
