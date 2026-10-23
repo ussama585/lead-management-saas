@@ -2,7 +2,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Route, matchRoutes } from 'react-router-dom';
 import api from '../../../shared/services/api.js';
-import { createDataLeadJob, getDataLeadJob, updateDataLeadJob, deleteDataLeadJob, dataLeadJobFormValues, dataLeadJobPayload, emptyDataLeadJob } from './data-lead-job-create.jsx';
+import { createDataLeadJob, getDataLeadJob, updateDataLeadJob, deleteDataLeadJob, dataLeadJobFormValues, dataLeadJobPayload, emptyDataLeadJob, jobNatureValues } from './data-lead-job-create.jsx';
 import { dataLeadJobSchema } from '../../schemas/data-lead-job-schema.js';
 import { createRoleRoutes } from '../../../../layouts/role-routes.jsx';
 
@@ -46,6 +46,31 @@ describe('data lead job route and API', () => {
     { skills: [{ skill_name: 'Python', experience: 12, last_used: 0 }] }, { skills: [{ skill_name: 'Python', experience: 1, last_used: 6 }] },
     { degrees: [{ degree_name: '' }] }])('validates IDs, choices, ranges and nested fields: %j', async changes => {
     await expect(dataLeadJobSchema.validate({ ...values, ...changes })).rejects.toThrow();
+  });
+});
+
+describe('Job Nature behavior from the old form', () => {
+  const nature = { ...values, hours_per_week: '20-40', contract_period: 'Month(s)', contract_length: '6-12', job_shift: 'day-shift' };
+  it('clears contract fields when switching to Part-Time', () => {
+    expect(jobNatureValues(nature, 'Part-Time')).toMatchObject({ hours_per_week: '20-40', contract_length: '', contract_period: '', job_shift: 'day-shift' });
+  });
+  it('clears hours when switching to Contract', () => {
+    expect(jobNatureValues(nature, 'Contract')).toMatchObject({ hours_per_week: null, contract_length: '6-12', contract_period: 'Month(s)' });
+  });
+  it.each(['Full-Time', 'Temporary', 'Internship', undefined])('clears conditional fields for %s', type => {
+    expect(jobNatureValues(nature, type)).toMatchObject({ hours_per_week: null, contract_length: '', contract_period: '' });
+  });
+  it('validates hours and contracts only for their relevant job types', async () => {
+    await expect(dataLeadJobSchema.validate({ ...nature, job_type: 'Part-Time' })).resolves.toBeDefined();
+    await expect(dataLeadJobSchema.validate({ ...nature, job_type: 'Contract' })).resolves.toBeDefined();
+    await expect(dataLeadJobSchema.validate({ ...values, job_type: 'Part-Time', hours_per_week: '' })).rejects.toThrow('Enter hours');
+    await expect(dataLeadJobSchema.validate({ ...values, job_type: 'Contract', contract_length: '' })).rejects.toThrow();
+    await expect(dataLeadJobSchema.validate({ ...values, job_type: 'Full-Time', hours_per_week: null, contract_period: null, contract_length: null })).resolves.toBeDefined();
+  });
+  it('preserves text ranges and strips irrelevant values from create/edit payloads', () => {
+    expect(dataLeadJobPayload({ ...nature, job_type: 'Part-Time' })).toMatchObject({ hours_per_week: '20-40', contract_period: '', contract_length: '' });
+    expect(dataLeadJobPayload({ ...nature, job_type: 'Contract' })).toMatchObject({ hours_per_week: null, contract_period: 'Month(s)', contract_length: '6-12' });
+    expect(dataLeadJobPayload({ ...nature, job_type: 'Part-Time', hours_per_week: '40' }).hours_per_week).toBe(40);
   });
 });
 

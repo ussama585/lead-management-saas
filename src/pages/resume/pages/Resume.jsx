@@ -1103,7 +1103,7 @@ const Resume = () => {
       <Box sx={{ p: 3, backgroundColor: 'white', minHeight: '100vh' }}>
         <ResumePageTopSection
           onUploadBulkCv={() => navigate('/resume-upload')}
-          {...(userType === 'admin' && {
+          {...(userType === 'super_admin' && {
             onViewCvListing: () => navigate('/cv-listing'),
             onViewProfileListing: () => navigate('/profile-listing'),
           })}
@@ -1150,7 +1150,7 @@ const Resume = () => {
 
         <ResumeTableSection
           selectedCount={selectedCount}
-          isAdmin={userType === 'admin'}
+          isAdmin={userType === 'super_admin'}
           onDownloadSelected={handleDownloadResumes}
           totalCount={totalCount}
           columns={columns}

@@ -742,10 +742,10 @@ export default function JobHeadhunting() {
     userType === 'recruitment_executive' ||
     userType === 'sales_manager' ||
     userType === 'sales_executive' ||
-    userType === 'admin';
+    userType === 'super_admin';
 
   const isSaasApplicationsReadOnly =
-    userType === 'admin' ||
+    userType === 'super_admin' ||
     userType === 'sales_manager' ||
     userType === 'sales_executive';
 
@@ -1652,7 +1652,7 @@ export default function JobHeadhunting() {
   // Handle view screening questionnaire responses (job-level list)
   const handleViewScreeningResponses = () => {
     const userType = user?.user_type;
-    const basePath = userType === 'admin' ? '/admin' : userType === 'recruitment_manager' ? '/recruitment-manager' : userType === 'recruitment_executive' ? '/recruitment-executive' : '';
+    const basePath = userType === 'super_admin' ? '/super_admin' : userType === 'recruitment_manager' ? '/recruitment-manager' : userType === 'recruitment_executive' ? '/recruitment-executive' : '';
     if (basePath) navigate(`${basePath}/response-analysis/${jobId}?type=jobResponse`);
   };
 
@@ -1670,7 +1670,7 @@ export default function JobHeadhunting() {
     const userType = user?.user_type;
     let basePath = '';
 
-    if (userType === 'admin') {
+    if (userType === 'super_admin') {
       basePath = '/admin';
     } else if (userType === 'recruitment_manager') {
       basePath = '/recruitment-manager';
@@ -1715,7 +1715,7 @@ export default function JobHeadhunting() {
     const resumeId = getResumeIdentifier(record);
     const userType = user?.user_type;
     let basePath = '';
-    if (userType === 'admin') basePath = '/admin';
+    if (userType === 'super_admin') basePath = '/super_admin';
     else if (userType === 'recruitment_manager') basePath = '/recruitment-manager';
     else if (userType === 'recruitment_executive') basePath = '/recruitment-executive';
     if (!basePath) return;
@@ -2052,7 +2052,7 @@ export default function JobHeadhunting() {
       responsive: ['xs', 'sm'],
       render: (val, record) => {
         const canEditSalesRemarks =
-          (userType === 'admin' || userType === 'sales_manager' || userType === 'sales_executive') &&
+          (userType === 'super_admin' || userType === 'sales_manager' || userType === 'sales_executive') &&
           jobStatus === 'Active';
 
         return (
@@ -2124,7 +2124,7 @@ export default function JobHeadhunting() {
       )
     },
     // Status History - admin only (placeholder until API is provided)
-    ...(userType === 'admin' ? [{
+    ...(userType === 'super_admin' ? [{
       title: 'Status History',
       key: 'status_history',
       align: 'left',
@@ -3753,7 +3753,7 @@ export default function JobHeadhunting() {
               >
                 Close
               </Button>,
-              (userType === 'admin' || userType === 'sales_manager' || userType === 'sales_executive') &&
+              (userType === 'super_admin' || userType === 'sales_manager' || userType === 'sales_executive') &&
               jobStatus === 'Active' && (
                 <Button
                   key="save"
@@ -3768,7 +3768,7 @@ export default function JobHeadhunting() {
             width="90%"
             style={{ maxWidth: '600px' }}
           >
-            {(userType === 'admin' || userType === 'sales_manager' || userType === 'sales_executive') &&
+            {(userType === 'super_admin' || userType === 'sales_manager' || userType === 'sales_executive') &&
               jobStatus === 'Active' ? (
               <TextArea
                 value={salesRemarksModal.currentRemarks}
@@ -4092,7 +4092,7 @@ export default function JobHeadhunting() {
               onCancel={() => setBatchShareModal({ visible: false, link: null, title: '' })}
             />
           </Suspense>
-          {userType === 'admin' && (
+          {userType === 'super_admin' && (
             <StatusHistoryModal
               open={statusHistoryModal.visible}
               entity={statusHistoryModal.entity}

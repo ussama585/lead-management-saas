@@ -212,3 +212,9 @@ export const getVacancyOptions = () => {
     value: i + 1,
   })).concat({ label: "100+", value: 101 });
 };
+export const degreeNameOptions = [
+  'Software Engineering', 'Information Technology', 'Mechanical Engineering',
+  'Electrical Engineering', 'Chemical Engineering', 'Aerospace Engineering',
+  'Biomedical Engineering', 'Environmental Engineering', 'Pharmacy', 'Business Administration',
+].map(name => ({ label: name, value: name }));
+

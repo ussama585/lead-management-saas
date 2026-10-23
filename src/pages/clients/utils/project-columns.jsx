@@ -277,7 +277,7 @@ export const createProjectColumns = ({
       },
     },
     // Delete column - only for admin and sales_manager
-    ...(userType === 'admin' || userType === 'sales_manager'
+    ...(userType === 'super_admin' || userType === 'sales_manager'
       ? [
         {
           header: 'Delete',

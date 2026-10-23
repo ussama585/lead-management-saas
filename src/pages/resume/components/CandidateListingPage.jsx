@@ -426,7 +426,7 @@ const CandidateListingPage = ({ listKind, breadcrumbText, tableHeadingLabel }) =
         {isCvListing && (
           <SelectedRowsActions
             selectedCount={selectedCount}
-            isAdmin={userType === 'admin'}
+            isAdmin={userType === 'super_admin'}
             onMarkUnprocessed={handleMarkUnprocessed}
           />
         )}
@@ -451,7 +451,7 @@ const CandidateListingPage = ({ listKind, breadcrumbText, tableHeadingLabel }) =
           columnVisibility={{ id: false }}
         />
 
-        {isCvListing && userType === 'admin' && (
+        {isCvListing && userType === 'super_admin' && (
           <ConfirmationModal
             showModal={markUnprocessedModalVisible}
             setShowModal={setMarkUnprocessedModalVisible}

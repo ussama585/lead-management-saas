@@ -67,6 +67,9 @@ export const createStatusColumn = ({
   additionalProps = {},
   size,
   leadType, // 'meta-leads', 'data-leads', or undefined (for regular leads)
+  statusOptions = STATUS_OPTIONS,
+  requireRemarksForAll = false,
+  editableRoles = ['admin', 'sales_manager', 'sales_executive'],
 }) => {
   console.log('[StatusColumn] createStatusColumn called with:', {
     userType,
@@ -127,17 +130,13 @@ export const createStatusColumn = ({
       // - Sales executives can edit status if converted_to_client is false
       // - Admin can always edit all leads
       // - Sales managers can edit all leads (including executives' leads)
-      const canEdit = userType !== 'marketing_manager' && (
-        userType === 'admin' || 
-        userType === 'sales_manager' ||
-        userType === 'sales_executive'
-      );
+      const canEdit = userType !== 'marketing_manager' && editableRoles.includes(userType);
 
       console.log('[StatusColumn] canEdit evaluation:', {
         entryId: entry.id,
         userType,
         isMarketingManager: userType === 'marketing_manager',
-        isAdmin: userType === 'admin',
+        isAdmin: userType === 'super_admin',
         isSalesManager: userType === 'sales_manager',
         isSalesExecutive: userType === 'sales_executive',
         canEdit
@@ -166,6 +165,11 @@ export const createStatusColumn = ({
           style={{ width: 'fit-content' }}
           value={currentStatus || 'Select Status'}
           onChange={async value => {
+            if (value === currentStatus) return;
+            if (requireRemarksForAll) {
+              onOpenRemarksModal?.(entry, value);
+              return;
+            }
             // Check if converting to Potential Client and job count is 0
             if (value === 'Potential Client') {
               const jobCount = entry.job_count || 0;
@@ -235,7 +239,7 @@ export const createStatusColumn = ({
           className="antd-input dropdown"
           {...additionalProps}
         >
-          {STATUS_OPTIONS.map((status) => (
+          {statusOptions.map((status) => (
             <Option key={status} value={status}>
               {status}
             </Option>

@@ -1,9 +1,10 @@
 import React, { useMemo, useState, useEffect, Suspense } from 'react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import "../../../../assets/styles/legacy/leads.generated.css";
-import { message, Row, Col, Select, Modal, Input, Button } from 'antd';
+import { Alert, Spin, message, Row, Col, Select, Modal, Input, Button } from 'antd';
 import { Trash2 as DeleteOutlined } from 'lucide-react';
 import LeadCard from '../../../../components/lead-card.component.jsx';
+import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
 import { ConfirmationModal } from '../../../clients/components/LazyModals.jsx';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -15,6 +16,31 @@ import { formatCurrency, formatPaymentTerm, formatSalaryNum } from '../../../sha
 import useUserStore from '../../../shared/store/user-store.js';
 import { countriesNames, citiesNames, nationalityOptions, currencyOptions, paymentTermOptions, languagesOptions } from '../../../shared/utils/countries.js';
 import { loadTableState } from '../../../shared/utils/persistTableState.js';
+import { getRolePath } from '../../../auth/role-home.js';
+import { isSuperAdmin } from '../../../auth/role-access.js';
+
+export async function getWebsiteLeadDetail(identifier) {
+    const { data } = await api.get(`/lead-generation/job/${encodeURIComponent(identifier)}`);
+    if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead details.');
+    if (data?.id == null || !data?.identifier) throw new Error('Could not read lead details.');
+    return data;
+}
+
+export async function getWebsiteLeadJobHistory(jobId) {
+    const { data } = await api.get(`/lead-generation/job-history/${encodeURIComponent(jobId)}`);
+    if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load job history.');
+    if (!Array.isArray(data)) throw new Error('Could not read job history.');
+    return data;
+}
+
+export async function getWebsiteLeadJobs(leadId, { page = 1, size = 10, search = '', sortBy = '', order = 'asc' } = {}) {
+    const { data } = await api.get(`/lead-generation/job-list/${encodeURIComponent(leadId)}`, {
+        params: { page, size, search, sort_by: sortBy, order },
+    });
+    if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead jobs.');
+    if (!Array.isArray(data?.results)) throw new Error('Could not read lead jobs.');
+    return data;
+}
 
 const LeadDetailPage = () => {
     document.title = 'Lead | Search O Pal';
@@ -43,6 +69,7 @@ const LeadDetailPage = () => {
     const [descEditRow, setDescEditRow] = useState(null);
     const [descLoading, setDescLoading] = useState(false);
     const [deleteModal, setDeleteModal] = useState({ visible: false, job: null });
+    const [historyJob, setHistoryJob] = useState(null);
     const [deleteReason, setDeleteReason] = useState('');
 
     // Persist table state to sessionStorage
@@ -77,9 +104,10 @@ const LeadDetailPage = () => {
         return employmentTypeMap[value.toLowerCase()] || value;
     };
 
-    const { isLoading, data } = useQuery(
-        `lead-${id}`,
-        async () => await api.get(`/lead-generation/update/${id}`),
+    const identifier = searchParams.get('identifier') || id;
+    const { isLoading, data, isError: detailError, error: detailRequestError, refetch: refetchDetail } = useQuery(
+        ['websiteLeadDetail', user?.id, user?.user_type, identifier],
+        () => getWebsiteLeadDetail(identifier),
         {
             staleTime: 10 * 60 * 1000, // 10 minutes - lead details rarely change
             cacheTime: 15 * 60 * 1000, // 15 minutes
@@ -87,7 +115,7 @@ const LeadDetailPage = () => {
         }
     );
 
-    const { isLoading: loadingJobs, data: jobsData, refetch: refetchJobs } = useQuery(
+    const { isLoading: loadingJobs, data: jobsData, isError: jobsError, error: jobsRequestError, refetch: refetchJobs } = useQuery(
         [
             `leadjobs-${id}`, 
             pagination.pageIndex, 
@@ -96,7 +124,8 @@ const LeadDetailPage = () => {
             sorting?.[0]?.['id'], 
             sorting?.[0]?.['desc']
         ],
-        async () => await api.get(`/lead-generation/jobs/${id}?page=${pagination.pageIndex+1}&size=${pagination.pageSize}&search=${globalFilter}&sort_by=${sorting?.[0]?.['id'] ?? ''}&order=${sorting?.[0]?.['desc'] ? 'desc' : 'asc'}`),
+        () => getWebsiteLeadJobs(id, { page: pagination.pageIndex + 1, size: pagination.pageSize, search: globalFilter,
+            sortBy: sorting?.[0]?.id ?? '', order: sorting?.[0]?.desc ? 'desc' : 'asc' }),
         {
             staleTime: 5 * 60 * 1000, // 5 minutes - jobs data changes frequently
             cacheTime: 10 * 60 * 1000, // 10 minutes
@@ -104,10 +133,10 @@ const LeadDetailPage = () => {
         }
     );
 
-    const jobs = jobsData?.data?.results ?? [];
-    const lead = data?.data ?? {};
+    const jobs = jobsData?.results ?? [];
+    const lead = data ?? {};
     const isReadOnlyLead =lead?.converted_to_client === true
-    const canDeleteJob = (user?.user_type === 'admin' || user?.user_type === 'sales_manager') && !isReadOnlyLead;
+    const canDeleteJob = (isSuperAdmin(user?.user_type) || user?.user_type === 'sales_manager') && !isReadOnlyLead;
 
     const deleteJobMutation = useMutation(
         ({ jobId, reason }) => deleteWebsiteLeadJob(jobId, reason),
@@ -130,21 +159,11 @@ const LeadDetailPage = () => {
     };
 
     const handleConfirmDeleteJob = () => {
-        if (!deleteReason.trim()) {
-            message.error('Please provide a reason for deletion');
-            return;
-        }
         deleteJobMutation.mutate({ jobId: deleteModal.job?.id, reason: deleteReason.trim() });
     };
 
     const goBack = () => {
-        if (user?.user_type === 'admin') {
-            navigate('/admin/leads');
-        } else if (user?.user_type === 'sales_manager') {
-            navigate('/sales-manager/leads');
-        } else {
-            navigate('/sales-executive/leads');
-        }
+        navigate(getRolePath(user?.user_type, '/leads'));
     };
 
     // Options for dropdowns
@@ -181,13 +200,7 @@ const LeadDetailPage = () => {
             Cell: ({ cell, row }) => <span style={{ cursor: isReadOnlyLead ? 'default' : 'pointer' }}
                 onClick={() => {
                     if (isReadOnlyLead) return;
-                    if (user?.user_type === 'admin') {
-                        navigate(`/admin/leads/${id}/job/${row?.original?.id}`);
-                    } else if (user?.user_type === 'sales_manager') {
-                        navigate(`/sales-manager/leads/${id}/job/${row?.original?.id}`);
-                    } else {
-                        navigate(`/sales-executive/leads/${id}/job/${row?.original?.id}`);
-                    }
+                    navigate(getRolePath(user?.user_type, `/leads/${id}/job/${row.original.id}`));
                 }}>
                 <span style={{ textDecoration: isReadOnlyLead ? 'none' : 'underline' }}>{cell.getValue()}</span></span>,
         },
@@ -625,6 +638,11 @@ const LeadDetailPage = () => {
                 },
             ]
             : []),
+        ...(isSuperAdmin(user?.user_type) ? [{
+            ...createStatusHistoryColumn({ header: 'Status History', buttonTitle: 'View job history',
+                accessorKey: 'website_job_history', onOpenHistory: setHistoryJob }),
+            enableEditing: false, enableColumnFilter: false,
+        }] : []),
     ], [id, user?.user_type, navigate, isReadOnlyLead, canDeleteJob]);
 
     const table = useMaterialReactTable({
@@ -695,7 +713,7 @@ const LeadDetailPage = () => {
         manualPagination: true,
         manualSorting: true,
         manualFiltering: true,
-        rowCount: jobsData?.data?.count,
+        rowCount: jobsData?.count ?? 0,
         enableGlobalFilter: true,
     });
 
@@ -705,7 +723,9 @@ const LeadDetailPage = () => {
             <div className="container">
              
                     
-                        <LeadCard lead={lead} leadType="Website Lead" />
+                        {isLoading ? <div className="py-6 text-center"><Spin /></div> : detailError
+                            ? <Alert type="error" showIcon message={detailRequestError?.message || 'Could not load lead details.'} action={<Button onClick={() => refetchDetail()}>Retry</Button>} />
+                            : <LeadCard lead={lead} leadType="Website Lead" />}
                    
                
                 <div className="row">
@@ -713,15 +733,10 @@ const LeadDetailPage = () => {
                         {!isReadOnlyLead && (
                             <button onClick={() => {
                                 if (isReadOnlyLead) return;
-                                if (user?.user_type === 'admin') {
-                                    navigate(`/admin/leads/${id}/new-job`);
-                                } else if (user?.user_type === 'sales_manager') {
-                                    navigate(`/sales-manager/leads/${id}/new-job`);
-                                } else {
-                                    navigate(`/sales-executive/leads/${id}/new-job`);
-                                }
+                                navigate(getRolePath(user?.user_type, `/leads/${lead.id || id}/new-job`), { state: { identifier: lead.identifier } });
                             }} className='custom-button' disabled={isReadOnlyLead}>Add New Job</button>
                         )}
+                        {jobsError && <Alert type="error" showIcon message={jobsRequestError?.message || 'Could not load lead jobs.'} action={<Button onClick={() => refetchJobs()}>Retry</Button>} />}
                         <MaterialReactTable table={table} />
                     </div>
                 </div>
@@ -765,6 +780,17 @@ const LeadDetailPage = () => {
                 </div>
             </Modal>
 
+            {isSuperAdmin(user?.user_type) && <StatusHistoryModal
+                open={historyJob != null}
+                entity={historyJob}
+                onClose={() => setHistoryJob(null)}
+                fetchHistoryApi={getWebsiteLeadJobHistory}
+                title={job => `Lead Job History - ${job?.job_title || 'Job'}`}
+                getTitleFromEntity={job => job?.job_title || 'Job'}
+                historyDateKey="changed_at"
+                queryKeyPrefix={`websiteLeadJobHistory-${user?.id}-${user?.user_type}-${id}`}
+                emptyMessage="No job history available."
+            />}
             <Suspense fallback={null}>
                 <ConfirmationModal
                     showModal={deleteModal.visible}
@@ -774,7 +800,7 @@ const LeadDetailPage = () => {
                     }}
                     mutation={deleteJobMutation}
                     onConfirm={handleConfirmDeleteJob}
-                    showReasonField={true}
+                    showReasonField={false}
                     reason={deleteReason}
                     setReason={setDeleteReason}
                     message={

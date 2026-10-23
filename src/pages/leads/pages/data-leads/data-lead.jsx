@@ -8,6 +8,7 @@ import { MaterialReactTable, useMaterialReactTable } from "material-react-table"
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
+import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
 import api from '../../../shared/services/api.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
 import { getRolePath } from '../../../auth/role-home.js';
@@ -19,6 +20,13 @@ import useUserStore from "../../../shared/store/user-store.js";
 import { countriesNames, citiesNames, currencyOptions, paymentTermOptions } from "../../../shared/utils/countries.js";
 import { loadTableState } from "../../../shared/utils/persistTableState.js";
 import { formatSalaryNum } from "../../../shared/utils/formatters.js";
+
+export async function getDataLeadJobHistory(jobId) {
+  const { data } = await api.get(`/data-leads/job-history/${encodeURIComponent(jobId)}`);
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load job history.');
+  if (!Array.isArray(data)) throw new Error('Could not read job history.');
+  return data;
+}
 
 async function updateDataLeadJob(jobId, payload) {
   const { data } = await api.patch(`/data-leads/update-job/${encodeURIComponent(jobId)}`, payload);
@@ -56,6 +64,7 @@ const DataLead = () => {
   const [descEditRow, setDescEditRow] = useState(null);
   const [descLoading, setDescLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ visible: false, job: null });
+  const [historyJob, setHistoryJob] = useState(null);
 
   // Persist table state to sessionStorage
   useEffect(() => {
@@ -648,6 +657,12 @@ const DataLead = () => {
             },
           ]
         : []),
+      ...(isSuperAdmin(user?.user_type) ? [{ ...createStatusHistoryColumn({
+        header: 'History',
+        buttonTitle: 'View job history',
+        accessorKey: 'job_history_data',
+        onOpenHistory: setHistoryJob,
+      }), enableEditing: false, enableColumnFilter: false }] : []),
     ],
     [navigate, dataLeadId, normalizeEmploymentType, refetchJobs, isReadOnlyLead, canDeleteJob, handleDeleteJob, user?.user_type],
   );
@@ -833,6 +848,17 @@ const DataLead = () => {
         </div>
       </Modal>
 
+      {isSuperAdmin(user?.user_type) && <StatusHistoryModal
+        open={historyJob != null}
+        entity={historyJob}
+        onClose={() => setHistoryJob(null)}
+        fetchHistoryApi={getDataLeadJobHistory}
+        title={job => `Data Lead Job History - ${job?.job_title || 'Job'}`}
+        getTitleFromEntity={job => job?.job_title || 'Job'}
+        historyDateKey="changed_at"
+        queryKeyPrefix={`dataLeadJobHistory-${user?.id}-${user?.user_type}-${dataLeadId}`}
+        emptyMessage="No job history available."
+      />}
       <SettingsDeleteModal title="Delete job" itemName={deleteModal.job?.job_title}
         open={deleteModal.visible} loading={deleteJobMutation.isLoading}
         error={deleteJobMutation.isError ? deleteJobMutation.error?.response?.data?.message || deleteJobMutation.error?.message || 'Could not delete job.' : null}

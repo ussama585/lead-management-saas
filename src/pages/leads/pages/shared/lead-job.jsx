@@ -33,6 +33,7 @@ import {
   normalizeEmploymentType,
 } from "../../../shared/utils/job-utils.js";
 import useUserStore from "../../../shared/store/user-store.js";
+import { getRolePath } from '../../../auth/role-home.js';
 
 
 const LeadJobPage = () => {
@@ -75,6 +76,10 @@ const isLeadReadOnly = (lead) =>
   };
 
   const goBack = () => {
+  if (isRegularLead) {
+    navigate(getRolePath(user?.user_type, `/leads/${leadIdentifier}`));
+    return;
+  }
   let basePath;
   if (user?.user_type === "admin") {
     basePath = "/admin";

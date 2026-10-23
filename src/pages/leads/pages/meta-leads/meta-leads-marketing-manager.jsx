@@ -474,14 +474,14 @@ export default function MetaLeadsMarketingManager() {
     if (user?.user_type === 'admin') {
       // For admin, data from getManangersExecutives() is directly the array
       const allUsers = assigningUsersData || [];
-      return allUsers.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
+      return allUsers;
     }
 
     // For marketing manager, use getManangersExecutives API to get executives list
     if (user?.user_type === 'marketing_manager') {
       // Filter to only show sales_executive users
       const allUsers = Array.isArray(assigningUsersData) ? assigningUsersData : [];
-      return allUsers.filter(u => u.user_type === 'sales_executive');
+      return allUsers;
     }
 
     return [];

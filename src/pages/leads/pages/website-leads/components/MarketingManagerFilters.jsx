@@ -89,7 +89,7 @@ const MarketingManagerFilters = ({
         >
           {statusTabs
             .filter(tab =>
-              tab.value !== 'Unassigned' || userType === 'admin' || userType === 'sales_manager' || userType === 'marketing_manager'
+              tab.value !== 'Unassigned' || userType === 'super_admin' || userType === 'sales_manager' || userType === 'marketing_manager'
             )
             .map(tab => {
               const count = tab.apiKey === 'total_count' 

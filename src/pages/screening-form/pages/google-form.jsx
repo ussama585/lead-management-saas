@@ -41,7 +41,7 @@ function createGoogleStyleBlankQuestion() {
 }
 
 const screeningFormsPathForUser = (userType) => {
-  if (userType === 'admin') return '/admin/screening-forms';
+  if (userType === 'super_admin') return '/super_admin/screening-forms';
   if (userType === 'recruitment_manager') return '/recruitment-manager/screening-forms';
   return '/recruitment-executive/screening-forms';
 };

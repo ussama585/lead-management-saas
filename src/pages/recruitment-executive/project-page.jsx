@@ -50,7 +50,7 @@ const { TextArea } = Input;
 
 // Status colors (aligned with sales-manager meta/data leads tab styling)
 const statusColors = {
-   'All': '#8c8c8c',
+  'All': '#8c8c8c',
   'Pending': '#faad14', // Orange
   'Active': '#52c41a', // Green
   'Delayed': '#ff7a45', // Dark Orange
@@ -77,7 +77,7 @@ export default function AssignedProjectsPage() {
   const showApprovalFilter = isRecruitmentUser || userType === 'admin';
 
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   // Load initial state from sessionStorage or URL params
   const routeKey = userType === 'project_manager' ? 'project-manager-projects' : 'recruitment-projects';
   const initialState = loadTableState(routeKey, searchParams, {
@@ -89,25 +89,25 @@ export default function AssignedProjectsPage() {
     selectedRecruiterId2: '',
     selectedExecId: null,
   });
-  
+
   const clientIdFromParams = searchParams.get('client_id');
   const assignedToUser = searchParams.get('assigned_to_user') === 'true';
-  
+
   // Initialize states with loaded values
   const [selectedTab, setSelectedTab] = useState(initialState.tab || 'Active');
-  
+
   const [pagination, setPagination] = useState({
     pageIndex: initialState.pageIndex || 0,
     pageSize: initialState.pageSize || 10,
   });
 
   const [globalFilter, setGlobalFilter] = useState(initialState.search || '');
-  
+
   const [sorting, setSorting] = useState(initialState.sorting || []);
-  
+
   // Track if component is mounting to prevent resetting pagination from URL params
   const isInitialMount = useRef(true);
-  
+
   // Prevent clearing search on component mount - handle MaterialReactTable edge cases
   const handleGlobalFilterChange = (value) => {
     setGlobalFilter(value === undefined || value === null ? '' : value);
@@ -118,10 +118,10 @@ export default function AssignedProjectsPage() {
   }, [navigate]);
 
   // Status change confirmation modal state
-  const [statusModal, setStatusModal] = useState({ 
-    visible: false, 
-    project: null, 
-    oldStatus: '', 
+  const [statusModal, setStatusModal] = useState({
+    visible: false,
+    project: null,
+    oldStatus: '',
     newStatus: '',
     recruiterId: undefined,
     hasRecruitmentManager: false,
@@ -150,7 +150,7 @@ export default function AssignedProjectsPage() {
     newRecruiterId: null,
     newRecruiterName: '',
   });
-  
+
   // Delete modal state
   const [deleteModal, setDeleteModal] = useState({ visible: false, project: null });
   const [deleteReason, setDeleteReason] = useState('');
@@ -218,83 +218,83 @@ export default function AssignedProjectsPage() {
   // Selected executive card (for recruitment_manager view)
   const [selectedExecId, setSelectedExecId] = useState(initialState.selectedExecId ?? null);
 
-// Sync all state to URL params
-useEffect(() => {
-  const params = {};
-  
-  // Keep existing params
-  if (clientIdFromParams) params.client_id = clientIdFromParams;
-  if (assignedToUser) params.assigned_to_user = 'true';
-  
-  // Tab
-  if (selectedTab !== 'Active') {
-    params.tab = selectedTab;
-  }
-  
-  // Search
-  if (globalFilter && globalFilter.trim()) {
-    params.search = globalFilter.trim();
-  }
-  
-  // Pagination
-  if (pagination.pageIndex !== 0) {
-    params.page = pagination.pageIndex.toString();
-  }
-  if (pagination.pageSize !== 10) {
-    params.pageSize = pagination.pageSize.toString();
-  }
-  
-  // Sorting
-  if (sorting && sorting.length > 0 && sorting[0]?.id) {
-    params.sortBy = sorting[0].id;
-    params.sortOrder = sorting[0].desc ? 'desc' : 'asc';
-  }
+  // Sync all state to URL params
+  useEffect(() => {
+    const params = {};
 
-  // Recruiter filter tab (project_manager only)
-  if (selectedRecruiterId2) {
-    params.recruiter = selectedRecruiterId2;
-  }
+    // Keep existing params
+    if (clientIdFromParams) params.client_id = clientIdFromParams;
+    if (assignedToUser) params.assigned_to_user = 'true';
 
-  // Executive card click (recruitment_manager only)
-  if (selectedExecId) {
-    params.execId = String(selectedExecId);
-  }
+    // Tab
+    if (selectedTab !== 'Active') {
+      params.tab = selectedTab;
+    }
 
-  // Approval status filter (recruitment users / admin only)
-  if (selectedApprovalFilter && selectedApprovalFilter !== 'Approved') {
-    params.approval = selectedApprovalFilter;
-  }
+    // Search
+    if (globalFilter && globalFilter.trim()) {
+      params.search = globalFilter.trim();
+    }
 
-  setSearchParams(params, { replace: true });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [selectedTab, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, selectedRecruiterId2, selectedExecId, selectedApprovalFilter]);
+    // Pagination
+    if (pagination.pageIndex !== 0) {
+      params.page = pagination.pageIndex.toString();
+    }
+    if (pagination.pageSize !== 10) {
+      params.pageSize = pagination.pageSize.toString();
+    }
 
-// Save state to sessionStorage for persistence
-useEffect(() => {
-  try {
-    sessionStorage.setItem(
-      `tableState_${routeKey}`,
-      JSON.stringify({
-        tab: selectedTab,
-        search: globalFilter,
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-        sorting: sorting,
-        selectedRecruiterId2,
-        selectedExecId,
-        selectedApprovalFilter,
-        timestamp: Date.now(),
-      })
-    );
-  } catch (e) {
-    console.warn('Failed to save table state to sessionStorage:', e);
-  }
-}, [routeKey, selectedTab, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, selectedRecruiterId2, selectedExecId, selectedApprovalFilter]);
+    // Sorting
+    if (sorting && sorting.length > 0 && sorting[0]?.id) {
+      params.sortBy = sorting[0].id;
+      params.sortOrder = sorting[0].desc ? 'desc' : 'asc';
+    }
+
+    // Recruiter filter tab (project_manager only)
+    if (selectedRecruiterId2) {
+      params.recruiter = selectedRecruiterId2;
+    }
+
+    // Executive card click (recruitment_manager only)
+    if (selectedExecId) {
+      params.execId = String(selectedExecId);
+    }
+
+    // Approval status filter (recruitment users / admin only)
+    if (selectedApprovalFilter && selectedApprovalFilter !== 'Approved') {
+      params.approval = selectedApprovalFilter;
+    }
+
+    setSearchParams(params, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTab, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, selectedRecruiterId2, selectedExecId, selectedApprovalFilter]);
+
+  // Save state to sessionStorage for persistence
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        `tableState_${routeKey}`,
+        JSON.stringify({
+          tab: selectedTab,
+          search: globalFilter,
+          pageIndex: pagination.pageIndex,
+          pageSize: pagination.pageSize,
+          sorting: sorting,
+          selectedRecruiterId2,
+          selectedExecId,
+          selectedApprovalFilter,
+          timestamp: Date.now(),
+        })
+      );
+    } catch (e) {
+      console.warn('Failed to save table state to sessionStorage:', e);
+    }
+  }, [routeKey, selectedTab, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, selectedRecruiterId2, selectedExecId, selectedApprovalFilter]);
 
   // Fetch client details
   const { data: clientData, isLoading: clientLoading } = useQuery(
     ['clientDetails', clientId],
-    () =>  getClientDetails(clientId),
+    () => getClientDetails(clientId),
     {
       enabled: !!clientId,
       staleTime: 10 * 60 * 1000, // 10 minutes - client details rarely change
@@ -343,39 +343,39 @@ useEffect(() => {
 
   // Fetch projects data using the API
   // Update the useQuery for projects data
-const { data: projectsData, isLoading: projectsLoading } = useQuery(
-  [
-    'assignedProjects',
-    user?.id,
-    pagination.pageIndex,
-    pagination.pageSize,
-    sortField,
-    sortDirection,
-    globalFilter,
-    selectedTab,
-    selectedProjectManagerId,
-    effectiveRecruiterId,
-    selectedApprovalFilter,
-  ],
-  () => getAssignedProjects(
-    pagination.pageIndex + 1,
-    pagination.pageSize,
-    sorting,
-    globalFilter,
-    (selectedApprovalFilter === 'Pending' || selectedApprovalFilter === 'Rejected') ? undefined : (selectedTab === 'All' ? undefined : selectedTab),
-    selectedProjectManagerId,
-    effectiveRecruiterId,
-    selectedApprovalFilter === 'All' ? '' : selectedApprovalFilter,
-  ),
-  {
-    enabled: !!user?.id,
-    staleTime: 2 * 60 * 1000, // 2 minutes - reasonable for project data
-    cacheTime: 10 * 60 * 1000, // 10 minutes cache
-    refetchOnWindowFocus: false,
-    refetchOnMount: false, // Don't refetch on mount unless stale
-    keepPreviousData: true, // Keep previous data while loading new data
-  }
-);
+  const { data: projectsData, isLoading: projectsLoading } = useQuery(
+    [
+      'assignedProjects',
+      user?.id,
+      pagination.pageIndex,
+      pagination.pageSize,
+      sortField,
+      sortDirection,
+      globalFilter,
+      selectedTab,
+      selectedProjectManagerId,
+      effectiveRecruiterId,
+      selectedApprovalFilter,
+    ],
+    () => getAssignedProjects(
+      pagination.pageIndex + 1,
+      pagination.pageSize,
+      sorting,
+      globalFilter,
+      (selectedApprovalFilter === 'Pending' || selectedApprovalFilter === 'Rejected') ? undefined : (selectedTab === 'All' ? undefined : selectedTab),
+      selectedProjectManagerId,
+      effectiveRecruiterId,
+      selectedApprovalFilter === 'All' ? '' : selectedApprovalFilter,
+    ),
+    {
+      enabled: !!user?.id,
+      staleTime: 2 * 60 * 1000, // 2 minutes - reasonable for project data
+      cacheTime: 10 * 60 * 1000, // 10 minutes cache
+      refetchOnWindowFocus: false,
+      refetchOnMount: false, // Don't refetch on mount unless stale
+      keepPreviousData: true, // Keep previous data while loading new data
+    }
+  );
 
   // Track which project is currently being assigned a recruiter (for individual loading state)
   const [assigningRecruiterProjectId, setAssigningRecruiterProjectId] = useState(null);
@@ -428,19 +428,19 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
     'recruitmentExecutiveStats',
     getRecruitmentExecutiveStats,
     {
-      enabled: userType === 'recruitment_manager' || userType === 'admin',
+      enabled: userType === 'recruitment_manager' || userType === 'super_admin',
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
     }
   );
 
-  // Fetch recruiters under selected recruitment manager — project_manager and admin only
+  // Fetch recruiters under selected recruitment manager — project_manager and super_admin only
   const { data: projectRecruitersData } = useQuery(
     ['assignedProjectRecruiters', selectedProjectManagerId, userType, selectedApprovalFilter],
     () => getAssignedProjectRecruiters(selectedProjectManagerId, showApprovalFilter ? (selectedApprovalFilter === 'All' ? '' : selectedApprovalFilter) : ''),
     {
-      enabled: !!user?.id && (userType === 'project_manager' || userType === 'admin'),
+      enabled: !!user?.id && (userType === 'project_manager' || userType === 'super_admin'),
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
@@ -486,19 +486,19 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
   const statusMutation = useMutation(
     async ({ id, value, selected_jobs, recruiter_id }) => {
       const payload = { status: value };
-      
+
       // Include selected jobs if provided
       if (selected_jobs) {
         payload.selected_jobs = selected_jobs;
       }
-      
+
       // Include recruiter if provided
       if (recruiter_id) {
         payload.recruiter_id = recruiter_id;
       }
-     
+
       const response = await updateProjectStatus(id, payload);
-      
+
       return response;
     },
     {
@@ -508,8 +508,8 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
         // Store current sorting state
         const currentSorting = [...sorting];
         // Invalidate only the affected queries
-         queryClient.invalidateQueries(['assignedProjects']);
-         queryClient.invalidateQueries(['assignedProjectsCount']);
+        queryClient.invalidateQueries(['assignedProjects']);
+        queryClient.invalidateQueries(['assignedProjectsCount']);
         // Reapply sorting after a brief delay to ensure data is refreshed
         setTimeout(() => {
           if (currentSorting && currentSorting.length > 0) {
@@ -519,7 +519,7 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
         // Don't manually refetch - invalidation will trigger automatic refetch
       },
       onError: (error) => {
-     
+
         message.error(error?.message || 'Failed to update project status');
       },
     }
@@ -531,7 +531,7 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
 
   const approvalMutation = useMutation(
     ({ id, approvalStatus, reason, field, row }) => {
-      if (userType === 'admin' && field) {
+      if (userType === 'super_admin' && field) {
         const payload = {
           recruitment_manager_approval: field === 'recruitment_manager' ? approvalStatus : (row?.recruitment_manager_approval ?? 'Pending'),
           recruitment_manager_reason: field === 'recruitment_manager'
@@ -818,33 +818,33 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
     [filteredProjects, pagination.pageIndex, pagination.pageSize]
   );
 
-  
 
-    // Check if user can edit a project
+
+  // Check if user can edit a project
   const canEditProject = useCallback((project) => {
-    // Admin can edit any project
-    if (userType === 'admin') {
+    // Super Admin can edit any project
+    if (userType === 'super_admin') {
       return true;
     }
-    
+
     // Sales manager can edit any project regardless of client status
     if (userType === 'sales_manager') {
       return true;
     }
-    
+
     // For other non-admin users, check if client status is "Active"
     if (clientStatus !== 'Active') {
       return false;
     }
-    
+
     // Other users can only edit if the client is assigned to them
     if (assignedToUser) {
-        return true;
-      }
-      
-      return false;
-    
-    
+      return true;
+    }
+
+    return false;
+
+
   }, [userType, clientStatus, assignedToUser]);
 
   // Handler to update project status
@@ -1006,17 +1006,17 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
       message.error('Please select a recruitment executive');
       return;
     }
-   assignmentMutation.mutate({ projectIds: selectedProjectIds, recruiterId: selectedRecruiterId });
+    assignmentMutation.mutate({ projectIds: selectedProjectIds, recruiterId: selectedRecruiterId });
   };
 
   const getFilteredStatusOptions = useCallback((currentStatus, userTypeArg) => {
-  // If current status is not "Pending" and user is not admin, exclude "Pending" from options
-  if (currentStatus !== 'Pending' && userTypeArg !== 'admin') {
-    return statusOptions.filter(option => option.value !== 'Pending');
-  }
-  // Otherwise, return all status options
-  return statusOptions;
-}, [statusOptions]);
+    // If current status is not "Pending" and user is not admin, exclude "Pending" from options
+    if (currentStatus !== 'Pending' && userTypeArg !== 'admin') {
+      return statusOptions.filter(option => option.value !== 'Pending');
+    }
+    // Otherwise, return all status options
+    return statusOptions;
+  }, [statusOptions]);
 
   const projectsColumns = useProjectColumns({
     navigate,
@@ -1053,103 +1053,103 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
 
   return (
     <>
-      <BreadCrumb 
-       
+      <BreadCrumb
+
         linkText={
-           'Projects'
-        } 
+          'Projects'
+        }
       />
-      
+
       <div className="listing-page-content">
-       {/* Client Detail Card */}
-       <ClientDetailCard clientId={clientId} clientData={clientData} />
-      
-      {showApprovalFilter && (
-        <ApprovalStatusTabs
-          activeValue={selectedApprovalFilter}
-          counts={approvalCounts}
-          onChange={(val) => { setSelectedApprovalFilter(val); setPagination({ pageIndex: 0, pageSize: 10 }); }}
-        />
-      )}
+        {/* Client Detail Card */}
+        <ClientDetailCard clientId={clientId} clientData={clientData} />
 
-      {/* Executive summary cards - only for recruitment_manager, using stats API, and only on the Approved tab */}
-      {(userType === 'recruitment_manager' || userType === 'admin') && selectedApprovalFilter === 'Approved' && Array.isArray(executiveStatsData) && executiveStatsData.length > 0 && (
-        <div className="listing-exec-overview">
-          <div className="listing-exec-overview__title">Executive Overview</div>
-          <div className="listing-exec-overview__grid">
-            {executiveStatsData.map((exec) => {
-              const isSelected = selectedExecId === exec.id;
-              const clients =
-                exec.client_count ??
-                exec.clients ??
-                exec.total_clients ??
-                0;
-              const projects =
-                exec.project_count ??
-                exec.projects ??
-                exec.total_projects ??
-                0;
-              const jobs =
-                exec.job_count ??
-                exec.jobs ??
-                exec.total_jobs ??
-                0;
-              const resources =
-                exec.resources ??
-                exec.resources_required ??
-                exec.total_resources ??
-                0;
+        {showApprovalFilter && (
+          <ApprovalStatusTabs
+            activeValue={selectedApprovalFilter}
+            counts={approvalCounts}
+            onChange={(val) => { setSelectedApprovalFilter(val); setPagination({ pageIndex: 0, pageSize: 10 }); }}
+          />
+        )}
 
-              return (
-                <button
-                  key={exec.id}
-                  type="button"
-                  className={`listing-exec-card${isSelected ? ' listing-exec-card--selected' : ''}`}
-                  onClick={() =>
-                    setSelectedExecId((prev) => (prev === exec.id ? null : exec.id))
-                  }
-                >
-                  <div className="listing-exec-card__title">
-                    {exec.name || exec.label || 'Executive'}
-                  </div>
-                  <div className="listing-exec-card__meta">
-                    <span>Clients: <strong>{clients}</strong></span>
-                    <span>Projects: <strong>{projects}</strong></span>
-                    <span>Jobs: <strong>{jobs}</strong></span>
-                    <span>Resources: <strong>{resources}</strong></span>
-                  </div>
-                </button>
-              );
-            })}
+        {/* Executive summary cards - only for recruitment_manager, using stats API, and only on the Approved tab */}
+        {(userType === 'recruitment_manager' || userType === 'super_admin') && selectedApprovalFilter === 'Approved' && Array.isArray(executiveStatsData) && executiveStatsData.length > 0 && (
+          <div className="listing-exec-overview">
+            <div className="listing-exec-overview__title">Executive Overview</div>
+            <div className="listing-exec-overview__grid">
+              {executiveStatsData.map((exec) => {
+                const isSelected = selectedExecId === exec.id;
+                const clients =
+                  exec.client_count ??
+                  exec.clients ??
+                  exec.total_clients ??
+                  0;
+                const projects =
+                  exec.project_count ??
+                  exec.projects ??
+                  exec.total_projects ??
+                  0;
+                const jobs =
+                  exec.job_count ??
+                  exec.jobs ??
+                  exec.total_jobs ??
+                  0;
+                const resources =
+                  exec.resources ??
+                  exec.resources_required ??
+                  exec.total_resources ??
+                  0;
+
+                return (
+                  <button
+                    key={exec.id}
+                    type="button"
+                    className={`listing-exec-card${isSelected ? ' listing-exec-card--selected' : ''}`}
+                    onClick={() =>
+                      setSelectedExecId((prev) => (prev === exec.id ? null : exec.id))
+                    }
+                  >
+                    <div className="listing-exec-card__title">
+                      {exec.name || exec.label || 'Executive'}
+                    </div>
+                    <div className="listing-exec-card__meta">
+                      <span>Clients: <strong>{clients}</strong></span>
+                      <span>Projects: <strong>{projects}</strong></span>
+                      <span>Jobs: <strong>{jobs}</strong></span>
+                      <span>Resources: <strong>{resources}</strong></span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Recruiter filter tabs - hidden for admin (layer-1 exec cards only) */}
-      {userType === 'project_manager' && (
-        <FilterTabRow
-          items={projectRecruitersList}
-          selectedId={selectedRecruiterId2}
-          onSelect={(id) => {
-            setSelectedRecruiterId2(id);
-            setPagination({ pageIndex: 0, pageSize: 10 });
-          }}
-          style={{ marginBottom: 12 }}
-        />
-      )}
-
-      {userType === 'admin' && selectedExecId && (
-        <div style={{ marginBottom: 12 }}>
-          <ResumeClearAllFiltersButton
-            onClick={() => {
-              setSelectedExecId(null);
+        {/* Recruiter filter tabs - hidden for admin (layer-1 exec cards only) */}
+        {userType === 'project_manager' && (
+          <FilterTabRow
+            items={projectRecruitersList}
+            selectedId={selectedRecruiterId2}
+            onSelect={(id) => {
+              setSelectedRecruiterId2(id);
               setPagination({ pageIndex: 0, pageSize: 10 });
             }}
+            style={{ marginBottom: 12 }}
           />
-        </div>
-      )}
+        )}
 
-       <div className="listing-toolbar-flex" style={{ display: showApprovalFilter && selectedApprovalFilter !== 'All' && selectedApprovalFilter !== 'Approved' ? 'none' : undefined }}>
+        {userType === 'super_admin' && selectedExecId && (
+          <div style={{ marginBottom: 12 }}>
+            <ResumeClearAllFiltersButton
+              onClick={() => {
+                setSelectedExecId(null);
+                setPagination({ pageIndex: 0, pageSize: 10 });
+              }}
+            />
+          </div>
+        )}
+
+        <div className="listing-toolbar-flex" style={{ display: showApprovalFilter && selectedApprovalFilter !== 'All' && selectedApprovalFilter !== 'Approved' ? 'none' : undefined }}>
           <StatusTabs
             tabs={statusTabs}
             activeTab={selectedTab}
@@ -1167,185 +1167,185 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
               setSearchParams(params);
             }}
           />
-         </div>
-      {userType === 'admin' && (
-        <div className="listing-action-bar-end">
-          <button
-            type="button"
-            onClick={openDeletedProjectsList}
-            className="listing-btn-warn"
-          >
-            Deleted Projects
-          </button>
         </div>
-      )}
-
-      {/* Assignment Controls - Only show if projects are selected and user is recruitment manager */}
-      {selectedProjectIds.length > 0 && userType === 'recruitment_manager' && (
-        <div className="pp-assignment-panel">
-          <div className="pp-assignment-panel__row">
-            <span className="pp-assignment-panel__label">
-              {selectedProjectIds.length} project(s) selected:
-
-            </span>
-            
-            <Select
-              className="pp-select-assign-exec"
-              placeholder="Select Recruitment Executive"
-              value={selectedRecruiterId}
-              onChange={(value) => {
-                setSelectedRecruiterId(value);
-                if (value) {
-                  setAssignmentModal({ visible: true });
-                }
-              }}
-              loading={recruiterAssigningLoading}
-              showSearch
-              optionFilterProp="children"
-              allowClear
-              onClear={() => setSelectedProjectIds([])}
+        {userType === 'super_admin' && (
+          <div className="listing-action-bar-end">
+            <button
+              type="button"
+              onClick={openDeletedProjectsList}
+              className="listing-btn-warn"
             >
-              {recruiterList.map(recruiter => (
-                <Select.Option key={recruiter.value} value={recruiter.value}>
-                  {recruiter.label}
-                </Select.Option>
-              ))}
-            </Select>
+              Deleted Projects
+            </button>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Assignment Controls - Only show if projects are selected and user is recruitment manager */}
+        {selectedProjectIds.length > 0 && userType === 'recruitment_manager' && (
+          <div className="pp-assignment-panel">
+            <div className="pp-assignment-panel__row">
+              <span className="pp-assignment-panel__label">
+                {selectedProjectIds.length} project(s) selected:
+
+              </span>
+
+              <Select
+                className="pp-select-assign-exec"
+                placeholder="Select Recruitment Executive"
+                value={selectedRecruiterId}
+                onChange={(value) => {
+                  setSelectedRecruiterId(value);
+                  if (value) {
+                    setAssignmentModal({ visible: true });
+                  }
+                }}
+                loading={recruiterAssigningLoading}
+                showSearch
+                optionFilterProp="children"
+                allowClear
+                onClear={() => setSelectedProjectIds([])}
+              >
+                {recruiterList.map(recruiter => (
+                  <Select.Option key={recruiter.value} value={recruiter.value}>
+                    {recruiter.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        )}
         <div className="table-container">
-            <NewTableComponent
-              columns={projectsColumns}
-              data={transformedProjectsData}
-              totalCount={projectsData?.count || 0}
-              heading={`Projects(${projectsData?.count || 0})`}
-              initialState
-              pagination={pagination}
-              onPaginationChange={setPagination}
-              onPageSizeChange
-              sorting={sorting}
-              onSortingChange={handleSortingChange}
-              enableRowSelection={false}
-              globalFilter={globalFilter}
-              onGlobalFilterChange={handleGlobalFilterChange}
-              isLoading={projectsLoading || countsLoading || clientLoading}
-            />
+          <NewTableComponent
+            columns={projectsColumns}
+            data={transformedProjectsData}
+            totalCount={projectsData?.count || 0}
+            heading={`Projects(${projectsData?.count || 0})`}
+            initialState
+            pagination={pagination}
+            onPaginationChange={setPagination}
+            onPageSizeChange
+            sorting={sorting}
+            onSortingChange={handleSortingChange}
+            enableRowSelection={false}
+            globalFilter={globalFilter}
+            onGlobalFilterChange={handleGlobalFilterChange}
+            isLoading={projectsLoading || countsLoading || clientLoading}
+          />
         </div>
       </div>
 
       {/* Status Change Confirmation Modal */}
       <Suspense fallback={null}>
-      <ConfirmationModal
-        showModal={statusModal.visible}
-        setShowModal={(visible) => setStatusModal(prev => ({ ...prev, visible }))}
-        mutation={statusMutation}
-        oldStatus={statusModal.oldStatus}
-        newStatus={statusModal.newStatus}
-        details={statusModal.project ? {
-          'Company Name': clientName,
-          'Project Name': statusModal.project.project_name,
-          'Project ID': `#${statusModal.project.id}`,
-          'Current Status': statusModal.oldStatus,
-          'New Status': statusModal.newStatus,
-          'Job Count': statusModal.project.job_count || 0,
-          'Recruitment Manager': statusModal.project.recruitment_manager_name || '-',
-          'Current Recruiter': statusModal.project.recruiter_name || 'Not Assigned',
-          'Contract Currency': statusModal.project.contract_currency || '-',
-          'Contract Price': statusModal.project.contract_price
-            ? `${Number(statusModal.project.contract_price).toLocaleString()} ${statusModal.project.contract_currency || 'PKR'}`
-            : '-',
-          'Project Creation': statusModal.project.created_at ? formatDateUniversal(statusModal.project.created_at) : '-',
-          'Last Modified': statusModal.project.updated_at ? formatDateUniversal(statusModal.project.updated_at) : '-',
-          'Status Change': `From "${statusModal.oldStatus}" to "${statusModal.newStatus}"`,
-          ...(statusModal.newStatus === 'Active' && !statusModal.hasRecruitmentManager ? {
-            'Select Jobs / Assign Recruiter': (
-              <HeadhuntingActivateProjectContent
-                jobsList={jobsList}
-                loadingJobsList={loadingJobsList}
-                selectedJobIds={selectedJobIds}
-                jobDeadlines={jobDeadlines}
-                jobSelectionError={jobSelectionError}
-                onToggleJob={(jobId, checked) => {
-                  setJobSelectionError('');
-                  if (checked) {
-                    setSelectedJobIds(prev => [...prev, jobId]);
-                  } else {
-                    setSelectedJobIds(prev => prev.filter(id => id !== jobId));
-                    setDeadlineForJob(jobId, undefined);
+        <ConfirmationModal
+          showModal={statusModal.visible}
+          setShowModal={(visible) => setStatusModal(prev => ({ ...prev, visible }))}
+          mutation={statusMutation}
+          oldStatus={statusModal.oldStatus}
+          newStatus={statusModal.newStatus}
+          details={statusModal.project ? {
+            'Company Name': clientName,
+            'Project Name': statusModal.project.project_name,
+            'Project ID': `#${statusModal.project.id}`,
+            'Current Status': statusModal.oldStatus,
+            'New Status': statusModal.newStatus,
+            'Job Count': statusModal.project.job_count || 0,
+            'Recruitment Manager': statusModal.project.recruitment_manager_name || '-',
+            'Current Recruiter': statusModal.project.recruiter_name || 'Not Assigned',
+            'Contract Currency': statusModal.project.contract_currency || '-',
+            'Contract Price': statusModal.project.contract_price
+              ? `${Number(statusModal.project.contract_price).toLocaleString()} ${statusModal.project.contract_currency || 'PKR'}`
+              : '-',
+            'Project Creation': statusModal.project.created_at ? formatDateUniversal(statusModal.project.created_at) : '-',
+            'Last Modified': statusModal.project.updated_at ? formatDateUniversal(statusModal.project.updated_at) : '-',
+            'Status Change': `From "${statusModal.oldStatus}" to "${statusModal.newStatus}"`,
+            ...(statusModal.newStatus === 'Active' && !statusModal.hasRecruitmentManager ? {
+              'Select Jobs / Assign Recruiter': (
+                <HeadhuntingActivateProjectContent
+                  jobsList={jobsList}
+                  loadingJobsList={loadingJobsList}
+                  selectedJobIds={selectedJobIds}
+                  jobDeadlines={jobDeadlines}
+                  jobSelectionError={jobSelectionError}
+                  onToggleJob={(jobId, checked) => {
+                    setJobSelectionError('');
+                    if (checked) {
+                      setSelectedJobIds(prev => [...prev, jobId]);
+                    } else {
+                      setSelectedJobIds(prev => prev.filter(id => id !== jobId));
+                      setDeadlineForJob(jobId, undefined);
+                    }
+                  }}
+                  onDeadlineChange={(jobId, date) => setDeadlineForJob(jobId, date)}
+                  onCvsChange={(jobId, value) =>
+                    setJobDeadlines(prev => ({ ...prev, [`${jobId}_cvs`]: value }))
                   }
-                }}
-                onDeadlineChange={(jobId, date) => setDeadlineForJob(jobId, date)}
-                onCvsChange={(jobId, value) =>
-                  setJobDeadlines(prev => ({ ...prev, [`${jobId}_cvs`]: value }))
-                }
-                recruiterOptions={recruiterOptions}
-                assigningRecruiter={assigningRecruiter}
-                recruiterId={statusModal.recruiterId}
-                onRecruiterChange={value => setStatusModal(prev => ({ ...prev, recruiterId: value }))}
-                projectSubmissionDeadline={projectSubmissionDeadline}
-                onProjectSubmissionDeadlineChange={date => setProjectSubmissionDeadline(date)}
-              />
-            ),
-          } : {})
-        } : null}
-        onConfirm={handleStatusConfirm}
-      />
+                  recruiterOptions={recruiterOptions}
+                  assigningRecruiter={assigningRecruiter}
+                  recruiterId={statusModal.recruiterId}
+                  onRecruiterChange={value => setStatusModal(prev => ({ ...prev, recruiterId: value }))}
+                  projectSubmissionDeadline={projectSubmissionDeadline}
+                  onProjectSubmissionDeadlineChange={date => setProjectSubmissionDeadline(date)}
+                />
+              ),
+            } : {})
+          } : null}
+          onConfirm={handleStatusConfirm}
+        />
       </Suspense>
 
       {/* Assignment Confirmation Modal */}
       <Suspense fallback={null}>
-      <ConfirmationModal
-        showModal={assignmentModal.visible}
-        setShowModal={(visible) => setAssignmentModal({ visible })}
-        mutation={assignmentMutation}
-        oldStatus=""
-        newStatus=""
-        details={{
-          'Assignment Type': 'Project Assignment',
-          'Selected Projects Count': selectedProjectIds.length,
-          'Recruitment Executive': recruiterList.find(r => r.value === selectedRecruiterId)?.label || '-',
-          'Client Name': clientName || '-',
-          'Client Status': clientStatus || '-',
-          'Selected Projects': (
-            <div className="pp-assign-scroll-wrap">
-              <div className="pp-assign-scroll-box">
-                {selectedProjectIds.map(projectId => {
-                  const project = filteredProjects.find(p => p.id === projectId);
-                  return project ? (
-                    <div key={projectId} className="pp-assign-item">
-                      <div className="pp-assign-item__title">
-                        {project.project_name}
-                      </div>
-                      <div className="pp-assign-item__meta">
-                        ID: #{project.id} | Jobs: {project.job_count || 0} | Status: {project.status}
-                      </div>
-                      {project.contract_price && (
-                        <div className="pp-assign-item__meta">
-                          Contract: {Number(project.contract_price).toLocaleString()} {project.contract_currency || 'PKR'}
+        <ConfirmationModal
+          showModal={assignmentModal.visible}
+          setShowModal={(visible) => setAssignmentModal({ visible })}
+          mutation={assignmentMutation}
+          oldStatus=""
+          newStatus=""
+          details={{
+            'Assignment Type': 'Project Assignment',
+            'Selected Projects Count': selectedProjectIds.length,
+            'Recruitment Executive': recruiterList.find(r => r.value === selectedRecruiterId)?.label || '-',
+            'Client Name': clientName || '-',
+            'Client Status': clientStatus || '-',
+            'Selected Projects': (
+              <div className="pp-assign-scroll-wrap">
+                <div className="pp-assign-scroll-box">
+                  {selectedProjectIds.map(projectId => {
+                    const project = filteredProjects.find(p => p.id === projectId);
+                    return project ? (
+                      <div key={projectId} className="pp-assign-item">
+                        <div className="pp-assign-item__title">
+                          {project.project_name}
                         </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div key={projectId} className="pp-assign-item-fallback">
-                      Project ID: #{projectId} (Details not available)
-                    </div>
-                  );
-                })}
+                        <div className="pp-assign-item__meta">
+                          ID: #{project.id} | Jobs: {project.job_count || 0} | Status: {project.status}
+                        </div>
+                        {project.contract_price && (
+                          <div className="pp-assign-item__meta">
+                            Contract: {Number(project.contract_price).toLocaleString()} {project.contract_currency || 'PKR'}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div key={projectId} className="pp-assign-item-fallback">
+                        Project ID: #{projectId} (Details not available)
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ),
-          'Assignment Summary': `Assigning ${selectedProjectIds.length} project(s) to the selected recruitment executive. This will transfer responsibility for project management and job assignments.`,
-          'Previous Assignee': filteredProjects[0]?.recruitment_manager_name || '-',
-          'Total Jobs Across Selected Projects': selectedProjectIds.reduce((total, projectId) => {
-            const project = filteredProjects.find(p => p.id === projectId);
-            return total + (project?.job_count || 0);
-          }, 0)
-        }}
-        onConfirm={handleAssignmentConfirm}
-        title="Assign Projects"
-        description="Are you sure you want to assign the selected projects to the recruitment executive?"
-      />
+            ),
+            'Assignment Summary': `Assigning ${selectedProjectIds.length} project(s) to the selected recruitment executive. This will transfer responsibility for project management and job assignments.`,
+            'Previous Assignee': filteredProjects[0]?.recruitment_manager_name || '-',
+            'Total Jobs Across Selected Projects': selectedProjectIds.reduce((total, projectId) => {
+              const project = filteredProjects.find(p => p.id === projectId);
+              return total + (project?.job_count || 0);
+            }, 0)
+          }}
+          onConfirm={handleAssignmentConfirm}
+          title="Assign Projects"
+          description="Are you sure you want to assign the selected projects to the recruitment executive?"
+        />
       </Suspense>
 
       <Modal
@@ -1415,86 +1415,86 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
             locale={{ emptyText: 'No PM remarks available' }}
             dataSource={projectRemarks}
             renderItem={(item) => (
-            <List.Item
-              actions={[
-                userType === 'project_manager' ? (
-                  editingPmRemarkId === item.id ? (
-                    <Button
-                      key="save"
-                      type="link"
-                      className="sop-brand-link"
-                      onClick={() => {
-                        if (!editingPmRemarkText.trim()) {
-                          message.warning('Remark cannot be empty');
-                          return;
-                        }
-                        updateProjectRemarkMutation.mutate({
-                          remarkId: item.id,
-                          remarks: editingPmRemarkText.trim(),
-                        });
-                      }}
-                      loading={updateProjectRemarkMutation.isLoading}
-                    >
-                      Save
-                    </Button>
-                  ) : (
-                    <Button
-                      key="edit"
-                      type="link"
-                      className="sop-brand-link"
-                      icon={<EditOutlined size="1em" className="app-icon" />}
-                      onClick={async () => {
-                        try {
-                          const latest = await getProjectRemarkById(item.id);
-                          setEditingPmRemarkId(item.id);
-                          setEditingPmRemarkText(
-                            latest?.project_manager_remarks ?? item?.project_manager_remarks ?? ''
-                          );
-                        } catch (_err) {
-                          setEditingPmRemarkId(item.id);
-                          setEditingPmRemarkText(item?.project_manager_remarks ?? '');
-                        }
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  )
-                ) : null,
-              ].filter(Boolean)}
-            >
-              <List.Item.Meta
-                title={
-                  <div>
-                    <span className="pp-remark-title-strong">
-                      {formatDateUniversal(item?.created_at) || '—'}
-                    </span>
-                    <span className="pp-remark-meta">
-                      ID: {item?.id ?? '—'}
-                    </span>
-                    {item?.updated_at && item.updated_at !== item.created_at && (
-                      <span className="pp-remark-meta">
-                        (Edited: {formatDateUniversal(item.updated_at)})
+              <List.Item
+                actions={[
+                  userType === 'project_manager' ? (
+                    editingPmRemarkId === item.id ? (
+                      <Button
+                        key="save"
+                        type="link"
+                        className="sop-brand-link"
+                        onClick={() => {
+                          if (!editingPmRemarkText.trim()) {
+                            message.warning('Remark cannot be empty');
+                            return;
+                          }
+                          updateProjectRemarkMutation.mutate({
+                            remarkId: item.id,
+                            remarks: editingPmRemarkText.trim(),
+                          });
+                        }}
+                        loading={updateProjectRemarkMutation.isLoading}
+                      >
+                        Save
+                      </Button>
+                    ) : (
+                      <Button
+                        key="edit"
+                        type="link"
+                        className="sop-brand-link"
+                        icon={<EditOutlined size="1em" className="app-icon" />}
+                        onClick={async () => {
+                          try {
+                            const latest = await getProjectRemarkById(item.id);
+                            setEditingPmRemarkId(item.id);
+                            setEditingPmRemarkText(
+                              latest?.project_manager_remarks ?? item?.project_manager_remarks ?? ''
+                            );
+                          } catch (_err) {
+                            setEditingPmRemarkId(item.id);
+                            setEditingPmRemarkText(item?.project_manager_remarks ?? '');
+                          }
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )
+                  ) : null,
+                ].filter(Boolean)}
+              >
+                <List.Item.Meta
+                  title={
+                    <div>
+                      <span className="pp-remark-title-strong">
+                        {formatDateUniversal(item?.created_at) || '—'}
                       </span>
-                    )}
-                  </div>
-                }
-                description={
-                  editingPmRemarkId === item.id && userType === 'project_manager' ? (
-                    <TextArea
-                      rows={2}
-                      value={editingPmRemarkText}
-                      onChange={(e) => setEditingPmRemarkText(e.target.value)}
-                      maxLength={500}
-                      showCount
-                    />
-                  ) : (
-                    <span className="pp-pre-wrap">{item?.project_manager_remarks || ''}</span>
-                  )
-                }
-              />
-            </List.Item>
-          )}
-        />
+                      <span className="pp-remark-meta">
+                        ID: {item?.id ?? '—'}
+                      </span>
+                      {item?.updated_at && item.updated_at !== item.created_at && (
+                        <span className="pp-remark-meta">
+                          (Edited: {formatDateUniversal(item.updated_at)})
+                        </span>
+                      )}
+                    </div>
+                  }
+                  description={
+                    editingPmRemarkId === item.id && userType === 'project_manager' ? (
+                      <TextArea
+                        rows={2}
+                        value={editingPmRemarkText}
+                        onChange={(e) => setEditingPmRemarkText(e.target.value)}
+                        maxLength={500}
+                        showCount
+                      />
+                    ) : (
+                      <span className="pp-pre-wrap">{item?.project_manager_remarks || ''}</span>
+                    )
+                  }
+                />
+              </List.Item>
+            )}
+          />
         </div>
 
         <div className="pp-modal-footer-actions">
@@ -1512,27 +1512,27 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
       </Modal>
 
       <Suspense fallback={null}>
-      <ConfirmationModal
-        showModal={deleteModal.visible}
-        setShowModal={(visible) => {
-          setDeleteModal(prev => ({ ...prev, visible }));
-          if (!visible) setDeleteReason('');
-          
-        }}
-        mutation={deleteMutation}
-        onConfirm={() => deleteMutation.mutate({ id: deleteModal.project?.id, reason: deleteReason })}
-        showReasonField={true}
-        reason={deleteReason}
-        setReason={setDeleteReason}
-        message={
-          <span>
-            This action cannot be reversed. Are you sure you want to delete project: <strong>{deleteModal.project?.project_name}</strong>?
-          </span>
-        }
-      />
+        <ConfirmationModal
+          showModal={deleteModal.visible}
+          setShowModal={(visible) => {
+            setDeleteModal(prev => ({ ...prev, visible }));
+            if (!visible) setDeleteReason('');
+
+          }}
+          mutation={deleteMutation}
+          onConfirm={() => deleteMutation.mutate({ id: deleteModal.project?.id, reason: deleteReason })}
+          showReasonField={true}
+          reason={deleteReason}
+          setReason={setDeleteReason}
+          message={
+            <span>
+              This action cannot be reversed. Are you sure you want to delete project: <strong>{deleteModal.project?.project_name}</strong>?
+            </span>
+          }
+        />
       </Suspense>
 
-      {userType === 'admin' && (
+      {userType === 'super_admin' && (
         <StatusHistoryModal
           open={statusHistoryModal.visible}
           entity={statusHistoryModal.entity}
@@ -1558,20 +1558,20 @@ const { data: projectsData, isLoading: projectsLoading } = useQuery(
 
       {/* Recruiter change confirmation modal (per row) */}
       <Suspense fallback={null}>
-      <ConfirmationModal
-        showModal={recruiterChangeModal.visible}
-        setShowModal={(visible) =>
-          setRecruiterChangeModal((prev) => ({ ...prev, visible }))
-        }
-        onConfirm={confirmRecruiterChange}
-        isLoading={recruiterAssignmentMutation.isLoading}
-        details={{
-          'Project Name': recruiterChangeModal.projectName || '-',
-          'Current Recruiter': recruiterChangeModal.oldRecruiterName || 'Unassigned',
-          'New Recruiter': recruiterChangeModal.newRecruiterName || '-',
-        }}
-        message="Are you sure you want to change the recruiter for this project?"
-      />
+        <ConfirmationModal
+          showModal={recruiterChangeModal.visible}
+          setShowModal={(visible) =>
+            setRecruiterChangeModal((prev) => ({ ...prev, visible }))
+          }
+          onConfirm={confirmRecruiterChange}
+          isLoading={recruiterAssignmentMutation.isLoading}
+          details={{
+            'Project Name': recruiterChangeModal.projectName || '-',
+            'Current Recruiter': recruiterChangeModal.oldRecruiterName || 'Unassigned',
+            'New Recruiter': recruiterChangeModal.newRecruiterName || '-',
+          }}
+          message="Are you sure you want to change the recruiter for this project?"
+        />
       </Suspense>
 
       {/* Rejection reason modal */}

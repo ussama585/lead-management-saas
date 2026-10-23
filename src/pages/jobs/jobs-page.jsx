@@ -271,7 +271,7 @@ export default function JobsPage() {
           const currentStatus = cell.getValue() || '';
           const jobId = row.original?.id;
           const canEditStatus =
-            userType === 'admin' ||
+            userType === 'super_admin' ||
             userType === 'sales_manager' ||
             userType === 'sales_executive';
 
@@ -389,7 +389,7 @@ export default function JobsPage() {
           ]
         : []),
       // Delete column - only for admin and sales_manager
-      ...(userType === 'admin' || userType === 'sales_manager'
+      ...(userType === 'super_admin' || userType === 'sales_manager'
         ? [
             {
               header: 'Actions',
@@ -410,7 +410,7 @@ export default function JobsPage() {
             },
           ]
         : []),
-      ...(userType === 'admin'
+      ...(userType === 'super_admin'
         ? [
             {
               ...createStatusHistoryColumn({
@@ -471,7 +471,7 @@ export default function JobsPage() {
             }}
           />
         </div>
-        {userType === 'admin' && (
+        {userType === 'super_admin' && (
           <div className="listing-action-bar-end">
             <button
               type="button"
@@ -523,7 +523,7 @@ export default function JobsPage() {
           }
         />
       </Suspense>
-      {userType === 'admin' && (
+      {userType === 'super_admin' && (
         <StatusHistoryModal
           open={statusHistoryModal.visible}
           entity={statusHistoryModal.entity}

@@ -1,6 +1,8 @@
   import React, { useMemo, useState, useEffect, useCallback, useRef, Suspense } from 'react';
   import { useSearchParams } from "react-router-dom";
   import { useNavigate, useLocation } from 'react-router-dom';
+  import { getRolePath } from '../../../auth/role-home.js';
+  import { isSuperAdmin } from '../../../auth/role-access.js';
 
   //components
   import { ConfirmationModal, ShowRemarksLead, ProposalModal } from '../../../clients/components/LazyModals.jsx';
@@ -8,7 +10,7 @@
   import WebsiteStatusTabs from './website-status-tabs.jsx';
   import ExecutiveTabButton from '../../../../components/executive-tab-button.component.jsx';
   import NewTableComponent from '../../../../components/tables/new-table.jsx';
-  import { Select, message, Tooltip, Spin, Button, Space } from 'antd';
+  import { Avatar, Select, message, Tooltip, Spin, Button, Space } from 'antd';
   import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
   import { createStatusColumn, isLeadConvertedToClient } from '../../../shared/utils/statusColumn.jsx';
   import { createAssignedToColumn } from '../../../shared/utils/assignedToColumn.jsx';
@@ -24,9 +26,9 @@
   import { useQueryApi } from '../../../../components/hooks/useQueryApi.js';
   import api, { fetchLeadCounts, fetchLeadStats } from '../../../shared/services/api.js';
   import { updateLeadById, getProposalUrl } from '../../../shared/services/manager-service.js';
-  import { getLeadGenerationHistoryTrack, createWebsiteLeadFollowUp, getAssignedUsers, addUserAssignments, removeUserAssignments } from '../../../shared/services/leads.js';
+  import { createWebsiteLeadFollowUp, getAssignedUsers, addUserAssignments, removeUserAssignments } from '../../../shared/services/leads.js';
   import ManageAssigneesModal from '../../../../components/manage-assignees-modal.jsx';
-  import { getManangersExecutives, assignClient } from '../../../shared/services/users-service.js';
+  import { getManangersExecutives } from '../../../shared/services/users-service.js';
 
 
   //utils
@@ -51,6 +53,13 @@
 
 
   // CSV export helpers
+  export async function getWebsiteLeadHistory(leadId) {
+    const { data } = await api.get(`/lead-generation/history/${encodeURIComponent(leadId)}`);
+    if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead history.');
+    if (!Array.isArray(data)) throw new Error('Could not read lead history.');
+    return data;
+  }
+
   const arrayToCSV = (data, columns) => {
     if (!Array.isArray(data) || data.length === 0) return "";
     const headers = columns.map((col) => col.header);
@@ -207,9 +216,9 @@
     // Fetch executives/managers list for assignment (same as lead-card)
     // Marketing managers use leadStatsData instead, so they don't need this API
     const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
-      queryKey: ['executiveList', user?.user_type],
+      queryKey: ['executiveList', user?.id, user?.user_type],
       queryFn: () => getManangersExecutives(userType),
-      enabled: userType === 'sales_manager' || userType === 'admin',
+      enabled: ['sales_manager', 'admin', 'super_admin', 'company_admin'].includes(userType),
       staleTime: 10 * 60 * 1000,
       cacheTime: 15 * 60 * 1000,
       refetchOnWindowFocus: false
@@ -219,6 +228,7 @@
     const executivesList = useMemo(() => {
       return Array.isArray(leadStatsData) ? leadStatsData : [];
     }, [leadStatsData]);
+    const assigneeOptions = useMemo(() => Array.isArray(assigningUsersData) ? assigningUsersData : [], [assigningUsersData]);
 
 
     const [statusTabs, setStatusTabs] = useState([]);
@@ -450,7 +460,7 @@
     };
 
     const apiEndpoint =
-      (userType === 'admin' || userType === 'sales_manager' || 'sales_executive')
+      (userType === 'super_admin' || userType === 'sales_manager' || 'sales_executive')
         ? `/lead-generation/list?page=${pagination.pageIndex + 1}&size=${pagination.pageSize}&search=${globalFilter}&sort_by=${sortBy}&order=${sortOrder}${formatStatusParam()}${formatExecutiveParam()}${formatHearAboutUsParam()}${duplicateCheck === 'duplicate' ? '&is_duplicate=true' : ''}${duplicateCheck === 'not_duplicate' ? '&is_duplicate=false' : ''}${dateRange?.[0] ? `&start_date=${encodeURIComponent(dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ'))}` : ''}${dateRange?.[1] ? `&end_date=${encodeURIComponent(dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ'))}` : ''}`
         : `/lead-generation/list?id=${user?.id}&page=${pagination.pageIndex + 1}&size=${pagination.pageSize}&search=${globalFilter}&sort_by=${sortBy}&order=${sortOrder}${formatStatusParam()}${formatHearAboutUsParam()}${duplicateCheck === 'duplicate' ? '&is_duplicate=true' : ''}${duplicateCheck === 'not_duplicate' ? '&is_duplicate=false' : ''}${dateRange?.[0] ? `&start_date=${encodeURIComponent(dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ'))}` : ''}${dateRange?.[1] ? `&end_date=${encodeURIComponent(dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ'))}` : ''}`;
 
@@ -490,7 +500,7 @@
     //   }
     // }, [data]);
 
-    const sendUpdate = (payload) => {
+    const sendUpdate = async (payload) => {
       console.log('=== sendUpdate DEBUG ===');
       console.log('Full payload received in sendUpdate:', payload);
 
@@ -542,7 +552,12 @@
         requestData.remarks = payload.remarks;
       }
 
-      return api.patch(`/lead-generation/update/${payload.id}`, requestData);
+      const endpoint = payload.status !== undefined
+        ? `/lead-generation/job/${encodeURIComponent(payload.id)}`
+        : `/lead-generation/update/${encodeURIComponent(payload.id)}`;
+      const response = await api.patch(endpoint, requestData);
+      if (response.data?.status === false || response.data?.success === false) throw new Error(response.data.message || 'Could not update lead.');
+      return response;
     };
 
 
@@ -554,8 +569,7 @@
         refetchCounts();
       },
       onError: (error) => {
-        message.error(error?.response?.data?.message || "Failed to update status/remarks");
-        setRemarksModal({ visible: false, lead: null, forStatusChange: false, newStatus: null });
+        message.error(error?.response?.data?.message || error?.message || "Failed to update status/remarks");
       },
     });
 
@@ -592,7 +606,11 @@
 
     // Assignment mutation (same as lead-card)
     const assignmentMutation = useMutation(
-      ({ leadId, userId }) => assignClient(leadId, userId),
+      async ({ leadId, userId }) => {
+        const { data } = await api.patch(`/lead-generation/job/${encodeURIComponent(leadId)}`, { assigned_to: userId });
+        if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not update assignee.');
+        return data;
+      },
       {
         onSuccess: (data) => {
           message.success(data?.message || 'Lead reassigned successfully');
@@ -625,7 +643,7 @@
     // Handle assignment change - show confirmation modal
     const handleAssignmentChange = (lead, newAssigneeName) => {
       if (isLeadConvertedToClient(lead)) return;
-      const newAssignee = executivesList?.find((user) => user.name === newAssigneeName);
+      const newAssignee = assigneeOptions.find((user) => String(user.id) === String(newAssigneeName));
       if (!newAssignee) {
         message.error("Selected assignee not found");
         return;
@@ -737,9 +755,10 @@
         // Assigned To - editable for sales managers and admin, exclude for sales_executive
         ...(userType !== 'sales_executive' ? [
           createAssignedToColumn({
+            useAssigneeIds: true,
             userType,
             user,
-            executivesList,
+            executivesList: assigneeOptions,
             onAssignmentChange: handleAssignmentChange,
             isLoading: assignmentMutation.isLoading,
             loadingAssigningUsers,
@@ -796,16 +815,18 @@
           sortDescFirst: false,
           Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
         },
-        // Status History - admin only (placeholder until API is provided)
-        ...(userType === 'admin' ? [
+        // Status History is available to Super Admin, including the legacy admin role.
+        ...(isSuperAdmin(userType) ? [
           createStatusHistoryColumn({
+            header: 'Status History',
+            buttonTitle: 'View lead history',
             onOpenHistory: (entity) => setStatusHistoryModal({ visible: true, entity }),
             accessorKey: 'status_history_website',
           }),
         ] : []),
       ];
 
-      return [
+      const tableColumns = [
         // 0. Row Number - FIRST COLUMN
         {
           header: '#',
@@ -869,6 +890,9 @@
         // },
         // 2. Status — use createStatusColumn for all users (it handles permissions based on converted_to_client)
         createStatusColumn({
+          statusOptions: STATUS_OPTIONS,
+          requireRemarksForAll: true,
+          editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
           statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
           statusColors,
           userType,
@@ -923,8 +947,13 @@
         {
           header: 'Company',
           accessorKey: 'company_name',
-          size: 0.5,
-          Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
+          size: 220,
+          Cell: ({ cell }) => <Space>
+            <Avatar size={40} style={{ flexShrink: 0, backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }} aria-hidden="true">
+              {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
+            </Avatar>
+            <span>{cell.getValue() || '-'}</span>
+          </Space>,
         },
         // 7. Name
         {
@@ -980,11 +1009,8 @@
             }
 
             // Other users see hyperlink
-            const leadHref = userType === 'admin'
-              ? `/admin/leads/${row.original.id}`
-              : userType === 'sales_manager'
-                ? `/sales-manager/leads/${row.original.id}`
-                : `/sales-executive/leads/${row.original.id}`;
+            const identifierQuery = row.original.identifier ? `?identifier=${encodeURIComponent(row.original.identifier)}` : '';
+            const leadHref = getRolePath(userType, `/leads/${row.original.id}${identifierQuery}`);
             return (
               <Tooltip title="View lead details">
                 <a
@@ -1179,6 +1205,11 @@
         // Extra columns at the end
         ...extraColumns,
       ];
+      const leadingKeys = ['row_number', 'company_name', 'contact_person_name'];
+      return [
+        ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)),
+        ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey)),
+      ];
     }, [userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
 
 
@@ -1362,7 +1393,7 @@
               statusFilter={selectedStatus}
               setStatusFilter={handleTabClick}
               statusChoices={statusTabs.filter(tab =>
-                tab.value !== 'Unassigned' || userType === 'admin' || userType === 'sales_manager' || userType === 'marketing_manager'
+                tab.value !== 'Unassigned' || userType === 'super_admin' || userType === 'sales_manager' || userType === 'marketing_manager'
               )}
               getTotalCount={() => getStatusCount(leadCounts, 'total_count')}
               getStatusCount={(apiKey) => getStatusCount(leadCounts, apiKey)}
@@ -1424,6 +1455,14 @@
       try {
         const trimmedRemarks = typeof remarks === 'string' ? remarks.trim() : '';
         const includeRemarks = Boolean(trimmedRemarks);
+        if (remarksModal.forStatusChange) {
+          if (!includeRemarks) {
+            message.error('Enter remarks before changing status.');
+            return;
+          }
+          await updateStatusMutation.mutateAsync({ id: remarksModal.lead.id, status: remarksModal.newStatus, remarks: trimmedRemarks });
+          return;
+        }
 
 
         const isRemarksOnlyMode = !remarksModal.forStatusChange && !remarksModal.newStatus;
@@ -1568,7 +1607,7 @@
           </Space>
 
           {/* Manage Assignees Button - Only for Admin */}
-          {userType === 'admin' && (
+          {isSuperAdmin(userType) && (
             <Button
               icon={<UserAddOutlined size="1em" className="app-icon" />}
               onClick={() => setUserAssignmentModalVisible(true)}
@@ -1597,51 +1636,15 @@
                 lead={remarksModal.lead}
                 onSave={handleRemarksSave}
                 loading={remarksLoading || updateStatusMutation.isLoading}
-                showContractFields={remarksModal.forStatusChange && remarksModal.newStatus === 'Potential Client'}
-                proposalRequired={remarksModal.forStatusChange && remarksModal.newStatus === 'Potential Client'}
+                showContractFields={false}
+                proposalRequired={false}
                 isProposalAttached={!!proposalFile}
-                remarksRequired={
-                  remarksModal.forStatusChange &&
-                  STATUSES_REQUIRING_REMARKS.has(remarksModal.newStatus)
-                }
-                saveButtonText={remarksModal.forStatusChange && remarksModal.newStatus === 'Potential Client' ? 'Convert' : 'Update'}
+                remarksRequired={remarksModal.forStatusChange}
+                saveButtonText="Update"
                 viewOnlyMode={
                   userType === 'marketing_manager' ||
                   isLeadConvertedToClient(remarksModal.lead) ||
                   ((userType === 'sales_manager' || userType === 'sales_executive') && !remarksModal.forStatusChange)
-                }
-                extra={
-                  remarksModal.forStatusChange && remarksModal.newStatus === 'Potential Client'
-                    ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-                        <Button
-                          type="dashed"
-                          icon={<UploadOutlined size="1em" className="app-icon" />}
-                          onClick={() => proposalInputRef.current?.click()}
-                          style={{
-                            borderStyle: 'dashed',
-                            borderColor: '#3E6A9F',
-                            color: '#3E6A9F',
-                            justifyContent: 'flex-start',
-                            height: 40,
-                          }}
-                          block
-                        >
-                          {proposalFile ? 'Change Proposal PDF' : 'Attach Proposal PDF'}
-                        </Button>
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          ref={proposalInputRef}
-                          style={{ display: 'none' }}
-                          onChange={(e) => setProposalFile(e.target.files?.[0] || null)}
-                        />
-                        {proposalFile && (
-                          <span style={{ fontSize: 12, color: '#3E6A9F' }}>{proposalFile.name}</span>
-                        )}
-                      </div>
-                    )
-                    : null
                 }
               />
             </Suspense>
@@ -1713,14 +1716,16 @@
               onClose={closeDuplicateModal}
               leadType="website-leads"
             />
-            {userType === 'admin' && (
+            {isSuperAdmin(userType) && (
               <StatusHistoryModal
                 open={statusHistoryModal.visible}
                 entity={statusHistoryModal.entity}
                 onClose={() => setStatusHistoryModal({ visible: false, entity: null })}
-                fetchHistoryApi={getLeadGenerationHistoryTrack}
+                fetchHistoryApi={getWebsiteLeadHistory}
+                title={entity => `Lead History - ${entity?.company_name || 'Lead'}`}
+                historyDateKey="changed_at"
                 getTitleFromEntity={(entity) => entity?.company_name || 'Lead'}
-                queryKeyPrefix="websiteLeadStatusHistory"
+                queryKeyPrefix={`websiteLeadStatusHistory-${user?.id}-${userType}`}
                 emptyMessage="No status history available."
               />
             )}

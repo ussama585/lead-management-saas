@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Alert, Avatar, Button, Card, Descriptions, Input, Modal, Space, Spin, Switch, Table, Tag, message } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { Alert, Avatar, Button, Card, Input, Modal, Space, Spin, Switch, Table, Tag, message } from 'antd';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
@@ -84,6 +85,7 @@ export function companyError(error) {
 }
 
 export default function CompaniesPage() {
+  const navigate = useNavigate();
   const { user } = useUserStore();
   const queryClient = useQueryClient();
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
@@ -141,7 +143,7 @@ export default function CompaniesPage() {
   const columns = [
     { title: 'Company', dataIndex: 'name', key: 'name', sorter: true, render: (name, row) => <Space>
       <Avatar size={40} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</Avatar>
-      <span>{name}<span className='block text-xs text-muted-foreground'>ID: {row.id}</span></span>
+      <span><Link to={`/super-admin/companies/${row.id}`} className='text-primary underline underline-offset-2'>{name}</Link><span className='block text-xs text-muted-foreground'>ID: {row.id}</span></span>
     </Space> },
     ...[['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['city', 'City'], ['country', 'Country']].map(([field, title]) => ({
       title, dataIndex: field, key: field, sorter: ['email', 'city', 'country'].includes(field), render: value => value || '?',
@@ -149,8 +151,8 @@ export default function CompaniesPage() {
     { title: 'Website', dataIndex: 'website', key: 'website', render: value => /^https?:\/\//i.test(value || '') ? <a href={value} target='_blank' rel='noopener noreferrer' className='text-primary underline'>{value}</a> : value || '?' },
     { title: 'Status', dataIndex: 'is_active', key: 'is_active', render: value => <Tag color={value ? 'green' : 'default'}>{value ? 'Active' : 'Inactive'}</Tag> },
     { title: 'Created', dataIndex: 'created_at', key: 'created_at', sorter: true, render: value => value ? formatDateUniversal(value, true) : '?' },
-    { title: 'Actions', key: 'actions', fixed: 'right', width: 250, render: (_, row) => <Space wrap size={8} style={{ maxWidth: '100%' }}>
-      <Button size='small' icon={<Eye size={16} />} disabled={busy} onClick={() => openDialog('view', row)}>View</Button>
+    { title: 'Actions', key: 'actions', width: 250, render: (_, row) => <Space wrap size={8} style={{ maxWidth: '100%' }}>
+      <Button size='small' icon={<Eye size={16} />} disabled={busy} onClick={() => navigate(`/super-admin/companies/${row.id}`)}>View</Button>
       <Button size='small' icon={<Pencil size={16} />} disabled={busy} onClick={() => openDialog('edit', row)}>Edit</Button>
       <Button size='small' danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }}>Delete</Button>
     </Space> },
@@ -197,16 +199,6 @@ export default function CompaniesPage() {
           {formik.status && <Alert type='error' showIcon message={formik.status} />}
           <button type='submit' hidden disabled={save.isLoading}>Save company</button>
         </form>}
-    </Modal>
-    <Modal title='Company details' open={dialog?.mode === 'view'} width={680} onCancel={closeDialog} footer={<Button onClick={closeDialog}>Close</Button>}>
-      {detail.isFetching ? <div className='py-6 text-center'><Spin /></div> : detail.isError ? <Alert type='error' showIcon message={companyError(detail.error)} action={<Button onClick={() => detail.refetch()}>Retry</Button>} /> : detail.data &&
-        <Descriptions bordered column={1} size='small' className='mt-4' items={[
-          { key: 'id', label: 'ID', children: detail.data.id },
-          ...Object.entries({ name: 'Company', email: 'Email', phone: 'Phone', website: 'Website', address: 'Address', country: 'Country', city: 'City' }).map(([field, label]) => ({ key: field, label, children: detail.data[field] || '?' })),
-          { key: 'active', label: 'Status', children: detail.data.is_active ? 'Active' : 'Inactive' },
-          { key: 'created', label: 'Created', children: detail.data.created_at ? formatDateUniversal(detail.data.created_at, true) : '?' },
-          { key: 'updated', label: 'Updated', children: detail.data.updated_at ? formatDateUniversal(detail.data.updated_at, true) : '?' },
-        ]} />}
     </Modal>
     <SettingsDeleteModal title='Delete company' itemName={deleteTarget?.name} open={deleteTarget != null} loading={remove.isLoading}
       error={remove.isError ? companyError(remove.error) : null} onCancel={() => setDeleteTarget(null)}

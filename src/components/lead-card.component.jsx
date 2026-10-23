@@ -246,7 +246,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     if (user?.user_type === 'admin') {
       // For admin, data from getManangersExecutives() is directly the array
       const allUsers = data || []; // Data is directly the array
-      return allUsers.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
+      return Array.isArray(allUsers) ? allUsers : [];
     }
     
     // For sales manager, include themselves in the list along with executives

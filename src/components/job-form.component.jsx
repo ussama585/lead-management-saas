@@ -15,6 +15,7 @@ import {
   languageOptions,
   nationalityOptions,
   departmentOptions,
+  degreeNameOptions,
   timezoneOptions,
   workingDaysOptions,
   jobTypeOptions,
@@ -41,18 +42,6 @@ const degreeLevelOptions = [
   { value: 'Doctorate',                label: 'Doctorate' },
 ];
 
-const degreeNameOptions = [
-  { id: 1,  name: 'Software Engineering' },
-  { id: 3,  name: 'Information Technology' },
-  { id: 4,  name: 'Mechanical Engineering' },
-  { id: 5,  name: 'Electrical Engineering' },
-  { id: 7,  name: 'Chemical Engineering' },
-  { id: 8,  name: 'Aerospace Engineering' },
-  { id: 9,  name: 'Biomedical Engineering' },
-  { id: 10, name: 'Environmental Engineering' },
-  { id: 11, name: 'Pharmacy' },
-  { id: 15, name: 'Business Administration' },
-];
 
 const skillNameOptions = [
   'Python', 'Django', 'React JS', 'Node.js', 'PostgreSQL',
@@ -864,7 +853,7 @@ const JobForm = ({
                       mode="tags"
                       tokenSeparators={[',']}
                       value={(formik.values.degrees || []).map((d) => d.degree_name)}
-                      options={degreeNameOptions.map((d) => ({ label: d.name, value: d.name }))}
+                      options={degreeNameOptions}
                       onChange={handleDegreesChange}
                       filterOption={(input, opt) => opt.label.toLowerCase().includes(input.toLowerCase())}
                       status={formik.errors.degrees && formik.touched.degrees ? 'error' : ''}

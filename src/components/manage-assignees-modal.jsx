@@ -4,6 +4,7 @@ import { Trash2 as DeleteOutlined, Plus as PlusOutlined, UserPlus as UserAddOutl
 import { useQuery, useMutation } from 'react-query';
 import { getAssigningUsersListing } from '../pages/shared/services/users-service.js';
 import useUserStore from '../pages/shared/store/user-store.js';
+import { isSuperAdmin } from '../pages/auth/role-access.js';
 import NewTableComponent from './tables/new-table.jsx';
 import '../assets/styles/legacy/common.css';
 import '../assets/styles/legacy/manage-assignees-modal.css';
@@ -52,9 +53,9 @@ const ManageAssigneesModal = ({
   });
 
   const { data: allExecutivesData, isLoading: loadingExecutives } = useQuery({
-    queryKey: ['executiveListOnly'],
+    queryKey: ['executiveListOnly', user?.id, user?.user_type],
     queryFn: () => getAssigningUsersListing('sales_executive'),
-    enabled: visible && (user?.user_type === 'admin' || (!isMetaLeads && user?.user_type === 'sales_manager')),
+    enabled: visible && isSuperAdmin(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -84,7 +85,7 @@ const ManageAssigneesModal = ({
   const assignedUsers = assignedUsersData?.users || [];
   const assignedUserIds = new Set(assignedUsers.map((u) => u.id));
   const availableExecutives = (allExecutivesData || []).filter(
-    (exec) => exec.user_type === 'sales_executive' && !assignedUserIds.has(exec.id)
+    (exec) => !assignedUserIds.has(exec.id)
   );
 
   const selectedExecutives = useMemo(
@@ -171,7 +172,7 @@ const ManageAssigneesModal = ({
     [removeUsersMutation.isLoading]
   );
 
-  if (user?.user_type !== 'admin') return null;
+  if (!isSuperAdmin(user?.user_type)) return null;
 
   return (
     <Modal

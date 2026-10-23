@@ -231,7 +231,7 @@ const AddNewLead = () => {
     if (user?.user_type === 'admin') {
       // For admin, data from getManangersExecutives() is directly the array
       const allUsers = data || []; // Data is directly the array
-      return allUsers.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
+      return allUsers;
     }
     // For sales manager/executive, data from getAssigningUsersListing is directly the array
     return data || [];

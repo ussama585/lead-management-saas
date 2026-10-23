@@ -28,6 +28,8 @@ export const createAssignedToColumn = ({
   loadingAssigningUsers = false,
   additionalProps = {},
   size,
+  editableRoles = ['sales_manager', 'admin', 'super_admin', 'company_admin'],
+  useAssigneeIds = false,
 }) => {
 
   return {
@@ -44,10 +46,13 @@ export const createAssignedToColumn = ({
       const isConvertedToClient = isLeadConvertedToClient(entry);
       
       // Editable dropdown for sales managers and admin
-      if ((userType === 'sales_manager' || userType === 'admin') && executivesList.length > 0) {
+      if (editableRoles.includes(userType)) {
         // Ensure logged-in manager is always in the options list
         const optionsList = [...executivesList];
-        if (user && userType === 'sales_manager') {
+        if (useAssigneeIds && entry.assigned_to != null && assignedName !== '-' && !optionsList.some(option => String(option.id) === String(entry.assigned_to))) {
+          optionsList.unshift({ id: entry.assigned_to, name: assignedName, user_type: assignedType });
+        }
+        if (user && userType === 'sales_manager' && !useAssigneeIds) {
           const isUserInList = optionsList.some(exec => exec.id === user.id);
           if (!isUserInList) {
             optionsList.unshift({
@@ -60,7 +65,7 @@ export const createAssignedToColumn = ({
 
         return (
           <Select
-            value={assignedName !== '-' ? assignedName : undefined}
+            value={useAssigneeIds ? (entry.assigned_to == null ? undefined : String(entry.assigned_to)) : assignedName !== '-' ? assignedName : undefined}
             placeholder="Not Assigned"
             onChange={(value) => {
               if (onAssignmentChange) {
@@ -78,8 +83,8 @@ export const createAssignedToColumn = ({
             {...additionalProps}
           >
             {optionsList.map((executive) => (
-              <Option key={executive.id} value={executive.name}>
-                {executive.name} - {executive.user_type === 'sales_manager' ? 'Manager' : 'Executive'}
+              <Option key={executive.id} value={useAssigneeIds ? String(executive.id) : executive.name}>
+                {executive.name}{executive.user_type ? ` - ${executive.user_type.replace(/_/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase())}` : ''}
               </Option>
             ))}
           </Select>

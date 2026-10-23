@@ -422,7 +422,7 @@ export default function ClientHeadhunting() {
 
   const canEditProject = (project) => {
     // Admin and sales_manager can always edit projects (their own and executives')
-    if (userType === 'admin' || userType === 'sales_manager') {
+    if (userType === 'super_admin' || userType === 'sales_manager') {
       return true;
     }
 
@@ -616,7 +616,7 @@ export default function ClientHeadhunting() {
           getFilteredStatusOptions,
           handleDelete: handleDeleteProject,
         }),
-        ...(userType === 'admin' ? [
+        ...(userType === 'super_admin' ? [
           {
             ...createStatusHistoryColumn({
               onOpenHistory: (entity) => setStatusHistoryModal({ visible: true, entity }),
@@ -1012,7 +1012,7 @@ export default function ClientHeadhunting() {
           }
         />
       </Suspense>
-      {userType === 'admin' && (
+      {userType === 'super_admin' && (
         <StatusHistoryModal
           open={statusHistoryModal.visible}
           entity={statusHistoryModal.entity}

@@ -484,7 +484,7 @@ const CommonLeadsFollowUp = () => {
           const leadId = row.original?.object_id;
 
           const canOpenForRole =
-            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'admin';
+            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'super_admin';
 
           const handleOpenLead = () => {
             if (!leadId || !source) return;
@@ -499,8 +499,8 @@ const CommonLeadsFollowUp = () => {
             }
 
             const roleBase =
-              userType === 'admin'
-                ? '/admin'
+              userType === 'super_admin'
+                ? '/super_admin'
                 : userType === 'sales_manager'
                   ? '/sales-manager'
                   : '/sales-executive';

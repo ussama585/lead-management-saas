@@ -239,7 +239,7 @@ export default function HeadhuntingForAdmin() {
   const recruiterExecutivesList = useMemo(() => {
     if (user?.user_type === 'admin') {
       const allUsers = assigningUsersData || [];
-      return allUsers.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
+      return allUsers;
     }
 
     if (user?.user_type === 'sales_manager') {
@@ -253,9 +253,9 @@ export default function HeadhuntingForAdmin() {
       const isManagerAlreadyInList = executives.some(exec => exec.id === user.id);
 
       if (isManagerAlreadyInList) {
-        return executives.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
+        return executives;
       } else {
-        return [currentManager, ...executives.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager')];
+        return [currentManager, ...executives];
       }
     }
 

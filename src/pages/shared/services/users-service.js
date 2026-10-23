@@ -172,7 +172,7 @@ export const toggleUserActivation = async (userId, isActive) => {
 export const getAssigningUsersListing = async (user_type = "sales_manager") => {
   try {
 
-    const endpoint = `/accounts/assigning-user-list?user_type=${user_type}`;
+    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);
@@ -226,10 +226,8 @@ export const assignClient = async (clientId, userId) => {
 
 export const getManangersExecutives = async (userType = null) => {
   try {
-    // For sales_manager, use query param to get only sales_executive
-    // For admin, get all managers and executives without query param
-    const queryParam = userType === 'sales_manager' ? '?user_type=sales_executive' : '';
-    const endpoint = `/accounts/assigning-user-list${queryParam}`;
+    // Assignment dropdowns consistently request sales executives for every role.
+    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);

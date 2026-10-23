@@ -31,7 +31,7 @@ export const reassignMetaLead = async (leadId, userId) => {
 // Meta Leads - Get assigning user list
 export const getMetaLeadsAssigningUserList = async () => {
   try {
-    const endpoint = `/meta-leads/assigning-user-list`;
+    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
     const response = await api.get(endpoint);
     return response.data;
   } catch (error) {

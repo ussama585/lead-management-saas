@@ -169,9 +169,9 @@ const DataLeads = () => {
     data: assigningUsersData,
     isLoading: loadingAssigningUsers,
   } = useQuery({
-    queryKey: ["executiveList", user?.user_type],
+    queryKey: ["executiveList", user?.id, user?.user_type],
     queryFn: () => getManangersExecutives(user?.user_type),
-    enabled: user?.user_type === "sales_manager" || user?.user_type === "admin",
+    enabled: ['admin', 'super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -237,6 +237,8 @@ const DataLeads = () => {
   const executivesList = useMemo(() => {
     return Array.isArray(dataLeadsStats) ? dataLeadsStats : [];
   }, [dataLeadsStats]);
+  const assigneeOptions = useMemo(() => Array.isArray(assigningUsersData) ? assigningUsersData
+    : Array.isArray(assigningUsersData?.results) ? assigningUsersData.results : [], [assigningUsersData]);
 
   const statusCounts = countsData || {};
   const getStatusCount = useCallback(
@@ -580,7 +582,7 @@ const DataLeads = () => {
   const handleAssignedToChange = useCallback(
     (lead, newAssigneeName) => {
       if (isLeadConvertedToClient(lead)) return;
-      const newAssignee = executivesList?.find((user) => user.name === newAssigneeName);
+      const newAssignee = assigneeOptions.find((user) => String(user.id) === String(newAssigneeName));
       if (!newAssignee) {
         message.error("Selected assignee not found");
         return;
@@ -601,7 +603,7 @@ const DataLeads = () => {
         newAssigneeName: newAssignee.name
       });
     },
-    [executivesList],
+    [assigneeOptions],
   );
 
   // Confirm assignment - call API directly like statusColumn
@@ -769,9 +771,15 @@ const DataLeads = () => {
               underline="always"
               sx={{
                 fontWeight: 600,
-                color: "#1f3a61",
-                textDecorationColor: "#1f3a61",
-                "&:hover": { color: "#2d5a8a", textDecorationColor: "#2d5a8a" },
+                color: "var(--primary)",
+                cursor: "pointer",
+                textDecoration: "underline !important",
+                textUnderlineOffset: "3px",
+                textDecorationThickness: "1px",
+                "&:hover, &:focus-visible": {
+                  color: "var(--primary)",
+                  textDecorationThickness: "2px",
+                },
               }}
             >
               {cell.getValue() || "N/A"}
@@ -781,6 +789,8 @@ const DataLeads = () => {
       },
       // Status column — use createStatusColumn for all users (it handles permissions based on converted_to_client)
       createStatusColumn({
+        statusOptions: STATUS_OPTIONS,
+        editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
         statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
         statusColors: STATUS_TAB_COLORS,
         userType: user?.user_type,
@@ -841,9 +851,11 @@ const DataLeads = () => {
       // Assigned To column - exclude for sales_executive
       ...(user?.user_type !== 'sales_executive' ? [
         createAssignedToColumn({
+          editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager'],
+          useAssigneeIds: true,
           userType: user?.user_type,
           user,
-          executivesList,
+          executivesList: assigneeOptions,
           onAssignmentChange: handleAssignedToChange,
           isLoading: isAssignmentUpdating,
           loadingAssigningUsers,
@@ -1037,6 +1049,7 @@ const DataLeads = () => {
     ],
     [
       executivesList,
+      assigneeOptions,
       copyToClipboard,
       handleAssignedToChange,
       handleInlineStatusChange,

@@ -4,7 +4,7 @@ import JobForm from '../components/job-form.component.jsx';
 import "../assets/styles/legacy/leads.generated.css";
 import { useLocation } from 'react-router-dom';
 
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { message } from 'antd';
 import { commonJobFormSchema } from './shared/schemas/job.js';
 
@@ -12,9 +12,25 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import api from './shared/services/api.js';
 import useUserStore from './shared/store/user-store.js';
+import { getRolePath } from './auth/role-home.js';
+
+export async function createWebsiteLeadJob(payload) {
+    const { years_of_experience, working_days_from, working_days_to, ...body } = payload;
+    body.lead_generation_request = Number(payload.lead_generation_request);
+    if (!Number.isInteger(body.lead_generation_request) || body.lead_generation_request < 1) throw new Error('A valid website lead is required.');
+    for (const key of ['number_of_vacancies', 'min_experience', 'max_experience', 'min_salary', 'max_salary']) {
+        if (body[key] != null && body[key] !== '') body[key] = Number(body[key]);
+    }
+    body.degrees = (body.degrees || []).map(({ degree_name }) => ({ degree_name }));
+    body.skills = (body.skills || []).map(({ skill_name, experience, last_used }) => ({ skill_name, experience: Number(experience ?? 0), last_used: Number(last_used ?? 0) }));
+    const { data } = await api.post('/lead-generation/create-job', body);
+    if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not create job.');
+    return data;
+}
 
 
 const NewLeadJobPage = () => {
+    const queryClient = useQueryClient();
     const location = useLocation();
     const isDataLeads = location.pathname.includes('/data-leads');
     const { id } = useParams()
@@ -92,7 +108,7 @@ const NewLeadJobPage = () => {
             nationality_preference: finalPayload.nationality_preference
         });
 
-        createJobMutation.mutate(finalPayload);
+        return createJobMutation.mutateAsync(finalPayload).catch(() => { /* Error is displayed by the mutation. */ });
     };
 
     const initialValues = {
@@ -142,17 +158,14 @@ const NewLeadJobPage = () => {
 
         const baseRoute = isMetaLead ? 'meta-leads' : 'leads';
 
-        if (user?.user_type === 'admin') {
-            navigate(`/admin/${baseRoute}/${id}`);
-        } else if (user?.user_type === 'sales_manager') {
-            navigate(`/sales-manager/${baseRoute}/${id}`);
-        } else {
-            navigate(`/sales-executive/${baseRoute}/${id}`);
-        }
+        const identifier = location.state?.identifier;
+        const detailQuery = !isMetaLead && identifier ? `?identifier=${encodeURIComponent(identifier)}` : '';
+        navigate(getRolePath(user?.user_type, `/${baseRoute}/${id}${detailQuery}`));
     };
 
 
     const sendUpdate = (payload) => {
+        if (!isDataLeads && !isMetaLead) return createWebsiteLeadJob(payload);
         const endpoint = isDataLeads
             ? 'data-leads/create-job'
             : isMetaLead
@@ -163,7 +176,9 @@ const NewLeadJobPage = () => {
     };
 
     const createJobMutation = useMutation(sendUpdate, {
-        onSuccess: () => {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries([`leadjobs-${id}`]);
+            await queryClient.invalidateQueries(['websiteLeadDetail']);
             message.destroy('lead-job-toast');
             message.success({
                 content: `Job created successfully`,
@@ -177,7 +192,7 @@ const NewLeadJobPage = () => {
                 ? error?.message
                 : error?.response?.data?.message;
             message.error({
-                content: errorMessage || "Failed to create job",
+                content: errorMessage || error?.message || "Failed to create job",
                 key: 'lead-job-toast'
             });
         },

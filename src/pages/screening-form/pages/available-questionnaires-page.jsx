@@ -15,13 +15,13 @@ import { formatDateUniversal } from '../../shared/utils/formatDate.js';
 const THEME_PRIMARY = '#3E6A9F';
 
 const screeningFormsPathForUser = (userType) => {
-  if (userType === 'admin') return '/admin/screening-forms';
+  if (userType === 'super_admin') return '/super_admin/screening-forms';
   if (userType === 'recruitment_manager') return '/recruitment-manager/screening-forms';
   return '/recruitment-executive/screening-forms';
 };
 
 const addGoogleFormPathForUser = (userType) => {
-  if (userType === 'admin') return '/admin/add-google-form';
+  if (userType === 'super_admin') return '/super_admin/add-google-form';
   if (userType === 'recruitment_manager') return '/recruitment-manager/add-google-form';
   return '/recruitment-executive/add-google-form';
 };
@@ -70,16 +70,16 @@ const mapQuestionToTemplateQuestion = (question, idx) => {
   const rawOptions = getQuestionOptions(question);
   const mappedOptions = choiceTypes.includes(normalizedQuestionType)
     ? rawOptions
-        .map((opt, optIdx) => {
-          const label = getOptionLabel(opt);
-          if (!label) return null;
-          return {
-            id: opt?.id ?? Date.now() + idx * 100 + optIdx,
-            label,
-            value: label.toLowerCase().replace(/\s+/g, '_'),
-          };
-        })
-        .filter(Boolean)
+      .map((opt, optIdx) => {
+        const label = getOptionLabel(opt);
+        if (!label) return null;
+        return {
+          id: opt?.id ?? Date.now() + idx * 100 + optIdx,
+          label,
+          value: label.toLowerCase().replace(/\s+/g, '_'),
+        };
+      })
+      .filter(Boolean)
     : [];
 
   return {

@@ -386,43 +386,16 @@ export default function MetaLeadsStandard() {
 
   // Fetch executives/managers list for assignment (same as leads.jsx)
   const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
-    queryKey: ['executiveList', user?.user_type],
+    queryKey: ['executiveList', user?.id, user?.user_type],
     queryFn: () => getManangersExecutives(user?.user_type),
-    enabled: (user?.user_type === 'sales_manager' || user?.user_type === 'admin'),
+    enabled: ['sales_manager', 'admin', 'super_admin', 'company_admin'].includes(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
       refetchOnWindowFocus: false
   });
 
   // Build executives list including current user for sales managers (same as leads.jsx)
-  const executivesList = useMemo(() => {
-    if (user?.user_type === 'admin') {
-      // For admin, data from getManangersExecutives() is directly the array
-      const allUsers = assigningUsersData || [];
-      return allUsers.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
-    }
-
-    // For sales manager, include themselves in the list along with executives
-    if (user?.user_type === 'sales_manager') {
-      const executives = Array.isArray(assigningUsersData) ? assigningUsersData : [];
-      const currentManager = {
-        id: user.id,
-        name: user.name,
-        user_type: user.user_type
-      };
-
-      // Check if current manager is already in the list to avoid duplicates
-      const isManagerAlreadyInList = executives.some(exec => exec.id === user.id);
-
-      if (isManagerAlreadyInList) {
-        return executives.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
-      } else {
-        return [currentManager, ...executives.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager')];
-      }
-    }
-
-    return [];
-  }, [assigningUsersData, user?.user_type, user?.id, user?.name]);
+  const executivesList = useMemo(() => Array.isArray(assigningUsersData) ? assigningUsersData : [], [assigningUsersData]);
 
   // Debug executive filter changes
   useEffect(() => {
@@ -612,7 +585,7 @@ export default function MetaLeadsStandard() {
   // Handle assignment change - show confirmation modal
   const handleAssignmentChange = (lead, newAssigneeName) => {
     if (isLeadConvertedToClient(lead)) return;
-    const newAssignee = executivesList?.find((user) => user.name === newAssigneeName);
+    const newAssignee = executivesList?.find((user) => String(user.id) === String(newAssigneeName));
     if (!newAssignee) {
       message.error("Selected assignee not found");
       return;
@@ -764,6 +737,7 @@ export default function MetaLeadsStandard() {
     // Assigned To column - shows combined name and type for all users except marketing_manager and sales_executive
     ...(user?.user_type !== 'marketing_manager' && user?.user_type !== 'sales_executive' ? [
       createAssignedToColumn({
+        useAssigneeIds: true,
         userType: user?.user_type,
         user,
         executivesList: executivesList,

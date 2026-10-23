@@ -32,17 +32,10 @@ export const updateLeadJob = async (jobId, jobData) => {
 };
 
 // Delete a job for regular (website) lead
-export const deleteWebsiteLeadJob = async (jobId, reason) => {
-  try {
-    const formData = new FormData();
-    formData.append('delete_reason', reason);
-    const response = await api.delete(`/lead-generation/delete-website-lead-job/${jobId}`, {
-      data: formData,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: error.response?.data };
-  }
+export const deleteWebsiteLeadJob = async (jobId) => {
+  const { data } = await api.delete(`/lead-generation/delete-job/${encodeURIComponent(jobId)}`);
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not delete job.');
+  return data;
 };
 
 // Get all jobs for a regular lead (if needed)
@@ -96,7 +89,7 @@ export const getLeadGenerationDuplicateLeads = async (leadId) => {
 /** GET lead-generation/lead-history-track/:leadId - returns array of { status, updated_at } for website leads */
 export const getLeadGenerationHistoryTrack = async (leadId) => {
   try {
-    const response = await api.get(`/lead-generation/lead-history-track/${leadId}`);
+    const response = await api.get(`/lead-generation/history/${leadId}`);
     return response.data;
   } catch (error) {
     throw new Error(`Error fetching lead history track: ${error.message}`);

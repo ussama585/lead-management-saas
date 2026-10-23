@@ -17,7 +17,8 @@ export async function getJobDetails(jobId, leadId) {
     const visited = new Set();
     while (!visited.has(page)) {
       visited.add(page);
-      const { data } = await api.get(`/data-leads/jobs/${encodeURIComponent(leadId)}`, { params: { page, size: 100 } });
+      const { data } = await api.get(`/data-leads/jobs/${encodeURIComponent(leadId)}`);
+      // const { data } = await api.get(`/data-leads/jobs/${encodeURIComponent(leadId)}`, { params: { page, size: 100 } });
       if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load job details.');
       if (!Array.isArray(data?.results)) throw new Error('Could not read job details.');
       const job = data.results.find(job => String(job.id) === String(jobId));

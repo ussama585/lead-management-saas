@@ -65,7 +65,7 @@ function LeadCard({ lead: L, leadType, title, isFirst, duplicateOf }) {
     let routePrefix = '';
     const userType = user?.user_type;
 
-    if (userType === 'admin') {
+    if (userType === 'super_admin') {
       routePrefix = '/admin';
     } else if (userType === 'sales_manager') {
       routePrefix = '/sales-manager';

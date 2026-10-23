@@ -252,7 +252,7 @@ export const createStatusHistoryColumn = ({
   accessorKey,
   enableSorting: false,
   Cell: ({ row }) => (
-    <Tooltip title={buttonTitle}>
+    <Tooltip title={<span style={{ color: '#fff' }}>{buttonTitle}</span>}>
       <HistoryOutlined size="1em"
         className={["app-icon", "table-icon-action table-icon-action--history"].filter(Boolean).join(' ')}
         onClick={() => onOpenHistory(row.original)}

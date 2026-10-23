@@ -10,7 +10,7 @@ import api from '../../../shared/services/api.js';
 import useUserStore from '../../../shared/store/user-store.js';
 import { getRolePath } from '../../../auth/role-home.js';
 import { dataLeadJobSchema, dataLeadJobChoices } from '../../schemas/data-lead-job-schema.js';
-import { languageOptions, nationalityOptions, departmentOptions, workingDaysOptions } from '../../../shared/utils/job-form-options.js';
+import { languageOptions, nationalityOptions, departmentOptions, workingDaysOptions, degreeNameOptions } from '../../../shared/utils/job-form-options.js';
 import '../../../../assets/styles/data-lead-job-form.css';
 
 export const emptyDataLeadJob = {
@@ -23,13 +23,23 @@ export const emptyDataLeadJob = {
   cv_submission_deadline: '', expected_joining_date: '', degree_level: '', job_shift: '', hours_per_week: null,
   contract_length: '', contract_period: '', address: '', degrees: [], skills: [],
 };
-const numericFields = ['data_lead', 'number_of_vacancies', 'min_experience', 'max_experience', 'min_salary', 'max_salary', 'hours_per_week'];
+const numericFields = ['data_lead', 'number_of_vacancies', 'min_experience', 'max_experience', 'min_salary', 'max_salary'];
+const vacancyOptions = Array.from({ length: 100 }, (_, index) => index + 1);
 const dates = ['cv_submission_deadline', 'expected_joining_date'];
 const multiline = ['job_description', 'job_requirements', 'job_responsibilities', 'other_benefits', 'notes'];
 const labels = { job_title: 'Job Title', number_of_vacancies: 'No. of Vacancies', languages_required: 'Language Required', gender_preference: 'Gender Preference', nationality_preference: 'Nationality Preference', department: 'Department', working_hours: 'Working Hours', cv_submission_deadline: 'CV Submission Deadline', expected_joining_date: 'Expected Joining Date', timezone: 'Timezone', min_experience: 'Min Experience (Years)', max_experience: 'Max Experience (Years)', employment_type: 'Employment Type', location_city: 'City', location_country: 'Country', address: 'Address', degree_level: 'Degree Level', educational_qualification: 'Educational Qualification', job_type: 'Job Type', currency: 'Currency', min_salary: 'Minimum Salary', max_salary: 'Maximum Salary', payment_term: 'Payment Terms', job_description: 'Job Description', job_responsibilities: 'Responsibilities', job_requirements: 'Requirements', other_benefits: 'Other Benefits', notes: 'Notes', job_shift: 'Job Shift', hours_per_week: 'Hours per Week', contract_length: 'Contract Length', contract_period: 'Contract Period' };
 const requiredFields = new Set(['job_title', 'number_of_vacancies', 'gender_preference', 'min_experience', 'max_experience', 'employment_type', 'location_city', 'location_country', 'job_type', 'job_description']);
 const tagChoices = { languages_required: languageOptions, nationality_preference: nationalityOptions, department: departmentOptions };
 const splitTags = value => String(value || '').split(',').map(value => value.trim()).filter(Boolean);
+
+export function jobNatureValues(values, jobType) {
+  return {
+    ...values, job_type: jobType || '',
+    hours_per_week: jobType === 'Part-Time' ? values.hours_per_week : null,
+    contract_length: jobType === 'Contract' ? values.contract_length : '',
+    contract_period: jobType === 'Contract' ? values.contract_period : '',
+  };
+}
 
 
 export function dataLeadJobPayload(values) {
@@ -39,6 +49,11 @@ export function dataLeadJobPayload(values) {
     payload[key] = typeof values[key] === 'string' ? values[key].trim() : values[key] ?? null;
   }
   numericFields.forEach(key => { payload[key] = values[key] === '' || values[key] == null ? null : Number(values[key]); });
+  const nature = jobNatureValues(values, values.job_type);
+  const hours = String(nature.hours_per_week ?? '').trim();
+  payload.hours_per_week = hours ? /^\d+(?:\.\d+)?$/.test(hours) ? Number(hours) : hours : null;
+  payload.contract_length = String(nature.contract_length ?? '').trim();
+  payload.contract_period = nature.contract_period || '';
   const offset = values.timezone?.match(/\(UTC([+-]\d{2}:\d{2})\)/)?.[1] || '+00:00';
   dates.forEach(key => {
     const value = values[key];
@@ -139,13 +154,13 @@ export default function DataLeadJobCreate() {
     if (tagChoices[key]) control = <Select {...props} mode="tags" style={{ width: '100%' }} value={splitTags(value)} options={tagChoices[key]}
       placeholder={`Select or enter ${key === 'department' ? 'departments' : key === 'languages_required' ? 'languages' : 'nationalities'}`} tokenSeparators={[',']}
       onChange={values => formik.setFieldValue(key, values.join(', '))} />;
-    else if (choices) control = <Select {...props} showSearch optionFilterProp="label" style={{ width: '100%' }} value={value === '' ? undefined : value}
-      options={choices.map(option => ({ value: option, label: String(option) }))} placeholder={`Select ${label?.toLowerCase() || 'option'}`} onChange={value => formik.setFieldValue(key, value)} />;
+    else if (choices) control = <Select {...props} allowClear={key === 'job_type' || key === 'contract_period'} showSearch optionFilterProp="label" style={{ width: '100%' }} value={value === '' ? undefined : value}
+      options={choices.map(option => ({ value: option, label: String(option) }))} placeholder={`Select ${label?.toLowerCase() || 'option'}`} onChange={value => key === 'job_type' ? formik.setValues(previous => jobNatureValues(previous, value)) : formik.setFieldValue(key, value ?? '')} />;
     else if (numericFields.includes(key)) control = <InputNumber {...props} min={key === 'number_of_vacancies' || key === 'hours_per_week' ? 1 : 0} style={{ width: '100%' }} value={value} onChange={value => formik.setFieldValue(key, value)} />;
     else if (multiline.includes(key)) control = <Input.TextArea {...props} rows={5} placeholder={label} value={value} onChange={formik.handleChange} />;
-    else control = <Input {...props} type={dates.includes(key) ? 'datetime-local' : 'text'} placeholder={label} value={value} onChange={formik.handleChange} />;
+    else control = <Input {...props} disabled={props.disabled || key === 'job_shift'} readOnly={key === 'job_shift'} type={dates.includes(key) ? 'datetime-local' : 'text'} placeholder={['hours_per_week', 'contract_length'].includes(key) ? '10, 20-40, etc.' : label} value={value ?? ''} onChange={formik.handleChange} />;
     return <div key={key} className={`data-job-field ${className}`}>
-      <label htmlFor={key}>{label}{requiredFields.has(key) ? '*' : ''}</label>{control}
+      <label htmlFor={key}>{label}{requiredFields.has(key) || (key === 'hours_per_week' && formik.values.job_type === 'Part-Time') || (['contract_period', 'contract_length'].includes(key) && formik.values.job_type === 'Contract') ? '*' : ''}</label>{control}
       {typeof error === 'string' && <p id={`${key}-error`} role="alert" className="mt-1 text-sm text-destructive">{error}</p>}
     </div>;
   }
@@ -163,7 +178,7 @@ export default function DataLeadJobCreate() {
     <form onSubmit={formik.handleSubmit} noValidate className="data-job-form">
       {fieldError('data_lead') && <Alert type="error" message={fieldError('data_lead')} />}
       {section('Basic Job Info', <div className="data-job-grid">
-        {field('job_title')}{field('number_of_vacancies')}{field('languages_required')}{field('gender_preference')}
+        {field('job_title')}{field('number_of_vacancies', labels.number_of_vacancies, vacancyOptions)}{field('languages_required')}{field('gender_preference')}
         {field('nationality_preference')}{field('department')}{field('working_hours')}{field('cv_submission_deadline')}
         {field('expected_joining_date')}{field('timezone')}
         <div className="data-job-field data-job-span-all">
@@ -186,7 +201,7 @@ export default function DataLeadJobCreate() {
         {section('Education', <div className="data-job-stack">
           {field('degree_level')}
           <div className="data-job-field"><label htmlFor="degree-names">Degree Name(s)</label>
-            <Select id="degree-names" mode="tags" placeholder="Select or type degree names" disabled={save.isLoading}
+            <Select id="degree-names" mode="tags" showSearch optionFilterProp="label" options={degreeNameOptions} placeholder="Select or type degree names" disabled={save.isLoading}
               style={{ width: '100%' }} value={formik.values.degrees.map(degree => degree.degree_name)}
               onChange={names => formik.setFieldValue('degrees', names.map(degree_name => ({ degree_name })))} />
             <p className="data-job-help">Please type/select one degree name at a time</p>
@@ -196,7 +211,9 @@ export default function DataLeadJobCreate() {
         </div>)}
         {section('Job Nature', <div className="data-job-stack">
           {field('job_type')}
-          <div className="data-job-nature-grid">{field('job_shift')}{field('hours_per_week')}{field('contract_length')}{field('contract_period')}</div>
+          {formik.values.job_type === 'Part-Time' && field('hours_per_week')}
+          {formik.values.job_type === 'Contract' && <>{field('contract_period')}{field('contract_length')}</>}
+          {jobId && String(formik.values.job_shift ?? '').trim() && field('job_shift')}
         </div>)}
       </div>
       {section('Required Skills', <div className="data-job-stack">

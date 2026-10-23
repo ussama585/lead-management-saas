@@ -162,7 +162,7 @@ export const useAssignableUsers = (userType) => {
   return useQuery({
     queryKey: ['executiveList', userType],
     queryFn: () => getManangersExecutives(userType),
-    enabled: userType === 'admin' || userType === 'sales_manager',
+    enabled: userType === 'super_admin' || userType === 'sales_manager',
     staleTime: 1 * 60 * 1000, // Reduced from 10 min to 1 min
     cacheTime: 5 * 60 * 1000, // Reduced from 15 min to 5 min
     refetchOnWindowFocus: false,

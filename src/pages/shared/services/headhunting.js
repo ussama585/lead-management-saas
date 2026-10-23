@@ -132,7 +132,7 @@ export const getAllJobList = async (page = 1, pageSize = 10, sorting = [], searc
 
 export const getAssigningUserList = async () => {
   try {
-    const endpoint = `/data-entry/assigning-user-list`;
+    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
     const response = await api.get(endpoint);
     return response.data;
   } catch (error) {
@@ -1522,7 +1522,7 @@ export const assignRecruiter = async (clientId, recruiterId) => {
 
 export const getAssignRecruiterList = async () => {
   try {
-    const response = await api.get(`/headhunting/assign-recruiter-list`);
+    const response = await api.get(`/accounts/users-for-assigning?user_type=sales_executive`);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: error.response?.data };

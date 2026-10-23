@@ -18,6 +18,7 @@ import ManagerDashboard from './pages/dashboard/pages/dashboard-page.jsx';
 import ExecutiveDashboard from './pages/dashboard/pages/sales-executive/dashboard.jsx';
 import UserManagement from './pages/users/pages/user-management-page.jsx';
 import CompaniesPage from './pages/companies/pages/companies-page.jsx';
+import CompanyDetailPage from './pages/companies/pages/company-detail-page.jsx';
 import CreateUser from './pages/users/pages/create-user-page.jsx';
 import EditUser from './pages/users/pages/edit-user-page.jsx';
 import SalesManagerListing from './pages/users/pages/managers/sales-manager-listing-page.jsx';
@@ -188,6 +189,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/settings" element={<ProtectedRoute element={<AdminSettingsPage />} allowedRoles={USER_TYPES} />} />
             <Route path="/super-admin/companies" element={<ProtectedRoute element={<CompaniesPage />} allowedRoles={['super_admin']} />} />
+            <Route path="/super-admin/companies/:id" element={<ProtectedRoute element={<CompanyDetailPage />} allowedRoles={['super_admin']} />} />
             <Route path="/super-admin" element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['super_admin']} />}>
               <Route index element={<DashboardTabsSection />} />
             </Route>

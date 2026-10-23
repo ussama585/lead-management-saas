@@ -79,7 +79,7 @@ export default function EditClientHeadhunting() {
   const executivesList = useMemo(() => {
     if (user?.user_type === 'admin') {
       const allUsers = executivesData || [];
-      return allUsers.filter(u => u.user_type === 'sales_executive' || u.user_type === 'sales_manager');
+      return allUsers;
     }
     return executivesData || [];
   }, [executivesData, user?.user_type]);

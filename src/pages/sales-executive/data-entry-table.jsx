@@ -86,10 +86,10 @@ const copyToClipboard = async (text) => {
   }
 };
 
-export async function getSalesDataCompanies() {
-  const { data } = await api.get('/company/simple-list');
-  if (!Array.isArray(data)) throw new Error(data?.message || 'Could not load companies.');
-  return data;
+export async function getSalesDataCompanies(search = '') {
+  const { data } = await api.get('/company/list', { params: { page: 1, size: 50, search } });
+  if (data?.status === false || data?.success === false || !Array.isArray(data?.results)) throw new Error(data?.message || 'Could not load companies.');
+  return data.results;
 }
 
 async function listDataEntryCount(params = {}) {
@@ -103,9 +103,10 @@ const DataEntryTable = () => {
   const { user } = useUserStore();
   const superAdmin = isSuperAdmin(user?.user_type);
   const [companyId, setCompanyId] = useState(null);
+  const [companySearch, setCompanySearch] = useState('');
   const companyParams = superAdmin && companyId != null ? { company_id: companyId } : {};
-  const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
-    enabled: superAdmin, refetchOnWindowFocus: false,
+  const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type, companySearch], () => getSalesDataCompanies(companySearch), {
+    enabled: superAdmin, refetchOnWindowFocus: false, keepPreviousData: true,
   });
   
   const [searchParams, setSearchParams] = useSearchParams();
@@ -447,7 +448,7 @@ const DataEntryTable = () => {
   async function fetchAssignableUsers() {
     try {
       let data = [];
-      if (user.user_type === "admin" || user.user_type === "sales_manager") {
+      if (superAdmin || ['company_admin', 'sales_manager'].includes(user.user_type)) {
         data = await getAssigningUserList(); // NEW unified endpoint
       }
       setAssignableUsers(Array.isArray(data) ? data : []);
@@ -455,7 +456,7 @@ const DataEntryTable = () => {
       setAssignableUsers([]);
     }
   }
-  if (user.user_type === "admin" || user.user_type === "sales_manager") {
+  if (superAdmin || ['company_admin', 'sales_manager'].includes(user.user_type)) {
     fetchAssignableUsers();
   }
 }, [user.user_type]);
@@ -739,9 +740,9 @@ const DataEntryTable = () => {
         {superAdmin && <div className="flex flex-wrap items-center gap-3">
           <label htmlFor="sales-data-company-filter">Company</label>
           <Select id="sales-data-company-filter" aria-label="Filter sales data by company" showSearch allowClear
-            optionFilterProp="label" placeholder="All companies" value={companyId ?? undefined}
-            loading={companies.isLoading} style={{ width: 280, maxWidth: '100%' }}
-            options={(companies.data || []).map(company => ({ value: company.id, label: company.name }))}
+            filterOption={false} onSearch={setCompanySearch} onClear={() => setCompanySearch('')} placeholder="All companies" value={companyId ?? undefined}
+            loading={companies.isFetching} style={{ width: 280, maxWidth: '100%' }}
+            options={(companies.data || []).map(company => ({ value: company.id, label: `${company.name} (ID: ${company.id})` }))}
             onChange={value => { setCompanyId(value ?? null); setPagination(previous => ({ ...previous, pageIndex: 0 }));
               setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null); }} />
           {companies.isError && <Alert type="error" message={companies.error?.message || 'Could not load companies.'}
