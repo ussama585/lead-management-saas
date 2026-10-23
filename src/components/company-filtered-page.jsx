@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Alert, Select } from 'antd';
 import { QueryClient, QueryClientProvider, useIsMutating, useQuery, useQueryClient } from 'react-query';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -6,19 +6,19 @@ import api from '../pages/shared/services/api.js';
 import useUserStore from '../pages/shared/store/user-store.js';
 import { companyFilterSection, selectedCompany } from '../pages/shared/utils/company-filter.js';
 
-export async function getCompanies(search = '') {
-  const { data } = await api.get('/company/list', { params: { page: 1, size: 50, search } });
-  if (data?.status === false || data?.success === false || !Array.isArray(data?.results)) throw new Error(data?.message || 'Could not load companies.');
-  return data.results.map(({ id, name }) => ({ value: String(id), label: `${name} (ID: ${id})` }));
+export async function getCompanies() {
+  const { data } = await api.get('/company/simple-list');
+  if (!Array.isArray(data)) throw new Error(data?.message || 'Could not load companies.');
+  return data.map(({ id, name }) => ({ value: String(id), label: `${name} (ID: ${id})` }));
 }
 
-function FilterContents({ children, options, loading, error, retry, companyId, onChange, onSearch }) {
+function FilterContents({ children, options, loading, error, retry, companyId, onChange }) {
   const mutating = useIsMutating();
   return <>
     <div className="mb-4 flex flex-wrap items-center gap-2">
       <label htmlFor="overview-company-filter" className="text-sm font-medium">Company</label>
       <Select id="overview-company-filter" aria-label="Company" placeholder="All companies"
-        style={{ width: 280, maxWidth: '100%' }} showSearch allowClear filterOption={false} onSearch={onSearch} onClear={() => onSearch('')}
+        style={{ width: 280, maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
         options={options} loading={loading} disabled={mutating > 0} value={companyId ?? undefined}
         onChange={onChange} />
       {error && <Alert type="error" message="Could not load companies." action={<button onClick={retry}>Retry</button>} />}
@@ -31,9 +31,8 @@ function ScopedPage({ children, section, user }) {
   const [search, setSearch] = useSearchParams();
   const companyId = selectedCompany(search.toString());
   const parentClient = useQueryClient();
-  const [companySearch, setCompanySearch] = useState('');
   const { data: options = [], isFetching, isError, refetch } = useQuery(
-    ['overviewCompanies', user.id, companySearch], () => getCompanies(companySearch), { staleTime: 300000, keepPreviousData: true, refetchOnWindowFocus: false },
+    ['overviewCompanies', user.id], getCompanies, { staleTime: 300000, refetchOnWindowFocus: false },
   );
   // Each scope owns its cache and page state. In-flight results cannot populate another company.
   const client = useMemo(() => new QueryClient({ defaultOptions: parentClient.getDefaultOptions() }),
@@ -54,7 +53,7 @@ function ScopedPage({ children, section, user }) {
     setSearch(next, { replace: true });
   };
   return <QueryClientProvider client={client} key={`${user.id}:${section}:${companyId ?? 'all'}`}>
-    <FilterContents options={options} loading={isFetching} error={isError} retry={refetch} onSearch={setCompanySearch}
+    <FilterContents options={options} loading={isFetching} error={isError} retry={refetch}
       companyId={companyId} onChange={onChange}>{children}</FilterContents>
   </QueryClientProvider>;
 }
