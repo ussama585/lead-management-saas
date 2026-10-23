@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 
 import NewTableComponent from "../../components/tables/new-table.jsx";
-import { Modal, Button, message, Select, Tooltip } from "antd";
+import { Avatar, Alert, Modal, Button, message, Select, Tooltip } from "antd";
+import api from '../shared/services/api.js';
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Download as DownloadOutlined } from 'lucide-react';
 import { useQuery } from "react-query";
@@ -12,7 +13,6 @@ import {
   getStatusCount,
   bulkAssignDataEntry,
   listAssignedDataEntry,
-  listDataEntryCount,
 } from "../shared/services/data-entry-service.js";
 import { getAssigningUserList } from "../shared/services/headhunting.js";
 import "../../assets/styles/legacy/create-user.css";
@@ -22,6 +22,7 @@ import {
   getExecutives,
 } from "../shared/services/users-service.js";
 import useUserStore from "../shared/store/user-store.js";
+import { isSuperAdmin } from '../auth/role-access.js';
 import { ConfirmationModal } from "../clients/components/LazyModals.jsx";
 import { formatDateUniversal } from "../shared/utils/formatDate.js";
 
@@ -85,14 +86,32 @@ const copyToClipboard = async (text) => {
   }
 };
 
+export async function getSalesDataCompanies() {
+  const { data } = await api.get('/company/simple-list');
+  if (!Array.isArray(data)) throw new Error(data?.message || 'Could not load companies.');
+  return data;
+}
+
+async function listDataEntryCount(params = {}) {
+  const { data } = await api.get('/data-entry/list-count', { params });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load counts.');
+  return data;
+}
+
 const DataEntryTable = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
+  const superAdmin = isSuperAdmin(user?.user_type);
+  const [companyId, setCompanyId] = useState(null);
+  const companyParams = superAdmin && companyId != null ? { company_id: companyId } : {};
+  const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
+    enabled: superAdmin, refetchOnWindowFocus: false,
+  });
   
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Read initial values from URL params
-  const rawTab = searchParams.get("tab") || "assigned";
+  const rawTab = searchParams.get("tab") || (superAdmin ? 'all' : 'assigned');
   const initialTabFromUrl = ["assigned", "unassigned", "all"].includes(rawTab) ? rawTab : "assigned";
   const initialStatusFromUrl = searchParams.get("status") || "";
   const initialExecIdFromUrl = searchParams.get("execId") ? Number(searchParams.get("execId")) : null;
@@ -180,9 +199,10 @@ const DataEntryTable = () => {
     isLoading: isStatusCountLoading,
     refetch: refetchStatusCount,
   } = useQuery(
-    ["status-count", globalFilter, selectedTab, selectedExecId, statusFilter],
+    ["status-count", user?.id, user?.user_type, companyId, globalFilter, selectedTab, selectedExecId, statusFilter],
     async () => {
       const params = {
+        ...companyParams,
         search: globalFilter,
       };
 
@@ -207,6 +227,9 @@ const DataEntryTable = () => {
   const { data, isLoading, refetch } = useQuery(
     [
       "data-entry-list",
+      user?.id,
+      user?.user_type,
+      companyId,
       pagination,
       sorting,
       globalFilter,
@@ -216,6 +239,7 @@ const DataEntryTable = () => {
     ],
     async () => {
       const params = {
+        ...companyParams,
         page: pagination.pageIndex + 1,
         size: pagination.pageSize,
         search: globalFilter,
@@ -294,18 +318,17 @@ const DataEntryTable = () => {
             return <span>{pageIndex * pageSize + rowIndex + 1}</span>;
           },
         },
-        // Assigned To (now the first column)
-        (user?.user_type !== "sales_executive" && selectedTab !== "unassigned") && {
-  header: "Assigned To",
-  accessorKey: "assigned_to_name",
-  Cell: ({ cell }) => <span>{cell.getValue() || "-"}</span>,
-},
         // 3. Company Name
         {
           header: "Company Name",
           accessorKey: "company_name",
-          Cell: ({ cell, row }) =>
-            user.user_type === "admin" ? (
+          size: 260,
+          Cell: ({ cell, row }) => (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Avatar size={40} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>
+                {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
+              </Avatar>
+            {user.user_type === "admin" ? (
               <a
                 style={{ textDecoration: "underline", color: "#3E6A9F" }}
                 href={`/data-entry/edit/${row.original.id}`}
@@ -314,9 +337,17 @@ const DataEntryTable = () => {
                 {cell.getValue()}
               </a>
             ) : (
-              <span>{cell.getValue()}</span>
-            ),
+              <span>{cell.getValue() || "-"}</span>
+            )}
+            </span>
+          ),
         },
+        // Assigned To
+        (user?.user_type !== "sales_executive" && selectedTab !== "unassigned") && {
+  header: "Assigned To",
+  accessorKey: "assigned_to_name",
+  Cell: ({ cell }) => <span>{cell.getValue() || "-"}</span>,
+},
         // Representative Name
         {
           header: "Representative Name",
@@ -398,7 +429,7 @@ const DataEntryTable = () => {
     async function fetchExecutivesForTabs() {
       try {
         let data = [];
-        if (user.user_type === "admin" || user.user_type === "sales_manager") {
+        if (superAdmin || user.user_type === "sales_manager") {
           data = await getExecutives();
         }
         setExecutivesList(Array.isArray(data) ? data : []);
@@ -406,7 +437,7 @@ const DataEntryTable = () => {
         setExecutivesList([]);
       }
     }
-    if (user.user_type === "admin" || user.user_type === "sales_manager") {
+    if (superAdmin || user.user_type === "sales_manager") {
       fetchExecutivesForTabs();
     }
   }, [user.user_type]);
@@ -430,16 +461,19 @@ const DataEntryTable = () => {
 }, [user.user_type]);
   // Fetch tab counts
   React.useEffect(() => {
-    if (user.user_type === "admin" || user.user_type === "sales_manager") {
-      listDataEntryCount().then((counts) => {
+    let active = true;
+    if (superAdmin || user.user_type === "sales_manager" || user.user_type === 'company_admin') {
+      listDataEntryCount(companyParams).then((counts) => {
+        if (!active) return;
         setTabCounts({
           all: counts.all || 0,
           assigned: counts.assigned || 0,
           unassigned: counts.unassigned || 0,
         });
-      });
+      }).catch(() => { if (active) setTabCounts({ all: 0, assigned: 0, unassigned: 0 }); });
     }
-  }, [user.user_type]);
+    return () => { active = false; };
+  }, [user.id, user.user_type, companyId]);
   // Assign when dropdown value changes and rows are selected
   React.useEffect(() => {
     // Only show confirmation modal if a new assignee is selected (not cleared)
@@ -476,7 +510,7 @@ const DataEntryTable = () => {
       refetch();
       refetchStatusCount();
       // Refresh tab counts after assignment
-      listDataEntryCount().then((counts) => {
+      listDataEntryCount(companyParams).then((counts) => {
         setTabCounts({
           all: counts.all || 0,
           assigned: counts.assigned || 0,
@@ -529,6 +563,7 @@ const DataEntryTable = () => {
     try {
       // Fetch total count first
       const params = {
+        ...companyParams,
         page: 1,
         size: tabCounts.all || 10000, // fallback to 10k if count missing
         search: "",
@@ -701,10 +736,18 @@ const DataEntryTable = () => {
         )}
       </Modal>
       <div className="listing-page-content">
+        {superAdmin && <div className="flex flex-wrap items-center gap-3">
+          <label htmlFor="sales-data-company-filter">Company</label>
+          <Select id="sales-data-company-filter" aria-label="Filter sales data by company" showSearch allowClear
+            optionFilterProp="label" placeholder="All companies" value={companyId ?? undefined}
+            loading={companies.isLoading} style={{ width: 280, maxWidth: '100%' }}
+            options={(companies.data || []).map(company => ({ value: company.id, label: company.name }))}
+            onChange={value => { setCompanyId(value ?? null); setPagination(previous => ({ ...previous, pageIndex: 0 }));
+              setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null); }} />
+          {companies.isError && <Alert type="error" message={companies.error?.message || 'Could not load companies.'}
+            action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}
+        </div>}
         <div className="listing-toolbar-flex">
-          <h2 style={{ margin: 0, color: "#3E6A9F", fontSize: "1.25rem", fontWeight: 600 }}>
-            Sales Data
-          </h2>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
             {user.user_type === "admin" && (
               <button type="button" className="listing-btn-primary" onClick={handleExportAll}>
@@ -715,7 +758,7 @@ const DataEntryTable = () => {
           </div>
         </div>
 
-        {(user.user_type === "admin" || user.user_type === "sales_manager") && (
+        {(superAdmin || user.user_type === "sales_manager") && (
           <>
             <div
               style={{

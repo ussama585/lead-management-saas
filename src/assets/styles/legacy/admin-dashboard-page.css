@@ -44,9 +44,18 @@
     padding: 0;
   }
 
+  .follow-up-page,
+  .follow-up-page .follow-up-content,
+  .follow-up-page .follow-up-content .table-wrapper {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
   .follow-up-page .follow-up-content .table-wrapper {
     margin-top: 0;
     margin-bottom: 12px;
+    overflow-x: auto;
   }
 
   .follow-up-page .ant-tabs-nav {

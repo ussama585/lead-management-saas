@@ -138,7 +138,7 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
     ['leadFollowUpListing', leadType, leadId],
     async () => {
       const source = leadType === 'meta' ? 'meta' : leadType === 'data' ? 'data' : 'website';
-      const response = await api.get(`/followups-list/${leadId}/${source}`);
+      const response = await api.get(`/follow-up/list/${leadId}/${source}`);
       return response.data;
     },
     {

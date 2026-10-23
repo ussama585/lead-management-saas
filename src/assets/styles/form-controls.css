@@ -1,0 +1,82 @@
+/* Shared form dimensions across legacy, Ant Design, MUI, and shadcn forms. */
+:root {
+  --form-control-height: 40px;
+  --form-label-size: 14px;
+  --form-label-gap: 8px;
+}
+
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root, .sop-field)
+  :is(input.ant-input:not([type='checkbox']):not([type='radio']):not([type='file']),
+    .ant-input-affix-wrapper, .ant-input-number, .ant-picker, .ant-select-single,
+    input[data-slot='input']:not([type='checkbox']):not([type='radio']):not([type='file']),
+    [data-slot='select-trigger'], input.custom-input, select:not([multiple]), .form-control:not(textarea)) {
+  height: var(--form-control-height) !important;
+  min-height: var(--form-control-height);
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+/* Size the outside control once; its internal input must fit inside the border. */
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root)
+  :is(.ant-input-affix-wrapper > input.ant-input, .ant-picker input) {
+  height: auto !important;
+  min-height: 0;
+}
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .ant-input-number-input {
+  height: calc(var(--form-control-height) - 2px) !important;
+}
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .ant-select-single .ant-select-selector {
+  height: 100% !important;
+  align-items: center;
+}
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .ant-select-multiple {
+  height: auto !important;
+  min-height: var(--form-control-height);
+}
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .ant-select-multiple .ant-select-selector {
+  height: auto !important;
+  min-height: var(--form-control-height) !important;
+}
+
+:where(form, .form-grid, .sop-field, .data-job-field, .form-item, .ant-modal-body)
+  label:not(.ant-checkbox-wrapper):not(.ant-radio-wrapper):not(.MuiFormLabel-root):not(.MuiFormControlLabel-root):not(:has(input[type='checkbox'])):not(:has(input[type='radio'])) {
+  display: block;
+  font-size: var(--form-label-size) !important;
+  font-weight: 500 !important;
+  line-height: 20px;
+  margin-top: 0 !important;
+  margin-bottom: var(--form-label-gap) !important;
+}
+
+/* Ant Form supplies the label gap on its container. */
+.ant-form-vertical .ant-form-item-label {
+  padding-bottom: var(--form-label-gap) !important;
+}
+.ant-form-item .ant-form-item-label > label {
+  display: inline-flex;
+  margin-bottom: 0 !important;
+  font-size: var(--form-label-size) !important;
+  font-weight: 500 !important;
+}
+
+/* These forms use grid gaps between direct labels and controls. */
+form.grid:has(> label) { row-gap: var(--form-label-gap); }
+form.grid:has(> label) > label { margin-bottom: 0 !important; }
+.sop-field { row-gap: 0; }
+.sop-field > .sop-field-error { margin-top: 4px; }
+
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .MuiOutlinedInput-root:not(.MuiInputBase-multiline):not(:has(.MuiSelect-multiple)) {
+  height: var(--form-control-height);
+  min-height: var(--form-control-height);
+  font-size: 14px;
+}
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .MuiInputLabel-root {
+  font-size: var(--form-label-size);
+  font-weight: 500;
+}
+:is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .MuiOutlinedInput-root:not(.MuiInputBase-multiline):not(:has(.MuiSelect-multiple)) .MuiOutlinedInput-input {
+  height: 100%;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  box-sizing: border-box;
+}

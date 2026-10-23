@@ -100,13 +100,15 @@ const DEMO_SYSTEM_STATS = {
 // Tabbed section with its own state so that the rest of the
 // dashboard does not re-render when switching tabs.
 export function DashboardTabsSection() {
-  const [showDemoStats, setShowDemoStats] = useState(true);
+  const [showDemoStats, setShowDemoStats] = useState(() => !new URLSearchParams(window.location.search).has('company_id'));
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab') || searchParams.get('selected');
   const activeSection = VALID_TAB_KEYS.includes(tabFromUrl) ? tabFromUrl : DEFAULT_TAB;
 
   const handleTabChange = (tabKey) => {
-    setSearchParams({ tab: tabKey }, { replace: true });
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tabKey);
+    setSearchParams(next, { replace: true });
   };
   const [selectedOverviewType, setSelectedOverviewType] = useState('Projects');
   const [selectedOverviewExecutive, setSelectedOverviewExecutive] = useState(null);

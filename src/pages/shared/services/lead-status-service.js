@@ -1,7 +1,7 @@
 import api from './api.js';
 
 function assertSuccess(payload) {
-  if (payload?.success === false) throw new Error(payload.message || 'The lead status request failed.');
+  if (payload?.success === false || payload?.status === false) throw new Error(payload.message || 'The lead status request failed.');
   return payload;
 }
 

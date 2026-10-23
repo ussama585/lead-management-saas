@@ -52,25 +52,6 @@ export const getUsers = async (page = 1, pageSize = 10, user_type = "all", searc
 
 
 
-export const createUser = async (userData) => {
-
-  try {
-
-    const response = await api.post(`/accounts/create-user`, userData); // Adjust URL as needed
-    return response.data;
-
-  }
-
-  catch (error) {
-
-    console.error('Error creating new user:', error);
-    throw error;
-
-  }
-};
-
-
-
 export const getUserDetails = async (userId) => {
  
   try {

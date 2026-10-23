@@ -140,7 +140,7 @@ export default function CompaniesPage() {
   if (!isSuperAdmin(user?.user_type)) return null;
   const columns = [
     { title: 'Company', dataIndex: 'name', key: 'name', sorter: true, render: (name, row) => <Space>
-      <Avatar size={56} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</Avatar>
+      <Avatar size={40} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</Avatar>
       <span>{name}<span className='block text-xs text-muted-foreground'>ID: {row.id}</span></span>
     </Space> },
     ...[['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['city', 'City'], ['country', 'Country']].map(([field, title]) => ({

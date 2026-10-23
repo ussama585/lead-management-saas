@@ -1,18 +1,46 @@
 import React, { useState, useRef } from 'react';
 import InputField from '../../components/input-field.component.jsx';
-import { Form, Row, Col, Select, Button, Modal, Spin, Tooltip } from 'antd';
+import { Alert, Form, Row, Col, Select, Button, InputNumber, Modal, Spin, Tooltip } from 'antd';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import { salesDataValidationSchema } from '../shared/schemas/sales-data.js';
+import { dataEntryCreateSchema } from './schemas/data-entry-create-schema.js';
+import api from '../shared/services/api.js';
+import useUserStore from '../shared/store/user-store.js';
+import { isSuperAdmin } from '../auth/role-access.js';
 import '../../assets/styles/legacy/create-user.css';
 import '../../assets/styles/legacy/leads.generated.css';
 import '../../assets/styles/legacy/select-black-text.css';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from 'react-query';
-import { createDataEntry, bulkCreateDataEntry } from '../shared/services/data-entry-service.js';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { bulkCreateDataEntry } from '../shared/services/data-entry-service.js';
 import { message } from 'antd';
 import { citiesNames, countriesNames } from '../shared/utils/countries.js';
 import { Upload as UploadOutlined, Download as DownloadOutlined, CircleHelp as QuestionCircleOutlined } from 'lucide-react';
+
+export function readCompanyList(payload) {
+  if (payload?.status === false || payload?.success === false) throw new Error(payload.message || 'Could not load companies.');
+  const rows = [payload, payload?.results, payload?.data, payload?.data?.results].find(Array.isArray);
+  if (!rows) throw new Error('Could not read the company list.');
+  return rows.map(company => ({ ...company, id: Number(company.id), name: String(company.name ?? '').trim() }))
+    .filter(company => Number.isInteger(company.id) && company.id > 0 && company.name);
+}
+
+export async function listCompanies() {
+  const { data } = await api.get('/accounts/simple-users-list');
+  return readCompanyList(data);
+}
+
+export async function createDataEntry(values, role) {
+  const payload = {};
+  for (const field of ['representative_name', 'designation', 'company_name', 'industry_sector', 'phone', 'email', 'city', 'country', 'company_address', 'company_website', 'company_social_link', 'acquired_through', 'status']) {
+    payload[field] = String(values[field] ?? '').trim();
+  }
+  if (isSuperAdmin(role)) payload.company = Number(values.company);
+  const { data } = await api.post('/data-entry/create', payload);
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not create sales data.');
+  return data;
+}
 
 // Add industry options
 const industryOptions = [
@@ -45,6 +73,8 @@ const initialState = {
   company_website: '',
   company_social_link: '',
   acquired_through: null,
+  company: null,
+  status: 'Pending',
 };
 
 // Normalize phone for import: strip all non-digit chars except leading +
@@ -103,14 +133,26 @@ const ErrorMessageWithTooltip = ({ name, tooltip }) => (
 const AddUpdateLead = () => {
   const requiredMark = <span style={{ color: '#3E6A9F', marginLeft: 2 }}>*</span>;
   const navigate = useNavigate();
-
-  const { mutate: createLead, isLoading } = useMutation(createDataEntry, {
+  const { user } = useUserStore();
+  const superAdmin = isSuperAdmin(user?.user_type);
+  const queryClient = useQueryClient();
+  const { data: companies = [], isLoading: loadingCompanies, isError: companiesError, error: companyError, refetch: refetchCompanies } = useQuery({
+    queryKey: ['data-entry-company-options', '/accounts/simple-users-list', user?.id, user?.user_type],
+    queryFn: listCompanies,
+    enabled: superAdmin,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+  });
+  const { mutate: createLead, isLoading } = useMutation(values => createDataEntry(values, user?.user_type), {
     onSuccess: (data) => {
       message.success(data?.message || 'Lead added successfully');
+      queryClient.invalidateQueries(['data-entry-list']);
+      queryClient.invalidateQueries(['data-entry-list-count']);
+      queryClient.invalidateQueries(['data-entry-executive-stats']);
       navigate('/data-entry-executive/leads-table'); // Go back to leads table
     },
     onError: (error) => {
-      message.error(error?.message || 'Failed to add lead');
+      message.error(error?.response?.data?.message || error?.message || 'Failed to add lead');
     },
   });
 
@@ -469,19 +511,44 @@ const AddUpdateLead = () => {
           </div>
         </div>
         <Formik
-          initialValues={initialState}
-          validationSchema={salesDataValidationSchema}
-          onSubmit={(values, { resetForm }) => {
-            const payload = {
-              ...values,
-              company_social_link: values.company_social_link,
-            };
-            createLead(payload);
+          initialValues={{ ...initialState, company: null }}
+          validationSchema={dataEntryCreateSchema(superAdmin)}
+          onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
+            createLead(values, { onError: error => {
+              const body = error?.response?.data;
+              const fields = body?.errors || body;
+              const errors = {};
+              if (fields && typeof fields === 'object') for (const key of Object.keys(initialState)) {
+                if (typeof fields[key] === 'string' || Array.isArray(fields[key])) errors[key] = Array.isArray(fields[key]) ? fields[key].join(' ') : fields[key];
+              }
+              setErrors(errors);
+              setStatus(body?.message || body?.detail || error.message || 'Could not create sales data.');
+            }, onSettled: () => setSubmitting(false) });
           }}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, status }) => (
             <FormikForm onSubmit={handleSubmit}>
+              {status && <Alert type="error" showIcon message={status} className="mb-4" />}
               <Row gutter={[24, 24]}>
+                {superAdmin && <Col xs={24} sm={12} lg={8}>
+                  <label htmlFor="data-entry-company" className="form-label">Company {requiredMark}</label>
+                  <Field name="company">{({ field, form }) => <Select id="data-entry-company"
+                    value={field.value ?? undefined} onChange={value => form.setFieldValue('company', value ?? null)}
+                    onBlur={() => form.setFieldTouched('company', true)} loading={loadingCompanies}
+                    showSearch allowClear optionFilterProp="label" placeholder="Select company"
+                    options={companies.map(company => ({ value: company.id, label: company.name }))}
+                    notFoundContent={loadingCompanies ? <Spin size="small" /> : 'No companies found'}
+                    style={{ width: '100%' }} />}</Field>
+                  {companiesError && <div role="alert">{companyError?.response?.data?.message || companyError?.message || 'Could not load companies.'} <Button type="link" onClick={() => refetchCompanies()}>Retry</Button></div>}
+                  <ErrorMessage name="company" component="div" className="form-error" />
+                </Col>}
+                <Col xs={24} sm={12} lg={8}>
+                  <label htmlFor="data-entry-status" className="form-label">Status {requiredMark}</label>
+                  <Field name="status">{({ field, form }) => <Select id="data-entry-status" value={field.value}
+                    onChange={value => form.setFieldValue('status', value)} style={{ width: '100%' }}
+                    options={['Pending', 'Converted', 'Contacted But No Response'].map(value => ({ value, label: value }))} />}</Field>
+                  <ErrorMessage name="status" component="div" className="form-error" />
+                </Col>
                 <Col xs={24} sm={12} md={12} lg={8} xl={8} xxl={6}>
                   <label htmlFor="representative_name" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                     Representative Name 

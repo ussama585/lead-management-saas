@@ -1,0 +1,97 @@
+/* Constrain shared page shells; wide tables keep their own scroll area. */
+[data-slot='sidebar-wrapper'],
+[data-slot='sidebar-inset'],
+.sop-page-content,
+.sop-auth,
+.sop-auth-form {
+  min-width: 0;
+}
+
+.sop-page-content {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sop-page-content > *,
+.sop-page-content :is(.container, .listing-page-content, .dashboard-container,
+  .table-container, .table-wrapper, .form-container, .content-container,
+  .flex-container, .settings-layout, .settings-panel, .ant-table-wrapper) {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sop-page-content :is(.content-container, .flex-container, .form-grid, .stats-grid, .metrics-grid) > * {
+  min-width: 0;
+}
+
+.sop-page-content .content-container { flex-wrap: wrap; }
+
+.sop-page-content :is(.content-container, .flex-container) > .card {
+  min-width: min(300px, 100%);
+}
+
+.sop-page-content :is(.table-wrapper, .ant-table-content) {
+  overflow-x: auto;
+}
+
+.sop-page-content :is(.listing-toolbar-flex, .client-tabs-container) {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sop-page-content :is(.listing-toolbar-flex, .client-tabs-container) > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sop-page-content :is(.detail-card, .responsive-lead-card, .info-section) {
+  overflow-wrap: anywhere;
+}
+
+.sop-page-content .detail-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+}
+
+.sop-page-content :is(.stats-grid, .metrics-grid) {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .sop-page-content :is(.listing-page-content, .sales-manager-detail-container) {
+    padding: 12px;
+  }
+
+  .sop-page-content .container { padding-inline: 0; }
+
+  .sop-page-content .form-grid { grid-template-columns: minmax(0, 1fr); }
+
+  .sop-page-content :is(.form-container, .card) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .sop-page-content .card h2 { text-wrap: wrap; overflow-wrap: anywhere; }
+
+  .sop-page-content .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    padding: 16px;
+  }
+
+  .sop-page-content .metrics-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sop-page-content .tabs-1 {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .sop-page-content .date-range-trigger {
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    white-space: normal;
+  }
+}

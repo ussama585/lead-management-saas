@@ -71,10 +71,10 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
         </div>
       </SidebarFooter><SidebarRail />
     </Sidebar>
-    <SidebarInset>
+    <SidebarInset className='min-w-0'>
       <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b bg-background px-4'>
         <SidebarTrigger /><Separator orientation='vertical' className='h-4' />
-        <span className='text-sm font-medium'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Workspace'}</span>
+        <span className='min-w-0 truncate text-sm font-medium'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Workspace'}</span>
         <div className='ml-auto'><ThemeSwitcher /></div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -94,7 +94,7 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
       </header>
       <ChangePasswordDialog open={passwordOpen} onClose={() => setPasswordOpen(false)} />
       <main id='main-content' tabIndex={-1} className='sop-page-content'>{children}</main>
-      <footer className='flex items-center justify-between border-t px-6 py-4 text-xs text-muted-foreground'><span>Search O Pal · Management workspace</span><span className='capitalize'>{role}</span></footer>
+      <footer className='flex flex-wrap items-center justify-between gap-2 border-t px-6 py-4 text-xs text-muted-foreground'><span>Search O Pal · Management workspace</span><span className='capitalize'>{role}</span></footer>
     </SidebarInset>
   </>;
 }

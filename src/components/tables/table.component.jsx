@@ -120,7 +120,8 @@ export default function TableComponent({
           rowCount={totalCount}
           onPaginationChange={handlePaginationChange}
           onSortingChange={(newSorting) => onSortingChange(newSorting)}
-          muiTableContainerProps={{ sx: { overflowX: 'auto' } }}
+          muiTableContainerProps={{ sx: { minWidth: 0, maxWidth: '100%', overflowX: 'auto' } }}
+          muiTablePaperProps={{ elevation: 0, sx: { backgroundColor: 'transparent', boxShadow: 'none', border: '1px solid var(--border, #ddd)', borderRadius: '8px', overflow: 'hidden' } }}
           muiTableBodyRowProps={({ row }) => ({
             className: row.index % 2 === 0 ? 'table-body-row-odd' : 'table-body-row',
           })}
@@ -141,6 +142,9 @@ export default function TableComponent({
                   fontWeight: 'bold',
                   color: 'black',
                   display: 'flex',
+                  flexWrap: 'wrap',
+                  minWidth: 0,
+                  maxWidth: '100%',
                   alignItems: 'center',
                 }}
               >

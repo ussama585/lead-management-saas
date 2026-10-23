@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Tooltip } from 'antd';
+import { Alert, Modal, Button, Tooltip } from 'antd';
 import { useQuery } from 'react-query';
 import { History as HistoryOutlined } from 'lucide-react';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
@@ -95,6 +95,9 @@ const StatusHistoryModal = ({
   const {
     data: historyData,
     isLoading: loadingHistory,
+    isError,
+    error,
+    refetch,
   } = useQuery(
     [queryKeyPrefix, entityId ?? 'all'],
     () => fetchHistoryApi(entityId),
@@ -135,6 +138,9 @@ const StatusHistoryModal = ({
         <div style={{ textAlign: 'center', padding: '20px', color: THEME_PRIMARY }}>
           <span>Loading status history...</span>
         </div>
+      ) : isError ? (
+        <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load history.'}
+          action={<Button onClick={() => refetch()}>Retry</Button>} />
       ) : (
         <div>
           {hasHistory ? (

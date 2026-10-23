@@ -35,7 +35,7 @@ export default function AppLayout({ children, role }) {
   const { data: pendingFollowUpCount = 0 } = useQuery(
     ['sidebarPendingFollowupsCount', user?.id, user?.user_type],
     async () => {
-      const response = await api.get('/followup-overall-count');
+      const response = await api.get('/follow-up/overall-count');
       const followups = response?.data?.followups;
       const count = Array.isArray(followups) ? followups.length : Number(followups ?? 0);
       return Number.isFinite(count) ? count : 0;

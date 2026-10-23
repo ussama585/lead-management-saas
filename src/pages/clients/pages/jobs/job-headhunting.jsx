@@ -2639,7 +2639,7 @@ export default function JobHeadhunting() {
           <img
             src={record.profile_pic || ProfileImagePlaceholder}
             alt={val || 'Candidate'}
-            style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}
+            style={{ width: 40, height: 40, flexShrink: 0, borderRadius: '50%', objectFit: 'cover' }}
           />
           <span style={{ fontWeight: 500, color: '#3E6A9F' }}>
             {val || '-'}

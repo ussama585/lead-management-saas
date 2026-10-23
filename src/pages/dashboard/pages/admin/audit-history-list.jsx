@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Button, Select, Spin } from 'antd';
+import { Alert, Button, Select, Spin } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
@@ -7,10 +7,28 @@ import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
-import { getAccountsAllUsers, getAuditHistoryList, getHistoryModelNames } from '../../../shared/services/admin-graphs.js';
+import { getAccountsAllUsers, getHistoryModelNames } from '../../../shared/services/admin-graphs.js';
+import api from '../../../shared/services/api.js';
+import useUserStore from '../../../shared/store/user-store.js';
+import { getRolePath } from '../../../auth/role-home.js';
 import '../../../../assets/styles/legacy/table-client-actions.css';
 
 const THEME_PRIMARY = '#3E6A9F';
+
+export async function getAuditHistoryList({ page = 1, size = 10, sortBy = 'changed_at', order = 'desc', search, modelName, changedBy, startDate, endDate } = {}) {
+  const params = { page, size };
+  if (sortBy) params.sort_by = sortBy;
+  if (order) params.order = order;
+  if (search?.trim()) params.search = search.trim();
+  if (modelName) params.model_name = modelName;
+  if (changedBy?.length) params.changed_by = changedBy.join(',');
+  if (startDate) params.start_date = startDate;
+  if (endDate) params.end_date = endDate;
+  const { data } = await api.get('/activity/list', { params });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load user activity.');
+  if (!Array.isArray(data?.results)) throw new Error('Could not read the user activity list.');
+  return data;
+}
 
 const formatCellValue = (value) => {
   if (value === null || value === undefined || value === '') return '-';
@@ -106,8 +124,8 @@ const SORT_FIELD_MAP = {
   new_value: 'new_value',
   old_value: 'old_value',
   field_name: 'field_name',
-  category: 'category',
-  date: 'date',
+  category: 'model_name',
+  date: 'changed_at',
   duration: 'changed_at',
 };
 
@@ -120,6 +138,7 @@ const resolveSortField = (sorting) => {
 const getCurrentMonthRange = () => [dayjs().startOf('month'), dayjs().endOf('month')];
 
 export default function AuditHistoryListPage() {
+  const { user } = useUserStore();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([{ id: 'changed_at', desc: true }]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -133,6 +152,7 @@ export default function AuditHistoryListPage() {
 
   const handleGlobalFilterChange = useCallback((value) => {
     setGlobalFilter(value ?? '');
+    setPagination(previous => ({ ...previous, pageIndex: 0 }));
   }, []);
 
   const { data: allUsers = [] } = useQuery(
@@ -155,9 +175,11 @@ export default function AuditHistoryListPage() {
     }
   );
 
-  const { data, isLoading, isFetching } = useQuery(
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery(
     [
       'auditHistoryList',
+      user?.id,
+      user?.user_type,
       pagination.pageIndex,
       pagination.pageSize,
       sortBy,
@@ -266,14 +288,14 @@ export default function AuditHistoryListPage() {
         id: 'new_value',
         accessorKey: 'new_value',
         size: 200,
-        Cell: ({ cell }) => <span>{cell.getValue()}</span>,
+        Cell: ({ cell }) => <span>{formatCellValue(cell.getValue())}</span>,
       },
       {
         header: 'Old Value',
         id: 'old_value',
         accessorKey: 'old_value',
         size: 200,
-        Cell: ({ cell }) => <span>{cell.getValue()}</span>,
+        Cell: ({ cell }) => <span>{formatCellValue(cell.getValue())}</span>,
       },
       {
         header: 'Field',
@@ -291,8 +313,8 @@ export default function AuditHistoryListPage() {
         accessorKey: 'category',
         size: 180,
         Cell: ({ row }) => {
-          const v = row.original?.category ?? row.original?.field_name ?? row.original?.model_name;
-          const href = getActivityLinkPath(row.original);
+          const v = row.original?.category ?? row.original?.model_name;
+          const href = getRolePath(user?.user_type, getActivityLinkPath(row.original) || '');
           const label = formatFieldName(v);
 
           if (!href) return <span>{label}</span>;
@@ -330,12 +352,14 @@ export default function AuditHistoryListPage() {
         },
       },
     ],
-    []
+    [user?.user_type]
   );
 
   return (
     <>
       <BreadCrumb linkText="User Activity" />
+      {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load user activity.'}
+        action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
       <div className="container">
         <div style={{ display: 'flex', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
           <Select
@@ -365,8 +389,8 @@ export default function AuditHistoryListPage() {
             maxTagCount={0}
             maxTagPlaceholder={() => null}
             dropdownMatchSelectWidth
-            dropdownStyle={{ minWidth: 520 }}
-            style={{ width: 520, minWidth: 520, maxWidth: '100%' }}
+            dropdownStyle={{ maxWidth: 'calc(100vw - 32px)' }}
+            style={{ width: 520, minWidth: 0, maxWidth: '100%' }}
             allowClear
           />
           <BootstrapDateRangeModal

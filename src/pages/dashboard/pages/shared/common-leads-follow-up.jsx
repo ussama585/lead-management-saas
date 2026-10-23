@@ -278,7 +278,7 @@ const CommonLeadsFollowUp = () => {
         size: 90,
         Cell: ({ row }) => {
           const canUseFollowUp =
-            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'admin';
+            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'super_admin';
           const isConverted = isLeadConvertedToClient(row.original);
 
           if (!canUseFollowUp) return <span>-</span>;
@@ -613,6 +613,7 @@ const CommonLeadsFollowUp = () => {
             globalFilter={globalFilter}
             onGlobalFilterChange={setGlobalFilter}
             isLoading={isLoading}
+            muiTableContainerProps={{ sx: { maxWidth: '100%', overflowX: 'auto' } }}
             enableRowSelection={false}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={setColumnVisibility}

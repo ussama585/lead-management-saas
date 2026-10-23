@@ -29,7 +29,7 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   /* Flexibly adjust columns based on screen width */
   gap: 15px;
   flex: 2 1 70%;
@@ -51,9 +51,9 @@
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   /* Responsive column sizes */
-  grid-template-columns: repeat(3, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   /* Set a max of 3 columns */
   gap: 10px;
   /* Equal spacing between rows and columns */
@@ -74,14 +74,14 @@
 /* Media query to adjust the grid for smaller screens */
 @media (max-width: 1488px) {
   .metrics-grid {
-    grid-template-columns: repeat(2, minmax(250px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     /* Adjust to 2 columns for medium screens */
   }
 }
 
 @media (max-width: 705px) {
   .metrics-grid {
-    grid-template-columns: repeat(1, minmax(250px, 1fr));
+    grid-template-columns: repeat(1, minmax(0, 1fr));
     /* Adjust to 1 column for smaller screens */
   }
 }
@@ -94,7 +94,7 @@
   }
 
   .stats-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
     /* Adjust grid columns for tablets */
   }
 }

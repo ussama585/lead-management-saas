@@ -482,49 +482,4 @@ export const getHistoryModelNames = async () => {
   }
 };
 
-export const getAuditHistoryList = async ({
-  page = 1,
-  size = 10,
-  sortBy = 'changed_at',
-  order = 'desc',
-  search,
-  modelName,
-  changedBy,
-  startDate,
-  endDate,
-} = {}) => {
-  const query = new URLSearchParams();
-  query.append('page', String(page));
-  query.append('size', String(size));
-  if (sortBy) query.append('sort_by', sortBy);
-  if (order) {
-    // Keep multiple order keys for backend compatibility across endpoints.
-    query.append('order', order);
-    query.append('sort_order', order);
-    if (sortBy) query.append('ordering', order === 'desc' ? `-${sortBy}` : sortBy);
-  }
-  if (search && String(search).trim()) query.append('search', String(search).trim());
-  if (modelName && String(modelName).trim()) query.append('model_name', String(modelName).trim());
-  const changedByList = Array.isArray(changedBy) ? changedBy : changedBy ? [changedBy] : [];
-  if (changedByList.length > 0) {
-    query.append('changed_by', changedByList.map((v) => String(v).trim()).filter(Boolean).join(','));
-  }
-  if (startDate) query.append('start_date', String(startDate));
-  if (endDate) query.append('end_date', String(endDate));
 
-  const endpoint = `/audit-history-list${query.toString() ? `?${query.toString()}` : ''}`;
-
-  try {
-    const response = await api.get(endpoint);
-    const payload = response?.data ?? {};
-    return {
-      status: payload?.status ?? true,
-      count: Number(payload?.count) || 0,
-      next: payload?.next ?? null,
-      previous: payload?.previous ?? null,
-      results: Array.isArray(payload?.results) ? payload.results : [],
-    };
-  } catch (error) {
-    throw new Error(`Error fetching user activity list: ${error.message}`);
-  }
-};

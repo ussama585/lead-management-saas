@@ -95,7 +95,7 @@ const ExecutivePerformanceLeaderboardChart = ({
       render: (name, record) => (
         <div className="leaderboard-name-cell">
           <Avatar
-            size={36}
+            size={40}
             icon={<UserOutlined size="1em" className="app-icon" />}
             src={record.avatar}
             className="leaderboard-avatar"

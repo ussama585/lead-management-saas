@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { API_URL } from '../utils/api.js';
 import useUserStore from '../store/user-store.js';
+import { applyCompanyFilter } from '../utils/company-filter.js';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -20,6 +21,7 @@ export function storeRefreshedTokens(payload) {
 // Debugging Axios Request Interceptor
 api.interceptors.request.use(
   (config) => {
+    applyCompanyFilter(config, useUserStore.getState().user?.user_type, window.location);
     if (config?.skipAuth) {
       if (config.headers?.set) {
         config.headers.delete('Authorization');

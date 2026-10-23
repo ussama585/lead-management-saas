@@ -7,17 +7,29 @@ import { Trash2 as DeleteOutlined } from 'lucide-react';
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
-import { ConfirmationModal } from "../../../clients/components/LazyModals.jsx";
+import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
+import api from '../../../shared/services/api.js';
+import { isSuperAdmin } from '../../../auth/role-access.js';
+import { getRolePath } from '../../../auth/role-home.js';
 import {
   getDataLeadJobs,
   getDataLead,
-  updateDataLeadJob,
-  deleteDataLeadJob,
 } from "../../../shared/services/data-leads-service.js";
 import useUserStore from "../../../shared/store/user-store.js";
 import { countriesNames, citiesNames, currencyOptions, paymentTermOptions } from "../../../shared/utils/countries.js";
 import { loadTableState } from "../../../shared/utils/persistTableState.js";
 import { formatSalaryNum } from "../../../shared/utils/formatters.js";
+
+async function updateDataLeadJob(jobId, payload) {
+  const { data } = await api.patch(`/data-leads/update-job/${encodeURIComponent(jobId)}`, payload);
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not update job.');
+  return data;
+}
+async function deleteDataLeadJob(jobId) {
+  const { data } = await api.delete(`/data-leads/update-job/${encodeURIComponent(jobId)}`);
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not delete job.');
+  return data;
+}
 
 const DataLead = () => {
   const { id } = useParams();
@@ -44,7 +56,6 @@ const DataLead = () => {
   const [descEditRow, setDescEditRow] = useState(null);
   const [descLoading, setDescLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ visible: false, job: null });
-  const [deleteReason, setDeleteReason] = useState("");
 
   // Persist table state to sessionStorage
   useEffect(() => {
@@ -101,13 +112,14 @@ const DataLead = () => {
   const totalCount = data?.count ?? jobs.length;
 
   const deleteJobMutation = useMutation(
-    ({ jobId, reason }) => deleteDataLeadJob(jobId, reason),
+    ({ jobId }) => deleteDataLeadJob(jobId),
     {
       onSuccess: (res) => {
         message.success(res?.message || "Job deleted successfully");
         setDeleteModal({ visible: false, job: null });
-        setDeleteReason("");
         queryClient.invalidateQueries(["dataLeadJobs", dataLeadId]);
+        queryClient.invalidateQueries(['dataLeadJobDetail']);
+        queryClient.invalidateQueries(['dataLeadDetail']);
         refetchJobs();
       },
       onError: (error) => {
@@ -117,16 +129,14 @@ const DataLead = () => {
   );
 
   const handleDeleteJob = useCallback((job) => {
+    deleteJobMutation.reset();
     setDeleteModal({ visible: true, job });
   }, []);
 
   const handleConfirmDeleteJob = useCallback(() => {
-    if (!deleteReason.trim()) {
-      message.error("Please provide a reason for deletion");
-      return;
-    }
-    deleteJobMutation.mutate({ jobId: deleteModal.job?.id, reason: deleteReason.trim() });
-  }, [deleteModal.job, deleteReason, deleteJobMutation]);
+    if (!deleteModal.job || deleteJobMutation.isLoading) return;
+    deleteJobMutation.mutate({ jobId: deleteModal.job.id });
+  }, [deleteModal.job, deleteJobMutation]);
 
   const { data: leadDetail, refetch: refetchLeadDetail } = useQuery(
     ["dataLeadDetail", dataLeadId],
@@ -161,7 +171,7 @@ const DataLead = () => {
     leadForCard?.converted_to_client === 1 ||
     leadForCard?.converted_to_client === '1' ||
     leadForCard?.converted_to_client === 'true';
-  const canDeleteJob = (user?.user_type === "admin" || user?.user_type === "sales_manager") && !isReadOnlyLead;
+  const canDeleteJob = (isSuperAdmin(user?.user_type) || user?.user_type === "sales_manager") && !isReadOnlyLead;
 
   const formatDate = useCallback((value) => {
     if (!value) return "—";
@@ -616,6 +626,10 @@ const DataLead = () => {
           </>
         ),
       },
+      {
+        header: 'View Details', id: 'view_details', enableSorting: false, enableEditing: false,
+        Cell: ({ row }) => <AntButton size="small" onClick={() => navigate(getRolePath(user?.user_type, `/data-leads/${dataLeadId}/jobs/${row.original.id}`))}>View Details</AntButton>,
+      },
       // Delete column - only for admin and sales_manager
       ...(canDeleteJob
         ? [
@@ -635,7 +649,7 @@ const DataLead = () => {
           ]
         : []),
     ],
-    [navigate, dataLeadId, normalizeEmploymentType, refetchJobs, isReadOnlyLead, canDeleteJob, handleDeleteJob],
+    [navigate, dataLeadId, normalizeEmploymentType, refetchJobs, isReadOnlyLead, canDeleteJob, handleDeleteJob, user?.user_type],
   );
 
   const getRowId = useCallback(
@@ -819,25 +833,10 @@ const DataLead = () => {
         </div>
       </Modal>
 
-      <Suspense fallback={null}>
-        <ConfirmationModal
-          showModal={deleteModal.visible}
-          setShowModal={(visible) => {
-            setDeleteModal((prev) => ({ ...prev, visible }));
-            if (!visible) setDeleteReason("");
-          }}
-          mutation={deleteJobMutation}
-          onConfirm={handleConfirmDeleteJob}
-          showReasonField={true}
-          reason={deleteReason}
-          setReason={setDeleteReason}
-          message={
-            <span>
-              This action cannot be reversed. Are you sure you want to delete job: <strong>{deleteModal.job?.job_title}</strong>?
-            </span>
-          }
-        />
-      </Suspense>
+      <SettingsDeleteModal title="Delete job" itemName={deleteModal.job?.job_title}
+        open={deleteModal.visible} loading={deleteJobMutation.isLoading}
+        error={deleteJobMutation.isError ? deleteJobMutation.error?.response?.data?.message || deleteJobMutation.error?.message || 'Could not delete job.' : null}
+        onCancel={() => setDeleteModal({ visible: false, job: null })} onConfirm={handleConfirmDeleteJob} />
     </>
   );
 };

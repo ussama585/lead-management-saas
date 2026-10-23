@@ -1,14 +1,41 @@
 import React from "react";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import "../../../../assets/styles/legacy/leads.generated.css";
-import { Spin, Tag, Divider, Row, Col } from "antd";
+import { Alert, Button, Spin, Tag, Divider, Row, Col } from "antd";
 import { BookOpen as BookOutlined, Info as InfoCircleOutlined, MapPin as EnvironmentOutlined, DollarSign as DollarOutlined, User as UserOutlined, Zap as ThunderboltOutlined, FileText as FileTextOutlined, LayoutGrid as AppstoreOutlined } from 'lucide-react';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "react-query";
-import { getJobDetails } from "../../../shared/services/headhunting.js";
+import api from '../../../shared/services/api.js';
 import dayjs from "dayjs";
 import useUserStore from "../../../shared/store/user-store.js";
+import { isSuperAdmin } from '../../../auth/role-access.js';
 import { formatSalaryNum } from "../../../shared/utils/formatters.js";
+
+export async function getJobDetails(jobId, leadId) {
+  if (leadId != null && leadId !== '') {
+    let page = 1;
+    const visited = new Set();
+    while (!visited.has(page)) {
+      visited.add(page);
+      const { data } = await api.get(`/data-leads/jobs/${encodeURIComponent(leadId)}`, { params: { page, size: 100 } });
+      if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load job details.');
+      if (!Array.isArray(data?.results)) throw new Error('Could not read job details.');
+      const job = data.results.find(job => String(job.id) === String(jobId));
+      if (job) return job;
+      if (!data.next) break;
+      const nextPage = Number(new URL(data.next, 'https://api.invalid').searchParams.get('page'));
+      if (!Number.isInteger(nextPage) || nextPage < 1) break;
+      page = nextPage;
+    }
+    throw new Error('This job was not found for the selected data lead.');
+  }
+  // Preserve existing links from other modules that only supply the job ID.
+  const { data } = await api.get(`/data-leads/update-job/${encodeURIComponent(jobId)}`);
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load job.');
+  const job = data?.data ?? data;
+  if (job?.id == null) throw new Error('Could not read job details.');
+  return job;
+}
 
 const fmt = (date) =>
   date && dayjs(date).isValid() ? dayjs(date).format("MMM DD, YYYY") : "—";
@@ -53,13 +80,15 @@ const SkillCard = ({ skill }) => (
 
 const DataLeadJobDetail = () => {
   const navigate = useNavigate();
-  const { jobId } = useParams();
+  const { jobId, leadId: routeLeadId } = useParams();
+  const [searchParams] = useSearchParams();
+  const leadId = routeLeadId || searchParams.get('leadId');
   const { user } = useUserStore();
-  const isAdmin = user?.user_type === "admin";
+  const isAdmin = isSuperAdmin(user?.user_type);
 
-  const { data: job, isLoading, isError, error } = useQuery(
-    ["dataLeadJobDetail", jobId],
-    () => getJobDetails(jobId),
+  const { data: job, isLoading, isError, error, refetch } = useQuery(
+    ["dataLeadJobDetail", user?.id, user?.user_type, leadId, jobId],
+    () => getJobDetails(jobId, leadId),
     { enabled: Boolean(jobId), refetchOnWindowFocus: false }
   );
 
@@ -80,9 +109,7 @@ const DataLeadJobDetail = () => {
     return (
       <>
         <BreadCrumb linkText="Job Detail" goBack={goBack} />
-        <div style={{ padding: "2rem", color: "#cf1322" }}>
-          <p>{error?.message || "Something went wrong."}</p>
-        </div>
+        <Alert type="error" showIcon message={error?.message || 'Could not load job details.'} action={<Button onClick={() => refetch()}>Retry</Button>} />
       </>
     );
   }

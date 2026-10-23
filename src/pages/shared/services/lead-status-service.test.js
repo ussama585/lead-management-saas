@@ -46,6 +46,15 @@ describe('lead status API contract', () => {
     api.get.mockResolvedValue({ data: {} });
     await expect(listLeadStatuses()).rejects.toThrow('Could not read');
   });
+  it.each([
+    ['get', () => getLeadStatus(1)],
+    ['post', () => createLeadStatus('Active')],
+    ['patch', () => updateLeadStatus(1, 'Active')],
+    ['delete', () => deleteLeadStatus(1)],
+  ])('rejects status:false from %s', async (method, action) => {
+    api[method].mockResolvedValue({ data: { status: false, message: 'Request denied' } });
+    await expect(action()).rejects.toThrow('Request denied');
+  });
   it('shows field validation and API errors', () => {
     expect(leadStatusError({ response: { data: { name: ['This name already exists.'] } } })).toBe('This name already exists.');
     expect(leadStatusError({ response: { data: { message: 'Not permitted' } } })).toBe('Not permitted');

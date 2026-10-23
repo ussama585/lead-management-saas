@@ -8,6 +8,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import App from './App.jsx';
 import AppThemeProvider from './components/providers/app-theme.jsx';
 import './assets/styles/shadcn.css';
+import './assets/styles/responsive-workspace.css';
+import './assets/styles/form-controls.css';
 
 const queryClient = new QueryClient();
 createRoot(document.getElementById('root')).render(

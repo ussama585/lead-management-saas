@@ -29,7 +29,6 @@ import { useDuplicateLead } from '../../../../components/hooks/useDuplicateLead.
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import NewTableComponent from "../../../../components/tables/new-table.jsx";
 import {
-  getDataLeadHistoryTrack,
   createDataLeadFollowUp,
 } from "../../../shared/services/data-leads-service.js";
 import formatDateUniversal from "../../../shared/utils/formatDate.js";
@@ -45,6 +44,14 @@ import StatusHistoryModal, { createStatusHistoryColumn } from "../../../../compo
 import dayjs from "dayjs";
 import api from '../../../shared/services/api.js';
 import DataLeadDialog from './data-lead-dialog.jsx';
+import { isSuperAdmin } from '../../../auth/role-access.js';
+
+export async function getDataLeadHistory(leadId) {
+  const { data } = await api.get(`/data-leads/history/${encodeURIComponent(leadId)}`);
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead history.');
+  if (!Array.isArray(data)) throw new Error('Could not read lead history.');
+  return data;
+}
 
 async function getDataLeadsList(params) {
   const { data } = await api.get('/data-leads/list', { params });
@@ -1009,9 +1016,11 @@ const DataLeads = () => {
         sortDescFirst: false,
         Cell: ({ cell }) => <span>{cell.getValue() || "-"}</span>,
       },
-      ...(user?.user_type === "admin"
+      ...(isSuperAdmin(user?.user_type)
         ? [
             createStatusHistoryColumn({
+              header: 'History',
+              buttonTitle: 'View lead history',
               onOpenHistory: (entity) =>
                 setStatusHistoryModal({ visible: true, entity }),
               accessorKey: "status_history_data",
@@ -1432,15 +1441,17 @@ const DataLeads = () => {
           onClose={closeDuplicateModal}
           leadType="data-leads"
         />
-        {user?.user_type === "admin" && (
+        {isSuperAdmin(user?.user_type) && (
           <StatusHistoryModal
             open={statusHistoryModal.visible}
             entity={statusHistoryModal.entity}
             onClose={() => setStatusHistoryModal({ visible: false, entity: null })}
-            fetchHistoryApi={getDataLeadHistoryTrack}
+            fetchHistoryApi={getDataLeadHistory}
+            title={entity => `Data Lead History - ${entity?.company_name || 'Lead'}`}
+            historyDateKey="changed_at"
             getTitleFromEntity={(entity) => entity?.company_name || "Lead"}
-            queryKeyPrefix="dataLeadStatusHistory"
-            emptyMessage="No status history available."
+            queryKeyPrefix={`dataLeadHistory-${user?.id}-${user?.user_type}`}
+            emptyMessage="No lead history available."
           />
         )}
         <FollowUpModal

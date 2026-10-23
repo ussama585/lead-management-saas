@@ -1,20 +1,30 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import NewTableComponent from '../../components/tables/new-table.jsx';
-import { Modal, Button, message, Spin, Select } from 'antd';
+import { Avatar, Alert, Button, message } from 'antd';
 import { Copy as CopyOutlined } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useMutation, useQuery } from 'react-query';
-import { listDataEntry, updateDataEntryStatus } from '../shared/services/data-entry-service.js';
+import { useQuery } from 'react-query';
+import api from '../shared/services/api.js';
+import useUserStore from '../shared/store/user-store.js';
 import formatDateUniversal from '../shared/utils/formatDate.js';
 import '../../assets/styles/legacy/create-user.css';
 import '../../assets/styles/legacy/leads.generated.css';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
+import StatusFilterTabs from '../../components/status-filter-tabs.jsx';
 
-const statusOptions = [
-  { label: 'Pending', value: 'Pending' },
-  { label: 'Converted', value: 'Converted' },
-  { label: 'Contacted But No Response', value: 'Contacted But No Response' },
-];
+export async function getDataEntryCounts() {
+  const { data } = await api.get('/data-entry/list-count');
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load counts.');
+  if (!data || !['all', 'assigned', 'unassigned'].every(key => Number.isFinite(Number(data[key])))) throw new Error('Could not read sales data counts.');
+  return data;
+}
+
+export async function listDataEntry(params = {}) {
+  const { data } = await api.get('/data-entry/list', { params });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load sales data.');
+  if (!Array.isArray(data?.results)) throw new Error('Could not read the sales data list.');
+  return data;
+}
 
 const baseColumns = [
   { header: 'Representative Name', accessorKey: 'representative_name' },
@@ -29,6 +39,9 @@ const baseColumns = [
   { header: 'Company Website', accessorKey: 'company_website' },
   { header: 'Company Social Media', accessorKey: 'company_social_link' },
   { header: 'Data Acquired Through', accessorKey: 'acquired_through' },
+  { header: 'Status', accessorKey: 'status' },
+  { header: 'Added By', accessorKey: 'added_by_name' },
+  { header: 'Assigned To', accessorKey: 'assigned_to_name' },
   { 
     header: 'Date', 
     accessorKey: 'created_at',
@@ -50,6 +63,7 @@ const copyRowToClipboard = (row) => {
 };
 
 const LeadsTable = () => {
+  const { user } = useUserStore();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -77,10 +91,16 @@ const LeadsTable = () => {
   });
   
   const [globalFilter, setGlobalFilter] = useState(initialSearchFromUrl);
+  const [scope, setScope] = useState(() => {
+    const tab = searchParams.get('tab');
+    return tab === 'all' ? '' : tab === 'unassigned' ? 'unassigned' : 'assigned';
+  });
+  const counts = useQuery(['data-entry-list-count', user?.id, user?.user_type], getDataEntryCounts, { refetchOnWindowFocus: false });
 
   // Sync all state to URL params
   useEffect(() => {
     const newParams = {};
+    if (scope !== 'assigned') newParams.tab = scope || 'all';
     
     // Search
     if (globalFilter && globalFilter.trim()) {
@@ -103,11 +123,11 @@ const LeadsTable = () => {
     
     setSearchParams(newParams, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalFilter, pagination.pageIndex, pagination.pageSize, sorting]);
+  }, [globalFilter, pagination.pageIndex, pagination.pageSize, sorting, scope]);
 
   // Fetch dynamic data
-  const { data, isLoading, refetch } = useQuery(
-    ['data-entry-list', pagination, sorting, globalFilter],
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery(
+    ['data-entry-list', user?.id, user?.user_type, pagination, sorting, globalFilter, scope],
     async () => {
       const params = {
         page: pagination.pageIndex + 1,
@@ -116,6 +136,7 @@ const LeadsTable = () => {
         sort_by: sorting?.[0]?.id || '',
         order: sorting?.[0]?.desc ? 'desc' : 'asc',
       };
+      if (scope) params.assigned = scope === 'assigned';
       return await listDataEntry(params);
     },
     { keepPreviousData: true }
@@ -126,13 +147,19 @@ const LeadsTable = () => {
     {
       header: 'Company Name',
       accessorKey: 'company_name',
+      size: 260,
       Cell: ({ cell, row }) => (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Avatar size={40} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>
+            {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
+          </Avatar>
         <span
           className="cursor-pointer"
           style={{ textDecoration: 'underline', color: '#3E6A9F' }}
           onClick={() => navigate(`/data-entry/edit/${row.original.id}`)}
         >
           {cell.getValue()}
+        </span>
         </span>
       ),
     },
@@ -159,7 +186,20 @@ const LeadsTable = () => {
   return (
     <>
     <BreadCrumb linkText="Sales Data"  />
+    {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load sales data.'}
+      action={<Button loading={isFetching} onClick={() => refetch()}>Retry</Button>} />}
     <div className="container ">
+      <StatusFilterTabs statusFilter={scope} setStatusFilter={value => {
+        setScope(previous => typeof value === 'function' ? value(previous) : value);
+        setPagination(previous => ({ ...previous, pageIndex: 0 }));
+      }} statusChoices={[
+        { label: 'Assigned', value: 'assigned', apiKey: 'assigned' },
+        { label: 'Unassigned', value: 'unassigned', apiKey: 'unassigned' },
+      ]} getTotalCount={() => counts.data?.all ?? (counts.isLoading ? '…' : '-')}
+        getStatusCount={key => counts.data?.[key] ?? (counts.isLoading ? '…' : '-')}
+        statusColors={{ assigned: '#3e6a9f', unassigned: '#fa8c16' }} />
+      {counts.isError && <Alert type="error" showIcon message={counts.error?.message || 'Could not load counts.'}
+        action={<Button loading={counts.isFetching} onClick={() => counts.refetch()}>Retry</Button>} />}
       <div className="" style={{ marginTop: 24, marginBottom: 24 }}>
         
         <div style={{ marginTop: 8 }}>
@@ -182,8 +222,8 @@ const LeadsTable = () => {
             sorting={sorting}
             onSortingChange={setSorting}
             globalFilter={globalFilter}
-            onGlobalFilterChange={setGlobalFilter}
-            isLoading={isLoading}
+            onGlobalFilterChange={value => { setGlobalFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
+            isLoading={isLoading || isFetching}
             enableRowSelection={false}
             heading={`Sales Data (${data?.count || 0})`}
           />

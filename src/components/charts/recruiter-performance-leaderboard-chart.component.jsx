@@ -49,7 +49,7 @@ const RecruiterPerformanceLeaderboardChart = ({
       key: 'recruiter_name',
       render: (name) => (
         <div className="recruiter-name-cell">
-          <Avatar size={32} icon={<UserOutlined size="1em" className="app-icon" />} className="recruiter-avatar" />
+          <Avatar size={40} icon={<UserOutlined size="1em" className="app-icon" />} className="recruiter-avatar" />
           <span>{name || 'Unassigned'}</span>
         </div>
       ),

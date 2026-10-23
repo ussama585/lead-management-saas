@@ -1,0 +1,57 @@
+.data-job-form {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  container-type: inline-size;
+}
+.data-job-section {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+.sop-page-content .data-job-section > h2 {
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+.data-job-grid, .data-job-nature-grid, .data-job-skill-row, .data-job-paired-sections {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px 12px;
+  min-width: 0;
+}
+.data-job-stack { display: grid; gap: 16px; min-width: 0; }
+.data-job-field { min-width: 0; }
+.data-job-field > label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+.data-job-field :is(.ant-input-number, .ant-select) { width: 100%; max-width: 100%; min-width: 0; }
+.data-job-field :is(input, textarea, .ant-select-selector) { border-radius: 6px; }
+.data-job-help { margin: 4px 0 0; color: var(--muted-foreground); font-size: 12px; }
+.data-job-working-days { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.data-job-working-days .ant-select { flex: 1; min-width: 0; }
+.data-job-skill-row { align-items: end; padding: 12px; border: 1px solid var(--border); border-radius: 6px; }
+.data-job-span-all { grid-column: 1 / -1; }
+@container (min-width: 600px) {
+  .data-job-grid, .data-job-nature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .data-job-span-two { grid-column: span 2; }
+  .data-job-skill-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 800px) {
+  .data-job-paired-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 1000px) {
+  .data-job-grid, .data-job-skill-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .data-job-section { padding: 14px; }
+}

@@ -149,7 +149,7 @@ export default function ProjectApplication() {
             <img
               src={row.profile_pic || ProfileImagePlaceholder}
               alt="Profile"
-              style={{ width: '25px', height: '25px', borderRadius: '50%', marginRight: '10px' }}
+              style={{ width: 40, height: 40, flexShrink: 0, objectFit: 'cover', borderRadius: '50%', marginRight: '10px' }}
             />
             <span>{row.candidate}</span>
           </div>

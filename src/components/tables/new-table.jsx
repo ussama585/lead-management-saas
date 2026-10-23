@@ -244,14 +244,24 @@ export default function NewTableComponent({
 
                   },
               }}
-              muiTableContainerProps={muiTableContainerProps}
+              muiTableContainerProps={{
+                ...muiTableContainerProps,
+                sx: [
+                  { minWidth: 0, maxWidth: '100%', overflowX: 'auto' },
+                  ...(Array.isArray(muiTableContainerProps?.sx) ? muiTableContainerProps.sx : [muiTableContainerProps?.sx || {}]),
+                ],
+              }}
           muiTablePaperProps={{
                   elevation: 0, // removes shadow
                   sx: {
                       marginTop: '10px',
+                      minWidth: 0,
+                      maxWidth: '100%',
                       boxShadow: 'none', // just in case
-                      border: '1px solid #ddd', // light gray border
-                      borderRadius: '8px', // optional: consistent with header
+                      backgroundColor: 'transparent',
+                      border: '1px solid var(--border, #ddd)',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
                   },
               }}
               muiTableBodyRowProps={getRowStyle ? ({ row }) => {
@@ -263,6 +273,9 @@ export default function NewTableComponent({
                 <Box
                   sx={{
                     display: 'flex',
+                    flexWrap: 'wrap',
+                    minWidth: 0,
+                    maxWidth: '100%',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     width: '100%',
@@ -276,6 +289,8 @@ export default function NewTableComponent({
                       fontWeight: 'bold',
                       color: '#0f172a',
                       display: 'flex',
+                      minWidth: 0,
+                      overflowWrap: 'anywhere',
                       alignItems: 'center',
                       ...headingSx,
                     }}

@@ -65,27 +65,8 @@ export const updateDataLeadJob = async (jobId, payload) => {
   return response.data;
 };
 
-export const deleteDataLeadJob = async (jobId, reason) => {
-  try {
-    const formData = new FormData();
-    formData.append('delete_reason', reason);
-    const response = await api.delete(`/data-leads/delete-data-lead-job/${jobId}`, {
-      data: formData,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: error.response?.data };
-  }
-};
-
 export const updateDataLeadStatus = async (leadId, payload, config = {}) => {
   const response = await api.patch(`/data-leads/details/${leadId}`, payload, config);
-  return response.data;
-};
-
-/** GET data-leads/lead-history-track/:leadId - returns array of { status, updated_at } */
-export const getDataLeadHistoryTrack = async (leadId) => {
-  const response = await api.get(`/data-leads/lead-history-track/${leadId}`);
   return response.data;
 };
 
@@ -95,7 +76,8 @@ export const patchDataLeadJob = async (jobId, payload) => {
 };
 
 export const createDataLeadFollowUp = async (leadId, payload) => {
-  const response = await api.post(`/data-leads/data-follow-up/${leadId}`, payload);
+  const response = await api.post(`/follow-up/checkup_duration`, payload);
+  // const response = await api.post(`/follow-up/checkup_duration/${leadId}`, payload);
   return response.data;
 };
 

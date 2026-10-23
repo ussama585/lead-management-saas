@@ -271,7 +271,7 @@
       }
 
       // Update URL params (only status and executive for backwards compatibility)
-      const params = {};
+      const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
       // Normalize to single values (handle arrays by taking first value)
       const normalizedStatus = Array.isArray(selectedStatus)
         ? (selectedStatus.length > 0 ? selectedStatus[0] : '')
@@ -1209,7 +1209,7 @@
       setGlobalFilter('');
 
       // Update URL with status parameter
-      const params = {};
+      const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
       const normalizedExecutive = Array.isArray(selectedExecutive)
         ? (selectedExecutive.length > 0 ? selectedExecutive[0] : '')
         : selectedExecutive;
@@ -1240,7 +1240,7 @@
       setShowDateModal(false);
 
       // Update URL with executive parameter (keep status if selected)
-      const params = {};
+      const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
       const normalizedStatus = Array.isArray(selectedStatus)
         ? (selectedStatus.length > 0 ? selectedStatus[0] : '')
         : selectedStatus;
@@ -1310,7 +1310,7 @@
               setSorting([]);
               setGlobalFilter('');
 
-              const params = {};
+              const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
               const normalizedStatus = Array.isArray(selectedStatus)
                 ? (selectedStatus.length > 0 ? selectedStatus[0] : '')
                 : selectedStatus;
