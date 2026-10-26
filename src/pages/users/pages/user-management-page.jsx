@@ -23,7 +23,7 @@ import TargetIcon from '../../../assets/images/table-icons/target-icon.svg';
 import GreenPencilIcon from '../../../assets/images/table-icons/green-pencil.svg';
 import BlueHamburgerIcon from '../../../assets/images/table-icons/blue-hamburger.svg';
 
-import { getUsers, getAllUsers, getUserCount, toggleUserActivation, requestDeleteUserOtp, validateDeleteUserOtp } from '../../shared/services/users-service.js';
+import { getUsers, getAllUsers, getCompanyManagementUsers, getUserCount, getUserTabCounts, toggleUserActivation, requestDeleteUserOtp, validateDeleteUserOtp } from '../../shared/services/users-service.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { getTargetForUser } from '../../shared/services/stats-service.js';
@@ -31,7 +31,10 @@ import OtpModal from '../../auth/pages/otp-modal.jsx';
 
 export default function UserManagement() {
   const { user: currentUser } = useUserStore();
+  console.log(currentUser, "useruseruser")
   const isSuperAdminViewer = isSuperAdmin(currentUser?.user_type);
+  const isCompany = currentUser?.user_type === 'company_admin';
+  const companyId = isCompany ? currentUser?.company_id : undefined;
   const [activeFilter, setActiveFilter] = useState('');
 
   const [userForTarget, setUserForTarget] = useState({
@@ -88,12 +91,14 @@ export default function UserManagement() {
   const [otpModalVisible, setOtpModalVisible] = useState(false);
 
   // Fetch users list with pagination
-  const usersQueryKey = ['usersList', currentUser?.id, currentUser?.user_type, pagination.pageIndex, pagination.pageSize, selectedTab, search, sorting, activeFilter];
+  const usersQueryKey = ['usersList', currentUser?.id, currentUser?.user_type, companyId, pagination.pageIndex, pagination.pageSize, selectedTab, search, sorting, activeFilter];
   const { data: usersList = {}, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: usersQueryKey,
     queryFn: () => isSuperAdminViewer
       ? getAllUsers({ page: pagination.pageIndex + 1, pageSize: pagination.pageSize, userType: selectedTab, search, sorting, isActive: activeFilter })
-      : getUsers(pagination.pageIndex + 1, pagination.pageSize, selectedTab, search, sorting),
+      : currentUser?.user_type === 'company_admin'
+        ? getCompanyManagementUsers(companyId, { page: pagination.pageIndex + 1, pageSize: pagination.pageSize, userType: selectedTab, search, sorting, isActive: activeFilter })
+        : getUsers(pagination.pageIndex + 1, pagination.pageSize, selectedTab, search, sorting),
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5, // 5 minutes (adjust as needed)
     cacheTime: 1000 * 60 * 30,
@@ -101,16 +106,16 @@ export default function UserManagement() {
 
   // Fetch user counts 
   const { data: countData } = useQuery({
-    queryKey: ['userCount'],
-    queryFn: getUserCount,
-    enabled: !isSuperAdminViewer,
+    queryKey: ['userCount', currentUser?.id, currentUser?.user_type, companyId],
+    queryFn: isSuperAdminViewer || currentUser?.user_type === 'company_admin' ? getUserTabCounts : getUserCount,
+    enabled: Boolean(currentUser?.id),
     staleTime: 1000 * 60 * 5, // 5 minutes (adjust as needed)
     cacheTime: 1000 * 60 * 30,
   });
 
   // Mutation to toggle a user's activation
   const toggleUserActivationMutation = useMutation({
-    mutationFn: ({userId, isActive}) => {
+    mutationFn: ({ userId, isActive }) => {
       return toggleUserActivation(userId, isActive);
     },
 
@@ -239,23 +244,24 @@ export default function UserManagement() {
 
   const confirmToggleUserActivation = () => {
     if (userToToggleActivation.userId && userToToggleActivation.userName) {
-      toggleUserActivationMutation.mutate({userId: userToToggleActivation?.userId, isActive: userToToggleActivation?.isActive});
+      toggleUserActivationMutation.mutate({ userId: userToToggleActivation?.userId, isActive: userToToggleActivation?.isActive });
     }
   };
 
   useEffect(() => {
     if (countData) {
       setUserCount({
+        ...countData,
         all: countData.all,
-        admin: countData.admins,
-        sales_manager: countData.managers,
-        sales_executive: countData.executives,
-        data_entry_executive: countData.data_entry_executives,
+        admin: countData.admins ?? countData.company_admin,
+        sales_manager: countData.sales_manager ?? countData.managers,
+        sales_executive: countData.sales_executive ?? countData.executives,
+        data_entry_executive: countData.data_entry_executive ?? countData.data_entry_executives,
         recruitment_manager: countData.recruitment_managers,
         recruitment_executive: countData.recruitment_executives,
         project_manager: countData.project_managers || countData.project_manager || 0,
-        marketing_manager:countData.marketing_manager,
-        accountant:countData.accountant
+        marketing_manager: countData.marketing_manager,
+        accountant: countData.accountant
       });
     }
   }, [countData]);
@@ -272,14 +278,14 @@ export default function UserManagement() {
       {
         header: '#',
         accessorKey: 'id',
-          enableSorting: false,
-  enableColumnFilter: false,
-  enableColumnActions: false,
+        enableSorting: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
         Cell: ({ row }) => <span>{row.index + 1 + pagination.pageIndex * pagination.pageSize}</span>,
       },
       {
         header: 'Name',
-         accessorKey: 'name',
+        accessorKey: 'name',
         accessorFn: (row) => row,
         Cell: ({ cell }) => {
           const row = cell.getValue();
@@ -323,9 +329,9 @@ export default function UserManagement() {
       {
         header: 'Edit User',
         accessorFn: (row) => row,
-          enableSorting: false,
-  enableColumnFilter: false,
-  enableColumnActions: false,
+        enableSorting: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
@@ -346,9 +352,9 @@ export default function UserManagement() {
         header: 'Delete User',
         enableColumnActions: false,
         accessorFn: (row) => row,
-          enableSorting: false,
-  enableColumnFilter: false,
-  enableColumnActions: false,
+        enableSorting: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
@@ -367,9 +373,9 @@ export default function UserManagement() {
       },
       {
         header: 'Active/Deactive User',
-          enableSorting: false,
-  enableColumnFilter: false,
-  enableColumnActions: false,
+        enableSorting: false,
+        enableColumnFilter: false,
+        enableColumnActions: false,
         accessorFn: (row) => row,
         Cell: ({ cell }) => {
           const row = cell.getValue();
@@ -377,46 +383,46 @@ export default function UserManagement() {
             !isSuperAdmin(row.user_type) ? (
               row.is_active ? (
                 <ToggleOnIcon size="1em" className="app-icon"
-                  
+
                   onClick={() => handleToggleUser(row.id, row.name, row.is_active)}
                   style={{ fontSize: 35, ...({ cursor: 'pointer', color: 'green' }) }}
-                />                
+                />
               ) : (
                 <ToggleOffIcon size="1em" className="app-icon"
-                  
+
                   onClick={() => handleToggleUser(row.id, row.name, row.is_active)}
                   style={{ fontSize: 35, ...({ cursor: 'pointer', color: 'red' }) }}
                 />
               )
-           ) : (
-              <span>-</span>
-            )
-          );
-        },
-      },
-      {
-        header: 'Targets',
-        enableSorting: false,
-        enableColumnFilter: false,
-        enableColumnActions: false,
-        accessorFn: (row) => row,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          // Only show for non-admin and non-data_entry_executive
-          return (
-            !isSuperAdmin(row.user_type) && row.user_type !== 'data_entry_executive' ? (
-              <img
-                src={TargetIcon}
-                alt="Target"
-                onClick={() => navigate(`/admin/target-detail/${row.id}`)}
-                style={{ cursor: 'pointer', width: '20px', height: '20px' }}
-              />
             ) : (
               <span>-</span>
             )
           );
         },
       },
+      // {
+      //   header: 'Targets',
+      //   enableSorting: false,
+      //   enableColumnFilter: false,
+      //   enableColumnActions: false,
+      //   accessorFn: (row) => row,
+      //   Cell: ({ cell }) => {
+      //     const row = cell.getValue();
+      //     // Only show for non-admin and non-data_entry_executive
+      //     return (
+      //       !isSuperAdmin(row.user_type) && row.user_type !== 'data_entry_executive' ? (
+      //         <img
+      //           src={TargetIcon}
+      //           alt="Target"
+      //           onClick={() => navigate(`/admin/target-detail/${row.id}`)}
+      //           style={{ cursor: 'pointer', width: '20px', height: '20px' }}
+      //         />
+      //       ) : (
+      //         <span>-</span>
+      //       )
+      //     );
+      //   },
+      // },
 
     ],
     [navigate, pagination.pageIndex, pagination.pageSize]
@@ -505,74 +511,74 @@ export default function UserManagement() {
       <div className="client-tabs-container">
 
         <div className="client-tabs">
-          {isSuperAdminViewer ? [
-            ['all', 'All Users'], ['super_admin', 'Super Admins'], ['company_admin', 'Company Admins'],
+          {isSuperAdminViewer || currentUser?.user_type === 'company_admin' ? [
+            ['all', 'All Users'], ...(isSuperAdminViewer ? [['super_admin', 'Super Admins']] : []), ['company_admin', 'Company Admins'],
             ['sales_manager', 'Sales Managers'], ['sales_executive', 'Sales Executives'], ['data_entry_executive', 'Data Entry Executives'],
           ].map(([value, label]) => <button key={value} type="button" className={`tab ${selectedTab === value ? 'active' : ''}`} onClick={() => handleTabClick(value)}>
-            {label}{selectedTab === value && !isFetching && typeof usersList.count === 'number' ? ` (${usersList.count})` : ''}
+            {label} ({userCount[value] ?? 0})
           </button>) : <>
-          <button
-            className={`tab ${selectedTab === 'all' ? 'active' : ''}`}
-            onClick={() => handleTabClick('all')}
-          >
-            All ({userCount['all'] || 0})
-          </button>
-          <button
-            className={`tab ${selectedTab === 'sales_manager' ? 'active' : ''}`}
-            onClick={() => handleTabClick('sales_manager')}
-          >
-            Sales Managers ({userCount['sales_manager'] || 0})
-          </button>
-          <button
-            className={`tab ${selectedTab === 'sales_executive' ? 'active' : ''}`}
-            onClick={() => handleTabClick('sales_executive')}
-          >
-            Sales Executives ({userCount['sales_executive'] || 0})
-          </button>
-          <button
-            className={`tab ${selectedTab === 'data_entry_executive' ? 'active' : ''}`}
-            onClick={() => handleTabClick('data_entry_executive')}
-          >
-            Data Entry Executives ({userCount['data_entry_executive'] || 0})
-          </button>
-          <button
-            className={`tab ${selectedTab === 'recruitment_manager' ? 'active' : ''}`}
-            onClick={() => handleTabClick('recruitment_manager')}
-          >
-            Recruitment Managers ({userCount['recruitment_manager'] || 0})
-          </button>
-          <button
-            className={`tab ${selectedTab === 'recruitment_executive' ? 'active' : ''}`}
-            onClick={() => handleTabClick('recruitment_executive')}
-          >
-            Recruitment Executives ({userCount['recruitment_executive'] || 0})
-          </button>
-          <button
-            className={`tab ${selectedTab === 'project_manager' ? 'active' : ''}`}
-            onClick={() => handleTabClick('project_manager')}
-          >
-            Project Managers ({userCount['project_manager'] || 0})
-          </button>
+            <button
+              className={`tab ${selectedTab === 'all' ? 'active' : ''}`}
+              onClick={() => handleTabClick('all')}
+            >
+              All ({userCount['all'] || 0})
+            </button>
+            <button
+              className={`tab ${selectedTab === 'sales_manager' ? 'active' : ''}`}
+              onClick={() => handleTabClick('sales_manager')}
+            >
+              Sales Managers ({userCount['sales_manager'] || 0})
+            </button>
+            <button
+              className={`tab ${selectedTab === 'sales_executive' ? 'active' : ''}`}
+              onClick={() => handleTabClick('sales_executive')}
+            >
+              Sales Executives ({userCount['sales_executive'] || 0})
+            </button>
+            <button
+              className={`tab ${selectedTab === 'data_entry_executive' ? 'active' : ''}`}
+              onClick={() => handleTabClick('data_entry_executive')}
+            >
+              Data Entry Executives ({userCount['data_entry_executive'] || 0})
+            </button>
+            <button
+              className={`tab ${selectedTab === 'recruitment_manager' ? 'active' : ''}`}
+              onClick={() => handleTabClick('recruitment_manager')}
+            >
+              Recruitment Managers ({userCount['recruitment_manager'] || 0})
+            </button>
+            <button
+              className={`tab ${selectedTab === 'recruitment_executive' ? 'active' : ''}`}
+              onClick={() => handleTabClick('recruitment_executive')}
+            >
+              Recruitment Executives ({userCount['recruitment_executive'] || 0})
+            </button>
+            <button
+              className={`tab ${selectedTab === 'project_manager' ? 'active' : ''}`}
+              onClick={() => handleTabClick('project_manager')}
+            >
+              Project Managers ({userCount['project_manager'] || 0})
+            </button>
 
-           <button
-            className={`tab ${selectedTab === 'marketing_manager' ? 'active' : ''}`}
-            onClick={() => handleTabClick('marketing_manager')}
-          >
-            Marketing Manager ({userCount['marketing_manager'] || 0})
-          </button>
+            <button
+              className={`tab ${selectedTab === 'marketing_manager' ? 'active' : ''}`}
+              onClick={() => handleTabClick('marketing_manager')}
+            >
+              Marketing Manager ({userCount['marketing_manager'] || 0})
+            </button>
 
-           <button
-            className={`tab ${selectedTab === 'accountant' ? 'active' : ''}`}
-            onClick={() => handleTabClick('accountant')}
-          >
-            Accountant ({userCount['accountant'] || 0})
-          </button>
-          <button
-            className={`tab ${selectedTab === 'admin' ? 'active' : ''}`}
-            onClick={() => handleTabClick('admin')}
-          >
-            Admins ({userCount['admin'] || 0})
-          </button>
+            <button
+              className={`tab ${selectedTab === 'accountant' ? 'active' : ''}`}
+              onClick={() => handleTabClick('accountant')}
+            >
+              Accountant ({userCount['accountant'] || 0})
+            </button>
+            <button
+              className={`tab ${selectedTab === 'admin' ? 'active' : ''}`}
+              onClick={() => handleTabClick('admin')}
+            >
+              Admins ({userCount['admin'] || 0})
+            </button>
           </>}
 
         </div>
@@ -634,7 +640,7 @@ export default function UserManagement() {
         okText={
           isToggling ? (
             <span>
-              <Spin style={{ color: 'white' }} indicator={<LoadingOutlined size="1em" className="app-icon app-icon-spin" style={{ color: 'white' }}  />} size="small" /> Changing State...
+              <Spin style={{ color: 'white' }} indicator={<LoadingOutlined size="1em" className="app-icon app-icon-spin" style={{ color: 'white' }} />} size="small" /> Changing State...
             </span>
           ) : (
             userToToggleActivation?.isActive ? "Deactivate" : "Activate"

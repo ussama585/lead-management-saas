@@ -4,21 +4,22 @@ import { ConfigProvider, theme as antTheme } from 'antd';
 import { createAppTheme } from './theme.jsx';
 import { AppThemeContext } from './app-theme-context.js';
 import { DEFAULT_PRIMARY_COLOR, THEME_COLOR_STORAGE_KEY, normalizeThemeColor, primaryTextColor } from './theme-color.js';
+import useUserStore from '../../pages/shared/store/user-store.js';
 
 const systemIsDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
-function savedTheme() {
-  try {
-    const value = localStorage.getItem('app_theme');
-    return ['light', 'dark', 'system'].includes(value) ? value : 'system';
-  } catch { return 'system'; }
-}
 
 export default function AppThemeProvider({ children }) {
+  const userKey = useUserStore(state => state.user?.id
+    ? `${state.user.user_type}:${state.user.id}` : 'signed-out');
   const [primaryColor, setPrimaryColorState] = useState(() => {
     try { return normalizeThemeColor(localStorage.getItem(THEME_COLOR_STORAGE_KEY)) || DEFAULT_PRIMARY_COLOR; }
     catch { return DEFAULT_PRIMARY_COLOR; }
   });
-  const [preference, setPreference] = useState(savedTheme);
+  const [selection, setSelection] = useState(() => ({ userKey, preference: 'system' }));
+  const preference = selection.userKey === userKey ? selection.preference : 'system';
+  useLayoutEffect(() => {
+    setSelection({ userKey, preference: 'system' });
+  }, [userKey]);
   const [systemDark, setSystemDark] = useState(systemIsDark);
   const mode = preference === 'system' ? (systemDark ? 'dark' : 'light') : preference;
   const muiTheme = useMemo(() => createAppTheme(mode, primaryColor), [mode, primaryColor]);
@@ -44,8 +45,7 @@ export default function AppThemeProvider({ children }) {
   }
   function setTheme(value) {
     if (!['light', 'dark', 'system'].includes(value)) return;
-    setPreference(value);
-    try { localStorage.setItem('app_theme', value); } catch { /* Theme still works without storage. */ }
+    setSelection({ userKey, preference: value });
   }
   return <AppThemeContext.Provider value={{ preference, mode, setTheme, primaryColor, setPrimaryColor }}>
     <ThemeProvider theme={muiTheme}>

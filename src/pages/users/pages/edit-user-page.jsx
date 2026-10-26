@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getRolePath } from '../../auth/role-home.js';
+import useUserStore from '../../shared/store/user-store.js';
 import { Formik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Form, Select, Button, message, Spin, Modal, Upload } from 'antd';
 import { LoaderCircle as LoadingOutlined, Upload as UploadOutlined } from 'lucide-react';
-import { editUserValidationSchema } from '../../shared/schemas/schema.js';
+import { editUserSchema } from '../schemas/edit-user-schema.js';
+import { userFormError, applyUserErrors, assertUserSuccess } from '../user-form-errors.js';
 import { editUser, getAssigningUsersListing, getUserDetails } from '../../shared/services/users-service.js';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import UserDetailCard from '../../../components/user-detail-card.component.jsx';
 import UserPlaceholderIcon from '../../../assets/images/user-card-icons/user-placeholder.svg';
 import InputField from '../../../components/input-field.component.jsx';
 import '../../../assets/styles/legacy/create-user.css';
+import '../../../assets/styles/user-management-form.css';
 
 const { Option } = Select;
 const antIcon = <LoadingOutlined size="1em" className="app-icon app-icon-spin" style={{ fontSize: 24 }}  />;
 
 export default function EditUser() {
+  const navigate = useNavigate();
+  const { user } = useUserStore();
+  const goBack = () => navigate(getRolePath(user?.user_type, '/user-management'));
   const queryClient = useQueryClient();
   const { id: userId } = useParams();
 
@@ -70,7 +77,7 @@ export default function EditUser() {
   }, [userDetails]);
 
   const { mutate: editUserMutate } = useMutation({
-    mutationFn: (formData) => editUser(userId, formData),
+    mutationFn: async (formData) => assertUserSuccess(await editUser(userId, formData)),
 
     onMutate: () => setIsUpdating(true),
     onSettled: () => setIsUpdating(false),
@@ -79,7 +86,7 @@ export default function EditUser() {
       message.success('User edited successfully');
     },
     onError: (error) => {
-      message.error(`Failed to edit user: ${error.message}`);
+      message.error(userFormError(error));
     },
   });
 
@@ -121,7 +128,7 @@ export default function EditUser() {
       },
       onError: (error) => {
         setIsUploading(false);
-        message.error(`Failed to update profile picture: ${error.message}`);
+        message.error(userFormError(error));
       }
     });
   };
@@ -148,7 +155,7 @@ export default function EditUser() {
  
   return (
     <>
-      <BreadCrumb linkText="Edit User" />
+      <BreadCrumb linkText="Edit User" goBack={goBack} />
       <Spin spinning={isLoading} indicator={antIcon} size="large">
         <div className="container">
           <div className="flex-container">
@@ -165,8 +172,9 @@ export default function EditUser() {
             <div className="form-container">
               <Formik
                 initialValues={initialValues}
-                validationSchema={editUserValidationSchema}
-                onSubmit={(values) => {
+                validationSchema={editUserSchema}
+                onSubmit={(values, helpers) => {
+                  helpers.setStatus(null);
                   const formData = new FormData();
 
                   // Compare current values with initial values and include only changed fields
@@ -188,15 +196,18 @@ export default function EditUser() {
 
                   if (formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('password') || formData.has('manager')) {
                     // If there are changes, make the API call
-                    editUserMutate(formData);
+                    editUserMutate(formData, {
+                      onSuccess: () => navigate(getRolePath(user?.user_type, '/user-management'), { replace: true }),
+                      onError: error => applyUserErrors(error, helpers),
+                    });
                   } else {
                     message.info('No changes were made');
                   }
                 }}
                 enableReinitialize
               >
-                {({ handleSubmit, values, setFieldValue, errors, touched }) => (
-                  <form onSubmit={handleSubmit}>
+                {({ handleSubmit, handleBlur, values, setFieldValue, setFieldTouched, errors, touched }) => (
+                  <form className="user-management-form" onSubmit={handleSubmit} onBlur={handleBlur} noValidate>
                     <div className="form-grid">
                       <Form.Item className="form-item">
                         <label className="label">
@@ -262,7 +273,7 @@ export default function EditUser() {
 
 
                       <Form.Item className="form-item">
-                        <label className="label">New Password <span className="asterisk">*</span></label>
+                        <label className="label">New Password (optional)</label>
                         <InputField
                           type="password"
                           placeholder="Enter a new password"
@@ -286,6 +297,7 @@ export default function EditUser() {
                           <Select
                             className="dropdown-select"
                             name="manager"
+                            onBlur={() => setFieldTouched('manager', true)}
                             popupMatchSelectWidth={false}
                             value={values.manager || undefined}
                             placeholder={"Select Manager"}

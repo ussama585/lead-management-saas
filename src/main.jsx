@@ -10,6 +10,7 @@ import AppThemeProvider from './components/providers/app-theme.jsx';
 import './assets/styles/shadcn.css';
 import './assets/styles/responsive-workspace.css';
 import './assets/styles/form-controls.css';
+import './assets/styles/field-appearance.css';
 
 const queryClient = new QueryClient();
 createRoot(document.getElementById('root')).render(

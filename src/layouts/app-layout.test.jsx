@@ -68,11 +68,11 @@ describe('role navigation after the shadcn migration', () => {
     shell.onSelect({ key: '21' });
     expect(state.navigate).not.toHaveBeenCalled();
   });
-  it('preserves administrator screens and sidebar counts', () => {
+  it('preserves administrator navigation without a follow-up count badge', () => {
     const shell = render('admin', '/admin/edit-user/7');
     expect(shell.menuItems.map(item => item.label)).toEqual(expect.arrayContaining(['User Management', 'Settings']));
     expect(shell.selectedKey).toBe('2');
-    expect(shell.badges['17']).toBe(4);
+    expect(shell.badges['17']).toBeUndefined();
     expect(shell.badges['25']).toBeUndefined();
     shell.onSelect({ key: '21' });
     expect(state.navigate).toHaveBeenCalledWith('/super-admin/settings');

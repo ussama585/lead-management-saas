@@ -1,0 +1,4 @@
+.ant-select-item-option:hover .company-select-option-email,
+.ant-select-item-option-active .company-select-option-email {
+  color: #fff;
+}

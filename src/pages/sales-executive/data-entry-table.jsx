@@ -741,7 +741,9 @@ const DataEntryTable = () => {
           <Select id="sales-data-company-filter" aria-label="Filter sales data by company" showSearch allowClear
             optionFilterProp="label" placeholder="All companies" value={companyId ?? undefined}
             loading={companies.isFetching} style={{ width: 280, maxWidth: '100%' }}
-            options={(companies.data || []).map(company => ({ value: company.id, label: `${company.name} (ID: ${company.id})` }))}
+            options={(companies.data || []).map(company => ({ value: company.id, label: company.name, email: company.email }))}
+            virtual={false} optionRender={option => <CompanySelectOption option={option} />}
+            labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}
             onChange={value => { setCompanyId(value ?? null); setPagination(previous => ({ ...previous, pageIndex: 0 }));
               setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null); }} />
           {companies.isError && <Alert type="error" message={companies.error?.message || 'Could not load companies.'}
@@ -1009,3 +1011,4 @@ const DataEntryTable = () => {
 };
 
 export default DataEntryTable;
+import CompanySelectOption from '../../components/company-select-option.jsx';

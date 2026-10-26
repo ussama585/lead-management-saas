@@ -5,7 +5,6 @@ import AdminShell from './admin-shell.jsx';
 import useUserStore from '../pages/shared/store/user-store.js';
 import { getRoleHome, getRolePath } from '../pages/auth/role-home.js';
 import { getLayoutRole, canAccessMenu, isSuperAdmin } from '../pages/auth/role-access.js';
-import api from '../pages/shared/services/api.js';
 import { getProjectPaymentCount, getSidebarStats } from '../pages/shared/services/headhunting.js';
 import {
   LayoutDashboard as DashboardOutlined, UserPlus,
@@ -27,26 +26,6 @@ export default function AppLayout({ children, role }) {
   const routerNavigate = useNavigate();
   const navigate = path => routerNavigate(getRolePath(signedInUser?.user_type, path));
   const location = useLocation();
-  const isFollowUpBadgeEnabled =
-    user?.user_type === 'admin' ||
-    user?.user_type === 'sales_manager' ||
-    user?.user_type === 'sales_executive';
-
-  const { data: pendingFollowUpCount = 0 } = useQuery(
-    ['sidebarPendingFollowupsCount', user?.id, user?.user_type],
-    async () => {
-      const response = await api.get('/follow-up/overall-count');
-      const followups = response?.data?.followups;
-      const count = Array.isArray(followups) ? followups.length : Number(followups ?? 0);
-      return Number.isFinite(count) ? count : 0;
-    },
-    {
-      enabled: isFollowUpBadgeEnabled,
-      refetchOnWindowFocus: true,
-      refetchInterval: 60 * 1000,
-      staleTime: 30 * 1000,
-    }
-  );
 
   // Temporarily disabled: /headhunting/project-payment-count is 404ing on this backend
   const isInvoiceBadgeEnabled = false;
@@ -447,7 +426,6 @@ export default function AppLayout({ children, role }) {
     .filter(item => canAccessMenu(signedInUser?.user_type, item.key))
     .map(item => ({ ...item, group: menuGroupByKey[item.key] || 'Workspace' }));
   const sidebarBadgeByKey = {
-    ...(isFollowUpBadgeEnabled ? { '17': pendingFollowUpCount } : {}),
     ...(isInvoiceBadgeEnabled ? { '24': invoiceCount } : {}),
     ...(isJdRequestBadgeEnabled ? { '25': pendingJdRequestCount } : {}),
   };

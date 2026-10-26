@@ -552,10 +552,11 @@
         requestData.remarks = payload.remarks;
       }
 
-      const endpoint = payload.status !== undefined
-        ? `/lead-generation/job/${encodeURIComponent(payload.id)}`
-        : `/lead-generation/update/${encodeURIComponent(payload.id)}`;
-      const response = await api.patch(endpoint, requestData);
+      const formData = new FormData();
+      Object.entries(requestData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) formData.append(key, value);
+      });
+      const response = await api.patch(`/lead-generation/update/${encodeURIComponent(payload.id)}`, formData);
       if (response.data?.status === false || response.data?.success === false) throw new Error(response.data.message || 'Could not update lead.');
       return response;
     };
@@ -607,7 +608,9 @@
     // Assignment mutation (same as lead-card)
     const assignmentMutation = useMutation(
       async ({ leadId, userId }) => {
-        const { data } = await api.patch(`/lead-generation/job/${encodeURIComponent(leadId)}`, { assigned_to: userId });
+        const formData = new FormData();
+        formData.append('assigned_to', userId);
+        const { data } = await api.patch(`/lead-generation/update/${encodeURIComponent(leadId)}`, formData);
         if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not update assignee.');
         return data;
       },
@@ -857,18 +860,27 @@
             />
           ),
         },
-        ...((userType === 'sales_manager' || userType === 'sales_executive') ? [{
+        ...(['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType) ? [{
           header: 'Follow Ups and Remarks',
           id: 'follow_up',
           accessorKey: 'follow_up',
           enableSorting: false,
           size: 0.65,
           Cell: ({ row }) => (
-            <Tooltip title="Follow Ups and Remarks">
+            <Tooltip title={<span style={{ color: '#fff' }}>Follow Ups and Remarks</span>}>
               <ClockCircleOutlined size="1em" className="app-icon"
+                role="button"
+                tabIndex={0}
+                aria-label="Follow Ups and Remarks"
                 style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
                 onClick={() => {
                   setFollowUpModal({ visible: true, lead: row.original });
+                }}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    setFollowUpModal({ visible: true, lead: row.original });
+                  }
                 }}
               />
             </Tooltip>

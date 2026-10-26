@@ -1,0 +1,29 @@
+:root {
+  --field-border-color: #d2d2d2;
+}
+
+/* Apply the same field border in every module and interaction state. */
+html body :is(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='hidden']):not([type='button']):not([type='submit']),
+  textarea, select, .ant-input-affix-wrapper, .ant-input-number,
+  .ant-picker, .ant-select .ant-select-selector,
+  [data-slot='select-trigger'], .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline
+) {
+  border-color: var(--field-border-color) !important;
+}
+
+html body :is(.ant-select, .ant-picker, .ant-input-number, .ant-input-affix-wrapper, .MuiOutlinedInput-root)[class]
+  :is(.ant-select-selector, .MuiOutlinedInput-notchedOutline) {
+  border-color: var(--field-border-color) !important;
+}
+
+/* Remove field, button, card, dropdown and modal shadows throughout the app. */
+*, *::before, *::after {
+  box-shadow: none !important;
+}
+
+/* Keep keyboard focus visible without relying on shadow-based focus rings. */
+:is(input, textarea, select, button, [role='combobox'], [data-slot='select-trigger']):focus-visible {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px;
+}

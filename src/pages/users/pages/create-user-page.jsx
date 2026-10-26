@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getRolePath } from '../../auth/role-home.js';
 import { Formik } from 'formik';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Form, Select, Button, message, Spin } from 'antd';
+import { assertUserSuccess, userFormError, applyUserErrors } from '../user-form-errors.js';
 import { createUserSchema } from '../schemas/create-user-schema.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import api from '../../shared/services/api.js';
@@ -11,6 +14,7 @@ import UserDetailCard from '../../../components/user-detail-card.component.jsx';
 import UserPlaceholderIcon from '../../../assets/images/user-card-icons/user-placeholder.svg';
 import InputField from '../../../components/input-field.component.jsx';
 import '../../../assets/styles/legacy/create-user.css';
+import '../../../assets/styles/user-management-form.css';
 
 const { Option } = Select;
 
@@ -22,8 +26,7 @@ export async function createUser(values) {
   if (values.company_id) payload.company_id = Number(values.company_id);
   if (values.user_type === 'sales_executive' && values.manager) payload.manager_id = Number(values.manager);
   const { data } = await api.post('/accounts/signup', payload);
-  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not create user.');
-  return data;
+  return assertUserSuccess(data);
 }
 
 async function listCompanies(search) {
@@ -39,8 +42,10 @@ async function listSalesManagers() {
 }
 
 export default function CreateUser() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useUserStore();
+  const goBack = () => navigate(getRolePath(user?.user_type, '/user-management'));
   const superAdmin = isSuperAdmin(user?.user_type);
   const [companySearch, setCompanySearch] = useState('');
   const { data: companies = [], isLoading: loadingCompanies, isError: companiesError, refetch: refetchCompanies } = useQuery({
@@ -65,15 +70,11 @@ export default function CreateUser() {
       queryClient.invalidateQueries('usersList');
       queryClient.invalidateQueries('userCount'); // Refetch user counts for tabs
       message.success('User created successfully');
+      navigate(getRolePath(user?.user_type, '/user-management'), { replace: true });
     },
     onError: (error) => {
       // Check for API error response for existing user
-      const apiMsg = error?.response?.data;
-      if (apiMsg && apiMsg.email && Array.isArray(apiMsg.email) && apiMsg.email[0].includes('already exists')) {
-        message.error('A user with this email already exists.');
-      } else {
-        message.error(`Failed to create user: ${error.message}`);
-      }
+      message.error(userFormError(error));
     },
     onSettled: () => {
       setLoading(false); // Reset loading state when mutation is settled
@@ -104,7 +105,7 @@ export default function CreateUser() {
 
   return (
     <>
-      <BreadCrumb linkText="Create New User" />
+      <BreadCrumb linkText="Create New User" goBack={goBack} />
       <div className="container">
 
         <div className="flex-container">
@@ -132,32 +133,31 @@ export default function CreateUser() {
                 company_id: superAdmin ? '' : (user?.company_id || user?.company?.id || (typeof user?.company === 'number' ? user.company : '')),
               }}
               validationSchema={createUserSchema(superAdmin)}
-              onSubmit={(values, { setErrors }) => {
-                createUserMutate(values, { onError: error => {
-                  const body = error?.response?.data;
-                  const fields = body?.errors || body;
-                  if (!fields || typeof fields !== 'object') return;
-                  const errors = {};
-                  for (const key of ['name', 'email', 'phone', 'password', 'user_type', 'company_id', 'manager_id']) {
-                    const value = fields[key];
-                    if (typeof value === 'string' || Array.isArray(value)) errors[key === 'manager_id' ? 'manager' : key] = Array.isArray(value) ? value.join(' ') : value;
+              onSubmit={(values, helpers) => {
+                helpers.setStatus(null);
+                createUserMutate(values, {
+                  onError: error => {
+                    applyUserErrors(error, helpers);
                   }
-                  setErrors(errors);
-                } });
+                });
               }}
               validateOnMount
               validateOnBlur // Validate on blur
               validateOnChange // Validate on change
             >
-              {({ handleSubmit, values, setFieldValue, errors, touched }) => (
-                <form onSubmit={handleSubmit}>
+              {({ handleSubmit, handleBlur, values, setFieldValue, setFieldTouched, errors, touched }) => (
+                <form className="user-management-form" onSubmit={handleSubmit} onBlur={handleBlur} noValidate>
                   <div className="form-grid">
-                    {superAdmin && <Form.Item className="form-item" validateStatus={touched.company_id && errors.company_id ? 'error' : undefined} help={touched.company_id && errors.company_id}>
+                    {superAdmin && <Form.Item className="form-item">
                       <label className="label">Company <span className="asterisk">*</span></label>
                       <Select className="dropdown-select" placeholder="Select Company" value={values.company_id || undefined}
+                        onBlur={() => setFieldTouched('company_id', true)}
                         loading={loadingCompanies} showSearch filterOption={false} onSearch={setCompanySearch}
                         onChange={value => { setFieldValue('company_id', value); setFieldValue('manager', ''); }}
                         options={companies.map(company => ({ value: company.id, label: company.name }))} />
+                      {touched.company_id && errors.company_id && (
+                        <div className="error" style={{ color: 'red' }}>{errors.company_id}</div>
+                      )}
                       {companiesError && <div role="alert">Could not load companies. <Button type="link" onClick={() => refetchCompanies()}>Retry</Button></div>}
                     </Form.Item>}
                     <Form.Item className="form-item">
@@ -269,8 +269,20 @@ export default function CreateUser() {
                         className="dropdown-select"
                         popupMatchSelectWidth={false}
                         value={values.user_type}
+                        onBlur={() => setFieldTouched('user_type', true)}
                         onChange={(value) => handleUserTypeChange(value, setFieldValue)}
                       >
+                        {user?.user_type == "super_admin" && (
+                          <Option
+                            value="company_admin"
+                            className="option"
+                            onMouseEnter={() => setHoveredOption("company_admin")}
+                            onMouseLeave={() => setHoveredOption(null)}
+                          >
+                            Company Admin
+                          </Option>
+                        )}
+
                         <Option
                           value="sales_manager"
                           className="option"
@@ -314,6 +326,7 @@ export default function CreateUser() {
                           className="dropdown-select"
                           popupMatchSelectWidth={false}
                           value={values.manager || undefined}
+                          onBlur={() => setFieldTouched('manager', true)}
                           placeholder={"Select Manager"}
                           loading={loadingManagerList}
                           showSearch

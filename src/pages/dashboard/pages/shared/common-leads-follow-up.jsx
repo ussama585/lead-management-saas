@@ -103,10 +103,6 @@ const CommonLeadsFollowUp = () => {
           predicate: ({ queryKey }) =>
             Array.isArray(queryKey) && queryKey[0] === 'commonLeadsFollowUp',
         });
-        queryClient.invalidateQueries({
-          predicate: ({ queryKey }) =>
-            Array.isArray(queryKey) && queryKey[0] === 'sidebarPendingFollowupsCount',
-        });
       },
       onError: (error) => {
         message.error(

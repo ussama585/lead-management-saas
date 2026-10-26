@@ -54,7 +54,7 @@ function CompanyDetail({ companyId }) {
             ...Object.entries({ email: 'Email', phone: 'Phone', website: 'Website', address: 'Address', city: 'City', country: 'Country' }).map(([field, label]) => ({
               key: field, label, children: <span className="break-all">{company.data[field] || '—'}</span>,
             })),
-            ...['created_at', 'updated_at'].map(field => ({ key: field, label: field === 'created_at' ? 'Created' : 'Updated', children: company.data[field] ? formatDateUniversal(company.data[field], true) : '—' })),
+            { key: 'created_at', label: 'Created', children: company.data.created_at ? formatDateUniversal(company.data.created_at, true) : '—' },
           ]} />
         </Card>
         <section aria-label="Company users" className="min-w-0">

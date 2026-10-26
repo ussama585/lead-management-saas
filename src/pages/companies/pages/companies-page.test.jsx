@@ -39,8 +39,13 @@ describe('companies API', () => {
     await expect(createCompany({ name: 'Company' })).rejects.toThrow('Duplicate company');
   });
   it('formats backend field errors', () => {
+    expect(companyError({ response: { data: { success: false, message: 'Validation failed.', errors: 'Email: company with this email already exists.' } } })).toBe('Email: company with this email already exists.');
     expect(companyError({ response: { data: { email: ['Already exists.'] } } })).toBe('email: Already exists.');
     expect(companyError({ response: { data: { errors: { name: ['Required.'] } } } })).toBe('name: Required.');
+  });
+  it('preserves duplicate-email details in unsuccessful create responses', async () => {
+    api.post.mockResolvedValue({ data: { success: false, message: 'Validation failed.', errors: 'Email: company with this email already exists.' } });
+    await expect(createCompany({ name: 'Company', email: 'duplicate@example.com' })).rejects.toThrow('Email: company with this email already exists.');
   });
 });
 

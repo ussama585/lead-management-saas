@@ -15,6 +15,19 @@ export async function getAllUsers({ page = 1, pageSize = 10, userType = 'all', s
   return data;
 }
 
+export async function getCompanyManagementUsers(companyId, { page = 1, pageSize = 10, userType = 'all', search = '', sorting = [], isActive = '' } = {}) {
+  if (!/^[1-9]\d*$/.test(String(companyId ?? ''))) throw new Error('Your account is missing a company ID. Please sign in again.');
+  const params = { page, size: pageSize };
+  if (userType !== 'all') params.user_type = userType;
+  if (search.trim()) params.search = search.trim();
+  if (isActive !== '') params.is_active = isActive;
+  if (sorting.length) { params.sort_by = sorting[0].id; params.order = sorting[0].desc ? 'desc' : 'asc'; }
+  const { data } = await api.get(`/company/users/${encodeURIComponent(companyId)}`, { params });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load company users.');
+  if (!Array.isArray(data?.results)) throw new Error('Could not read the company users list.');
+  return data;
+}
+
 
 
 export const getUsers = async (page = 1, pageSize = 10, user_type = "all", search = "", sorting = []) => {
@@ -55,7 +68,7 @@ export const getUsers = async (page = 1, pageSize = 10, user_type = "all", searc
 export const getUserDetails = async (userId) => {
  
   try {
-    const response = await api.get(`/accounts/update-user/${userId}`);
+    const response = await api.get(`/accounts/detail/${userId}`);
     console.log(response.data);
     return response.data;
 
@@ -77,6 +90,13 @@ export const getUserCount = async () => {
   }
 };
 
+export async function getUserTabCounts() {
+  const { data } = await api.get('/accounts/users-count');
+  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load user counts.');
+  if (!data?.data || typeof data.data.total !== 'number') throw new Error('Could not read user counts.');
+  return { ...data.data, all: data.data.total };
+}
+
 
 
 
@@ -85,7 +105,7 @@ export const editUser = async (userId, userData) => {
 
   try {
 
-    const response = await api.patch(`/accounts/update-user/${userId}`, userData); // Adjust URL as needed
+    const response = await api.patch(`/accounts/detail/${userId}`, userData); // Adjust URL as needed
     return response.data;
 
   }
@@ -106,7 +126,7 @@ export const editUser = async (userId, userData) => {
 export const requestDeleteUserOtp = async (userId) => {
   try {
     // This endpoint triggers the OTP email (DELETE method, but only triggers OTP, does not delete)
-    const response = await api.delete(`/accounts/update-user/${userId}`);
+    const response = await api.delete(`/accounts/detail/${userId}`);
     return response.data;
   } catch (error) {
     console.error(`Error requesting OTP for user deletion ${userId}:`, error);
@@ -156,7 +176,7 @@ export const validateDeleteUserOtp = async (userId, otp) => {
 export const toggleUserActivation = async (userId, isActive) => {
 
   try {
-    const response = await api.patch(`/accounts/update-user/${userId}`, { is_active: !isActive});
+    const response = await api.patch(`/accounts/detail/${userId}`, { is_active: !isActive});
     return response.data;
   }
 

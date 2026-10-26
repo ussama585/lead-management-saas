@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import api from '../../../shared/services/api.js';
 import { getWebsiteLeadDetail, getWebsiteLeadJobs, getWebsiteLeadJobHistory } from './lead-detail.jsx';
-import { deleteWebsiteLeadJob } from '../../../shared/services/leads.js';
-vi.mock('../../../shared/services/api.js', () => ({ default: { get: vi.fn(), delete: vi.fn() } }));
+import { deleteWebsiteLeadJob, createWebsiteLeadFollowUp } from '../../../shared/services/leads.js';
+vi.mock('../../../shared/services/api.js', () => ({ default: { get: vi.fn(), delete: vi.fn(), post: vi.fn() } }));
 vi.mock('../../../shared/store/user-store.js', () => ({ default: () => ({ user: {} }) }));
 vi.mock('../../../../components/lead-card.component.jsx', () => ({ default: () => null }));
 vi.mock('../../../../components/status-history-modal.jsx', () => ({ default: () => null, createStatusHistoryColumn: vi.fn() }));
@@ -10,6 +10,16 @@ vi.mock('../../../../components/breadcrumb.component.jsx', () => ({ default: () 
 vi.mock('../../../clients/components/LazyModals.jsx', () => ({ ConfirmationModal: () => null }));
 vi.mock('antd', () => ({ Alert: () => null, Spin: () => null, message: {}, Row: () => null, Col: () => null, Select: () => null, Modal: () => null, Input: () => null, Button: () => null }));
 describe('Website Lead detail card API', () => {
+  it('submits remarks and scheduling fields to the Website Lead follow-up endpoint', async () => {
+    const payload = { current_followup_date: '2026-10-26T10:00:00Z', next_followup_date: '2026-10-27T15:30:00Z', is_next_followup_required: true, remarks: 'Follow up on the proposal.' };
+    api.post.mockResolvedValue({ data: { success: true } });
+    await createWebsiteLeadFollowUp(2, payload);
+    expect(api.post).toHaveBeenLastCalledWith('/lead-generation/follow-up/2', payload);
+  });
+  it('reports follow-up API failures', async () => {
+    api.post.mockResolvedValue({ data: { status: false, message: 'Invalid follow-up' } });
+    await expect(createWebsiteLeadFollowUp(2, {})).rejects.toThrow('Invalid follow-up');
+  });
   it('loads a job audit history using the job ID', async () => {
     const history = [{ change_id: 'change-1', model_name: 'LeadGenerationRequestJob', object_id: 2,
       changed_at: '2026-10-23T07:02:28Z', changed_by: 'admin@gmail.com', change: { field: 'job_title', old: 'Developer', new: 'Senior Developer' } }];

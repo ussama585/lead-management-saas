@@ -21,7 +21,10 @@ export const loginSuperAdmin = async ({ email, password }) => {
         localStorage.setItem('access_token', account.access);
         localStorage.setItem('refresh_token', account.refresh);
         const { id, name, email: address, phone, user_type, slug, is_superuser } = account;
-        return { id, name, email: address, phone, user_type, slug, is_superuser };
+        return { id, name, email: address, phone, user_type, slug, is_superuser,
+            ...(account.company_id != null ? { company_id: account.company_id } : {}),
+            ...(account.company != null ? { company: account.company } : {}),
+        };
     } catch (error) {
         throw new Error(error.response?.data?.message || error.message || 'Unable to sign in. Please try again.');
     }
@@ -73,7 +76,10 @@ export const loginWithPassword = async ({ email, password }) => {
         localStorage.setItem('access_token', access);
         localStorage.setItem('refresh_token', refresh);
         const { id, name, email: address, phone, user_type, slug, is_superuser } = account;
-        return { id, name, email: address, phone, user_type, slug, is_superuser };
+        return { id, name, email: address, phone, user_type, slug, is_superuser,
+            ...(account.company_id != null ? { company_id: account.company_id } : {}),
+            ...(account.company != null ? { company: account.company } : {}),
+        };
     } catch (error) {
         if (error.response?.status === 404) throw new Error('User does not exist');
         throw new Error(error.response?.data?.message || error.message || 'Unable to sign in. Please try again.');

@@ -22,7 +22,11 @@ function companyPayload(values) {
 }
 
 function assertCompanySuccess(data) {
-  if (data?.status === false || data?.success === false) throw new Error(data.message || 'The company request failed.');
+  if (data?.status === false || data?.success === false) {
+    const error = new Error(companyError({ response: { data } }));
+    error.response = { data };
+    throw error;
+  }
   return data;
 }
 
@@ -74,14 +78,16 @@ export function companyFieldErrors(error) {
 
 export function companyError(error) {
   const body = error?.response?.data;
-  if (typeof (body?.message || body?.detail) === 'string') return body.message || body.detail;
+  if (typeof body?.errors === 'string' && body.errors.trim()) return body.errors;
+  if (Array.isArray(body?.errors) && body.errors.length) return body.errors.join(' ');
+  if (!body?.errors && typeof (body?.message || body?.detail) === 'string') return body.message || body.detail;
   const fields = body?.errors || body;
   if (fields && typeof fields === 'object') {
     const errors = Object.entries(fields).filter(([, value]) => typeof value === 'string' || Array.isArray(value))
       .map(([field, value]) => `${field}: ${Array.isArray(value) ? value.join(' ') : value}`);
     if (errors.length) return errors.join(' ');
   }
-  return error?.message || 'The request failed. Please try again.';
+  return body?.message || body?.detail || error?.message || 'The request failed. Please try again.';
 }
 
 export default function CompaniesPage() {

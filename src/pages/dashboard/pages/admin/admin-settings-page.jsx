@@ -4,16 +4,17 @@ import api from '../../../shared/services/api.js';
 import { followUpDurationSchema } from '../schemas/follow-up-duration-schema.js';
 import { Alert, Card, Typography, InputNumber, Button, Space, Table, Modal, message } from 'antd';
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
-import { Palette, Clock, ListFilter, Ruler, RefreshCw } from 'lucide-react';
+import { Clock, ListFilter, Ruler } from 'lucide-react';
+// import { Palette, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { Button as SettingsNavButton } from '../../../../components/ui/button.jsx';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
-import AppearanceSettings from '../../../../components/appearance-settings.jsx';
+// import AppearanceSettings from '../../../../components/appearance-settings.jsx';
 import LeadStatusSettings from '../../../../components/lead-status-settings.jsx';
 import ProjectSizeSettings from '../../../../components/project-size-settings.jsx';
-import RefreshTokenSettings from '../../../../components/refresh-token-settings.jsx';
+// import RefreshTokenSettings from '../../../../components/refresh-token-settings.jsx';
 import useUserStore from '../../../shared/store/user-store.js';
 import { isSuperAdmin, canManageLeadStatuses, canManageProjectSizes, getLayoutRole } from '../../../auth/role-access.js';
 import '../../../../assets/styles/legacy/table-client-actions.css';
@@ -53,17 +54,17 @@ const durationError = error => error?.response?.data?.message || error?.response
 
 const AdminSettingsPage = () => {
   const { user } = useUserStore();
-  const canManageAppearance = isSuperAdmin(user?.user_type);
+  // const canManageAppearance = isSuperAdmin(user?.user_type);
   const settingsSections = [
-    ...(canManageAppearance ? [{ key: 'appearance', label: 'Appearance', icon: Palette }] : []),
+    // ...(canManageAppearance ? [{ key: 'appearance', label: 'Appearance', icon: Palette }] : []),
     ...(canManageLeadStatuses(user?.user_type) ? [{ key: 'leads', label: 'Leads', icon: ListFilter }] : []),
     ...(canManageProjectSizes(user?.user_type) ? [{ key: 'project-size', label: 'Project Size', icon: Ruler }] : []),
     ...(getLayoutRole(user?.user_type) === 'admin' ? [{ key: 'follow-up-duration', label: 'Follow-up Duration', icon: Clock }] : []),
-    { key: 'refresh-token', label: 'Refresh Token', icon: RefreshCw },
+    // { key: 'refresh-token', label: 'Refresh Token', icon: RefreshCw },
   ];
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedSection = settingsSections.find(item => item.key === searchParams.get('section')) || settingsSections[0];
-  const section = selectedSection.key;
+  const section = selectedSection?.key;
   const queryClient = useQueryClient();
   const durationQueryKey = ['checkupDurationList', user?.id, user?.user_type];
   const [editTarget, setEditTarget] = useState(null);
@@ -142,11 +143,12 @@ const AdminSettingsPage = () => {
               });
             }}><Icon />{label}</SettingsNavButton>)}
           </nav>
-          <div id="settings-panel" className="settings-panel" role="region" aria-label={`${selectedSection.label} settings`}>
-        {canManageAppearance && section === 'appearance' && <AppearanceSettings />}
+          <div id="settings-panel" className="settings-panel" role="region" aria-label={selectedSection ? `${selectedSection.label} settings` : 'Settings'}>
+        {!selectedSection && <p className="text-muted-foreground">No settings are available for your role at the moment.</p>}
+        {/* {canManageAppearance && section === 'appearance' && <AppearanceSettings />} */}
         {section === 'leads' && <LeadStatusSettings />}
         {section === 'project-size' && <ProjectSizeSettings />}
-        {section === 'refresh-token' && <RefreshTokenSettings />}
+        {/* {section === 'refresh-token' && <RefreshTokenSettings />} */}
         
 
         {section === 'follow-up-duration' && <Card title="Check-up follow-up duration">

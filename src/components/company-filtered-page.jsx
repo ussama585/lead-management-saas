@@ -5,11 +5,12 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import api from '../pages/shared/services/api.js';
 import useUserStore from '../pages/shared/store/user-store.js';
 import { companyFilterSection, selectedCompany } from '../pages/shared/utils/company-filter.js';
+import CompanySelectOption from './company-select-option.jsx';
 
 export async function getCompanies() {
   const { data } = await api.get('/company/simple-list');
   if (!Array.isArray(data)) throw new Error(data?.message || 'Could not load companies.');
-  return data.map(({ id, name }) => ({ value: String(id), label: `${name} (ID: ${id})` }));
+  return data.map(({ id, name, email }) => ({ value: String(id), label: name, email }));
 }
 
 function FilterContents({ children, options, loading, error, retry, companyId, onChange }) {
@@ -19,6 +20,8 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
       <label htmlFor="overview-company-filter" className="text-sm font-medium">Company</label>
       <Select id="overview-company-filter" aria-label="Company" placeholder="All companies"
         style={{ width: 280, maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
+        virtual={false} optionRender={option => <CompanySelectOption option={option} />}
+        labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}
         options={options} loading={loading} disabled={mutating > 0} value={companyId ?? undefined}
         onChange={onChange} />
       {error && <Alert type="error" message="Could not load companies." action={<button onClick={retry}>Retry</button>} />}

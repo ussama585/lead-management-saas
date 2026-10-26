@@ -1,0 +1,11 @@
+.user-management-form input[data-slot='input'],
+.user-management-form .ant-select .ant-select-selector {
+  border: 1px solid var(--field-border-color, #d2d2d2) !important;
+}
+
+.user-management-form input[data-slot='input']:hover,
+.user-management-form input[data-slot='input']:focus-visible,
+.user-management-form .ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.user-management-form .ant-select-focused:not(.ant-select-disabled) .ant-select-selector {
+  border-color: var(--field-border-color, #d2d2d2) !important;
+}

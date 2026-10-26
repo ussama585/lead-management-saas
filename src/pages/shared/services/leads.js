@@ -97,7 +97,8 @@ export const getLeadGenerationHistoryTrack = async (leadId) => {
 };
 
 export const createWebsiteLeadFollowUp = async (leadId, payload) => {
-  const response = await api.post(`/lead-generation/website-follow-up/${leadId}`, payload);
+  const response = await api.post(`/lead-generation/follow-up/${encodeURIComponent(leadId)}`, payload);
+  if (response.data?.status === false || response.data?.success === false) throw new Error(response.data.message || 'Could not save follow-up.');
   return response.data;
 };
 

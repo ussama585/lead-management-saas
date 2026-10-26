@@ -22,7 +22,7 @@ export function applyCompanyFilter(config, role, location) {
   const path = config.url.split('?')[0].replace(/\/$/, '');
   const overview = /^\/(?:lead-generation|data-leads|meta-leads)\/[^/]+$/.test(path)
     && !/\/(?:create|update|conversion|bulk-)/.test(path);
-  const people = /^\/(?:accounts\/(?:all-users|user-listing|user-count|users-for-assigning)|sales-(?:manager|executive)\/list|sales-(?:manager|executive)-stats|overall-users)$/.test(path);
+  const people = /^\/(?:accounts\/(?:all-users|user-listing|user-count|users-count|users-for-assigning)|sales-(?:manager|executive)\/list|sales-(?:manager|executive)-stats|overall-users)$/.test(path);
   const dashboard = section === 'dashboard' && (path === '/admin-stats' || path.startsWith('/headhunting/') || /^\/[\w-]+$/.test(path));
   if (!overview && !people && !dashboard && !['/admin-stats', '/follow-up/user-list', '/activity/list'].includes(path)) return config;
   // URLSearchParams and object params are both used by existing services.
