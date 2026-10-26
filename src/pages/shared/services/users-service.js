@@ -39,7 +39,7 @@ export const getUsers = async (page = 1, pageSize = 10, user_type = "all", searc
       });
     }
 
-    const endpoint = `/accounts/user-listing?${queryParams.toString()}`;
+    const endpoint = `/accounts/all-users?${queryParams.toString()}`;
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);
