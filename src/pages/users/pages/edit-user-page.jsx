@@ -8,9 +8,12 @@ import { Form, Select, Button, message, Spin, Modal, Upload } from 'antd';
 import { LoaderCircle as LoadingOutlined, Upload as UploadOutlined } from 'lucide-react';
 import { editUserSchema } from '../schemas/edit-user-schema.js';
 import { userFormError, applyUserErrors, assertUserSuccess } from '../user-form-errors.js';
-import { editUser, getAssigningUsersListing, getUserDetails } from '../../shared/services/users-service.js';
+import { editUser, getUserDetails } from '../../shared/services/users-service.js';
+import api from '../../shared/services/api.js';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import UserDetailCard from '../../../components/user-detail-card.component.jsx';
+import UserFormPreviewSync from '../../../components/user-form-preview-sync.jsx';
+import { managerIdFromOptions } from '../user-manager-options.js';
 import UserPlaceholderIcon from '../../../assets/images/user-card-icons/user-placeholder.svg';
 import InputField from '../../../components/input-field.component.jsx';
 import '../../../assets/styles/legacy/create-user.css';
@@ -18,6 +21,14 @@ import '../../../assets/styles/user-management-form.css';
 
 const { Option } = Select;
 const antIcon = <LoadingOutlined size="1em" className="app-icon app-icon-spin" style={{ fontSize: 24 }}  />;
+
+export async function getEditUserSalesManagers(companyId) {
+  if (!companyId) throw new Error('The user is missing a company ID.');
+  const { data } = await api.get('/sales-manager/simple-list', { params: { company_id: companyId } });
+  assertUserSuccess(data);
+  if (!Array.isArray(data)) throw new Error('Could not load sales managers.');
+  return data;
+}
 
 export default function EditUser() {
   const navigate = useNavigate();
@@ -38,6 +49,7 @@ export default function EditUser() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
+  const [previewValues, setPreviewValues] = useState({});
 
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -60,6 +72,13 @@ export default function EditUser() {
       .join(' ');
   };
 
+  const managerCompanyId = userDetails?.data?.company_id;
+  const { data: managerList, isLoading: loadingManagerList } = useQuery({
+    queryKey: ['managers-list', user?.id, user?.user_type, userId, managerCompanyId, 'simple-list'],
+    queryFn: () => getEditUserSalesManagers(managerCompanyId),
+    enabled: Boolean(managerCompanyId) && ['sales_executive', 'recruitment_executive'].includes(ManagerType),
+    refetchOnWindowFocus: false,
+  });
   useEffect(() => {
     if (userDetails) {
       setInitialValues({
@@ -68,13 +87,13 @@ export default function EditUser() {
         phone: userDetails.data.phone || '',
         password: '',
         profile_pic: userDetails.data.profile_pic || '',
-        manager: userDetails?.data?.manager || '',
+        manager: managerIdFromOptions(managerList, userDetails?.data),
 
       });
       setPhoneNumber(userDetails.data.phone || '');
       setEmail(userDetails.data.email || '');
     }
-  }, [userDetails]);
+  }, [userDetails, managerList]);
 
   const { mutate: editUserMutate } = useMutation({
     mutationFn: async (formData) => assertUserSuccess(await editUser(userId, formData)),
@@ -133,22 +152,11 @@ export default function EditUser() {
     });
   };
 
-  const { data: managerList, isLoading: loadingManagerList } = useQuery({
-    queryKey: ['managers-list', ManagerType],
-    queryFn: () => {
-      // Use recruitment_manager for recruitment_executive, sales_manager for sales_executive
-      const managerType = ManagerType === 'recruitment_executive' ? 'recruitment_manager' : 'sales_manager';
-      return getAssigningUsersListing(managerType);
-    },
-    enabled: true,
-    keepPreviousData: (ManagerType == "sales_executive" || ManagerType == "recruitment_executive") ? true : false,
-    staleTime: 5 * 60 * 60,
-    cacheTime: 5 * 60 * 60,
-  });
 
   const handleManagerSelect = (value, setFieldValue) => {
     setFieldValue('manager', value);
   };
+  const managerOptions = managerList || [];
 
 
   if (error) return <p>Error loading user details</p>;
@@ -161,12 +169,22 @@ export default function EditUser() {
           <div className="flex-container">
             <UserDetailCard
               type="user"
-              name={initialValues.name}
+              name={previewValues.name || ''}
               isCreate={false}
-              profileImg={UserPlaceholderIcon}
+              profileImg={userDetails?.data?.profile_pic || undefined}
               phoneNumber={phoneNumber}
               email={email}
               onEditPicture={handleImageEditClick}
+              editPictureByAvatar
+              details={[
+                { label: 'Name', value: previewValues.name }, { label: 'Email', value: previewValues.email },
+                { label: 'Phone', value: previewValues.phone },
+                { label: 'New Password', value: previewValues.password, secret: true },
+                { label: 'User Type', value: ManagerType?.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) },
+                ...(['sales_executive', 'recruitment_executive'].includes(ManagerType) ? [
+                  { label: 'Manager', value: managerOptions.find(manager => String(manager.id) === String(previewValues.manager))?.name },
+                ] : []),
+              ]}
             />
 
             <div className="form-container">
@@ -188,13 +206,13 @@ export default function EditUser() {
                           formData.append(key, values[key]); // Append the original value
                         }
                       } else {
-                        formData.append(key, values[key]); // Append as is for other keys
+                        formData.append(key === 'manager' ? 'manager_id' : key, values[key]);
                       }
                     }
                   });
 
 
-                  if (formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('password') || formData.has('manager')) {
+                  if (formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('password') || formData.has('manager_id')) {
                     // If there are changes, make the API call
                     editUserMutate(formData, {
                       onSuccess: () => navigate(getRolePath(user?.user_type, '/user-management'), { replace: true }),
@@ -208,6 +226,7 @@ export default function EditUser() {
               >
                 {({ handleSubmit, handleBlur, values, setFieldValue, setFieldTouched, errors, touched }) => (
                   <form className="user-management-form" onSubmit={handleSubmit} onBlur={handleBlur} noValidate>
+                    <UserFormPreviewSync onChange={setPreviewValues} />
                     <div className="form-grid">
                       <Form.Item className="form-item">
                         <label className="label">
@@ -300,11 +319,13 @@ export default function EditUser() {
                             onBlur={() => setFieldTouched('manager', true)}
                             popupMatchSelectWidth={false}
                             value={values.manager || undefined}
+                            disabled={!managerCompanyId || loadingManagerList}
+                            loading={loadingManagerList}
                             placeholder={"Select Manager"}
                             onChange={(value) => handleManagerSelect(value, setFieldValue)}
                           >
-                            {managerList?.length > 0 &&
-                              managerList.map((item) => (
+                            {managerOptions.length > 0 &&
+                              managerOptions.map((item) => (
                                 <Option
                                   key={item?.id}
                                   value={item?.id}

@@ -11,6 +11,7 @@ import api from '../../shared/services/api.js';
 import useUserStore from '../../shared/store/user-store.js';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import UserDetailCard from '../../../components/user-detail-card.component.jsx';
+import UserFormPreviewSync from '../../../components/user-form-preview-sync.jsx';
 import UserPlaceholderIcon from '../../../assets/images/user-card-icons/user-placeholder.svg';
 import InputField from '../../../components/input-field.component.jsx';
 import '../../../assets/styles/legacy/create-user.css';
@@ -35,8 +36,9 @@ async function listCompanies(search) {
   return data.results;
 }
 
-async function listSalesManagers() {
-  const { data } = await api.get('/sales-manager/simple-list');
+export async function listSalesManagers(companyId) {
+  if (!companyId) throw new Error('Select a company first.');
+  const { data } = await api.get('/sales-manager/simple-list', { params: { company_id: companyId } });
   if (!Array.isArray(data)) throw new Error(data?.message || 'Could not load sales managers.');
   return data;
 }
@@ -56,6 +58,7 @@ export default function CreateUser() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [previewValues, setPreviewValues] = useState({});
 
   const [hoveredOption, setHoveredOption] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -92,11 +95,12 @@ export default function CreateUser() {
 
   // State to track current user type for manager list
   const [currentUserType, setCurrentUserType] = useState('sales_executive');
+  const managerCompanyId = previewValues.company_id || (!superAdmin ? user?.company_id || user?.company?.id || user?.company : null);
 
   const { data: managerList = [], isLoading: loadingManagerList, isError: managerListError, refetch: refetchManagers } = useQuery({
-    queryKey: ['create-user-sales-managers', user?.id, user?.user_type],
-    queryFn: listSalesManagers,
-    enabled: currentUserType === 'sales_executive',
+    queryKey: ['create-user-sales-managers', user?.id, user?.user_type, managerCompanyId],
+    queryFn: () => listSalesManagers(managerCompanyId),
+    enabled: currentUserType === 'sales_executive' && Boolean(managerCompanyId),
     staleTime: 0,
     cacheTime: 0,
     refetchOnMount: true,
@@ -117,6 +121,15 @@ export default function CreateUser() {
             isCreate={false}
             showPencil={false}
             avatar={UserPlaceholderIcon}
+            details={[
+              { label: 'Name', value: previewValues.name }, { label: 'Email', value: previewValues.email },
+              { label: 'Phone', value: previewValues.phone },
+              { label: 'Password', value: previewValues.password, secret: true },
+              { label: 'Confirm Password', value: previewValues.confirmPassword, secret: true },
+              { label: 'User Type', value: previewValues.user_type?.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) },
+              ...(superAdmin ? [{ label: 'Company', value: companies.find(company => String(company.id) === String(previewValues.company_id))?.name }] : []),
+              ...(previewValues.user_type === 'sales_executive' ? [{ label: 'Manager', value: managerList.find(manager => String(manager.id) === String(previewValues.manager))?.name }] : []),
+            ]}
 
           />
 
@@ -147,6 +160,7 @@ export default function CreateUser() {
             >
               {({ handleSubmit, handleBlur, values, setFieldValue, setFieldTouched, errors, touched }) => (
                 <form className="user-management-form" onSubmit={handleSubmit} onBlur={handleBlur} noValidate>
+                  <UserFormPreviewSync onChange={setPreviewValues} />
                   <div className="form-grid">
                     {superAdmin && <Form.Item className="form-item">
                       <label className="label">Company <span className="asterisk">*</span></label>
@@ -327,7 +341,8 @@ export default function CreateUser() {
                           popupMatchSelectWidth={false}
                           value={values.manager || undefined}
                           onBlur={() => setFieldTouched('manager', true)}
-                          placeholder={"Select Manager"}
+                          placeholder={managerCompanyId ? 'Select Manager' : 'Select a company first'}
+                          disabled={!managerCompanyId || loadingManagerList}
                           loading={loadingManagerList}
                           showSearch
                           optionFilterProp="children"

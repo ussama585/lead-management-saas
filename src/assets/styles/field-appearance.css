@@ -22,6 +22,23 @@ html body :is(.ant-select, .ant-picker, .ant-input-number, .ant-input-affix-wrap
   box-shadow: none !important;
 }
 
+/* User form previews retain their original elevated card appearance. */
+.user-detail-preview-card {
+  border: none;
+  border-bottom: 8px solid var(--primary);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+.user-detail-preview-card .heading-section,
+.user-detail-preview-card .avatar-section,
+.user-detail-preview-card .avatar-outer-container {
+  width: 100%;
+}
+
+.user-detail-preview-card .heading-section {
+  text-align: left;
+}
+
 /* Keep keyboard focus visible without relying on shadow-based focus rings. */
 :is(input, textarea, select, button, [role='combobox'], [data-slot='select-trigger']):focus-visible {
   outline: 2px solid var(--primary) !important;

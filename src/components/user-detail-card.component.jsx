@@ -5,13 +5,14 @@ import CallIcon from '../assets/images/user-card-icons/call.svg';
 import MailIcon from '../assets/images/user-card-icons/mail.svg';
 import PencilIcon from '../assets/images/user-card-icons/pencil.svg';
 import Avatar from 'react-avatar';
+import { Pencil } from 'lucide-react';
 import '../assets/styles/legacy/create-user.css';
 
-export default function UserDetailCard({ type, name, phoneNumber, email, onEditPicture, isCreate = false, showPencil = true, isClient = false, status = "-", location }) {
+export default function UserDetailCard({ type, name, phoneNumber, email, onEditPicture, isCreate = false, showPencil = true, isClient = false, status = "-", location, details, profileImg, editPictureByAvatar = false }) {
   return (
-    <div className="card">
+    <div className={details ? 'card user-detail-preview-card' : 'card'}>
       <div className="heading-section">
-        {!isCreate && !isClient && (
+        {!editPictureByAvatar && !isCreate && !isClient && (
           <>
             {showPencil &&
               <h2>Personal Information</h2>
@@ -32,18 +33,29 @@ export default function UserDetailCard({ type, name, phoneNumber, email, onEditP
 
       <div className="avatar-section">
         <div className="avatar-outer-container">
-          <div className="avatar-container">
-            <Avatar name={name} round={true} />
+          <div className="avatar-container" style={editPictureByAvatar ? { position: 'relative' } : undefined}>
+            <Avatar name={name || '?'} src={profileImg} round={true} />
+            {editPictureByAvatar && showPencil && <button type="button" aria-label="Edit profile picture" title="Edit profile picture" onClick={onEditPicture}
+              className="flex items-center justify-center rounded-full bg-background text-foreground"
+              style={{ position: 'absolute', right: -4, bottom: -4, width: 30, height: 30, border: '1px solid #d2d2d2', cursor: 'pointer' }}>
+              <Pencil size={16} />
+            </button>}
           </div>
           {(
-            <h3 className="general-name" style={{ color: '#3E6A9F', textAlign: 'center' }}>
-              {name}
+            <h3 className="general-name" style={{ color: '#3E6A9F', textAlign: details && name && !editPictureByAvatar ? 'left' : 'center', ...(details ? { alignSelf: 'stretch' } : {}) }}>
+              {name || 'Not available'}
             </h3>
           )}
         </div>
       </div>
 
-      {!isCreate && (
+      {details && <dl className="mt-4 grid w-full gap-3 text-left text-sm">
+        {details.map(({ label, value, secret }) => <div key={label} className="min-w-0">
+          <dt className="font-medium text-muted-foreground">{label}</dt>
+          <dd className="m-0 break-words" style={{ overflowWrap: 'anywhere' }}>{value == null || String(value).trim() === '' ? 'Not available' : secret ? '********' : value}</dd>
+        </div>)}
+      </dl>}
+      {!details && !isCreate && (
         <div className="info-section">
           {type === 'user' && (
             <>
