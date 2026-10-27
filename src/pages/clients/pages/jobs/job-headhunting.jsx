@@ -1,6 +1,11 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button, Tooltip, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef, Suspense } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, Typography, Table, Button, Upload, message, Modal, Input, Select, Row, Col, Tooltip, Spin, DatePicker, Tabs, Divider, Popconfirm, Pagination, Switch } from 'antd';
+import { Card, Typography, Table, Upload, Row, Col, DatePicker, Tabs, Divider, Popconfirm, Pagination, Switch } from 'antd';
 import dayjs from 'dayjs';
 import { MessageSquare as MessageOutlined, MessageCircle as CommentOutlined, MessageCircle as WhatsAppOutlined, Link as LinkOutlined, Share2 as ShareAltOutlined, FileText as FilePdfOutlined, Clock as ClockCircleOutlined, History as HistoryOutlined, User as UserOutlined } from 'lucide-react';
 import ProfileImagePlaceholder from '../../../../assets/images/user-card-icons/user-placeholder.svg';

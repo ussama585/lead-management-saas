@@ -1,7 +1,13 @@
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import NewTableComponent from "../../components/tables/new-table.jsx";
-import { Avatar, Alert, Modal, Button, message, Select, Tooltip } from "antd";
+import { Avatar, AvatarFallback } from "../../components/ui/avatar.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog.jsx";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select.jsx";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../../components/ui/tooltip.jsx";
+import toast from 'react-hot-toast';
+
 import api from '../shared/services/api.js';
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Download as DownloadOutlined } from 'lucide-react';
@@ -24,8 +30,9 @@ import {
 import useUserStore from "../shared/store/user-store.js";
 import { isSuperAdmin } from '../auth/role-access.js';
 import { getRolePath } from '../auth/role-home.js';
-import { ConfirmationModal } from "../clients/components/LazyModals.jsx";
 import { formatDateUniversal } from "../shared/utils/formatDate.js";
+
+const message = { success: toast.success, error: toast.error, info: toast };
 
 /** StatusFilterTabs statusColors keys — matches `assigned` / `unassigned` tab values */
 const DATA_ENTRY_SCOPE_TAB_COLORS = {
@@ -327,8 +334,10 @@ const DataEntryTable = () => {
           size: 260,
           Cell: ({ cell, row }) => (
             <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Avatar size={40} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>
+              <Avatar className="size-10 shrink-0" aria-hidden="true">
+                <AvatarFallback className="bg-primary text-primary-foreground">
                 {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
+                </AvatarFallback>
               </Avatar>
             {superAdmin ? (
               <a
@@ -361,7 +370,7 @@ const DataEntryTable = () => {
           header: "Phone",
           accessorKey: "phone",
           Cell: ({ cell }) => (
-            <Tooltip title="Click to copy phone">
+            <Tooltip><TooltipTrigger asChild>
               <span
                 className="cursor-pointer"
                 onClick={() => {
@@ -371,7 +380,7 @@ const DataEntryTable = () => {
               >
                 {cell.getValue()}
               </span>
-            </Tooltip>
+            </TooltipTrigger><TooltipContent>Click to copy phone</TooltipContent></Tooltip>
           ),
         },
         // 5. Email
@@ -379,7 +388,7 @@ const DataEntryTable = () => {
           header: "Email",
           accessorKey: "email",
           Cell: ({ cell }) => (
-            <Tooltip title="Click to copy email">
+            <Tooltip><TooltipTrigger asChild>
               <span
                 className="cursor-pointer"
                 onClick={async () => {
@@ -398,7 +407,7 @@ const DataEntryTable = () => {
               >
                 {cell.getValue()}
               </span>
-            </Tooltip>
+            </TooltipTrigger><TooltipContent>Click to copy email</TooltipContent></Tooltip>
           ),
         },
         // 6+. Rest of the fields (excluding those already added)
@@ -657,17 +666,9 @@ const DataEntryTable = () => {
   return (
     <>
       <BreadCrumb linkText="Sales Data" />
-      <Modal
-        title="Assignment Issues"
-        open={assignSkippedModalVisible}
-        onCancel={() => setAssignSkippedModalVisible(false)}
-        footer={
-          <Button onClick={() => setAssignSkippedModalVisible(false)}>
-            Close
-          </Button>
-        }
-        width={500}
-      >
+      <Dialog open={assignSkippedModalVisible} onOpenChange={setAssignSkippedModalVisible}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[500px]" aria-describedby={undefined}>
+          <DialogHeader><DialogTitle>Assignment Issues</DialogTitle></DialogHeader>
         <div
           style={{
             marginBottom: 16,
@@ -736,7 +737,9 @@ const DataEntryTable = () => {
             No skipped assignments.
           </div>
         )}
-      </Modal>
+          <DialogFooter><Button onClick={() => setAssignSkippedModalVisible(false)}>Close</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="listing-page-content">
         {/* {superAdmin && <div className="flex flex-wrap items-center gap-3">
           <label htmlFor="sales-data-company-filter">Company</label>
@@ -845,33 +848,16 @@ const DataEntryTable = () => {
               >
                 Assign to
               </label>
-              <Select
-                id="assign-to-select"
-                style={{ minWidth: 220, cursor: "pointer" }}
-                dropdownStyle={{
-                  minWidth: 220,
-                  width: "auto",
-                  whiteSpace: "normal",
-                }}
-                placeholder="Select Executive/Manager"
-                value={selectedAssignee || undefined}
-                onChange={(value) => setSelectedAssignee(value)}
-                loading={isSaving}
-              >
-                {assignableUsers.map((exec) => (
-                  <Select.Option
-                    key={exec.id}
-                    value={exec.id}
-                    style={{
-                      whiteSpace: "normal",
-                      textOverflow: "unset",
-                      overflow: "visible",
-                    }}
-                  >
-                    {exec.name} -{" "}
-                    {exec.user_type === "sales_manager" ? "Manager" : "Executive"}
-                  </Select.Option>
-                ))}
+              <Select value={selectedAssignee == null ? '' : String(selectedAssignee)}
+                onValueChange={value => setSelectedAssignee(Number(value))} disabled={isSaving}>
+                <SelectTrigger id="assign-to-select" className="min-w-[220px]">
+                  <SelectValue placeholder="Select Executive/Manager" />
+                </SelectTrigger>
+                <SelectContent>
+                  {assignableUsers.map(exec => <SelectItem key={exec.id} value={String(exec.id)}>
+                    {exec.name} - {exec.user_type === 'sales_manager' ? 'Manager' : 'Executive'}
+                  </SelectItem>)}
+                </SelectContent>
               </Select>
             </div>
           )}
@@ -935,23 +921,14 @@ const DataEntryTable = () => {
           />
         </div>
 
-        <Suspense fallback={null}>
-        <ConfirmationModal
-          showModal={confirmAssignModalVisible}
-          setShowModal={(visible) => {
-            setConfirmAssignModalVisible(visible);
-            // Reset selectedAssignee when modal is closed/canceled
-            if (!visible) {
-              setSelectedAssignee(null);
-              setPendingAssignee(null);
-            }
-          }}
-          mutation={{
-            isLoading: isSaving,
-            mutate: handleConfirmAssign,
-          }}
-          value={null}
-          message={(() => {
+        <Dialog open={confirmAssignModalVisible} onOpenChange={visible => {
+          if (isSaving) return;
+          setConfirmAssignModalVisible(visible);
+          if (!visible) { setSelectedAssignee(null); setPendingAssignee(null); }
+        }}>
+          <DialogContent className="max-h-[85vh] overflow-y-auto" showCloseButton={!isSaving} aria-describedby={undefined}>
+            <DialogHeader><DialogTitle>Confirmation</DialogTitle></DialogHeader>
+          {(() => {
             const selectedRowIds = Object.keys(rowSelection).filter(
               (key) => rowSelection[key]
             );
@@ -1007,12 +984,19 @@ const DataEntryTable = () => {
               </>
             );
           })()}
-        />
-        </Suspense>
+            <DialogFooter>
+              <Button variant="outline" disabled={isSaving} onClick={() => {
+                setConfirmAssignModalVisible(false); setSelectedAssignee(null); setPendingAssignee(null);
+              }}>No</Button>
+              <Button disabled={isSaving} onClick={handleConfirmAssign}>{isSaving ? 'Assigning...' : 'Yes'}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </>
   );
 };
 
 export default DataEntryTable;
-import CompanySelectOption from '../../components/company-select-option.jsx';
+

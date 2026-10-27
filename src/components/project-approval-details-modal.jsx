@@ -1,5 +1,7 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Spin, Button, Tooltip } from './ui/app-controls.jsx';
 import React from 'react';
-import { Modal, Spin, Descriptions, Table, Typography, Alert, Button, Tooltip } from 'antd';
+import { Descriptions, Table, Typography, Alert } from 'antd';
 import { LoaderCircle as LoadingOutlined, ExternalLink as ExportOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import { getProjectApprovalDetails } from '../pages/shared/services/headhunting.js';

@@ -1,8 +1,12 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Select } from '../../components/ui/app-select.jsx';
+import { Input } from '../../components/ui/app-controls.jsx';
+import { Button } from '../../components/ui/app-controls.jsx';
 import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import { Formik, Form, Field } from 'formik';
-import { Input, Button, DatePicker, Select, message, Skeleton } from 'antd';
+import { DatePicker, Skeleton } from 'antd';
 import { setDataValidationSchema } from '../shared/schemas/schema.js';
 import '../../assets/styles/legacy/add-potential-client-page.css';
 import { createNewCallRecord, getCallRecordDetails } from '../shared/services/headhunting.js';

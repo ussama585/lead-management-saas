@@ -1,5 +1,7 @@
+import { message } from './ui/notifications.jsx';
+import { Input } from './ui/app-controls.jsx';
 import React from 'react';
-import { Input, message, Checkbox } from 'antd';
+import { Checkbox } from 'antd';
 import { normalizeJobId, getJobLabel, formatNumber, toNumericValue, getCurrencySymbol, formatCurrencyInput } from '../pages/shared/utils/job-utils.js';
 import '../assets/styles/legacy/common.css';
 import '../assets/styles/legacy/jobs-selection-table.css';

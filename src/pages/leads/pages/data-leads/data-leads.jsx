@@ -1,3 +1,6 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Select as AntSelect } from '../../../../components/ui/app-select.jsx';
+import { Tooltip as AntTooltip, Button as AntButton } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback, useEffect, useRef, Suspense } from "react";
 import {
   Box,
@@ -14,15 +17,7 @@ import GlobalStyles from "@mui/material/GlobalStyles";
 import { alpha } from "@mui/material/styles";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { useNavigate, Link as RouterLink, useSearchParams } from "react-router-dom";
-import {
-  message,
-  Avatar as AntAvatar,
-  Alert as AntAlert,
-  Select as AntSelect,
-  Tooltip as AntTooltip,
-  Button as AntButton,
-  Space,
-} from "antd";
+import { Avatar as AntAvatar, Alert as AntAlert, Space } from 'antd';
 import { Info as InfoCircleOutlined, MessageCircle as CommentOutlined, Upload as UploadOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
 import DuplicateLeadModal from '../../../../components/duplicate-lead-modal.component.jsx';
 import { useDuplicateLead } from '../../../../components/hooks/useDuplicateLead.js';

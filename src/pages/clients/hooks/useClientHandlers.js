@@ -1,5 +1,6 @@
+import { message } from '../../../components/ui/notifications.jsx';
 import { useState } from 'react';
-import { message } from 'antd';
+
 
 /**
  * Custom hook that provides all handler functions for client management

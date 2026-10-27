@@ -1,5 +1,7 @@
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Button, Tooltip } from '../../../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useCallback } from 'react';
-import { Tabs, Modal, Button, Tooltip } from 'antd';
+import { Tabs } from 'antd';
 import { MessageSquare as MessageOutlined, Clock as ClockCircleOutlined, Eye as EyeOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';

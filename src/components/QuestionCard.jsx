@@ -1,5 +1,6 @@
+import { Tooltip } from './ui/app-controls.jsx';
 import React from 'react';
-import { Col, Switch, Tooltip } from 'antd';
+import { Col, Switch } from 'antd';
 import { Copy as CopyOutlined, Trash2 as DeleteOutlined } from 'lucide-react';
 import { GripHorizontal as DragHandleIcon } from 'lucide-react';
 import QuestionOptions from './QuestionOptions.jsx';

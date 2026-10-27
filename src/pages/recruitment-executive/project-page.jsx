@@ -1,6 +1,11 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Modal } from '../../components/ui/app-modal.jsx';
+import { Select } from '../../components/ui/app-select.jsx';
+import { Input } from '../../components/ui/app-controls.jsx';
+import { Button } from '../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Select, message, Modal, Button, Input, List, Switch } from 'antd';
+import { List, Switch } from 'antd';
 import { Pencil as EditOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';

@@ -1,6 +1,7 @@
+import { Select } from '../ui/app-select.jsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Chart from './apex-chart.jsx';
-import { Select } from 'antd';
+
 import { Box, CircularProgress } from '@mui/material';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';

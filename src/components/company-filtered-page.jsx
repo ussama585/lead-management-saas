@@ -1,5 +1,6 @@
+import { Select } from './ui/app-select.jsx';
 import React, { useEffect, useMemo } from 'react';
-import { Alert, Select } from 'antd';
+import { Alert } from 'antd';
 import { QueryClient, QueryClientProvider, useIsMutating, useQuery, useQueryClient } from 'react-query';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import api from '../pages/shared/services/api.js';

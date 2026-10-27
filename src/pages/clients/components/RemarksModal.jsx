@@ -1,5 +1,7 @@
+import { Modal } from '../../../components/ui/app-modal.jsx';
+import { Input } from '../../../components/ui/app-controls.jsx';
 import React from 'react';
-import { Modal, Input } from 'antd';
+
 
 const { TextArea } = Input;
 

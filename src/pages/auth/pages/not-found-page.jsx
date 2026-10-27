@@ -1,5 +1,6 @@
+import { Button } from '../../../components/ui/app-controls.jsx';
 import React from 'react';
-import { Result, Button } from 'antd';
+import { Result } from 'antd';
 import { Link } from 'react-router-dom';
 import '../../../assets/styles/legacy/not-found-page.css';
 

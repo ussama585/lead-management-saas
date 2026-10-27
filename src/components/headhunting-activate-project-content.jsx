@@ -1,5 +1,6 @@
+import { Select } from './ui/app-select.jsx';
 import React from 'react';
-import { DatePicker, Select } from 'antd';
+import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import '../assets/styles/legacy/common.css';
 import '../assets/styles/legacy/headhunting-activate-project-content.css';

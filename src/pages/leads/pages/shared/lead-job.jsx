@@ -1,3 +1,5 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import JobForm from "../../../../components/job-form.component.jsx";
@@ -6,10 +8,7 @@ import {
   createDataLeadJob,
 } from "../../../shared/services/data-leads-service.js";
 import "../../../../assets/styles/legacy/leads.generated.css";
-import {
-  Button,
-  message,
-} from "antd";
+
 
 import { commonJobFormSchema } from "../../../shared/schemas/job.js";
 import {

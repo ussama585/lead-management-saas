@@ -1,6 +1,7 @@
+import { Modal } from '../../components/ui/app-modal.jsx';
 import React, { useMemo, useState, useCallback } from 'react';
 import { useQuery } from 'react-query';
-import { Modal } from 'antd';
+
 import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';

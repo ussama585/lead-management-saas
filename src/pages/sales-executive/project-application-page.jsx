@@ -1,7 +1,9 @@
+import { Modal } from '../../components/ui/app-modal.jsx';
+import { Spin } from '../../components/ui/app-controls.jsx';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Modal, Spin } from 'antd';
+
 import { LoaderCircle as LoadingOutlined, User as UserOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';

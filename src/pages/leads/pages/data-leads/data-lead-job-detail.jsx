@@ -1,7 +1,8 @@
+import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React from "react";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import "../../../../assets/styles/legacy/leads.generated.css";
-import { Alert, Button, Spin, Tag, Divider, Row, Col } from "antd";
+import { Alert, Tag, Divider, Row, Col } from 'antd';
 import { BookOpen as BookOutlined, Info as InfoCircleOutlined, MapPin as EnvironmentOutlined, DollarSign as DollarOutlined, User as UserOutlined, Zap as ThunderboltOutlined, FileText as FileTextOutlined, LayoutGrid as AppstoreOutlined } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "react-query";

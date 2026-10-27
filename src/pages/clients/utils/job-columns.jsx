@@ -1,5 +1,7 @@
+import { Select } from '../../../components/ui/app-select.jsx';
+import { Button as AntButton, Tooltip } from '../../../components/ui/app-controls.jsx';
 import React from 'react';
-import { Select, Button as AntButton, Tooltip } from 'antd';
+
 import { MessageCircle as CommentOutlined, Pencil as EditOutlined, Clock as ClockCircleOutlined, MessageSquare as MessageOutlined, Trash2 as DeleteOutlined, CirclePlus as PlusCircleOutlined, Table as TableOutlined } from 'lucide-react';
 import { formatDateUniversal } from '../../shared/utils/formatDate.js';
 import { formatSalaryNum } from '../../shared/utils/formatters.js';

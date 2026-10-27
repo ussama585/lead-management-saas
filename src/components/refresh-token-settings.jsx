@@ -1,5 +1,6 @@
+import { Button } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Alert, Button, Card } from 'antd';
+import { Alert, Card } from 'antd';
 import { RefreshCw } from 'lucide-react';
 import { useMutation } from 'react-query';
 import api, { storeRefreshedTokens } from '../pages/shared/services/api.js';

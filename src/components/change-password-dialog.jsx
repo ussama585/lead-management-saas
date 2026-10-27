@@ -1,5 +1,8 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
 import React from 'react';
-import { Alert, Input, Modal, message } from 'antd';
+import { Alert } from 'antd';
 import { useFormik } from 'formik';
 import { useMutation } from 'react-query';
 import api from '../pages/shared/services/api.js';

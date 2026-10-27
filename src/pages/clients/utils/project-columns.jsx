@@ -1,5 +1,6 @@
+import { Tooltip, Button } from '../../../components/ui/app-controls.jsx';
 import React from 'react';
-import { Tooltip, Button } from 'antd';
+
 import { FileText as FilePdfOutlined, FileText as FileTextOutlined, Pencil as EditOutlined, Trash2 as DeleteOutlined, ClipboardPen as FormOutlined, Info as InfoCircleOutlined, DollarSign as DollarOutlined } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge.jsx';
 import StatusSelect from '../components/StatusSelect.jsx';

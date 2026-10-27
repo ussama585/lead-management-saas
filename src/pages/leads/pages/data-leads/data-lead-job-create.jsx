@@ -1,6 +1,10 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { useFormik, getIn, setIn } from 'formik';
-import { Alert, Button, Input, InputNumber, Select, Space, Spin, message } from 'antd';
+import { Alert, InputNumber, Space } from 'antd';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
 import { isSuperAdmin } from '../../../auth/role-access.js';

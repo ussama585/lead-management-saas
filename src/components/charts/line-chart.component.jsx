@@ -1,6 +1,7 @@
+import { Select } from '../ui/app-select.jsx';
 import React, { useState } from 'react';
 import Chart from './apex-chart.jsx';
-import { Select } from 'antd';
+
 import '../../assets/styles/legacy/line-chart.component.css';
 
 const { Option } = Select;

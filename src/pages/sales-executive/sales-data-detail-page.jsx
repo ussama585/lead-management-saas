@@ -1,7 +1,8 @@
+import { Button } from '../../components/ui/app-controls.jsx';
 import React from 'react';
 import { useQuery } from 'react-query';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
-import { Typography, Skeleton, Button } from 'antd';
+import { Typography, Skeleton } from 'antd';
 import '../../assets/styles/legacy/add-potential-client-page.css';
 import { getDataEntryById } from '../shared/services/data-entry-service.js';
 import { useParams, useNavigate } from 'react-router-dom';

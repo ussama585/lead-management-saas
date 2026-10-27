@@ -1,5 +1,10 @@
+import { message } from '../../../components/ui/notifications.jsx';
+import { Modal } from '../../../components/ui/app-modal.jsx';
+import { Select } from '../../../components/ui/app-select.jsx';
+import { Input } from '../../../components/ui/app-controls.jsx';
+import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Avatar, Button, Card, Descriptions, Input, Modal, Select, Space, Spin, Table, Tag, message } from 'antd';
+import { Alert, Avatar, Card, Descriptions, Space, Table, Tag } from 'antd';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useFormik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';

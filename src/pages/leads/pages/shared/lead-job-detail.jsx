@@ -1,5 +1,6 @@
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo } from 'react';
-import { Col, Divider, Row, Spin } from 'antd';
+import { Col, Divider, Row } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';

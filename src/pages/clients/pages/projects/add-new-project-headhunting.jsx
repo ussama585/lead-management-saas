@@ -1,6 +1,10 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
-import { Button, Input, Col, Row, Select, message, Upload } from 'antd';
+import { Col, Row, Upload } from 'antd';
 import { useFormik } from 'formik';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectHeadhuntingValidationSchema } from '../../../shared/schemas/project.js';

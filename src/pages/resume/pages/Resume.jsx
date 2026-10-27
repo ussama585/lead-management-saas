@@ -1,7 +1,8 @@
+import { message } from '../../../components/ui/notifications.jsx';
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Box, Button, Chip, IconButton } from '@mui/material';
 import { Download } from 'lucide-react';
-import { message } from 'antd';
+
 import { FileText as FilePdfOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';

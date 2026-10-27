@@ -1,5 +1,8 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Select } from '../../components/ui/app-select.jsx';
+import { Spin, Tooltip, Button } from '../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect, useRef, useCallback, Suspense } from 'react';
-import { Spin, Select, message, Tooltip, Button } from 'antd';
+
 import { LoaderCircle as LoadingOutlined, Pencil as EditOutlined, MessageSquare as MessageOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';

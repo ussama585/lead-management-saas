@@ -1,5 +1,6 @@
+import { Modal } from '../../../components/ui/app-modal.jsx';
 import React from 'react';
-import { Modal } from 'antd';
+
 import ProfileCvPrintView from './ProfileCvPrintView.jsx';
 
 /** Modal wrapper; layout matches `generateProfileCvPdfBlob` in `profileCvPdf.js`. */

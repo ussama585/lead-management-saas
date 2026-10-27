@@ -1,3 +1,4 @@
+import { message } from '../../../components/ui/notifications.jsx';
 import React from 'react';
 import {
   Autocomplete,
@@ -10,7 +11,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { message } from 'antd';
+
 import OverallExperienceFilter from './OverallExperienceFilter.jsx';
 import ResumeFiltersHeader from './ResumeFiltersHeader.jsx';
 import { AutocompleteFilterTagPill, ExperienceFilterPill } from './FilterPills.jsx';

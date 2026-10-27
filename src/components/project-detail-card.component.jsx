@@ -1,5 +1,10 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Select } from './ui/app-select.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Spin, Button, Tooltip } from './ui/app-controls.jsx';
 import React, { useState, useEffect } from 'react';
-import { message, Select, Spin, Button, Modal, Input, Tooltip } from 'antd';
+
 import { LoaderCircle as LoadingOutlined, Pencil as EditOutlined, MessageCircle as CommentOutlined, Info as InfoCircleOutlined } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from 'react-query';

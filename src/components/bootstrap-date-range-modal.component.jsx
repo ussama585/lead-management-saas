@@ -1,6 +1,7 @@
+import { Tooltip } from './ui/app-controls.jsx';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Tooltip } from 'antd';
+
 import { X as CloseOutlined } from 'lucide-react';
 import { DateRangePicker } from 'react-date-range';
 import { format } from 'date-fns';

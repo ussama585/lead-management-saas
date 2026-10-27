@@ -1,6 +1,7 @@
+import { Select } from '../ui/app-select.jsx';
 import React, { useState, useMemo } from 'react';
 import Chart from './apex-chart.jsx';
-import { Select } from 'antd';
+
 import dayjs from 'dayjs';
 import '../../assets/styles/legacy/donut-chart.component.css'; // reuse card styles
 import {

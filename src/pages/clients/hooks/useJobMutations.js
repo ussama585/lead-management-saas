@@ -1,5 +1,6 @@
+import { message } from '../../../components/ui/notifications.jsx';
 import { useMutation, useQueryClient } from 'react-query';
-import { message } from 'antd';
+
 import { updateJob, deleteHeadhuntingJob } from '../../shared/services/headhunting.js';
 
 /**

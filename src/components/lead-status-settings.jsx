@@ -1,5 +1,9 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Alert, Button, Card, Descriptions, Input, Modal, Space, Spin, Table, message } from 'antd';
+import { Alert, Card, Descriptions, Space, Table } from 'antd';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';

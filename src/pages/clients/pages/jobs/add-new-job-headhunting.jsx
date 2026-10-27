@@ -1,8 +1,9 @@
+import { message } from '../../../../components/ui/notifications.jsx';
 import React, { useState, useEffect } from 'react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import JobForm from '../../../../components/job-form.component.jsx';
 import "../../../../assets/styles/legacy/leads.generated.css";
-import { message } from 'antd';
+
 import { commonJobFormSchema } from '../../../shared/schemas/job.js';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';

@@ -1,6 +1,7 @@
+import { Select } from '../ui/app-select.jsx';
 import React, { useMemo, useState } from 'react';
 import Chart from './apex-chart.jsx';
-import { Select } from 'antd';
+
 import { Box, CircularProgress } from '@mui/material';
 import dayjs from 'dayjs';
 import '../../assets/styles/legacy/donut-chart.component.css';

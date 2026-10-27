@@ -1,10 +1,15 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Modal } from '../../components/ui/app-modal.jsx';
+import { Select } from '../../components/ui/app-select.jsx';
+import { Input } from '../../components/ui/app-controls.jsx';
+import { Spin, Button } from '../../components/ui/app-controls.jsx';
 import React, { useState, useMemo } from 'react';
-import { Spin, Modal, Input, message } from 'antd';
+
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
-import { Typography, Select, Button } from 'antd';
+import { Typography } from 'antd';
 import ProjectDetailCard from '../../components/project-detail-card.component.jsx';
 import RequiredSkillCard from '../../components/required-skill-card.component.jsx';
 import { getProjectDetails } from '../shared/services/executive-service.js';

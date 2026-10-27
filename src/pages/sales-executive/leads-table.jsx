@@ -1,6 +1,8 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Button } from '../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useEffect } from 'react';
 import NewTableComponent from '../../components/tables/new-table.jsx';
-import { Avatar, Alert, Button, message } from 'antd';
+import { Avatar, Alert } from 'antd';
 import { Copy as CopyOutlined } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from 'react-query';

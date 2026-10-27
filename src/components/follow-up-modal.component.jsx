@@ -1,5 +1,8 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Button, Spin } from './ui/app-controls.jsx';
 import React from 'react';
-import { Modal, Checkbox, Input, Button, Spin, Empty } from 'antd';
+import { Checkbox, Empty } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useFormik } from 'formik';
 import { useQuery, useQueryClient } from 'react-query';

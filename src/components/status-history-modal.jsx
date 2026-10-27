@@ -1,5 +1,7 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Button, Tooltip } from './ui/app-controls.jsx';
 import React from 'react';
-import { Alert, Modal, Button, Tooltip } from 'antd';
+import { Alert } from 'antd';
 import { useQuery } from 'react-query';
 import { History as HistoryOutlined } from 'lucide-react';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';

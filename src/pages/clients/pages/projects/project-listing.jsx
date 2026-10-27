@@ -1,5 +1,9 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Spin, Button as AntButton } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect, useRef, useCallback, Suspense } from 'react';
-import { Spin, message, Input, Alert, Space, Button as AntButton } from "antd";
+import { Alert, Space } from 'antd';
 import { LoaderCircle as LoadingOutlined, RotateCw as ReloadOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
@@ -16,7 +20,7 @@ import StatusTabsContainer from '../../components/StatusTabsContainer.jsx';
 import { statusColors, jobStatusOptions, getJobStatusTabs } from '../../constants/client-constants.js';
 import { useJobStatusMutation, useJobRemarksMutation, useJobDeleteMutation } from '../../hooks/useJobMutations.js';
 import { useJobCounts, useProjectInfo, useProjectDetails, useJobsList } from '../../hooks/useJobQueries.js';
-import { Modal } from "antd";
+
 import { createJobColumns } from '../../utils/job-columns.jsx';
 import { useJobHandlers } from '../../hooks/useJobHandlers.js';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';

@@ -1,5 +1,6 @@
+import { Select } from './ui/app-select.jsx';
 import React, { useMemo } from 'react';
-import { Select } from 'antd';
+
 
 /**
  * Duplicate Check Filter

@@ -1,6 +1,8 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Select } from '../../components/ui/app-select.jsx';
 import React from 'react';
 import InputField from '../../components/input-field.component.jsx';
-import { Form, Row, Col, Select } from 'antd';
+import { Form, Row, Col } from 'antd';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import { salesDataValidationSchema } from '../shared/schemas/sales-data.js';
 import '../../assets/styles/legacy/create-user.css';
@@ -9,7 +11,7 @@ import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { createDataEntry } from '../shared/services/data-entry-service.js';
-import { message } from 'antd';
+
 import { citiesNames, countriesNames } from '../shared/utils/countries.js';
 
 const initialState = {

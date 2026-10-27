@@ -1,5 +1,10 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React from 'react';
-import { Alert, AutoComplete, Button, Descriptions, Input, InputNumber, Modal, Select, Spin, Switch, message } from 'antd';
+import { Alert, AutoComplete, Descriptions, InputNumber, Switch } from 'antd';
 import { useFormik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../shared/services/api.js';

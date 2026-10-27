@@ -1,5 +1,7 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Button } from './ui/app-controls.jsx';
 import React from 'react';
-import { Modal, Button, Alert } from 'antd';
+import { Alert } from 'antd';
 import useUserStore from '../pages/shared/store/user-store.js';
 import { getLeadJobEditUrl } from '../pages/shared/utils/conversion-job-errors.js';
 

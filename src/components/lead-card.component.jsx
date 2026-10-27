@@ -1,8 +1,10 @@
+import { message } from './ui/notifications.jsx';
+import { Select } from './ui/app-select.jsx';
 import React, { useEffect, useState, useMemo } from "react";
 import '../assets/styles/legacy/lead-card-component.css';
 import '../assets/styles/legacy/common.css';
 import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as UploadOutlined } from 'lucide-react';
-import { Select, message, Switch } from 'antd';
+import { Switch } from 'antd';
 
 import LeadEditModal from './LeadEditModal.jsx';
 import formatDate from "../pages/shared/utils/formatDate.js";
@@ -613,21 +615,6 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
       <div className="lead-detail responsive-lead-detail lead-card__detail-row">
         {/* Left Column: Contact Info */}
         <div className="div-1 responsive-div-1 lead-card__contact-info">
-          <div className="lead-card__contact-line">
-            <span>promo code:{lead?.promo_code ?? '-'}</span>
-            <CopyOutlined size="1em"
-              
-              className={["app-icon", "lead-card__copy-icon"].filter(Boolean).join(' ')}
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(lead?.promo_code || "");
-                  message.success("Promo code copied to clipboard");
-                } catch (error) {
-                  message.error("Failed to copy promo code");
-                }
-              }} style={{ rotate: (180) + 'deg' }}
-            />
-          </div>
           <div className="lead-card__contact-line">
             <span>{lead?.phone_number ?? '-'}</span>
             <CopyOutlined size="1em"

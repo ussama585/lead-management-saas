@@ -1,9 +1,13 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Button } from './ui/app-controls.jsx';
 /**
  * JobRemarksModal – Modal for viewing, adding, and editing job-level remarks
  * (project manager / job remarks). Fetches list by jobId, supports create and update.
  */
 import React, { useState } from 'react';
-import { Modal, List, Input, Button, message } from 'antd';
+import { List } from 'antd';
 import { Pencil as EditOutlined } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import {

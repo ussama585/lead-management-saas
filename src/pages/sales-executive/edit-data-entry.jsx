@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import InputField from '../../components/input-field.component.jsx';
-import { Form, Row, Col, Select, Button, Spin } from 'antd';
+import { Button } from '../../components/ui/button.jsx';
+import SalesDataSelect from './sales-data-select.jsx';
+import toast from 'react-hot-toast';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import { salesDataValidationSchema } from '../shared/schemas/sales-data.js';
@@ -11,7 +13,7 @@ import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { getDataEntryById, updateDataEntryById } from '../shared/services/data-entry-service.js';
-import { message } from 'antd';
+const message = { success: toast.success, error: toast.error };
 import { citiesNames, countriesNames } from '../shared/utils/countries.js';
 import { useFormik } from 'formik';
 import useUserStore from '../shared/store/user-store.js';
@@ -126,7 +128,7 @@ const EditDataEntry = () => {
 
 
   if (loading) {
-    return <div style={{ textAlign: 'center', marginTop: 80 }}><Spin indicator={<LoadingOutlined size="1em" className="app-icon app-icon-spin"  />} size="large" /></div>;
+    return <div style={{ textAlign: 'center', marginTop: 80 }}><LoadingOutlined className="mx-auto size-6 animate-spin" aria-label="Loading sales data" /></div>;
   }
 
   return (
@@ -155,12 +157,12 @@ const EditDataEntry = () => {
           >
             {({ handleSubmit }) => (
               <FormikForm onSubmit={handleSubmit}>
-                <Row gutter={[24, 24]}>
-                  <Col xs={24} sm={8}>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                  <div className="min-w-0">
                     <label htmlFor="representative_name" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Representative Name
                     </label>
-                    <Form.Item name="representative_name" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field 
                         name="representative_name" 
                         as={InputField} 
@@ -169,13 +171,13 @@ const EditDataEntry = () => {
                         onBlur={(event) => handleAutoSave(event, 'representative_name', formik.values.representative_name)}
                       />
                       <ErrorMessage name="representative_name" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="designation" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Designation
                     </label>
-                    <Form.Item name="designation" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field 
                         name="designation" 
                         as={InputField} 
@@ -184,13 +186,13 @@ const EditDataEntry = () => {
                         onBlur={(event) => handleAutoSave(event, 'designation', formik.values.designation)}
                       />
                       <ErrorMessage name="designation" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="company_name" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Company Name {requiredMark}
                     </label>
-                    <Form.Item name="company_name" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field 
                         name="company_name" 
                         as={InputField} 
@@ -199,17 +201,17 @@ const EditDataEntry = () => {
                         onBlur={(event) => handleAutoSave(event, 'company_name', formik.values.company_name)}
                       />
                       <ErrorMessage name="company_name" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
+                    </div>
+                  </div>
 
-                  <Col xs={24} sm={8}>
+                  <div className="min-w-0">
                     <label htmlFor="industry_sector" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Industry/Sector
                     </label>
-                    <Form.Item name="industry_sector" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field name="industry_sector">
                         {({ field, form }) => (
-                          <Select
+                          <SalesDataSelect
                             mode="multiple"
                             value={field.value ? field.value.split(',').filter(Boolean) : []}
                             onChange={value => {
@@ -224,13 +226,13 @@ const EditDataEntry = () => {
                         )}
                       </Field>
                       <ErrorMessage name="industry_sector" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="phone" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Phone {requiredMark}
                     </label>
-                    <Form.Item name="phone" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field 
                         name="phone" 
                         as={InputField} 
@@ -239,13 +241,13 @@ const EditDataEntry = () => {
                         onBlur={(event) => handleAutoSave(event, 'phone', formik.values.phone)}
                       />
                       <ErrorMessage name="phone" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="email" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Email {requiredMark}
                     </label>
-                    <Form.Item name="email" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field 
                         name="email" 
                         as={InputField} 
@@ -254,17 +256,17 @@ const EditDataEntry = () => {
                         onBlur={(event) => handleAutoSave(event, 'email', formik.values.email)}
                       />
                       <ErrorMessage name="email" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
+                    </div>
+                  </div>
 
-                  <Col xs={24} sm={8}>
+                  <div className="min-w-0">
                     <label htmlFor="city" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       City
                     </label>
-                    <Form.Item name="city" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field name="city">
                         {({ field, form }) => (
-                          <Select
+                          <SalesDataSelect
                             {...field}
                             value={field.value}
                             onChange={value => {
@@ -280,16 +282,16 @@ const EditDataEntry = () => {
                         )}
                       </Field>
                       <ErrorMessage name="city" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="country" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Country
                     </label>
-                    <Form.Item name="country" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field name="country">
                         {({ field, form }) => (
-                          <Select
+                          <SalesDataSelect
                             {...field}
                             value={field.value}
                             onChange={value => {
@@ -305,44 +307,44 @@ const EditDataEntry = () => {
                         )}
                       </Field>
                       <ErrorMessage name="country" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="company_website" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Company Website
                     </label>
-                    <Form.Item name="company_website" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field name="company_website" as={InputField} placeholder="URL should start from https:// or http://" className="antd-input styled-input" />
                       <ErrorMessage name="company_website" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
+                    </div>
+                  </div>
 
-                  <Col xs={24} sm={8}>
+                  <div className="min-w-0">
                     <label htmlFor="company_social_link" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Company Social Media Link
                     </label>
-                    <Form.Item name="company_social_link" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field name="company_social_link" as={InputField} placeholder="URL should start from https:// or http://" className="antd-input styled-input" />
                       <ErrorMessage name="company_social_link" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="company_address" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Company Address
                     </label>
-                    <Form.Item name="company_address" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field name="company_address" as={InputField} placeholder="Enter company address" className="antd-input styled-input" />
                       <ErrorMessage name="company_address" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
                     <label htmlFor="acquired_through" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                       Data Acquired Through
                     </label>
-                    <Form.Item name="acquired_through" style={{ marginBottom: 0 }}>
+                    <div>
                       <Field name="acquired_through">
                         {({ field, form }) => (
-                          <Select
+                          <SalesDataSelect
                             {...field}
                             value={field.value}
                             onChange={value => {
@@ -353,29 +355,26 @@ const EditDataEntry = () => {
                             placeholder='Select how data was acquired'
                             style={{ width: '100%', color: '#000000' }}
                             showSearch
-                          >
-                            <Select.Option value="" disabled>Select how data was acquired</Select.Option>
-                            <Select.Option value="LinkedIn">LinkedIn</Select.Option>
-                            <Select.Option value="Facebook">Facebook</Select.Option>
-                            <Select.Option value="WhatsApp">Whatsapp</Select.Option>
-                            <Select.Option value="Referral">Referral</Select.Option>
-                            <Select.Option value="Other">Other</Select.Option>
-                          </Select>
+                            options={[
+                              {value: 'LinkedIn', label: 'LinkedIn'}, {value: 'Facebook', label: 'Facebook'},
+                              {value: 'WhatsApp', label: 'Whatsapp'}, {value: 'Referral', label: 'Referral'},
+                              {value: 'Other', label: 'Other'},
+                            ]}
+                          />
                         )}
                       </Field>
                       <ErrorMessage name="acquired_through" component="div" className="form-error" />
-                    </Form.Item>
-                  </Col>
-                </Row>
+                    </div>
+                  </div>
+                </div>
                 <div style={{ textAlign: 'left', marginTop: '16px' }}>
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    type="submit"
                     className="custom-button"
-                    loading={isLoading}
+                    disabled={isLoading}
                     style={{ minWidth: 120, height: '40px', fontSize: '14px', fontWeight: '500', borderRadius: '6px' }}
                   >
-                    Update
+                    {isLoading ? 'Updating...' : 'Update'}
                   </Button>
                 </div>
               </FormikForm>

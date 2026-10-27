@@ -1,3 +1,4 @@
+import { Toaster } from 'react-hot-toast';
 import React from 'react';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
@@ -16,6 +17,7 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById('root')).render(
   <QueryClientProvider client={queryClient}>
     <AppThemeProvider>
+        <Toaster position="top-right" toastOptions={{ className: "!bg-background !text-foreground !border !border-border !rounded-lg" }} />
         <App />
     </AppThemeProvider>
   </QueryClientProvider>

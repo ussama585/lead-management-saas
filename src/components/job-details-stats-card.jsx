@@ -1,5 +1,9 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Select } from './ui/app-select.jsx';
+import { Button, Tooltip, Spin } from './ui/app-controls.jsx';
 import React, { useState, useEffect } from 'react';
-import { Button, Select, Tooltip, Switch, message, Spin, Modal, Row, Col, Statistic } from 'antd';
+import { Switch, Row, Col, Statistic } from 'antd';
 import { MessageCircle as CommentOutlined, ChartColumn as BarChartOutlined, Copy as CopyOutlined } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';

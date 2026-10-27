@@ -1,5 +1,7 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Tooltip, Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Alert, Tag, Tooltip, message, Button } from 'antd';
+import { Alert, Tag } from 'antd';
 import { MessageCircle as CommentOutlined, Clock as ClockCircleOutlined, FileText as FilePdfOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';

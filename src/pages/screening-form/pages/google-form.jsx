@@ -1,5 +1,7 @@
+import { message } from '../../../components/ui/notifications.jsx';
+import { Button, Spin, Tooltip } from '../../../components/ui/app-controls.jsx';
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Row, Col, message, Spin, Tooltip } from 'antd';
+import { Row, Col } from 'antd';
 import { Plus as PlusOutlined, LoaderCircle as LoadingOutlined } from 'lucide-react';
 
 import { Save as SaveIcon } from 'lucide-react';

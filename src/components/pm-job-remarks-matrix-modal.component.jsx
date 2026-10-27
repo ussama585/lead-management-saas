@@ -1,5 +1,7 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Spin } from './ui/app-controls.jsx';
 import React from 'react';
-import { Modal, Spin, Empty, Tag, Collapse } from 'antd';
+import { Empty, Tag, Collapse } from 'antd';
 import { LoaderCircle as LoadingOutlined, MessageSquare as MessageOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import { getProjectJobRemarksMatrix } from '../pages/shared/services/headhunting.js';

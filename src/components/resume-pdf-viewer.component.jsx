@@ -1,5 +1,7 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Spin, Tooltip } from './ui/app-controls.jsx';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Modal, Spin, Slider, Tooltip } from 'antd';
+import { Slider } from 'antd';
 import { LoaderCircle as LoadingOutlined, FileText as FilePdfOutlined, Download as DownloadOutlined, ZoomIn as ZoomInOutlined, ZoomOut as ZoomOutOutlined } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import '../assets/styles/legacy/common.css';

@@ -1,5 +1,6 @@
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React from 'react';
-import { Spin } from 'antd';
+
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';

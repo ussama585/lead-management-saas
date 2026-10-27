@@ -1,19 +1,11 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo } from "react";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import "../../../../assets/styles/legacy/leads.generated.css";
-import {
-  DatePicker,
-  Select,
-  message,
-  Button,
-  Input,
-  Col,
-  Row,
-  Divider,
-  Spin,
-  Typography,
-  Space,
-} from "antd";
+import { DatePicker, Col, Row, Divider, Typography, Space } from 'antd';
 import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { addLeadJobSchema } from "../../../shared/schemas/schema.js";

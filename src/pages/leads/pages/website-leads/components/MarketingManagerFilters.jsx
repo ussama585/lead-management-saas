@@ -1,5 +1,6 @@
+import { Select } from '../../../../../components/ui/app-select.jsx';
 import React from 'react';
-import { Select } from 'antd';
+
 
 /**
  * Marketing Manager Filters Component

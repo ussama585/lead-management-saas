@@ -1,6 +1,7 @@
+import { Select } from '../ui/app-select.jsx';
 import React, { useState } from 'react';
 import Chart from './apex-chart.jsx';
-import { Select } from 'antd';
+
 import dayjs from 'dayjs';
 import BootstrapDateRangeModal from '../bootstrap-date-range-modal.component.jsx';
 import { STATUS_OPTIONS as WEBSITE_LEAD_STATUS_OPTIONS } from '../../pages/leads/pages/website-leads/website-leads-constants.js';

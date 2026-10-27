@@ -1,5 +1,10 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Select } from './ui/app-select.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Button } from './ui/app-controls.jsx';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, Button, Input, Select, message, Alert } from 'antd';
+import { Alert } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { getClientDetails, createSaasClient } from '../pages/shared/services/headhunting.js';

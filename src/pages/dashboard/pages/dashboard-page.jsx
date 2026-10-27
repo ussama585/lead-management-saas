@@ -1,6 +1,8 @@
+import { Select } from '../../../components/ui/app-select.jsx';
+import { Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Select, Spin } from 'antd';
+
 import dayjs from 'dayjs';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import StatsCard from '../../../components/stats-card.component.jsx';

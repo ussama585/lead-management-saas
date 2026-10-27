@@ -1,7 +1,12 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Modal } from '../../components/ui/app-modal.jsx';
+import { Select } from '../../components/ui/app-select.jsx';
+import { Input } from '../../components/ui/app-controls.jsx';
+import { Spin, Button } from '../../components/ui/app-controls.jsx';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { Spin, Modal, Input, Button, Select, message } from 'antd';
+
 import { LoaderCircle as LoadingOutlined, FileText as FileTextOutlined, Pencil as EditOutlined, RefreshCw as SyncOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';

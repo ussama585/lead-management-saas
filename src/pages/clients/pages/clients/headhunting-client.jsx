@@ -1,3 +1,8 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button } from '../../../../components/ui/app-controls.jsx';
 import { useState, useMemo, useEffect, useRef, useCallback, Suspense } from 'react';
 
 import { useSearchParams } from "react-router-dom";
@@ -18,7 +23,7 @@ import { getRecruitmentExecutiveStats, getClientDetails, createSaasClient, getAs
 import { getManangersExecutives } from '../../../shared/services/users-service.js';
 import { useQuery, useQueryClient, useMutation } from 'react-query';
 import { citiesNames, countriesNames } from '../../../shared/utils/countries.js';
-import { Button, Input, Select, Modal, message } from 'antd';
+
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { getClientStatusHistory } from '../../../shared/services/status-history.js';
 import RemarksModal from '../../components/RemarksModal.jsx';

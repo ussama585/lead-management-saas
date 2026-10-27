@@ -1,6 +1,10 @@
+import { message } from '../../../components/ui/notifications.jsx';
+import { Modal } from '../../../components/ui/app-modal.jsx';
+import { Input } from '../../../components/ui/app-controls.jsx';
+import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Alert, Avatar, Button, Card, Input, Modal, Space, Spin, Switch, Table, Tag, message } from 'antd';
+import { Alert, Avatar, Card, Space, Switch, Table, Tag } from 'antd';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';

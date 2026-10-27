@@ -1,6 +1,9 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useState } from "react";
 import { useMutation } from "react-query";
-import { Button, message, Modal, Spin } from "antd";
+
 import { uploadCSVFileData } from "../pages/shared/services/headhunting.js"
 import { salesDataValidationSchema } from '../pages/shared/schemas/sales-data.js';
 import '../assets/styles/legacy/common.css';

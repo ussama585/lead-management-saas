@@ -1,6 +1,7 @@
+import { Select } from '../../../../components/ui/app-select.jsx';
 import React, { useState } from 'react';
 import StatsCard from '../../../../components/stats-card.component.jsx';
-import { Row, Col, Select } from 'antd';
+import { Row, Col } from 'antd';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';

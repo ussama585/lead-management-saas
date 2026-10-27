@@ -1,7 +1,8 @@
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo } from 'react';
 import { Box, Chip, Grid, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Spin } from 'antd';
+
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';

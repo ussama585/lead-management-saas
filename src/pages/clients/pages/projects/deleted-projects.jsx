@@ -1,6 +1,8 @@
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Tooltip } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback } from 'react';
 import { useQuery } from 'react-query';
-import { Modal, Tooltip } from 'antd';
+
 import { FileText as FilePdfOutlined } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';

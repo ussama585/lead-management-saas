@@ -1,7 +1,8 @@
+import { message } from '../../../components/ui/notifications.jsx';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Box, Button, IconButton, Alert } from '@mui/material';
 import { FileText as FilePdfOutlined } from 'lucide-react';
-import { message } from 'antd';
+
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';

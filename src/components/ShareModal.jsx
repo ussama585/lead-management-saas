@@ -1,5 +1,9 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Button, Tooltip, Spin } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Modal, Button, Row, Col, Input, Divider, Tooltip, message, Spin, Card, Space, Tag } from 'antd';
+import { Row, Col, Divider, Card, Space, Tag } from 'antd';
 import { MessageCircle as WhatsAppOutlined, Mail as MailOutlined, Copy as CopyOutlined, QrCode as QrcodeOutlined, Share2 as ShareAltOutlined, Link as LinkOutlined, Download as DownloadOutlined, CircleCheck as CheckCircleOutlined } from 'lucide-react';
 import { Typography } from 'antd';
 import '../assets/styles/legacy/common.css';

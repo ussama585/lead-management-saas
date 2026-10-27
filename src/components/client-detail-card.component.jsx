@@ -1,5 +1,8 @@
+import { message } from './ui/notifications.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Spin, Tooltip, Button } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { message, Spin, Input, Tooltip, Button } from 'antd';
+
 import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Pencil as EditOutlined } from 'lucide-react';
 import { useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';

@@ -1,8 +1,11 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import api from '../../../shared/services/api.js';
 import { followUpDurationSchema } from '../schemas/follow-up-duration-schema.js';
-import { Alert, Card, Typography, InputNumber, Button, Space, Table, Modal, message } from 'antd';
+import { Alert, Card, Typography, InputNumber, Space, Table } from 'antd';
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
 import { Clock, ListFilter, Ruler } from 'lucide-react';
 // import { Palette, RefreshCw } from 'lucide-react';

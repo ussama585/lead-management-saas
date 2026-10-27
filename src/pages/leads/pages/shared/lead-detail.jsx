@@ -1,7 +1,12 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Spin, Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect, Suspense } from 'react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import "../../../../assets/styles/legacy/leads.generated.css";
-import { Alert, Spin, message, Row, Col, Select, Modal, Input, Button } from 'antd';
+import { Alert, Row, Col } from 'antd';
 import { Trash2 as DeleteOutlined } from 'lucide-react';
 import LeadCard from '../../../../components/lead-card.component.jsx';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';

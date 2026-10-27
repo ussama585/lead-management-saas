@@ -1,8 +1,13 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button as AntButton } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback, useEffect, Suspense } from "react";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { message, Select, Modal, Input, Button as AntButton } from "antd";
+
 import { Trash2 as DeleteOutlined } from 'lucide-react';
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";

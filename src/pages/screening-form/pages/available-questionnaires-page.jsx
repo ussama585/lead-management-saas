@@ -1,5 +1,8 @@
+import { message } from '../../../components/ui/notifications.jsx';
+import { Modal } from '../../../components/ui/app-modal.jsx';
+import { Button } from '../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback } from 'react';
-import { Button, ConfigProvider, message, Modal, Space, Table, Tag, Typography } from 'antd';
+import { ConfigProvider, Space, Table, Tag, Typography } from 'antd';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import useUserStore from '../../shared/store/user-store.js';

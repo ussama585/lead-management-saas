@@ -1,5 +1,8 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Button } from './ui/app-controls.jsx';
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Card, Row, Col, Input, Typography } from 'antd';
+import { Card, Row, Col, Typography } from 'antd';
 import '../assets/styles/legacy/input-field.css';
 import '../assets/styles/legacy/common.css';
 import '../assets/styles/legacy/default-questionnaire-preview-modal.css';

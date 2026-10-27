@@ -1,5 +1,9 @@
+import { message } from './ui/notifications.jsx';
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Button } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Modal, Button, Card, Row, Col, Typography, message, Input } from 'antd';
+import { Card, Row, Col, Typography } from 'antd';
 import '../assets/styles/legacy/input-field.css';
 import { Plus as PlusOutlined } from 'lucide-react';
 

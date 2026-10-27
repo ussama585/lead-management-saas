@@ -1,7 +1,10 @@
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useEffect } from 'react';
 import moment from 'moment';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Spin, Input, Modal } from 'antd';
+
 import { Formik, Form, Field } from 'formik';
 import { LoaderCircle as LoadingOutlined, Info as InfoCircleOutlined, CircleHelp as QuestionCircleOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';

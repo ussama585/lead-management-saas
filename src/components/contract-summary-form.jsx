@@ -1,5 +1,7 @@
+import { Select } from './ui/app-select.jsx';
+import { Input } from './ui/app-controls.jsx';
 import React, { useMemo } from 'react';
-import { Input, Select } from 'antd';
+
 import { formatCurrencyInput, getCurrencySymbol, toNumericValue, normalizeJobId, formatNumber } from '../pages/shared/utils/job-utils.js';
 import { citiesNames } from '../pages/shared/utils/countries.js';
 import './contract-summary-form.css';

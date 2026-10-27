@@ -1,5 +1,7 @@
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback } from 'react';
-import { Alert, Button, Select, Spin } from 'antd';
+import { Alert } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';

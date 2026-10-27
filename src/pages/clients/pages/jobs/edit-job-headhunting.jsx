@@ -1,7 +1,9 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import JobForm from '../../../../components/job-form.component.jsx';
-import { Button, message } from 'antd';
+
 import { CircularProgress } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { editJobHeadhuntingValidationSchema } from '../../../shared/schemas/job.js';

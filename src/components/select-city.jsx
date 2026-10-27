@@ -1,5 +1,6 @@
+import { Input } from './ui/app-controls.jsx';
 import React, { useState, useEffect } from "react";
-import { AutoComplete, Input } from "antd";
+import { AutoComplete } from 'antd';
 import { citiesNames } from "../pages/shared/utils/countries.js";
 
 export default function CityAutoSelect ({ name, value, onChange }) {

@@ -1,5 +1,7 @@
+import { message } from '../../../components/ui/notifications.jsx';
+import { Select } from '../../../components/ui/app-select.jsx';
 import React from 'react';
-import { Select, message } from 'antd';
+
 import { getConversionToPotential, createOrUpdateConversionToPotential } from '../services/leads.js';
 
 const { Option } = Select;

@@ -1,6 +1,7 @@
+import { Button } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Button, Avatar, Badge, Menu, Dropdown, Typography, Space } from 'antd';
+import { Layout, Avatar, Badge, Menu, Dropdown, Typography, Space } from 'antd';
 import { Bell as BellOutlined, ChevronDown as DownOutlined, ChevronsLeft as DoubleLeftOutlined, ChevronsRight as DoubleRightOutlined, Menu as MenuOutlined } from 'lucide-react';
 import '../assets/styles/legacy/layout/top-bar.css'; // Ensure the CSS file is imported
 

@@ -1,5 +1,6 @@
+import { Select } from '../../../components/ui/app-select.jsx';
 import React from 'react';
-import { Select } from 'antd';
+
 import { MessageCircle as CommentOutlined, Pencil as EditOutlined, Trash2 as DeleteOutlined, CirclePlus as PlusCircleOutlined } from 'lucide-react';
 import { createAssignedToColumn } from '../../shared/utils/assignedToColumn.jsx';
 import formatDateUniversal from '../../shared/utils/formatDate.js';

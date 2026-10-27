@@ -1,7 +1,8 @@
+import { Modal } from '../../../components/ui/app-modal.jsx';
 import React, { useState } from 'react';
 import { Box, Button, Typography, Alert, CircularProgress } from '@mui/material';
 import { Download } from 'lucide-react';
-import { Modal } from 'antd';
+
 import useUserStore from '../../shared/store/user-store.js';
 import ResumeCvDetailGrid from './ResumeCvDetailGrid.jsx';
 import { buildDownloadUrl } from '../utils/candidateListingShared.js';

@@ -1,5 +1,6 @@
+import { Modal } from './ui/app-modal.jsx';
 import React from 'react';
-import { Alert, Modal } from 'antd';
+import { Alert } from 'antd';
 import { Trash2 } from 'lucide-react';
 
 export default function SettingsDeleteModal({ title, itemName, open, loading, error, onConfirm, onCancel }) {

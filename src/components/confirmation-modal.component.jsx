@@ -1,5 +1,8 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Input } from './ui/app-controls.jsx';
+import { Spin, Button } from './ui/app-controls.jsx';
 import React from "react";
-import { Spin, Modal, Button, Input } from 'antd';
+
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 
 const { TextArea } = Input;

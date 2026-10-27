@@ -1,7 +1,9 @@
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Spin, Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from 'react-query';
-import { Spin, Modal, Button } from 'antd';
+
 import { LoaderCircle as LoadingOutlined, FileText as FileTextOutlined, Info as InfoCircleOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';

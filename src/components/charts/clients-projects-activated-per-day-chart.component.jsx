@@ -1,6 +1,7 @@
+import { Select } from '../ui/app-select.jsx';
 import React, { useState, useMemo } from 'react';
 import Chart from './apex-chart.jsx';
-import { Select } from 'antd';
+
 import dayjs from 'dayjs';
 import BootstrapDateRangeModal from '../bootstrap-date-range-modal.component.jsx';
 import '../../assets/styles/legacy/clients-projects-activated-per-day-chart.component.css';

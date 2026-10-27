@@ -1,5 +1,7 @@
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React from 'react';
-import { Modal, Progress, Spin, Alert } from 'antd';
+import { Progress, Alert } from 'antd';
 import { Clock as ClockCircleOutlined, LoaderCircle as LoadingOutlined } from 'lucide-react';
 import ProfileImagePlaceholder from '../../../../assets/images/user-card-icons/user-placeholder.svg';
 

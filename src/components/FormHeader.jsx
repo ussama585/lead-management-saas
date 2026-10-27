@@ -1,5 +1,6 @@
+import { Input } from './ui/app-controls.jsx';
 import React from 'react';
-import { Input, Row, Col } from 'antd';
+import { Row, Col } from 'antd';
 import '../assets/styles/legacy/global.generated.css';
 
 const FormHeader = ({

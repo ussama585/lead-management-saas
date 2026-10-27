@@ -1,6 +1,10 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Input } from '../../../../components/ui/app-controls.jsx';
+import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Input, Col, Row, Select, Divider, Form, message, Spin } from 'antd';
+import { Col, Row, Divider, Form } from 'antd';
 import { useQuery, useMutation } from 'react-query';
 import { FieldArray, FormikProvider, useFormik } from "formik";
 import { Trash2 as DeleteOutlined, Plus as PlusOutlined } from 'lucide-react';

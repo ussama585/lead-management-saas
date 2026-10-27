@@ -1,7 +1,8 @@
+import { Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState } from 'react';
 import { Box, Button as MuiButton } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Space } from 'antd';
+import { Space } from 'antd';
 import { useQuery } from 'react-query';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';

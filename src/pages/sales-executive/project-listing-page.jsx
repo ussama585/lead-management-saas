@@ -1,7 +1,10 @@
+import { Modal } from '../../components/ui/app-modal.jsx';
+import { Input } from '../../components/ui/app-controls.jsx';
+import { Spin, Button } from '../../components/ui/app-controls.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
-import { Spin, Modal, Form, Input, Button, Row, Col, Table, Avatar, DatePicker } from 'antd';
+import { Form, Row, Col, Table, Avatar, DatePicker } from 'antd';
 import { LoaderCircle as LoadingOutlined, User as UserOutlined, CircleHelp as QuestionCircleOutlined, DollarSign as DollarOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import StatsCard from '../../components/stats-card.component.jsx';

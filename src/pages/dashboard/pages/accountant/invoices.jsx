@@ -1,10 +1,14 @@
+import { message } from '../../../../components/ui/notifications.jsx';
+import { Modal } from '../../../../components/ui/app-modal.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { Tooltip } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import dayjs from 'dayjs';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
-import { Modal, Tooltip, Select, message } from 'antd';
+
 import { FileImage as FileImageOutlined, MessageCircle as CommentOutlined } from 'lucide-react';
 import ApprovalStatusTabs from '../../../../components/approval-status-tabs.component.jsx';
 import { ConfirmationModal } from '../../../clients/components/LazyModals.jsx';

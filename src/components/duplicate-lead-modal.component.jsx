@@ -1,5 +1,7 @@
+import { Modal } from './ui/app-modal.jsx';
+import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useMemo } from 'react';
-import { Modal, Button, Descriptions, Typography, Space, Spin, Alert } from 'antd';
+import { Descriptions, Typography, Space, Alert } from 'antd';
 import { Info as InfoCircleOutlined, Eye as EyeOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';

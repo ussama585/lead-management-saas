@@ -1,5 +1,6 @@
+import { Modal } from '../../../components/ui/app-modal.jsx';
 import React, { useEffect } from 'react';
-import { Modal } from 'antd';
+
 import { Box, Typography, CircularProgress, Alert, Chip, Grid, Divider } from '@mui/material';
 import { BriefcaseBusiness as Work, User as Person, MapPin as LocationOn, Folder } from 'lucide-react';
 

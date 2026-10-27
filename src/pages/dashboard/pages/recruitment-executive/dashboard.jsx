@@ -1,6 +1,7 @@
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React from 'react';
 import { useQuery } from 'react-query';
-import { Spin, Alert } from 'antd';
+import { Alert } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { getRecruitmentExecutiveStats } from '../../../shared/services/stats-service.js';
 import StatsCard from '../../../../components/stats-card.component.jsx';

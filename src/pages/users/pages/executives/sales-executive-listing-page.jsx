@@ -1,7 +1,8 @@
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import { Spin } from 'antd';
+
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';

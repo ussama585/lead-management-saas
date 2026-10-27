@@ -1,3 +1,4 @@
+import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo } from 'react';
 import {
   Box, Chip, Divider, Grid, IconButton, Paper, Stack,
@@ -7,7 +8,7 @@ import {
 import { Copy as CopyOutlined, Eye as EyeOutlined, Globe as GlobalOutlined, Link as LinkOutlined, Minus as MinusOutlined, TrendingUp as RiseOutlined } from 'lucide-react';
 import Chart from '../../../../components/charts/apex-chart.jsx';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Spin } from 'antd';
+
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';

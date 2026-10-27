@@ -1,5 +1,7 @@
+import { Select } from '../../../components/ui/app-select.jsx';
+import { Tooltip } from '../../../components/ui/app-controls.jsx';
 import { useMemo } from 'react';
-import { Select, Switch, Tooltip } from 'antd';
+import { Switch } from 'antd';
 import { FileText as FilePdfOutlined, Pencil as EditOutlined, Trash2 as DeleteOutlined, MessageSquare as MessageOutlined, ChartBar as AuditOutlined, Info as InfoCircleOutlined, DollarSign as DollarOutlined } from 'lucide-react';
 import { createStatusHistoryColumn } from '../../../components/status-history-modal.jsx';
 import { ApprovalPill } from '../utils/project-columns.jsx';

@@ -1,6 +1,9 @@
+import { message } from '../../components/ui/notifications.jsx';
+import { Select } from '../../components/ui/app-select.jsx';
+import { Button, Tooltip } from '../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useCallback, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Select, message, Tooltip } from 'antd';
+
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';
 import { Trash2 as DeleteOutlined, Pencil as EditOutlined, MessageSquare as MessageOutlined } from 'lucide-react';
