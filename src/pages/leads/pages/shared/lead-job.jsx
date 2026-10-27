@@ -518,6 +518,7 @@ const isReadOnlyPage = isLeadReadOnly(leadDetailData);
 
      
         <JobForm
+          manualLocation={isRegularLead}
           initialValues={formInitialValues}
           validationSchema={commonJobFormSchema}
           onSubmit={handleSubmit}

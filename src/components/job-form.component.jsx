@@ -271,6 +271,7 @@ const JobForm = ({
   showValidationErrors = true,
   onFormikReady,
   dateOnly = false,
+  manualLocation = false,
   allowPastDates = false,
   readOnlyMode = false,
   hideSubmitButton = false,
@@ -759,6 +760,17 @@ const JobForm = ({
 
           <Col span={6}>
             <label htmlFor="location_city" className="form-label text-start mt-3 mb-1">City*</label>
+            {manualLocation ? <Input
+              id="location_city"
+              name="location_city"
+              disabled={isFormDisabled}
+              className="antd-input"
+              placeholder="Enter city"
+              value={formik.values.location_city || ''}
+              onChange={formik.handleChange}
+              onBlur={getSelectBlur('location_city')}
+              status={formik.errors.location_city && formik.touched.location_city ? 'error' : ''}
+            /> : (
             <Select
               disabled={isFormDisabled}
               className="antd-input dropdown"
@@ -771,11 +783,23 @@ const JobForm = ({
               status={formik.errors.location_city && formik.touched.location_city ? 'error' : ''}
               onBlur={getSelectBlur('location_city')}
             />
+            )}
             {formik.errors.location_city && formik.touched.location_city && <div className="text-red">{formik.errors.location_city}</div>}
           </Col>
 
           <Col span={6}>
             <label htmlFor="location_country" className="form-label text-start mt-3 mb-1">Country*</label>
+            {manualLocation ? <Input
+              id="location_country"
+              name="location_country"
+              disabled={isFormDisabled}
+              className="antd-input"
+              placeholder="Enter country"
+              value={formik.values.location_country || ''}
+              onChange={formik.handleChange}
+              onBlur={getSelectBlur('location_country')}
+              status={formik.errors.location_country && formik.touched.location_country ? 'error' : ''}
+            /> : (
             <Select
               disabled={isFormDisabled}
               className="antd-input dropdown"
@@ -788,6 +812,7 @@ const JobForm = ({
               onBlur={getSelectBlur('location_country')}
               status={formik.errors.location_country && formik.touched.location_country ? 'error' : ''}
             />
+            )}
             {formik.errors.location_country && formik.touched.location_country && (
               <div className="text-red">{formik.errors.location_country}</div>
             )}

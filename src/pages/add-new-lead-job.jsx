@@ -158,9 +158,7 @@ const NewLeadJobPage = () => {
 
         const baseRoute = isMetaLead ? 'meta-leads' : 'leads';
 
-        const identifier = location.state?.identifier;
-        const detailQuery = !isMetaLead && identifier ? `?identifier=${encodeURIComponent(identifier)}` : '';
-        navigate(getRolePath(user?.user_type, `/${baseRoute}/${id}${detailQuery}`));
+        navigate(getRolePath(user?.user_type, `/${baseRoute}/${id}`));
     };
 
 
@@ -205,6 +203,7 @@ const NewLeadJobPage = () => {
 
             
                 <JobForm
+                    manualLocation={!isMetaLead && !isDataLeads}
                     initialValues={initialValues}
                     validationSchema={commonJobFormSchema}
                     onSubmit={onSubmit}
