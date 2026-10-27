@@ -23,6 +23,7 @@ import {
 } from "../shared/services/users-service.js";
 import useUserStore from "../shared/store/user-store.js";
 import { isSuperAdmin } from '../auth/role-access.js';
+import { getRolePath } from '../auth/role-home.js';
 import { ConfirmationModal } from "../clients/components/LazyModals.jsx";
 import { formatDateUniversal } from "../shared/utils/formatDate.js";
 
@@ -102,11 +103,12 @@ const DataEntryTable = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
   const superAdmin = isSuperAdmin(user?.user_type);
+  const canViewUserTabs = superAdmin || ['company_admin', 'sales_manager'].includes(user?.user_type);
   const [companyId, setCompanyId] = useState(null);
   const companyParams = superAdmin && companyId != null ? { company_id: companyId } : {};
-  const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
-    enabled: superAdmin, refetchOnWindowFocus: false, keepPreviousData: true,
-  });
+  // const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
+  //   enabled: superAdmin, refetchOnWindowFocus: false, keepPreviousData: true,
+  // });
   
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -328,11 +330,11 @@ const DataEntryTable = () => {
               <Avatar size={40} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>
                 {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
               </Avatar>
-            {user.user_type === "admin" ? (
+            {superAdmin ? (
               <a
                 style={{ textDecoration: "underline", color: "#3E6A9F" }}
-                href={`/data-entry/edit/${row.original.id}`}
-                onClick={(e) => { e.preventDefault(); navigate(`/data-entry/edit/${row.original.id}`); }}
+                href={getRolePath(user?.user_type, `/data-entry/edit/${row.original.id}`)}
+                onClick={(e) => { e.preventDefault(); navigate(getRolePath(user?.user_type, `/data-entry/edit/${row.original.id}`)); }}
               >
                 {cell.getValue()}
               </a>
@@ -429,7 +431,7 @@ const DataEntryTable = () => {
     async function fetchExecutivesForTabs() {
       try {
         let data = [];
-        if (superAdmin || user.user_type === "sales_manager") {
+        if (canViewUserTabs) {
           data = await getExecutives();
         }
         setExecutivesList(Array.isArray(data) ? data : []);
@@ -437,10 +439,10 @@ const DataEntryTable = () => {
         setExecutivesList([]);
       }
     }
-    if (superAdmin || user.user_type === "sales_manager") {
+    if (canViewUserTabs) {
       fetchExecutivesForTabs();
     }
-  }, [user.user_type]);
+  }, [user.id, user.user_type, canViewUserTabs]);
 
   // Fetch assignable users for dropdowns (Assign to)
  React.useEffect(() => {
@@ -736,7 +738,7 @@ const DataEntryTable = () => {
         )}
       </Modal>
       <div className="listing-page-content">
-        {superAdmin && <div className="flex flex-wrap items-center gap-3">
+        {/* {superAdmin && <div className="flex flex-wrap items-center gap-3">
           <label htmlFor="sales-data-company-filter">Company</label>
           <Select id="sales-data-company-filter" aria-label="Filter sales data by company" showSearch allowClear
             optionFilterProp="label" placeholder="All companies" value={companyId ?? undefined}
@@ -748,7 +750,7 @@ const DataEntryTable = () => {
               setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null); }} />
           {companies.isError && <Alert type="error" message={companies.error?.message || 'Could not load companies.'}
             action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}
-        </div>}
+        </div>} */}
         <div className="listing-toolbar-flex">
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
             {user.user_type === "admin" && (
@@ -784,7 +786,7 @@ const DataEntryTable = () => {
               />
             </div>
 
-            {(superAdmin || user.user_type === "sales_manager") && selectedTab === "assigned" && (
+            {canViewUserTabs && (
               <div
                 style={{
                   display: "flex",
@@ -813,6 +815,8 @@ const DataEntryTable = () => {
                       onClick={() => {
                         const next =
                           selectedExecId === exec.id ? null : exec.id;
+                        setSelectedTab("assigned");
+                        setStatusFilter("");
                         setSelectedExecId(next);
                         setPagination({ pageIndex: 0, pageSize: 10 });
                       }}

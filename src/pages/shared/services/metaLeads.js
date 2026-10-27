@@ -26,13 +26,8 @@ const toCommaSeparatedQueryParam = (value) => {
 // Meta Leads - Reassign lead to user
 export const reassignMetaLead = async (leadId, userId) => {
   try {
-    const formData = new FormData();
-    formData.append('user_id', userId);
-    
-    const response = await api.post(`/meta-leads/reassign/${leadId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const response = await api.patch(`/meta-leads/lead/${leadId}`, {
+      assigned_to: userId,
     });
     return response.data;
   } catch (error) {
@@ -280,13 +275,8 @@ export const getMetaLeadHistoryTrack = async (leadId) => {
 // Meta Leads - Update project size
 export const updateMetaLeadProjectSize = async (leadId, projectSize) => {
   try {
-    const formData = new FormData();
-    formData.append('project_size', projectSize);
-    
-    const response = await api.patch(`/meta-leads/update-project-size/${leadId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const response = await api.patch(`/meta-leads/update-project-size/${leadId}`, {
+      project_size: projectSize,
     });
     return response.data;
   } catch (error) {

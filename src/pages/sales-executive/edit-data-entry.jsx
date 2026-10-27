@@ -14,6 +14,8 @@ import { getDataEntryById, updateDataEntryById } from '../shared/services/data-e
 import { message } from 'antd';
 import { citiesNames, countriesNames } from '../shared/utils/countries.js';
 import { useFormik } from 'formik';
+import useUserStore from '../shared/store/user-store.js';
+import { getRolePath } from '../auth/role-home.js';
 
 const industryOptions = [
     { label: "Technology", value: "Technology" },
@@ -50,6 +52,7 @@ const initialState = {
 const EditDataEntry = () => {
   const requiredMark = <span style={{ color: '#3E6A9F', marginLeft: 2 }}>*</span>;
   const navigate = useNavigate();
+  const user = useUserStore(state => state.user);
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [initialValues, setInitialValues] = useState(initialState);
@@ -81,9 +84,7 @@ const EditDataEntry = () => {
     {
       onSuccess: (data) => {
         message.success(data?.message || 'Data updated successfully');
-        if (!id) {
-          navigate(-1); // Only redirect if it's "Add" mode
-        }
+        navigate(getRolePath(user?.user_type, '/data-entry-table'), { replace: true });
       },
       onError: (error) => {
         message.error(error?.message || 'Failed to update data entry');

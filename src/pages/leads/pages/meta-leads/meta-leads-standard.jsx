@@ -670,6 +670,8 @@ export default function MetaLeadsStandard() {
     }] : []),
     // Status column — use createStatusColumn for all users (it handles permissions based on converted_to_client)
       createStatusColumn({
+        editableRoles: ['super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
+        statusOptions: STATUS_OPTIONS,
         statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
         statusColors,
         userType: user?.user_type,
@@ -1263,13 +1265,7 @@ export default function MetaLeadsStandard() {
         return acc;
       }, {});
 
-      // Ensure required fields have values from lead if not in contract data
-      if (filteredContractData.total_vacancies === undefined && remarksModal.lead?.total_vacancies !== undefined) {
-        filteredContractData.total_vacancies = remarksModal.lead.total_vacancies;
-      }
-      if (filteredContractData.job_count === undefined && remarksModal.lead?.job_count !== undefined) {
-        filteredContractData.job_count = remarksModal.lead.job_count;
-      }
+      // Job totals come only from an explicit proposal/contract submission.
       if (!filteredContractData.selected_job_ids) {
         filteredContractData.selected_job_ids = [];
       }
