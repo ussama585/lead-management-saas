@@ -20,15 +20,10 @@ import { getRolePath } from '../../../auth/role-home.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
 
 export async function getWebsiteLeadDetail(identifier) {
-    console.log('Fetching lead:', identifier);
 
     const { data } = await api.get(
-        `/lead-generation/job/${encodeURIComponent(identifier)}`
+        `/lead-generation/update/${encodeURIComponent(identifier)}`
     );
-
-    console.log('API Response:', data);
-    console.log('ID:', data?.id);
-    console.log('Condition:', data?.id == null);
 
     if (data?.id == null) {
         console.trace('Invalid lead details:', identifier);
