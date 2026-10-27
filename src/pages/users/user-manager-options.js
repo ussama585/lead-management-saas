@@ -11,13 +11,8 @@ export function managerIdFromOptions(managers, user) {
   const selected = managerFromUser(user);
   const id = selectedManagerId(selected);
   if (!Array.isArray(managers)) return '';
-  const byId = managers.find(manager => String(manager.id) === String(id));
-  if (byId) return byId.id;
-  // Older detail responses contained an account ID. Resolve it only when the
-  // returned name uniquely identifies a manager in this company's simple list.
-  const byName = typeof selected === 'object' && selected?.name
-    ? managers.filter(manager => manager.name === selected.name) : [];
-  return byName.length === 1 ? byName[0].id : '';
+  const byId = managers.find(manager => manager.user_id != null && String(manager.user_id) === String(id));
+  return byId?.user_id ?? '';
 }
 
 export function withSelectedManager(managers, selected) {

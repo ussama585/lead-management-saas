@@ -1,5 +1,17 @@
 import api from './api.js';
 
+export const getMetaLeadHistory = async (leadId) => {
+  const { data } = await api.get(`/meta-leads/history/${encodeURIComponent(leadId)}`);
+  if (!Array.isArray(data)) throw new Error(data?.message || 'Could not load meta lead history.');
+  return data;
+};
+
+export const getMetaLeadJobHistory = async (jobId) => {
+  const { data } = await api.get(`/meta-leads/job-history/${jobId}`);
+  if (!Array.isArray(data)) throw new Error('Could not load meta lead job history.');
+  return data;
+};
+
 /** Serialize filter values for query params (comma-separated). */
 const toCommaSeparatedQueryParam = (value) => {
   if (value == null || value === '') return null;
@@ -101,7 +113,7 @@ export const getMetaLeadsListCount = async (page = 1, startDate = null, endDate 
     const endpoint = `/meta-leads/list-count`;
     
     const params = {
-      page: page,
+      // page: page,
     };
     
     if (startDate) {

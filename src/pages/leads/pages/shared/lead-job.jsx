@@ -80,21 +80,12 @@ const isLeadReadOnly = (lead) =>
     navigate(getRolePath(user?.user_type, `/leads/${leadIdentifier}`));
     return;
   }
-  let basePath;
-  if (user?.user_type === "admin") {
-    basePath = "/admin";
-  } else if (user?.user_type === "sales_manager") {
-    basePath = "/sales-manager";
-  } else {
-    basePath = "/sales-executive";
-  }
-
   if (isMetaLead) {
-    navigate(`${basePath}/meta-leads/${leadIdentifier}`);
+    navigate(getRolePath(user?.user_type, `/meta-leads/${leadIdentifier}`));
   } else if (isDataLead) {
     navigate(`/data-lead/${leadIdentifier}`);
   } else {
-    navigate(`${basePath}/leads/${leadIdentifier}`);
+    navigate(getRolePath(user?.user_type, `/leads/${leadIdentifier}`));
   }
 };
 

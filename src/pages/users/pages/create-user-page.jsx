@@ -128,7 +128,7 @@ export default function CreateUser() {
               { label: 'Confirm Password', value: previewValues.confirmPassword, secret: true },
               { label: 'User Type', value: previewValues.user_type?.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) },
               ...(superAdmin ? [{ label: 'Company', value: companies.find(company => String(company.id) === String(previewValues.company_id))?.name }] : []),
-              ...(previewValues.user_type === 'sales_executive' ? [{ label: 'Manager', value: managerList.find(manager => String(manager.id) === String(previewValues.manager))?.name }] : []),
+              ...(previewValues.user_type === 'sales_executive' ? [{ label: 'Manager', value: managerList.find(manager => String(manager.user_id) === String(previewValues.manager))?.name }] : []),
             ]}
 
           />
@@ -353,7 +353,7 @@ export default function CreateUser() {
                             managerList.map((item) => (
                               <Option
                                 key={item?.id}
-                                value={item?.id}
+                                value={item?.user_id}
                                 className="option"
                               >
                                 {item?.name}

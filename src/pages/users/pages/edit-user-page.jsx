@@ -182,7 +182,7 @@ export default function EditUser() {
                 { label: 'New Password', value: previewValues.password, secret: true },
                 { label: 'User Type', value: ManagerType?.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) },
                 ...(['sales_executive', 'recruitment_executive'].includes(ManagerType) ? [
-                  { label: 'Manager', value: managerOptions.find(manager => String(manager.id) === String(previewValues.manager))?.name },
+                  { label: 'Manager', value: managerOptions.find(manager => String(manager.user_id) === String(previewValues.manager))?.name },
                 ] : []),
               ]}
             />
@@ -328,7 +328,7 @@ export default function EditUser() {
                               managerOptions.map((item) => (
                                 <Option
                                   key={item?.id}
-                                  value={item?.id}
+                                  value={item?.user_id}
                                   className="option"
                                 >
                                   {item?.name}

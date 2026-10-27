@@ -19,7 +19,7 @@ import {
   getMetaLeadsAdsetListByCampaign,
   getMetaLeadsAdsListByAdset,
   updateMetaLeadProjectSize,
-  getMetaLeadHistoryTrack,
+  getMetaLeadHistory,
   getMetaLeadFormNameList,
 } from '../../../shared/services/metaLeads.js';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
@@ -266,9 +266,9 @@ export default function MetaLeadsMarketingManager() {
   };
 
   // Project size permissions
-  const canViewProjectSize = ['admin', 'marketing_manager', 'sales_manager', 'sales_executive'].includes(user?.user_type);
+  const canViewProjectSize = ['super_admin', 'marketing_manager', 'sales_manager', 'sales_executive'].includes(user?.user_type);
   const canEditProjectSize = (lead) => {
-    if (user?.user_type === 'admin' || user?.user_type === 'sales_manager') {
+    if (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager') {
       return true;
     }
     if (user?.user_type === 'sales_executive') {
@@ -471,7 +471,7 @@ export default function MetaLeadsMarketingManager() {
 
   // Build executives list including current user for sales managers (same as leads.jsx)
   const executivesList = useMemo(() => {
-    if (user?.user_type === 'admin') {
+    if (user?.user_type === 'super_admin') {
       // For admin, data from getManangersExecutives() is directly the array
       const allUsers = assigningUsersData || [];
       return allUsers;
@@ -1864,7 +1864,8 @@ export default function MetaLeadsMarketingManager() {
           open={statusHistoryModal.visible}
           entity={statusHistoryModal.lead}
           onClose={() => setStatusHistoryModal({ visible: false, lead: null })}
-          fetchHistoryApi={getMetaLeadHistoryTrack}
+          fetchHistoryApi={getMetaLeadHistory}
+          historyDateKey="changed_at"
           getTitleFromEntity={(lead) => lead?.company_name || 'Lead'}
           renderSummary={(lead) => (
             <>

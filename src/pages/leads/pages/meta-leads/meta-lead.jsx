@@ -7,14 +7,17 @@ import { Trash2 as DeleteOutlined } from 'lucide-react';
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
+import StatusHistoryModal, { createStatusHistoryColumn } from "../../../../components/status-history-modal.jsx";
 import { ConfirmationModal } from "../../../clients/components/LazyModals.jsx";
 import api from "../../../shared/services/api.js";
 import {
   getMetaLeadDetail,
+  getMetaLeadJobHistory,
   updateMetaLeadJobById,
   deleteMetaLeadJob,
 } from "../../../shared/services/metaLeads.js";
 import useUserStore from "../../../shared/store/user-store.js";
+import { getRoleHome } from "../../../auth/role-home.js";
 import { countriesNames, citiesNames, currencyOptions, paymentTermOptions } from "../../../shared/utils/countries.js";
 import { loadTableState } from "../../../shared/utils/persistTableState.js";
 import { formatSalaryNum } from "../../../shared/utils/formatters.js";
@@ -57,6 +60,7 @@ const MetaLead = () => {
   const [descLoading, setDescLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ visible: false, job: null });
   const [deleteReason, setDeleteReason] = useState("");
+  const [historyJob, setHistoryJob] = useState(null);
 
   // Persist table state to sessionStorage
   useEffect(() => {
@@ -166,7 +170,7 @@ const MetaLead = () => {
 
     leadForCard?.converted_to_client === true
 
-  const canDeleteJob = (user?.user_type === "admin" || user?.user_type === "sales_manager") && !isReadOnlyLead;
+  const canDeleteJob = (user?.user_type === "super_admin" || user?.user_type === "sales_manager") && !isReadOnlyLead;
 
   const formatDate = useCallback((value) => {
     if (!value) return "—";
@@ -180,11 +184,7 @@ const MetaLead = () => {
         });
   }, []);
 
-  const routePrefix = useMemo(() => {
-    if (user?.user_type === "admin") return "/admin";
-    if (user?.user_type === "sales_executive") return "/sales-executive";
-    return "/sales-manager";
-  }, [user?.user_type]);
+  const routePrefix = getRoleHome(user?.user_type);
 
   const handleCreateJob = useCallback(() => {
     if (!leadId) return;
@@ -667,6 +667,12 @@ const MetaLead = () => {
           },
         ]
       : []),
+    createStatusHistoryColumn({
+      header: 'History',
+      accessorKey: 'job_history',
+      buttonTitle: 'View Job History',
+      onOpenHistory: setHistoryJob,
+    }),
     ],
     [navigate, routePrefix, leadId, normalizeEmploymentType, refetchJobs, isReadOnlyLead, canDeleteJob, handleDeleteJob],
   );
@@ -757,16 +763,7 @@ const MetaLead = () => {
   });
 
 const getMetaLeadUrl = () => {
-  switch (user?.user_type) {
-    case "admin":
-      return `/admin/meta-leads`;
-    case "sales_manager":
-      return `/sales-manager/meta-leads`;
-    case "sales_executive":
-      return `/sales-executive/meta-leads`;
-    default:
-      return `/meta-leads`;
-  }
+  return `${routePrefix}/meta-leads`;
 };
 
   return (
@@ -859,6 +856,17 @@ const getMetaLeadUrl = () => {
         </div>
       </Modal>
 
+      <StatusHistoryModal
+        open={historyJob != null}
+        entity={historyJob}
+        onClose={() => setHistoryJob(null)}
+        fetchHistoryApi={getMetaLeadJobHistory}
+        title={job => `Meta Lead Job History - ${job?.job_title || 'Job'}`}
+        getTitleFromEntity={job => job?.job_title || 'Job'}
+        historyDateKey="changed_at"
+        queryKeyPrefix={`metaLeadJobHistory-${user?.id}-${user?.user_type}-${leadId}`}
+        emptyMessage="No job history available."
+      />
       <Suspense fallback={null}>
         <ConfirmationModal
           showModal={deleteModal.visible}

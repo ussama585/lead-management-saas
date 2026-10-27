@@ -3,8 +3,9 @@ import { managerFromUser, managerIdFromOptions, selectedManagerId, withSelectedM
 
 const selected = { id: 21, name: 'Company 4 Manager', email: 'company4manager.sop@gmail.com', user_type: 'sales_manager' };
 describe('nested manager details in both edit-user forms', () => {
-  it('resolves an older account ID to the company simple-list manager ID', () => {
-    expect(managerIdFromOptions([{ id: 6, name: 'Company 4 Manager' }], { manager_id: 21, manager_name: 'Company 4 Manager' })).toBe(6);
+  it('selects the simple-list user_id rather than the manager record ID', () => {
+    expect(managerIdFromOptions([{ id: 6, user_id: 21, name: 'Company 4 Manager' }], { manager_id: 21, manager_name: 'Company 4 Manager' })).toBe(21);
+    expect(managerIdFromOptions([{ id: 6, user_id: 21, name: 'Company 4 Manager' }], { manager_id: 6 })).toBe('');
     expect(managerIdFromOptions([{ id: 6, name: 'Same' }, { id: 8, name: 'Same' }], { manager_id: 21, manager_name: 'Same' })).toBe('');
   });
   it('maps the new manager_id and manager_name response into the selected option', () => {

@@ -382,8 +382,8 @@ export default function AppLayout({ children, role }) {
   const roleMenuMap = {
     admin: [
       { key: '2', icon: <SettingOutlined className={getIconStyle('2').className} />, label: 'User Management' },
-      { key: '3', icon: <UserPlus className={getIconStyle('3').className} />, label: 'Sales Managers' },
-      { key: '4', icon: <UserStar className={getIconStyle('4').className} />, label: 'Sales Executives' },
+      // { key: '3', icon: <UserPlus className={getIconStyle('3').className} />, label: 'Sales Managers' },
+      // { key: '4', icon: <UserStar className={getIconStyle('4').className} />, label: 'Sales Executives' },
       ...(isSuperAdmin(signedInUser?.user_type) ? [{ key: '26', icon: <Building2 />, label: 'Companies' }] : []),
       { key: '14', icon: <FolderOpenOutlined className={getIconStyle('14').className} />, label: 'CV Pool' },
       { key: '16', icon: <AimOutlined className={getIconStyle('16').className} />, label: 'Questionnaires' },

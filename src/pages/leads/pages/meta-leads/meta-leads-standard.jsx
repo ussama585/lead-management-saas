@@ -11,7 +11,7 @@ import { getMetaLeadsAssignedUsers, addMetaLeadsUserAssignments, removeMetaLeads
 import { createAssignedToColumn } from '../../../shared/utils/assignedToColumn.jsx';
 import { loadTableState } from '../../../shared/utils/persistTableState.js';
 
-import {getMetaLeadsStats, getMetaLeadsListCount,updateMetaLeadProjectSize, createMetaLeadFollowUp} from '../../../shared/services/metaLeads.js'
+import {getMetaLeadsStats, getMetaLeadsListCount,updateMetaLeadProjectSize, createMetaLeadFollowUp, getMetaLeadHistory} from '../../../shared/services/metaLeads.js'
   // getMetaLeadsCampaignNameList, getMetaLeadsAdsetNameList, getMetaLeadsAdNameList, getMetaLeadsListWithHistory, getMetaLeadsAdsetListByCampaign, getMetaLeadsAdsListByAdset, 
 import { getMetaLeadsList } from '../../../shared/services/metaLeads.js';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
@@ -21,6 +21,7 @@ import {  updateMetaLeadStatus } from '../../../shared/services/headhunting.js';
 import { getManangersExecutives } from '../../../shared/services/users-service.js';
 import { reassignMetaLead } from '../../../shared/services/metaLeads.js'
 import useUserStore from '../../../shared/store/user-store.js';
+import { getRoleHome } from '../../../auth/role-home.js';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
 import ShowRemarksLead from '../../../../components/show-remarks-lead.jsx';
 import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
@@ -140,7 +141,7 @@ export default function MetaLeadsStandard() {
   const [showDateModal, setShowDateModal] = useState(false);
   const [datePickerResetKey, setDatePickerResetKey] = useState(0);
   const [selectedExecId, setSelectedExecId] = useState(null);
-  const [statusFilter, setStatusFilter] = useState(initialState.statusFilter || 'All');
+  const [statusFilter, setStatusFilter] = useState(STATUS_OPTIONS.includes(initialState.statusFilter) ? initialState.statusFilter : 'All');
   const [selectedProjectSize, setSelectedProjectSize] = useState(null);
   const [updatingProjectSizeId, setUpdatingProjectSizeId] = useState(null);
   const [projectSizeFilter, setProjectSizeFilter] = useState(initialState.projectSizeFilter || null);
@@ -156,17 +157,12 @@ export default function MetaLeadsStandard() {
   
   // Duplicate lead hook
   const { duplicateModal, openDuplicateModal, closeDuplicateModal, isDuplicate, getRowStyle } = useDuplicateLead();
-  const metaLeadDetailBasePath = useMemo(() => {
-    if (user?.user_type === "admin") return "/admin";
-    if (user?.user_type === "sales_executive") return "/sales-executive";
-    return "/sales-manager";
-  }, [user?.user_type]);
+  const metaLeadDetailBasePath = getRoleHome(user?.user_type);
 
   const [proposalFile, setProposalFile] = useState(null);
   const proposalInputRef = useRef(null);
   const [statusHistoryModal, setStatusHistoryModal] = useState({ visible: false, lead: null });
   const [extraDataModal, setExtraDataModal] = useState({ visible: false, data: [], leadName: '' });
-  const fetchStatusHistoryPlaceholder = async () => Promise.resolve([]);
   const [followUpModal, setFollowUpModal] = useState({ visible: false, lead: null });
   const [userAssignmentModalVisible, setUserAssignmentModalVisible] = useState(false);
 
@@ -219,9 +215,9 @@ export default function MetaLeadsStandard() {
   };
 
   // Project size permissions
-  const canViewProjectSize = ['admin', 'marketing_manager', 'sales_manager', 'sales_executive'].includes(user?.user_type);
+  const canViewProjectSize = ['super_admin', 'marketing_manager', 'sales_manager', 'sales_executive'].includes(user?.user_type);
   const canEditProjectSize = (lead) => {
-    if (user?.user_type === 'admin' || user?.user_type === 'sales_manager') {
+    if (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager') {
       return true;
     }
     if (user?.user_type === 'sales_executive') {
@@ -231,7 +227,7 @@ export default function MetaLeadsStandard() {
   };
 
   // Check if user is admin or manager
-  const canAssign = user?.user_type === 'admin' || user?.user_type === 'sales_manager';
+  const canAssign = user?.user_type === 'super_admin' || user?.user_type === 'sales_manager';
 
   // Meta leads stats query
   const {
@@ -239,14 +235,13 @@ export default function MetaLeadsStandard() {
     isLoading: loadingMetaLeadsStats,
     refetch: refetchMetaLeadsStats
   } = useQuery(
-    ['metaLeadsStats', dateRange, selectedExecId],
+    ['metaLeadsStats', dateRange],
     () => getMetaLeadsStats(
       dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'),
       dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ'),
       null // No campaign filter for standard users
     ),
     {
-      enabled: canAssign,
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false
@@ -388,7 +383,7 @@ export default function MetaLeadsStandard() {
   const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
     queryKey: ['executiveList', user?.id, user?.user_type],
     queryFn: () => getManangersExecutives(user?.user_type),
-    enabled: ['sales_manager', 'admin', 'super_admin', 'company_admin'].includes(user?.user_type),
+    enabled: ['sales_manager', 'super_admin', 'company_admin'].includes(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
       refetchOnWindowFocus: false
@@ -443,16 +438,6 @@ export default function MetaLeadsStandard() {
     // Use the total_count field directly from the API response
     return metaLeadsCountData.total_count || 0;
   };
-
-  // Old statuses configuration
-  const OLD_STATUSES = [
-    { apiKey: 'company_profile_sent', label: 'Company Profile Sent' },
-    { apiKey: 'completed', label: 'Completed' },
-    { apiKey: 'contacted_but_no_response', label: 'Contacted But No Response' },
-    { apiKey: 'converted_client', label: 'Converted Client' },
-    { apiKey: 'phone_powered_off', label: 'Phone Powered Off' },
-    { apiKey: 'proposal_shared', label: 'Proposal Shared' },
-  ];
 
   // Status update mutation
   const updateStatusMutation = useMutation(
@@ -1010,7 +995,7 @@ export default function MetaLeadsStandard() {
         );
       },
     },
-    ...(user?.user_type === 'admin' ? [
+    ...(user?.user_type === 'super_admin' ? [
       createStatusHistoryColumn({
         onOpenHistory: (lead) => setStatusHistoryModal({ visible: true, lead }),
         accessorKey: 'status_history_meta_standard',
@@ -1061,7 +1046,7 @@ export default function MetaLeadsStandard() {
         {canAssign && <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingRight: '20px' }}>
   <h2 style={{ margin: 0 }}></h2>
   <Space>
-    {user?.user_type === 'admin' && (
+    {user?.user_type === 'super_admin' && (
       <Button
         icon={<UserAddOutlined size="1em" className="app-icon" />}
         onClick={() => setUserAssignmentModalVisible(true)}
@@ -1070,7 +1055,7 @@ export default function MetaLeadsStandard() {
         Manage Assignees
       </Button>
     )}
-    {user?.user_type === 'admin' && (
+    {user?.user_type === 'super_admin' && (
       <ImportLeadsButton onSuccess={() => {
         refetchMetaLeads();
         refetchMetaLeadsStats();
@@ -1081,7 +1066,7 @@ export default function MetaLeadsStandard() {
 </div> }
 
       {/* Executive/Manager filter tabs */}
-        {canAssign && Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0 && (
+        {Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0 && (
         <div className="client-tabs-container" style={{ marginBottom: 12, borderRadius: '6px', padding: '8px' }}>
           <div className="client-tabs">
                     <button
@@ -1101,6 +1086,7 @@ export default function MetaLeadsStandard() {
               }}
                       onClick={() => {
                         setSelectedExecId(null);
+                        setPagination(previous => ({ ...previous, pageIndex: 0 }));
                       }}
                     >
               All
@@ -1127,6 +1113,7 @@ export default function MetaLeadsStandard() {
                         onClick={(e) => {
                           const value = Number(e.currentTarget.value);
                           setSelectedExecId((prev) => (prev === value ? null : value));
+                          setPagination(previous => ({ ...previous, pageIndex: 0 }));
                         }}
                       >
                   {userItem.user_type
@@ -1152,46 +1139,6 @@ export default function MetaLeadsStandard() {
         getStatusCount={getStatusCount}
       />
 
-      {/* Old Statuses Section */}
-      <div style={{ marginTop: '16px', marginBottom: '16px', padding: '0 8px' }}>
-        <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '500', color: '#666' }}>Old Statuses</h4>
-        <div className="client-tabs-container" style={{ borderRadius: '6px', padding: '8px' }}>
-          <div className="client-tabs">
-            {OLD_STATUSES.map((status) => {
-              const count = getStatusCount(status.apiKey);
-              const isSelected = statusFilter === status.label;
-              return (
-                <button
-                  key={status.apiKey}
-                  className={`tab ${isSelected ? 'active' : ''}`}
-                  style={{
-                    border: isSelected ? '1px solid #8c8c8c' : '1px solid #8c8c8c30',
-                    borderRadius: '4px',
-                    margin: '2px',
-                    backgroundColor: isSelected ? '#8c8c8c' : '#8c8c8c15',
-                    color: isSelected ? '#ffffff' : '#8c8c8c',
-                    fontWeight: '500',
-                    padding: '5px 10px',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => {
-                    const newStatus = isSelected ? 'All' : status.label;
-                    setStatusFilter(newStatus);
-                    // Reset pagination to default values
-                    setPagination({ pageIndex: 0, pageSize: 10 });
-
-                    // Refetch data
-                    refetchMetaLeads();
-                    refetchMetaLeadsCount();
-                  }}
-                >
-                  {status.label} ({count})
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
         </div>
 
@@ -1436,12 +1383,14 @@ export default function MetaLeadsStandard() {
           }
         />
 
-        {user?.user_type === 'admin' && (
+        {user?.user_type === 'super_admin' && (
           <StatusHistoryModal
             open={statusHistoryModal.visible}
             entity={statusHistoryModal.lead}
             onClose={() => setStatusHistoryModal({ visible: false, lead: null })}
-            fetchHistoryApi={fetchStatusHistoryPlaceholder}
+            fetchHistoryApi={getMetaLeadHistory}
+            historyDateKey="changed_at"
+            title={lead => `Meta Lead History - ${lead?.company_name || lead?.id || 'Lead'}`}
             getTitleFromEntity={(lead) => lead?.company_name || 'Lead'}
             renderSummary={(lead) => (
               <>
@@ -1450,7 +1399,7 @@ export default function MetaLeadsStandard() {
                 <strong>Current Status:</strong> {lead?.status || '-'}
               </>
             )}
-            queryKeyPrefix="metaLeadStatusHistoryStandard"
+            queryKeyPrefix={`metaLeadHistory-${user?.id}-${user?.user_type}`}
             emptyMessage="No status history available for this lead."
           />
         )}

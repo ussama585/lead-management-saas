@@ -13,10 +13,10 @@ vi.mock('../../../components/settings-delete-modal.jsx', () => ({ default: () =>
 beforeEach(() => vi.clearAllMocks());
 describe('company detail users', () => {
   it('loads company-scoped manager IDs without injecting account IDs into the options', async () => {
-    api.get.mockResolvedValue({ data: [{ id: 6, name: 'Company 4 Manager' }, { id: 8, name: 'sales manager 1' }] });
+    api.get.mockResolvedValue({ data: [{ id: 6, user_id: 21, name: 'Company 4 Manager' }, { id: 8, user_id: 30, name: 'sales manager 1' }] });
     const options = await getCompanySalesManagers(10);
     expect(api.get).toHaveBeenLastCalledWith('/sales-manager/simple-list', { params: { company_id: 10 } });
-    expect(managerIdFromOptions(options, { manager_id: 21, manager_name: 'Company 4 Manager' })).toBe(6);
+    expect(managerIdFromOptions(options, { manager_id: 21, manager_name: 'Company 4 Manager' })).toBe(21);
     expect(options.map(option => option.id)).toEqual([6, 8]);
     expect(options.filter(option => option.name === 'Company 4 Manager')).toHaveLength(1);
   });

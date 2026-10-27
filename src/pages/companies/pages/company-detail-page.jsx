@@ -133,7 +133,7 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
           {formik.values.user_type === 'sales_executive' && <div><label htmlFor="company-user-manager">Manager</label>
             <Select id="company-user-manager" className="w-full" placeholder="Select Manager" allowClear showSearch optionFilterProp="label"
               value={formik.values.manager ? String(formik.values.manager) : undefined} loading={managers.isFetching} disabled={save.isLoading || managers.isLoading}
-              options={managerOptions.map(item => ({ value: String(item.id), label: item.name }))}
+              options={managerOptions.map(item => ({ value: String(item.user_id), label: item.name }))}
               onChange={value => formik.setFieldValue('manager', value ? Number(value) : '')} onBlur={() => formik.setFieldTouched('manager', true)} />{fieldError('manager')}
             {managers.isError && <div role="alert">Could not load managers. <Button type="link" onClick={() => managers.refetch()}>Retry</Button></div>}
           </div>}

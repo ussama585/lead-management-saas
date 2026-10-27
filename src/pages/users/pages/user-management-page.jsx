@@ -302,6 +302,11 @@ export default function UserManagement() {
         },
       },
       {
+        header: 'Company',
+        accessorKey: 'company_name',
+        Cell: ({ cell }) => <span>{cell.getValue() || 'Not available'}</span>,
+      },
+      {
         header: 'User Type',
         accessorKey: 'user_type',
         Cell: ({ cell }) => <span style={{ display: 'flex', alignItems: 'center' }}>{String(cell.getValue() || '')

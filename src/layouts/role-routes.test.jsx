@@ -8,6 +8,8 @@ import { canAccessRoute } from '../pages/auth/role-access.js';
 const Guard = () => null;
 const routes = <>
   <Route path='/admin/leads/:id' element={<Guard allowedRoles={['admin']} />} />
+  <Route path='/admin/meta-leads/:id' element={<Guard allowedRoles={['admin']} />} />
+  <Route path='/admin/meta-leads/:id/job/:jobId' element={<Guard allowedRoles={['admin']} />} />
   <Route path='/data-leads' element={<Guard allowedRoles={USER_TYPES} />} />
   <Route path='/settings' element={<Guard allowedRoles={USER_TYPES} />} />
   <Route path='/super-admin/companies' element={<Guard allowedRoles={['super_admin']} />} />
@@ -17,6 +19,19 @@ const routes = <>
 // Match the same direct Route children used by the application.
 const children = routes.props.children;
 describe('role-specific URLs', () => {
+  it.each(['super_admin', 'admin', 'company_admin'])('opens Meta Lead jobs within the %s layout', role => {
+    const path = `${getRoleHome(role)}/meta-leads/42/job/7`;
+    const definitions = createRoleRoutes(children, role).map(route => route.props);
+    expect(matchRoutes(definitions, path)[0].params).toEqual({ id: '42', jobId: '7' });
+    expect(canAccessRoute(role, ['admin'], path)).toBe(true);
+  });
+  it.each(['super_admin', 'admin', 'company_admin'])('opens Meta Lead details within the %s layout', role => {
+    const path = `${getRoleHome(role)}/meta-leads/42`;
+    const definitions = createRoleRoutes(children, role).map(route => route.props);
+    expect(matchRoutes(definitions, path)[0].params.id).toBe('42');
+    expect(canAccessRoute(role, ['admin'], path)).toBe(true);
+    expect(canAccessRoute(role, ['sales_manager'], '/sales-manager/meta-leads/42')).toBe(false);
+  });
   it.each(['super_admin', 'admin', 'company_admin'])('opens Website Lead details within the %s layout', role => {
     const path = getRolePath(role, '/leads/42');
     const definitions = createRoleRoutes(children, role).map(route => route.props);

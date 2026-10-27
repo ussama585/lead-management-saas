@@ -20,9 +20,22 @@ import { getRolePath } from '../../../auth/role-home.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
 
 export async function getWebsiteLeadDetail(identifier) {
-    const { data } = await api.get(`/lead-generation/job/${encodeURIComponent(identifier)}`);
-    if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead details.');
-    if (data?.id == null || !data?.identifier) throw new Error('Could not read lead details.');
+    console.log('Fetching lead:', identifier);
+
+    const { data } = await api.get(
+        `/lead-generation/job/${encodeURIComponent(identifier)}`
+    );
+
+    console.log('API Response:', data);
+    console.log('ID:', data?.id);
+    console.log('Condition:', data?.id == null);
+
+    if (data?.id == null) {
+        console.trace('Invalid lead details:', identifier);
+        throw new Error('Could not read lead details.');
+    }
+
+    console.log('Returning lead data:', data);
     return data;
 }
 
@@ -114,7 +127,7 @@ const LeadDetailPage = () => {
             refetchOnWindowFocus: false
         }
     );
-
+    console.log(data,"datadata__")
     const { isLoading: loadingJobs, data: jobsData, isError: jobsError, error: jobsRequestError, refetch: refetchJobs } = useQuery(
         [
             `leadjobs-${id}`, 
@@ -135,6 +148,7 @@ const LeadDetailPage = () => {
 
     const jobs = jobsData?.results ?? [];
     const lead = data ?? {};
+    console.log(lead,"leadleadlead")
     const isReadOnlyLead =lead?.converted_to_client === true
     const canDeleteJob = (isSuperAdmin(user?.user_type) || user?.user_type === 'sales_manager') && !isReadOnlyLead;
 
