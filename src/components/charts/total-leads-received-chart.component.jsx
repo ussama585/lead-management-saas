@@ -27,6 +27,7 @@ const TotalLeadsReceivedChart = ({
   onPeriodChange,
   selectedSource = 'Meta',
   onSourceChange,
+  showSourceFilter = true,
   isLoading = false,
   emptyMessage = 'No data to display',
   dateRange,
@@ -104,12 +105,12 @@ const TotalLeadsReceivedChart = ({
             onChange={onPeriodChange}
             options={PERIOD_OPTIONS}
           />
-          <Select
+          {showSourceFilter && <Select
             value={selectedSource}
             style={{ width: 140 }}
             onChange={onSourceChange}
             options={LEAD_SOURCE_OPTIONS}
-          />
+          />}
         </div>
       </div>
       <div className="total-leads-received-kpi">

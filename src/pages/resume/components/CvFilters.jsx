@@ -1,3 +1,4 @@
+import { ManualLocationListInput } from '../../../components/manual-location-input.jsx';
 import { message } from '../../../components/ui/notifications.jsx';
 import React from 'react';
 import {
@@ -65,69 +66,17 @@ const CvFilters = ({
 
         <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
-            <Autocomplete
-              multiple
-              size="small"
-              clearOnBlur
-              options={citiesData || []}
-              value={filters.city}
-              onChange={(event, newValue) => handleFilterChange('city', newValue)}
-              onInputChange={(_event, value, reason) => {
-                if (reason === 'input' || reason === 'clear') {
-                  debouncedSetCitiesSearchText(value || '');
-                }
-              }}
-              onClose={() => {
-                debouncedSetCitiesSearchText('');
-              }}
-              filterOptions={(options) => options}
-              renderInput={(params) => <TextField {...params} label="City" placeholder="Select cities..." />}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <AutocompleteFilterTagPill
-                    key={`${String(option)}-${index}`}
-                    label={option}
-                    tagProps={getTagProps({ index })}
-                  />
-                ))
-              }
-              loading={loadingCities}
-              loadingText="Loading cities..."
-              noOptionsText="No cities found"
-              className="rf-autocomplete"
-            />
+            <label className="grid gap-2 text-sm font-medium">City
+              <ManualLocationListInput value={filters.city} placeholder="Enter cities, separated by commas"
+                onChange={values => handleFilterChange('city', values)} />
+            </label>
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Autocomplete
-              multiple
-              size="small"
-              clearOnBlur
-              options={countriesData || []}
-              value={filters.country}
-              onChange={(event, newValue) => handleFilterChange('country', newValue)}
-              onInputChange={(_event, value, reason) => {
-                if (reason === 'input' || reason === 'clear') debouncedSetCountriesSearchText(value || '');
-              }}
-              onClose={() => {
-                debouncedSetCountriesSearchText('');
-              }}
-              filterOptions={(options) => options}
-              renderInput={(params) => <TextField {...params} label="Country" placeholder="Select countries..." />}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <AutocompleteFilterTagPill
-                    key={`${String(option)}-${index}`}
-                    label={option}
-                    tagProps={getTagProps({ index })}
-                  />
-                ))
-              }
-              loading={loadingCountries}
-              loadingText="Loading countries..."
-              noOptionsText="No countries found"
-              className="rf-autocomplete"
-            />
+            <label className="grid gap-2 text-sm font-medium">Country
+              <ManualLocationListInput value={filters.country} placeholder="Enter countries, separated by commas"
+                onChange={values => handleFilterChange('country', values)} />
+            </label>
           </Grid>
 
           <Grid item xs={12} md={4}>

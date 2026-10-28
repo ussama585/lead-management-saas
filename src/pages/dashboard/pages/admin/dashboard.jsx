@@ -31,8 +31,10 @@ import {
   getAverageJobProject,
   getSystemLeadFunnel,
   getLeadStatusDistribution,
+  getSuperAdminLeadStatusDistribution,
   getProjectStatusHealth,
   getExecutiveMobilisationAmounts,
+  getSuperAdminMobilisationAmounts,
   getRecruiterResumeSubmissionVolume,
   getLeadsStatusHealth,
   getRecruiterStats,
@@ -41,6 +43,7 @@ import {
 } from '../../../shared/services/admin-graphs.js';
 import {
   getTotalLeadsReceived,
+  getSuperAdminTotalLeadsReceived,
   getOverallLeadConversionRate,
   getClientsAndProjectsActivatedPerDay,
 } from '../../../shared/services/admin-total-leads.js';
@@ -49,6 +52,11 @@ import { getLeadPotentialConversion } from '../../../shared/services/leads.js';
 
 // Standard chart imports (must stay before lazy const declarations)
 import StatsCard from '../../../../components/stats-card.component.jsx';
+import SuperAdminStats from './super-admin-stats.jsx';
+import useUserStore from '../../../shared/store/user-store.js';
+import { isSuperAdmin } from '../../../auth/role-access.js';
+import { selectedCompany } from '../../../shared/utils/company-filter.js';
+import { Button } from '../../../../components/ui/button.jsx';
 import SalesPerformancePreview from '../../../../components/charts/sales-performance-preview.jsx';
 import LeadsDistributionStatusBreakdownChart from '../../../../components/charts/leads-distribution-status-breakdown-chart.component.jsx';
 import LeadStatusDistributionChart from '../../../../components/charts/lead-status-distribution-chart.component.jsx';
@@ -100,8 +108,11 @@ const DEMO_SYSTEM_STATS = {
 // Tabbed section with its own state so that the rest of the
 // dashboard does not re-render when switching tabs.
 export function DashboardTabsSection() {
+  const currentUser = useUserStore(state => state.user);
+  const superAdmin = isSuperAdmin(currentUser?.user_type);
   const [showDemoStats, setShowDemoStats] = useState(() => !new URLSearchParams(window.location.search).has('company_id'));
   const [searchParams, setSearchParams] = useSearchParams();
+  const mobilisationCompanyId = superAdmin ? selectedCompany(searchParams.toString()) : null;
   const tabFromUrl = searchParams.get('tab') || searchParams.get('selected');
   const activeSection = VALID_TAB_KEYS.includes(tabFromUrl) ? tabFromUrl : DEFAULT_TAB;
 
@@ -159,7 +170,7 @@ export function DashboardTabsSection() {
   } = useQueryApi({
     key: ['adminStats'],
     url: '/admin-stats/',
-    enabled: activeSection === 'systemStats' && !showDemoStats,
+    enabled: activeSection === 'systemStats' && !showDemoStats && !superAdmin,
     options: {
       staleTime: 0,
       cacheTime: 0,
@@ -260,10 +271,18 @@ export function DashboardTabsSection() {
   const {
     data: totalLeadsReceivedRaw = { totalCount: 0, timeSeriesData: [] },
     isLoading: loadingTotalLeadsReceived,
+    error: totalLeadsReceivedError,
+    refetch: refetchTotalLeadsReceived,
   } = useQuery({
-    queryKey: ['totalLeadsReceived', totalLeadsReceivedDateRange, selectedTotalLeadsPeriod, totalLeadsReceivedLeadType],
+    queryKey: ['totalLeadsReceived', currentUser?.id, superAdmin, mobilisationCompanyId, totalLeadsReceivedDateRange, selectedTotalLeadsPeriod, superAdmin ? null : totalLeadsReceivedLeadType],
     queryFn: () => {
       const [start, end] = totalLeadsReceivedDateRange || [];
+      if (superAdmin) return getSuperAdminTotalLeadsReceived({
+        startDate: start?.format?.('YYYY-MM-DDTHH:mm:ss'),
+        endDate: end?.format?.('YYYY-MM-DDTHH:mm:ss'),
+        period: selectedTotalLeadsPeriod,
+        companyId: mobilisationCompanyId,
+      });
       return getTotalLeadsReceived({
         startDate: toDateString(start),
         endDate: toDateString(end),
@@ -283,14 +302,18 @@ export function DashboardTabsSection() {
   const {
     data: leadStatusDistributionData = [],
     isLoading: loadingLeadStatusDistribution,
+    error: leadStatusDistributionError,
+    refetch: refetchLeadStatusDistribution,
   } = useQuery({
-    queryKey: ['leadStatusDistribution', leadStatusDistributionDateRange, leadStatusDistributionLeadType],
+    queryKey: ['leadStatusDistribution', currentUser?.id, superAdmin, mobilisationCompanyId, leadStatusDistributionDateRange, leadStatusDistributionLeadType],
     queryFn: () => {
       const [start, end] = leadStatusDistributionDateRange || [];
-      return getLeadStatusDistribution({
+      const fetchDistribution = superAdmin ? getSuperAdminLeadStatusDistribution : getLeadStatusDistribution;
+      return fetchDistribution({
         startDate: toDateString(start),
         endDate: toDateString(end),
         leadType: toLeadTypeLabel(leadStatusDistributionLeadType),
+        ...(superAdmin && mobilisationCompanyId ? { companyId: mobilisationCompanyId } : {}),
       });
     },
     enabled: activeSection === 'systemLeads',
@@ -438,14 +461,18 @@ export function DashboardTabsSection() {
   const {
     data: executiveMobilisationRaw = {},
     isLoading: loadingExecutiveMobilisation,
+    error: executiveMobilisationError,
+    refetch: refetchExecutiveMobilisation,
   } = useQuery({
-    queryKey: ['executiveMobilisationAmounts', executiveMobilisationDateRange],
+    queryKey: ['executiveMobilisationAmounts', currentUser?.id, superAdmin, mobilisationCompanyId, executiveMobilisationDateRange],
     queryFn: () => {
       const [start, end] = executiveMobilisationDateRange || [];
       const toDateString = (d) => (d && d.format ? d.format('YYYY-MM-DD') : null);
-      return getExecutiveMobilisationAmounts({
+      const fetchAmounts = superAdmin ? getSuperAdminMobilisationAmounts : getExecutiveMobilisationAmounts;
+      return fetchAmounts({
         startDate: toDateString(start),
         endDate: toDateString(end),
+        ...(superAdmin && mobilisationCompanyId ? { companyId: mobilisationCompanyId } : {}),
       });
     },
     enabled: activeSection === 'salesExecutives',
@@ -797,6 +824,7 @@ export function DashboardTabsSection() {
 
       {/* SYSTEM STATS SECTION (cards) */}
       {activeSection === 'systemStats' && (
+        superAdmin ? <SuperAdminStats userId={currentUser?.id} /> :
         <>
           <SalesPerformancePreview />
           <div className="my-4 flex flex-wrap items-center justify-between gap-3">
@@ -949,14 +977,17 @@ export function DashboardTabsSection() {
 
           {/* 6. Mobilisation Amounts per Executive */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
-            <ExecutiveMobilisationAmountsChart
+            {executiveMobilisationError ? <div role="alert" className="flex items-center gap-3 rounded-md border p-4 text-destructive">
+              <span>{executiveMobilisationError.message || 'Could not load mobilisation amounts.'}</span>
+              <Button variant="outline" onClick={() => refetchExecutiveMobilisation()}>Retry</Button>
+            </div> : <ExecutiveMobilisationAmountsChart
               title="Mobilisation Amounts per Executive"
               data={executiveMobilisationData}
               isLoading={loadingExecutiveMobilisation}
               dateRange={executiveMobilisationDateRange}
               onDateRangeChange={setExecutiveMobilisationDateRange}
               emptyMessage="No mobilisation data to display"
-            />
+            />}
           </div>
 
           {/* 7. Projects/Jobs Per status per executive */}
@@ -1079,7 +1110,11 @@ export function DashboardTabsSection() {
         <>
           {/* Total Leads Received */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
-            <TotalLeadsReceivedChart
+            {totalLeadsReceivedError ? <div role="alert" className="flex items-center gap-3 rounded-md border p-4 text-destructive">
+              <span>{totalLeadsReceivedError.message || 'Could not load total leads received.'}</span>
+              <Button variant="outline" onClick={() => refetchTotalLeadsReceived()}>Retry</Button>
+            </div> : <TotalLeadsReceivedChart
+              showSourceFilter={!superAdmin}
               title="Total Leads Received"
               totalCount={totalLeadsReceivedTotalCount}
               timeSeriesData={totalLeadsReceivedTimeSeries}
@@ -1094,7 +1129,7 @@ export function DashboardTabsSection() {
               dateRange={totalLeadsReceivedDateRange}
               onDateRangeChange={setTotalLeadsReceivedDateRange}
               emptyMessage="No leads received in this period"
-            />
+            />}
           </div>
 
           {/* Clients and Projects Activated Per Day */}
@@ -1154,7 +1189,10 @@ export function DashboardTabsSection() {
 
           {/* Lead Status Distribution */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
-            <LeadStatusDistributionChart
+            {leadStatusDistributionError ? <div role="alert" className="flex items-center gap-3 rounded-md border p-4 text-destructive">
+              <span>{leadStatusDistributionError.message || 'Could not load lead status distribution.'}</span>
+              <Button variant="outline" onClick={() => refetchLeadStatusDistribution()}>Retry</Button>
+            </div> : <LeadStatusDistributionChart
               title="Lead Status Distribution "
               data={leadStatusDistributionData}
               selectedSource={toLeadTypeLabel(leadStatusDistributionLeadType)}
@@ -1166,7 +1204,7 @@ export function DashboardTabsSection() {
               dateRange={leadStatusDistributionDateRange}
               onDateRangeChange={setLeadStatusDistributionDateRange}
               emptyMessage="No lead status data to display"
-            />
+            />}
           </div>
 
           {/* Leads Distribution & Status Breakdown */}

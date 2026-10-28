@@ -223,13 +223,14 @@ export default function NewTableComponent({
           getRowId={getRowId}
           muiTableHeadCellProps={{
                   sx: {
-                      fontSize: '12px',
+                      fontSize: '14px',
                       padding: denseCells ? '4px 6px' : '4px 8px',
                   },
               }}
               muiTableBodyCellProps={{
                   sx: {
-                      fontSize: '12px',
+                      fontSize: '14px',
+                      height: '80px',
                       padding: denseCells ? '6px 6px' : '8px',
                   },
               }}

@@ -32,8 +32,12 @@ export const updateLeadJob = async (jobId, jobData) => {
 };
 
 // Delete a job for regular (website) lead
-export const deleteWebsiteLeadJob = async (jobId) => {
-  const { data } = await api.delete(`/lead-generation/delete-job/${encodeURIComponent(jobId)}`);
+export const deleteWebsiteLeadJob = async (jobId, reason) => {
+  const deleteReason = typeof reason === 'string' ? reason.trim() : '';
+  if (!deleteReason) throw new Error('Please add remarks before deleting this job.');
+  const { data } = await api.delete(`/lead-generation/delete-job/${encodeURIComponent(jobId)}`, {
+    data: { delete_reason: deleteReason },
+  });
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not delete job.');
   return data;
 };

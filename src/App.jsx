@@ -18,6 +18,7 @@ import ManagerDashboard from './pages/dashboard/pages/dashboard-page.jsx';
 import ExecutiveDashboard from './pages/dashboard/pages/sales-executive/dashboard.jsx';
 import UserManagement from './pages/users/pages/user-management-page.jsx';
 import CompaniesPage from './pages/companies/pages/companies-page.jsx';
+import DemoRequestsPage from './pages/demo-requests/demo-requests-page.jsx';
 import CompanyDetailPage from './pages/companies/pages/company-detail-page.jsx';
 import CreateUser from './pages/users/pages/create-user-page.jsx';
 import EditUser from './pages/users/pages/edit-user-page.jsx';
@@ -189,6 +190,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/settings" element={<ProtectedRoute element={<AdminSettingsPage />} allowedRoles={USER_TYPES} />} />
             <Route path="/super-admin/companies" element={<ProtectedRoute element={<CompaniesPage />} allowedRoles={['super_admin']} />} />
+            <Route path="/super-admin/demo-requests" element={<ProtectedRoute element={<DemoRequestsPage />} allowedRoles={['super_admin']} />} />
             <Route path="/super-admin/companies/:id" element={<ProtectedRoute element={<CompanyDetailPage />} allowedRoles={['super_admin']} />} />
             <Route path="/super-admin" element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['super_admin']} />}>
               <Route index element={<DashboardTabsSection />} />
@@ -301,9 +303,9 @@ function App() {
             <Route path="/sales-manager/meta-leads/:id" element={<ProtectedRoute element={<MetaLeadDetail />} allowedRoles={['sales_manager']} />} />
             <Route path="/data-leads" element={<ProtectedRoute element={<DataLeads />} allowedRoles={['admin','sales_manager','sales_executive','marketing_manager','recruitment_manager','recruitment_executive','accountant','data_entry_executive']} />} />
             <Route path="/data-lead/:id" element={<ProtectedRoute element={<DataLead />} allowedRoles={['admin','sales_manager','sales_executive','marketing_manager','recruitment_manager','recruitment_executive','accountant','data_entry_executive']} />} />
-            <Route path="/data-leads/create-job/:id" element={<ProtectedRoute element={<DataLeadJobCreate />} allowedRoles={['super_admin', 'sales_manager', 'sales_executive']} />} />
-            <Route path="/data-leads/:leadId/edit/:jobId" element={<ProtectedRoute element={<DataLeadJobCreate />} allowedRoles={['super_admin', 'sales_manager', 'sales_executive']} />} />
-            <Route path="/data-leads/:leadId/jobs/:jobId" element={<ProtectedRoute element={<DataLeadJobDetail />} allowedRoles={['super_admin', 'sales_manager', 'sales_executive']} />} />
+            <Route path="/data-leads/create-job/:id" element={<ProtectedRoute element={<DataLeadJobCreate />} allowedRoles={['super_admin', 'company_admin', 'sales_manager', 'sales_executive']} />} />
+            <Route path="/data-leads/:leadId/edit/:jobId" element={<ProtectedRoute element={<DataLeadJobCreate />} allowedRoles={['super_admin', 'company_admin', 'sales_manager', 'sales_executive']} />} />
+            <Route path="/data-leads/:leadId/jobs/:jobId" element={<ProtectedRoute element={<DataLeadJobDetail />} allowedRoles={['super_admin', 'company_admin', 'sales_manager', 'sales_executive']} />} />
             <Route path="/job-detail/:jobId" element={<ProtectedRoute element={<DataLeadJobDetail />} allowedRoles={['admin','sales_manager','sales_executive','marketing_manager','recruitment_manager','recruitment_executive','accountant','data_entry_executive','project_manager']} />} />
 
              <Route path="/sales-executive/meta-leads" element={<ProtectedRoute element={<MetaLeads/>} allowedRoles={['sales_executive']} />} />

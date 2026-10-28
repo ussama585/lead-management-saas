@@ -1,5 +1,19 @@
 import api from './api.js';
 
+export const getSuperAdminTotalLeadsReceived = async ({ startDate, endDate, period = 'month', companyId } = {}) => {
+  const { data } = await api.get('/accounts/total-lead-received', {
+    params: {
+      ...(companyId ? { company_id: companyId } : {}),
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+      period,
+    },
+  });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load total leads received.');
+  if (!Number.isFinite(data?.totalCount) || !Array.isArray(data?.timeSeriesData)) throw new Error('Could not read total leads received.');
+  return data;
+};
+
 
 export const getTotalLeadsReceived = async ({
   startDate,

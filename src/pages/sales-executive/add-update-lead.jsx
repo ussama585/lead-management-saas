@@ -1,3 +1,4 @@
+import ManualLocationInput from '../../components/manual-location-input.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import { Modal } from '../../components/ui/app-modal.jsx';
 import { Select } from '../../components/ui/app-select.jsx';
@@ -19,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { bulkCreateDataEntry } from '../shared/services/data-entry-service.js';
 
-import { citiesNames, countriesNames } from '../shared/utils/countries.js';
+import { countriesNames } from '../shared/utils/countries.js';
 import { Upload as UploadOutlined, Download as DownloadOutlined, CircleHelp as QuestionCircleOutlined } from 'lucide-react';
 
 export function readCompanyList(payload) {
@@ -634,7 +635,7 @@ const AddUpdateLead = () => {
                   <Form.Item name="city" style={{ marginBottom: 0 }}>
                     <Field name="city">
                       {({ field, form }) => (
-                        <Select
+                        <ManualLocationInput
                           {...field}
                           value={field.value}
                           onChange={value => {
@@ -642,7 +643,6 @@ const AddUpdateLead = () => {
                             const stringValue = typeof value === 'object' ? value?.value || '' : value || '';
                             form.setFieldValue('city', stringValue);
                           }}
-                          options={citiesNames}
                           placeholder='Select city'
                           style={{ width: '100%', color: '#000000' }}
                           showSearch
@@ -659,7 +659,7 @@ const AddUpdateLead = () => {
                   <Form.Item name="country" style={{ marginBottom: 0 }}>
                     <Field name="country">
                       {({ field, form }) => (
-                        <Select
+                        <ManualLocationInput
                           {...field}
                           value={field.value}
                           onChange={value => {
@@ -667,7 +667,6 @@ const AddUpdateLead = () => {
                             const stringValue = typeof value === 'object' ? value?.value || '' : value || '';
                             form.setFieldValue('country', stringValue);
                           }}
-                          options={countriesNames}
                           placeholder='Select country'
                           style={{ width: '100%', color: '#000000' }}
                           showSearch

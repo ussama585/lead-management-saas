@@ -1,3 +1,4 @@
+import ManualLocationInput from './manual-location-input.jsx';
 import { message } from './ui/notifications.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Select } from './ui/app-select.jsx';
@@ -8,7 +9,7 @@ import { Alert } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { getClientDetails, createSaasClient } from '../pages/shared/services/headhunting.js';
-import { citiesNames, countriesNames } from '../pages/shared/utils/countries.js';
+import { countriesNames } from '../pages/shared/utils/countries.js';
 import '../assets/styles/legacy/common.css';
 import '../assets/styles/legacy/create-saas-client-modal.component.css';
 
@@ -141,11 +142,10 @@ const CreateSaasClientModal = ({ open, clientId, onClose, onSuccess }) => {
           </div>
           <div className="saas-client-modal__field">
             <label className="form-label text-start mb-1 saas-client-modal__field-label">City<sup>*</sup></label>
-            <Select
+            <ManualLocationInput
               className="antd-input dropdown saas-client-modal__select-full"
               placeholder="Select City"
               value={form.city || undefined}
-              options={citiesNames}
               showSearch
               allowClear
               onChange={(value) => setForm((prev) => ({ ...prev, city: value || null }))}
@@ -153,11 +153,10 @@ const CreateSaasClientModal = ({ open, clientId, onClose, onSuccess }) => {
           </div>
           <div>
             <label className="form-label text-start mb-1 saas-client-modal__field-label">Country<sup>*</sup></label>
-            <Select
+            <ManualLocationInput
               className="antd-input dropdown saas-client-modal__select-full"
               placeholder="Select Country"
               value={form.country || undefined}
-              options={countriesNames}
               showSearch
               allowClear
               onChange={(value) => setForm((prev) => ({ ...prev, country: value || null }))}

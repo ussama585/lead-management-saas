@@ -1174,8 +1174,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             </span>
           ),
         },
-        // 17. Project Size - for sales managers and sales executives
-        ...((userType === 'sales_manager' || userType === 'sales_executive') ? [{
+        // Project Size uses the same visibility and editing behavior as Data Leads.
+        {
           header: 'Project Size',
           id: 'project_size',
           accessorKey: 'project_size',
@@ -1205,15 +1205,19 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               />
             );
           },
-        }] : []),
+        },
         // Extra columns at the end
         ...extraColumns,
       ];
       const leadingKeys = ['row_number', 'company_name', 'contact_person_name'];
-      return [
-        ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)),
-        ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey)),
+      const adjacentKeys = ['project_size', 'assigned_to_name'];
+      const ordered = [
+        ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
+        ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && !adjacentKeys.includes(column.accessorKey)),
       ];
+      const statusIndex = ordered.findIndex(column => column.accessorKey === 'status');
+      ordered.splice(statusIndex + 1, 0, ...adjacentKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean));
+      return ordered;
     }, [userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
 
 

@@ -16,6 +16,7 @@ import { getRolePath } from '../../../auth/role-home.js';
 import { dataLeadJobSchema, dataLeadJobChoices } from '../../schemas/data-lead-job-schema.js';
 import { languageOptions, nationalityOptions, departmentOptions, workingDaysOptions, degreeNameOptions } from '../../../shared/utils/job-form-options.js';
 import '../../../../assets/styles/data-lead-job-form.css';
+import '../../../../assets/styles/job-form-appearance.css';
 
 export const emptyDataLeadJob = {
   data_lead: null, job_title: '', number_of_vacancies: null, job_type: '', employment_type: '', department: '',
@@ -161,7 +162,7 @@ export default function DataLeadJobCreate() {
     else if (choices) control = <Select {...props} allowClear={key === 'job_type' || key === 'contract_period'} showSearch optionFilterProp="label" style={{ width: '100%' }} value={value === '' ? undefined : value}
       options={choices.map(option => ({ value: option, label: String(option) }))} placeholder={`Select ${label?.toLowerCase() || 'option'}`} onChange={value => key === 'job_type' ? formik.setValues(previous => jobNatureValues(previous, value)) : formik.setFieldValue(key, value ?? '')} />;
     else if (numericFields.includes(key)) control = <InputNumber {...props} min={key === 'number_of_vacancies' || key === 'hours_per_week' ? 1 : 0} style={{ width: '100%' }} value={value} onChange={value => formik.setFieldValue(key, value)} />;
-    else if (multiline.includes(key)) control = <Input.TextArea {...props} rows={5} placeholder={label} value={value} onChange={formik.handleChange} />;
+    else if (multiline.includes(key)) control = <Input.TextArea {...props} rows={key === 'key_skills_required' ? 4 : 6} placeholder={label} value={value} onChange={formik.handleChange} />;
     else control = <Input {...props} disabled={props.disabled || key === 'job_shift'} readOnly={key === 'job_shift'} type={dates.includes(key) ? 'datetime-local' : 'text'} placeholder={['hours_per_week', 'contract_length'].includes(key) ? '10, 20-40, etc.' : label} value={value ?? ''} onChange={formik.handleChange} />;
     return <div key={key} className={`data-job-field ${className}`}>
       <label htmlFor={key}>{label}{requiredFields.has(key) || (key === 'hours_per_week' && formik.values.job_type === 'Part-Time') || (['contract_period', 'contract_length'].includes(key) && formik.values.job_type === 'Contract') ? '*' : ''}</label>{control}

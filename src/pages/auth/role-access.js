@@ -33,7 +33,7 @@ const SUPER_ADMIN_REMOVED_PATHS = [
 ];
 
 export function canAccessMenu(role, key) {
-  if (key === '26') return isSuperAdmin(role);
+  if (key === '26' || key === '27') return isSuperAdmin(role);
   if (role === 'company_admin') return COMPANY_ADMIN_MENU_KEYS.has(key);
   if (role === 'sales_manager') return SALES_MANAGER_MENU_KEYS.has(key);
   if (role === 'sales_executive') return SALES_EXECUTIVE_MENU_KEYS.has(key);
@@ -48,6 +48,7 @@ export function canAccessRoute(role, allowedRoles = [], pathname = '') {
   if (!getRoleHome(role)) return false;
   const prefix = pathname.match(/^\/(super-admin|company-admin|sales-manager|sales-executive|data-entry-executive)(?=\/|$)/)?.[0];
   if (prefix && prefix !== getRoleHome(role)) return false;
+  if (/^\/(?:super-admin|admin)\/demo-requests(?:\/|$)/.test(pathname) && !isSuperAdmin(role)) return false;
   if (/^\/(?:super-admin|admin)\/companies(?:\/|$)/.test(pathname) && !isSuperAdmin(role)) return false;
   if (isSuperAdmin(role) && SUPER_ADMIN_REMOVED_PATHS.some(pattern => pattern.test(pathname))) return false;
   return allowedRoles.includes(role) ||

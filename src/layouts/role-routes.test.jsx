@@ -11,6 +11,9 @@ const routes = <>
   <Route path='/admin/meta-leads/:id' element={<Guard allowedRoles={['admin']} />} />
   <Route path='/admin/meta-leads/:id/job/:jobId' element={<Guard allowedRoles={['admin']} />} />
   <Route path='/data-leads' element={<Guard allowedRoles={USER_TYPES} />} />
+  <Route path='/data-leads/create-job/:id' element={<Guard allowedRoles={['super_admin', 'company_admin', 'sales_manager', 'sales_executive']} />} />
+  <Route path='/data-leads/:leadId/edit/:jobId' element={<Guard allowedRoles={['super_admin', 'company_admin', 'sales_manager', 'sales_executive']} />} />
+  <Route path='/data-leads/:leadId/jobs/:jobId' element={<Guard allowedRoles={['super_admin', 'company_admin', 'sales_manager', 'sales_executive']} />} />
   <Route path='/settings' element={<Guard allowedRoles={USER_TYPES} />} />
   <Route path='/super-admin/companies' element={<Guard allowedRoles={['super_admin']} />} />
   <Route path='/super-admin/companies/:id' element={<Guard allowedRoles={['super_admin']} />} />
@@ -19,6 +22,15 @@ const routes = <>
 // Match the same direct Route children used by the application.
 const children = routes.props.children;
 describe('role-specific URLs', () => {
+  it.each([
+    ['/company-admin/data-leads/create-job/42', { id: '42' }],
+    ['/company-admin/data-leads/42/edit/7', { leadId: '42', jobId: '7' }],
+    ['/company-admin/data-leads/42/jobs/7', { leadId: '42', jobId: '7' }],
+  ])('allows Company Admin access to %s', (path, params) => {
+    const definitions = createRoleRoutes(children, 'company_admin').map(route => route.props);
+    expect(matchRoutes(definitions, path)[0].params).toEqual(params);
+    expect(canAccessRoute('company_admin', ['super_admin', 'company_admin', 'sales_manager', 'sales_executive'], path)).toBe(true);
+  });
   it.each(['super_admin', 'admin', 'company_admin'])('opens Meta Lead jobs within the %s layout', role => {
     const path = `${getRoleHome(role)}/meta-leads/42/job/7`;
     const definitions = createRoleRoutes(children, role).map(route => route.props);

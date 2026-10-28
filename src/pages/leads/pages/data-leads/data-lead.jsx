@@ -1,3 +1,4 @@
+import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -22,7 +23,7 @@ import {
   getDataLead,
 } from "../../../shared/services/data-leads-service.js";
 import useUserStore from "../../../shared/store/user-store.js";
-import { countriesNames, citiesNames, currencyOptions, paymentTermOptions } from "../../../shared/utils/countries.js";
+import { currencyOptions, paymentTermOptions } from "../../../shared/utils/countries.js";
 import { loadTableState } from "../../../shared/utils/persistTableState.js";
 import { formatSalaryNum } from "../../../shared/utils/formatters.js";
 
@@ -201,8 +202,8 @@ const DataLead = () => {
 
   const handleCreateJob = useCallback(() => {
     if (!dataLeadId) return;
-    navigate(`/data-leads/create-job/${dataLeadId}`);
-  }, [navigate, dataLeadId]);
+    navigate(getRolePath(user?.user_type, `/data-leads/create-job/${dataLeadId}`));
+  }, [navigate, dataLeadId, user?.user_type]);
 
   // Function to normalize employment_type values
   const normalizeEmploymentType = useCallback((value) => {
@@ -254,7 +255,7 @@ const DataLead = () => {
             style={{ cursor: isReadOnlyLead ? "default" : "pointer", textDecoration: isReadOnlyLead ? "none" : "underline" }}
             onClick={() => {
               if (isReadOnlyLead) return;
-              navigate(`/data-leads/${dataLeadId}/edit/${row.original.id}`);
+              navigate(getRolePath(user?.user_type, `/data-leads/${dataLeadId}/edit/${row.original.id}`));
             }}
           >
             {cell.getValue() || "-"}
@@ -378,10 +379,9 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <ManualLocationInput commitOnBlur
               className="antd-input dropdown"
               value={value}
-              options={citiesNames}
               showSearch
               onChange={(newValue) => {
                 setValue(newValue);
@@ -410,10 +410,9 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <ManualLocationInput commitOnBlur
               className="antd-input dropdown"
               value={value}
-              options={countriesNames}
               showSearch
               onChange={(newValue) => {
                 setValue(newValue);

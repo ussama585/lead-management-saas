@@ -1,6 +1,24 @@
 import * as Yup from 'yup';
 import { normalizeEmploymentType } from '../utils/job-utils.js';
 
+export const EXPERIENCE_RANGE_ERROR = 'Minimum experience must be less than or equal to maximum experience';
+
+export function isExperienceRangeValid({ min_experience, max_experience }) {
+  if (min_experience == null || min_experience === '' || max_experience == null || max_experience === '') return true;
+  const min = Number(min_experience);
+  const max = Number(max_experience);
+  return !Number.isFinite(min) || !Number.isFinite(max) || min <= max;
+}
+
+export const jobExperienceFields = {
+  min_experience: Yup.number().typeError('Min experience must be a number').required('Min experience is required')
+    .integer('Select a whole number of years').min(0, 'Min experience must be at least 0').max(11, 'Experience must be between 0 and 11 years')
+    .test('experience-range', EXPERIENCE_RANGE_ERROR, function () { return isExperienceRangeValid(this.parent); }),
+  max_experience: Yup.number().typeError('Max experience must be a number').required('Max experience is required')
+    .integer('Select a whole number of years').min(0, 'Max experience must be at least 0').max(11, 'Experience must be between 0 and 11 years')
+    .test('experience-range', EXPERIENCE_RANGE_ERROR, function () { return isExperienceRangeValid(this.parent); }),
+};
+
 export const isRemoteEmploymentType = (employmentType) =>
   normalizeEmploymentType(employmentType) === 'Remote';
 
@@ -100,8 +118,7 @@ export const commonJobFormSchema = Yup.object({
   job_requirements: Yup.string().nullable(),
   job_responsibilities: Yup.string().nullable(),
   key_skills_required: Yup.string().nullable(),
-  min_experience: Yup.number().typeError('Min experience must be a number').required('Min experience is required').min(0, 'Min experience must be at least 0'),
-  max_experience: Yup.number().typeError('Max experience must be a number').required('Max experience is required').min(0, 'Max experience must be at least 0'),
+  ...jobExperienceFields,
   educational_qualification: Yup.string().nullable(),
   other_benefits: Yup.string().nullable(),
   currency: Yup.string().required('Currency is required'),
@@ -166,19 +183,7 @@ export const editJobHeadhuntingValidationSchema = Yup.object({
   job_requirements: Yup.string().nullable(),
   job_responsibilities: Yup.string().nullable(),
   key_skills_required:Yup.string().nullable(),
-  min_experience: Yup.number()
-    .typeError('Min experience must be a number')
-    .required('Min experience is required')
-    .min(0, 'Min experience must be at least 0'),
-  max_experience: Yup.number()
-    .typeError('Max experience must be a number')
-    .required('Max experience is required')
-    .min(0, 'Max experience must be at least 0')
-    .test('max-greater-than-min', 'Max experience must be greater than or equal to min experience', function(value) {
-      const { min_experience } = this.parent;
-      if (!value || !min_experience) return true;
-      return value >= min_experience;
-    }),
+  ...jobExperienceFields,
   educational_qualification: Yup.string().trim().nullable(),
   other_benefits: Yup.string().nullable(),
   currency: Yup.string().required('Required'),

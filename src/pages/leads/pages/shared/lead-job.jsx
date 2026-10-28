@@ -496,6 +496,7 @@ const isReadOnlyPage = isLeadReadOnly(leadDetailData);
   // Wrapper for onFieldBlur — debounced so Update click can cancel pending autosave
   const handleFieldBlur = (event, key, value) => {
     if (isNewJob) return;
+    if (key === 'min_experience' || key === 'max_experience') return;
     clearTimeout(autosaveTimerRef.current);
     autosaveTimerRef.current = setTimeout(() => {
       if (!isSubmitRef.current) {

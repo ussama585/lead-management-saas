@@ -1,0 +1,18 @@
+/* Shared typography for native, Material and Ant Design table cells. */
+html body table :is(th, td) {
+  font-size: 14px !important;
+}
+
+html body table :is(th, td) :is(div, span, p, a, strong, b, em, small) {
+  font-size: inherit !important;
+}
+
+/* Secondary information may opt into the smaller supporting text size. */
+html body table :is(th, td) [data-table-secondary],
+html body table :is(th, td) [data-table-secondary] * {
+  font-size: 12px !important;
+}
+
+html body table tbody > tr {
+  height: 80px;
+}

@@ -1,3 +1,4 @@
+import ManualLocationInput from './manual-location-input.jsx';
 import { Select } from './ui/app-select.jsx';
 import { Input } from './ui/app-controls.jsx';
 import React, { useMemo } from 'react';
@@ -189,11 +190,10 @@ const ContractSummaryForm = ({
               <label className="contract-summary-form__block-label">
                 Proposal City
               </label>
-              <Select
+              <ManualLocationInput
                 className="antd-input dropdown contract-summary-select contract-summary-form__select-full"
                 value={proposalCity || undefined}
                 onChange={(value) => onProposalCityChange(value || '')}
-                options={citiesNames}
                 placeholder="Select city"
                 allowClear
                 showSearch

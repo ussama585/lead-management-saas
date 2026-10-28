@@ -1,16 +1,17 @@
+import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Spin, Button } from '../../../../components/ui/app-controls.jsx';
-import React, { useMemo, useState, useEffect, Suspense } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import "../../../../assets/styles/legacy/leads.generated.css";
 import { Alert, Row, Col } from 'antd';
 import { Trash2 as DeleteOutlined } from 'lucide-react';
 import LeadCard from '../../../../components/lead-card.component.jsx';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
-import { ConfirmationModal } from '../../../clients/components/LazyModals.jsx';
+import DeleteJobDialog from './delete-job-dialog.jsx';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
@@ -19,7 +20,7 @@ import api from '../../../shared/services/api.js';
 import { deleteWebsiteLeadJob } from '../../../shared/services/leads.js';
 import { formatCurrency, formatPaymentTerm, formatSalaryNum } from '../../../shared/utils/formatters.js';
 import useUserStore from '../../../shared/store/user-store.js';
-import { countriesNames, citiesNames, nationalityOptions, currencyOptions, paymentTermOptions, languagesOptions } from '../../../shared/utils/countries.js';
+import { nationalityOptions, currencyOptions, paymentTermOptions, languagesOptions } from '../../../shared/utils/countries.js';
 import { loadTableState } from '../../../shared/utils/persistTableState.js';
 import { getRolePath } from '../../../auth/role-home.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
@@ -83,7 +84,6 @@ const LeadDetailPage = () => {
     const [descLoading, setDescLoading] = useState(false);
     const [deleteModal, setDeleteModal] = useState({ visible: false, job: null });
     const [historyJob, setHistoryJob] = useState(null);
-    const [deleteReason, setDeleteReason] = useState('');
 
     // Persist table state to sessionStorage
     useEffect(() => {
@@ -158,12 +158,8 @@ const LeadDetailPage = () => {
             onSuccess: (res) => {
                 message.success(res?.message || 'Job deleted successfully');
                 setDeleteModal({ visible: false, job: null });
-                setDeleteReason('');
                 queryClient.invalidateQueries([`leadjobs-${id}`]);
                 refetchJobs();
-            },
-            onError: (error) => {
-                message.error(error?.message || 'Failed to delete job');
             },
         }
     );
@@ -172,9 +168,8 @@ const LeadDetailPage = () => {
         setDeleteModal({ visible: true, job });
     };
 
-    const handleConfirmDeleteJob = () => {
-        deleteJobMutation.mutate({ jobId: deleteModal.job?.id, reason: deleteReason.trim() });
-    };
+    const handleConfirmDeleteJob = (jobId, payload) =>
+        deleteJobMutation.mutateAsync({ jobId, reason: payload.delete_reason });
 
     const goBack = () => {
         navigate(getRolePath(user?.user_type, '/leads'));
@@ -347,10 +342,9 @@ const LeadDetailPage = () => {
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
-                    <Select
+                    <ManualLocationInput commitOnBlur
                         className='antd-input dropdown'
                         value={value}
-                        options={citiesNames}
                         showSearch
                         onChange={(newValue) => {
                             setValue(newValue);
@@ -379,10 +373,9 @@ const LeadDetailPage = () => {
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
-                    <Select
+                    <ManualLocationInput commitOnBlur
                         className='antd-input dropdown'
                         value={value}
-                        options={countriesNames}
                         showSearch
                         onChange={(newValue) => {
                             setValue(newValue);
@@ -739,7 +732,7 @@ const LeadDetailPage = () => {
                     
                         {isLoading ? <div className="py-6 text-center"><Spin /></div> : detailError
                             ? <Alert type="error" showIcon message={detailRequestError?.message || 'Could not load lead details.'} action={<Button onClick={() => refetchDetail()}>Retry</Button>} />
-                            : <LeadCard lead={lead} leadType="Website Lead" />}
+                            : <LeadCard lead={lead} leadType="Website Lead" refetchLeadDetail={refetchDetail} />}
                    
                
                 <div className="row">
@@ -805,25 +798,11 @@ const LeadDetailPage = () => {
                 queryKeyPrefix={`websiteLeadJobHistory-${user?.id}-${user?.user_type}-${id}`}
                 emptyMessage="No job history available."
             />}
-            <Suspense fallback={null}>
-                <ConfirmationModal
-                    showModal={deleteModal.visible}
-                    setShowModal={(visible) => {
-                        setDeleteModal(prev => ({ ...prev, visible }));
-                        if (!visible) setDeleteReason('');
-                    }}
-                    mutation={deleteJobMutation}
-                    onConfirm={handleConfirmDeleteJob}
-                    showReasonField={false}
-                    reason={deleteReason}
-                    setReason={setDeleteReason}
-                    message={
-                        <span>
-                            This action cannot be reversed. Are you sure you want to delete job: <strong>{deleteModal.job?.job_title}</strong>?
-                        </span>
-                    }
-                />
-            </Suspense>
+            {deleteModal.visible && deleteModal.job && <DeleteJobDialog key={deleteModal.job.id}
+                job={deleteModal.job}
+                onClose={() => setDeleteModal({ visible: false, job: null })}
+                onConfirm={handleConfirmDeleteJob}
+            />}
         </>
     );
 };

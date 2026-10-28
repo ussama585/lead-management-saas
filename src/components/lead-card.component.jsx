@@ -14,13 +14,17 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import { getManangersExecutives, getAssigningUsersListing } from "../pages/shared/services/users-service.js";
 import useUserStore from "../pages/shared/store/user-store.js";
 import ConfirmationModal from "./confirmation-modal.component.jsx";
-import { assignClient } from "../pages/shared/services/users-service.js";
 import { updateLeadAcceptingResponse, updateLeadById } from '../pages/shared/services/manager-service.js';
 import { updateDataLeadStatus, getDataLeadJobs, getDataLead } from '../pages/shared/services/data-leads-service.js';
 import { reassignMetaLead, updateMetaLead } from '../pages/shared/services/metaLeads.js';
+import { updateMetaLeadStatus } from '../pages/shared/services/headhunting.js';
 import { getConversionToPotential } from '../pages/shared/services/leads.js';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 import ShowRemarksLead from './show-remarks-lead.jsx';
+import { STATUS_OPTIONS as WEBSITE_STATUS_OPTIONS } from '../pages/leads/pages/website-leads/website-leads-constants.js';
+import { STATUS_OPTIONS as DATA_STATUS_OPTIONS } from '../pages/leads/pages/data-leads/data-leads-constants.js';
+import { updateLeadCardFields } from './lead-card-updates.js';
+import { isLeadConvertedToClient } from '../pages/shared/utils/statusColumn.jsx';
 
 const STATUS_OPTIONS = [
   "Pending Contact",
@@ -80,10 +84,6 @@ const STATUSES_REQUIRING_REMARKS = new Set([
   "Irrelevant Lead",
 ]);
 
-const isLeadReadOnly = (lead) =>
-
-  lead?.converted_to_client === true;
-
 const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const [showModal, setShowModal] = useState(false);
   const [status, setStatus] = useState(lead?.status);
@@ -99,13 +99,16 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   const { user } = useUserStore();
   // Allow admins, sales managers, and the person assigned to the lead to edit
-  const isConvertedToClient = isLeadReadOnly(lead);
+  const isConvertedToClient = isLeadConvertedToClient(lead);
   const canEdit = !isConvertedToClient && (user?.user_type === 'admin' || user?.user_type === 'sales_manager' || user?.id === lead?.assigned_to);
   const { Option } = Select;
   const queryClient = useQueryClient();
 
   const isDataLead = leadType === 'Data Lead';
   const isMetaLead = leadType === 'Meta Lead';
+  const isWebsiteLead = !isDataLead && !isMetaLead;
+  const statusOptions = isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
+  const canAssign = !isConvertedToClient && ['admin', 'super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
 
   // Fetch jobs for the selected lead when modal opens
   const { isLoading: loadingJobs, data: jobsData, refetch: refetchJobs } = useQuery(
@@ -116,7 +119,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
         const data = await getDataLeadJobs(jobsLeadId, {});
         return data?.results ?? [];
       }
-      const res = await api.get(`/lead-generation/jobs/${jobsLeadId}`);
+      const res = await api.get(isMetaLead ? `/meta-leads/jobs/${jobsLeadId}` : `/lead-generation/job-list/${jobsLeadId}`);
       return res.data?.results || [];
     },
     { enabled: !!jobsLeadId }
@@ -150,18 +153,26 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     const requestData = {
       status: payload.status,
       remarks: payload.remarks,
-      selected_job_ids: selectedJobIdsString,
-      total_vacancies: payload.total_vacancies,
+      ...(selectedJobIdsString ? { selected_job_ids: selectedJobIdsString } : {}),
+      ...(payload.total_vacancies != null ? { total_vacancies: payload.total_vacancies } : {}),
     };
     if (isDataLead) {
-      return updateDataLeadStatus(payload.id, requestData);
+      return updateLeadCardFields('Data Lead', payload.id, requestData);
     }
-    return api.patch(`/lead-generation/update/${payload.id}`, requestData);
+    if (isMetaLead) return updateMetaLeadStatus(payload.id, { ...requestData, selected_job_ids: payload.selected_job_ids });
+    return updateLeadCardFields('Website Lead', payload.id, requestData);
   };
 
   const updateStatusMutation = useMutation(sendUpdate, {
-    onSuccess: () => {
+    onSuccess: (_response, payload) => {
       message.success("Status updated successfully");
+      setStatus(payload.status);
+      if (isMetaLead) {
+        queryClient.invalidateQueries(['metaLeadDetail']);
+        queryClient.invalidateQueries(['metaLeads']);
+      }
+      queryClient.invalidateQueries(['websiteLeadDetail']);
+      refetchLeadDetail?.();
       if (isDataLead) {
         queryClient.invalidateQueries(['dataLeadJobs', lead.id]);
         queryClient.invalidateQueries(['dataLeadDetail', lead.id]);
@@ -179,15 +190,18 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   // Assignee update mutation
   const sendAssigneeUpdate = (assignedToId) => {
     if (isDataLead) {
-      return api.patch(`data-leads/details/${lead.id}`, { assigned_to: assignedToId });
+      return updateLeadCardFields('Data Lead', lead.id, { assigned_to: assignedToId });
     }
     if (isMetaLead) {
       return reassignMetaLead(lead.id, assignedToId);
     }
-    return assignClient(lead.id, assignedToId);
+    return updateLeadCardFields('Website Lead', lead.id, { assigned_to: assignedToId });
   };
   const updateAssigneeMutation = useMutation(sendAssigneeUpdate, {
     onSuccess: (response) => {
+      setAssignedTo(pendingAssignee);
+      queryClient.invalidateQueries(['websiteLeadDetail']);
+      refetchLeadDetail?.();
       setPendingAssignee(null);
       setShowModal(false);
       message.success("Assignee updated successfully");
@@ -233,7 +247,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   // Fetch executives or managers/executives based on user type (do not call for sales_executive)
   const { data } = useQuery({
-    queryKey: ['executiveList', user?.user_type],
+    queryKey: ['executiveList', user?.id, user?.user_type],
     queryFn: () => user?.user_type === 'admin'
         ? getManangersExecutives()
         : getAssigningUsersListing('sales_executive'),
@@ -245,6 +259,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   });
 
   const executivesList = useMemo(() => {
+    if (isDataLead || isWebsiteLead || isMetaLead) return Array.isArray(data) ? data : [];
     if (user?.user_type === 'admin') {
       // For admin, data from getManangersExecutives() is directly the array
       const allUsers = data || []; // Data is directly the array
@@ -272,7 +287,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     
     // For sales executive, data from getAssigningUsersListing is directly the array
     return Array.isArray(data) ? data : [];
-  }, [data, user?.user_type, user?.id, user?.name]);
+  }, [data, user?.user_type, user?.id, user?.name, isDataLead, isWebsiteLead, isMetaLead]);
 
   useEffect(() => {
     if (lead?.status) setStatus(lead.status);
@@ -324,11 +339,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   // Handle status change with remarks modal
   const handleStatusChange = async (value) => {
-    // Prevent changing status if already Potential Client
-    if (lead?.status === 'Potential Client') {
-      message.error('Cannot change status of Potential Client');
-      return;
-    }
+    if (isConvertedToClient || value === status) return;
 
     // If converting to Potential Client, verify via API that jobs exist
     let conversionData = null;
@@ -336,7 +347,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
       try {
         const jobs = isDataLead
           ? (await getDataLeadJobs(lead.id, {})).results ?? []
-          : (await api.get(`/lead-generation/jobs/${lead.id}`)).data?.results || [];
+          : (await api.get(isMetaLead ? `/meta-leads/jobs/${lead.id}` : `/lead-generation/job-list/${lead.id}`)).data?.results || [];
         if (!Array.isArray(jobs) || jobs.length === 0) {
           message.error('At least 1 job must be present to convert lead to Potential Client');
           return;
@@ -373,6 +384,16 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     
     setRemarksLoading(true);
     try {
+      if (contractData?._conversionHandled) {
+        setStatus(remarksModal.newStatus);
+        setProposalFile(null);
+        setRemarksModal({ visible: false, lead: null, forStatusChange: false, newStatus: null });
+        queryClient.invalidateQueries(['websiteLeadDetail']);
+        queryClient.invalidateQueries(['dataLeadDetail']);
+        queryClient.invalidateQueries(['metaLeadDetail']);
+        refetchLeadDetail?.();
+        return;
+      }
       if (remarksModal.forStatusChange) {
         const payload = {
           id: remarksModal.lead.id,
@@ -380,7 +401,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
           proposal: proposalFile,
           contract_currency: contractData.contract_currency,
           contract_price: contractData.contract_price,
-          total_vacancies: contractData.total_vacancies ?? remarksModal.lead.total_vacancies,
+          total_vacancies: contractData.total_vacancies,
           selected_job_ids: contractData.selected_job_ids || []
         };
         if (includeRemarks) {
@@ -412,12 +433,16 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
             queryClient.invalidateQueries(['dataLeadJobs', lead.id]);
             queryClient.invalidateQueries(['dataLeadDetail', lead.id]);
           } else {
-            const response = await updateLeadById(remarksModal.lead.id, payload);
+            const response = isMetaLead
+              ? await updateMetaLeadStatus(remarksModal.lead.id, payload)
+              : await updateLeadById(remarksModal.lead.id, payload);
             setProposalFile(null);
             message.success(response?.message || 'Proposal uploaded and status updated successfully');
             setRemarksModal({ visible: false, lead: null, forStatusChange: false, newStatus: null });
             setStatus(remarksModal.newStatus);
             queryClient.invalidateQueries(`lead-${lead.id}`);
+            if (isMetaLead) queryClient.invalidateQueries(['metaLeadDetail']);
+            refetchLeadDetail?.();
           }
         } else {
           await new Promise((resolve, reject) => {
@@ -474,6 +499,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     if (isConvertedToClient) {
       return false;
     }
+    if (isDataLead || isWebsiteLead || isMetaLead) return ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type);
 
     // Admin can always edit
     if (user?.user_type === 'admin') {
@@ -491,7 +517,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     }
 
     return false;
-  }, [user?.user_type, isAssignedToCurrentUser, isAssignedToExecutive, isConvertedToClient]);
+  }, [user?.user_type, isAssignedToCurrentUser, isAssignedToExecutive, isConvertedToClient, isDataLead, isWebsiteLead, isMetaLead]);
 
   return (
     <div className="lead-card responsive-lead-card">
@@ -595,7 +621,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               placeholder="Select Status"
               className="select-fit-content"
               popupMatchSelectWidth={false}
-              options={STATUS_OPTIONS.map((option) => ({
+              disabled={updateStatusMutation.isLoading || remarksLoading}
+              options={statusOptions.map((option) => ({
                 label: option,
                 value: option,
               }))}
@@ -608,6 +635,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               {status || 'No Status'}
             </span>
           )}
+
+
         </div>
       </div>
 
@@ -683,17 +712,17 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
           <div className="lead-card__meta-line">{lead?.created_at ? formatDateUniversal(lead.created_at, true) : '-'}</div>
           <div className="lead-card__assigned-label">Assigned To</div>
           <div className="responsive-assigned-select lead-card__assigned-select-wrap">
-            {(user?.user_type === 'sales_manager' || user?.user_type === 'admin') ?
+            {canAssign ?
               <Select
                 value={assignedTo?.id || undefined}
                 placeholder={'Not Assigned'}
                 onChange={(selectedId) => {
-                  const exec = executivesList.find(e => e.id === selectedId) ?? assignedTo;
+                  const exec = executivesList.find(e => String(e.id) === String(selectedId)) ?? assignedTo;
                   if (exec) handleAssigneeChange(exec);
                 }}
                 popupMatchSelectWidth={false}
                 className="lead-card__assigned-select-wrap"
-                disabled={isConvertedToClient}
+                disabled={isConvertedToClient || updateAssigneeMutation.isLoading}
                 optionLabelProp="label"
               >
                 {/* Include current assignee in options if not in executivesList (so dropdown shows assigned_to_name) */}
@@ -733,6 +762,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
       {/* Remarks Modal */}
       <ShowRemarksLead
+        leadType={isDataLead ? 'data-leads' : isMetaLead ? 'meta-leads' : 'website-leads'}
         visible={remarksModal.visible}
         onClose={() => { 
           setRemarksModal({ visible: false, lead: null, forStatusChange: false, newStatus: null }); 
@@ -746,7 +776,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
         isProposalAttached={!!proposalFile}
         remarksRequired={
           remarksModal.forStatusChange &&
-          STATUSES_REQUIRING_REMARKS.has(remarksModal.newStatus)
+          (isWebsiteLead || STATUSES_REQUIRING_REMARKS.has(remarksModal.newStatus))
         }
         saveButtonText={remarksModal.forStatusChange && remarksModal.newStatus === 'Potential Client' ? 'Convert' : 'Update'}
         extra={remarksModal.forStatusChange && remarksModal.newStatus === 'Potential Client' ? (

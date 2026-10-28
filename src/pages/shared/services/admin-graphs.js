@@ -265,6 +265,21 @@ export const getExecutiveMobilisationAmounts = async ({
   }
 };
 
+export const getSuperAdminMobilisationAmounts = async ({ startDate, endDate, companyId } = {}) => {
+  const params = {
+    ...(startDate ? { start_date: startDate } : {}),
+    ...(endDate ? { end_date: endDate } : {}),
+    ...(companyId ? { company_id: companyId } : {}),
+  };
+  const { data } = await api.get('/accounts/leads-mobilisation-amounts', { params });
+  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load mobilisation amounts.');
+  const groups = data?.data ?? data;
+  if (!groups || !['Meta', 'Data', 'Website'].some(key => Array.isArray(groups[key]))) {
+    throw new Error('Could not read mobilisation amounts.');
+  }
+  return groups;
+};
+
 export const getProjectsByStatusPerExecutive = async ({
   startDate,
   endDate,
@@ -303,6 +318,20 @@ export const getSystemLeadFunnel = async ({
   } catch (error) {
     throw new Error(`Error fetching system lead funnel: ${error.message}`);
   }
+};
+
+export const getSuperAdminLeadStatusDistribution = async ({ startDate, endDate, leadType, companyId } = {}) => {
+  const { data } = await api.get('/accounts/lead-status-distribute', {
+    params: {
+      ...(leadType ? { lead_type: leadType } : {}),
+      ...(companyId ? { company_id: companyId } : {}),
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+    },
+  });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead status distribution.');
+  if (!Array.isArray(data?.data)) throw new Error('Could not read lead status distribution.');
+  return data.data;
 };
 
 export const getLeadStatusDistribution = async ({
@@ -462,7 +491,7 @@ export const getAccountsNewUserGraph = async ({
 
 export const getAccountsAllUsers = async () => {
   try {
-    const response = await api.get('/overall-users');
+    const response = await api.get('/accounts/simple-users-list');
     const raw = response?.data;
     if (Array.isArray(raw?.data)) return raw.data;
     return Array.isArray(raw) ? raw : [];
@@ -473,7 +502,7 @@ export const getAccountsAllUsers = async () => {
 
 export const getHistoryModelNames = async () => {
   try {
-    const response = await api.get('/history-model-names');
+    const response = await api.get('/activity/history-model-names');
     const raw = response?.data;
     if (Array.isArray(raw?.data)) return raw.data;
     return Array.isArray(raw) ? raw : [];

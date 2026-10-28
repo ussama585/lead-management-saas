@@ -21,6 +21,14 @@ function render(role, path = '/') {
 beforeEach(() => { state.navigate.mockClear(); state.shell = null; });
 
 describe('role navigation after the shadcn migration', () => {
+  it('shows and opens Demo Request only for Super Admin', () => {
+    const shell = render('super_admin', '/super-admin/demo-requests');
+    expect(shell.selectedKey).toBe('27');
+    expect(shell.menuItems.some(item => item.label === 'Demo Request')).toBe(true);
+    shell.onSelect({ key: '27' });
+    expect(state.navigate).toHaveBeenCalledWith('/super-admin/demo-requests');
+    expect(render('company_admin').menuItems.some(item => item.key === '27')).toBe(false);
+  });
   it.each(['admin', 'super_admin'])('opens Companies for %s', role => {
     const shell = render(role, '/super-admin/companies');
     expect(shell.selectedKey).toBe('26');
@@ -50,7 +58,7 @@ describe('role navigation after the shadcn migration', () => {
     const shell = render(role, '/admin');
     expect(shell.menuItems.map(item => item.label)).toEqual([
       'Dashboard', 'User Activity', 'Website Leads', 'Data Leads', 'Meta Leads',
-      'Follow-up', 'Sales Data', 'User Management', 'Sales Managers', 'Sales Executives', ...(role === 'company_admin' ? [] : ['Companies']), 'Settings',
+      'Follow-up', 'Sales Data', 'User Management', ...(role === 'company_admin' ? [] : ['Companies', 'Demo Request']), 'Settings',
     ]);
     expect(shell.badges['25']).toBeUndefined();
     for (const key of ['19', '6', '25', '8', '18', '22', '24', '14', '16', '23']) shell.onSelect({ key });

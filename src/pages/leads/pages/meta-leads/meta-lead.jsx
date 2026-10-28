@@ -1,3 +1,4 @@
+import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -23,7 +24,7 @@ import {
 } from "../../../shared/services/metaLeads.js";
 import useUserStore from "../../../shared/store/user-store.js";
 import { getRoleHome } from "../../../auth/role-home.js";
-import { countriesNames, citiesNames, currencyOptions, paymentTermOptions } from "../../../shared/utils/countries.js";
+import { currencyOptions, paymentTermOptions } from "../../../shared/utils/countries.js";
 import { loadTableState } from "../../../shared/utils/persistTableState.js";
 import { formatSalaryNum } from "../../../shared/utils/formatters.js";
 
@@ -375,10 +376,9 @@ const MetaLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <ManualLocationInput commitOnBlur
               className="antd-input dropdown"
               value={value}
-              options={citiesNames}
               showSearch
               onChange={(newValue) => {
                 setValue(newValue);
@@ -407,10 +407,9 @@ const MetaLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <ManualLocationInput commitOnBlur
               className="antd-input dropdown"
               value={value}
-              options={countriesNames}
               showSearch
               onChange={(newValue) => {
                 setValue(newValue);

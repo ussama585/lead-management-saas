@@ -1,3 +1,4 @@
+import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -22,7 +23,7 @@ import { useClientHandlers } from '../../hooks/useClientHandlers.js';
 import { getRecruitmentExecutiveStats, getClientDetails, createSaasClient, getAssignedClientsRecruiters } from '../../../shared/services/headhunting.js';
 import { getManangersExecutives } from '../../../shared/services/users-service.js';
 import { useQuery, useQueryClient, useMutation } from 'react-query';
-import { citiesNames, countriesNames } from '../../../shared/utils/countries.js';
+import { countriesNames } from '../../../shared/utils/countries.js';
 
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { getClientStatusHistory } from '../../../shared/services/status-history.js';
@@ -851,11 +852,10 @@ export default function HeadhuntingForAdmin() {
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label className="form-label text-start mb-1" style={{ color: '#3E6A9F' }}>City<sup>*</sup></label>
-                <Select
+                <ManualLocationInput
                   className="antd-input dropdown"
                   placeholder="Select City"
                   value={saasClientForm.city || undefined}
-                  options={citiesNames}
                   showSearch
                   allowClear
                   style={{ width: '100%' }}
@@ -864,11 +864,10 @@ export default function HeadhuntingForAdmin() {
               </div>
               <div>
                 <label className="form-label text-start mb-1" style={{ color: '#3E6A9F' }}>Country<sup>*</sup></label>
-                <Select
+                <ManualLocationInput
                   className="antd-input dropdown"
                   placeholder="Select Country"
                   value={saasClientForm.country || undefined}
-                  options={countriesNames}
                   showSearch
                   allowClear
                   style={{ width: '100%' }}

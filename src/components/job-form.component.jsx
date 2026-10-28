@@ -10,8 +10,6 @@ import dayjs from 'dayjs';
 import moment from 'moment';
 import { formatCurrency, formatSalaryNum } from '../pages/shared/utils/formatters.js';
 import {
-  countriesNames,
-  citiesNames,
   currencyOptions,
   paymentTermOptions,
 } from '../pages/shared/utils/countries.js';
@@ -30,8 +28,11 @@ import {
 import { isDegreeNameRequiredForLevel, isRemoteEmploymentType } from '../pages/shared/schemas/job.js';
 import '../assets/styles/legacy/common.css';
 import '../assets/styles/legacy/job-form.component.css';
+import '../assets/styles/job-form-appearance.css';
 
 // ─── Static Options ───────────────────────────────────────────────────────────
+
+const jobExperienceOptions = Array.from({ length: 12 }, (_, value) => ({ value, label: String(value) }));
 
 const degreeLevelOptions = [
   { value: 'Middle School',              label: 'Middle School' },
@@ -275,7 +276,6 @@ const JobForm = ({
   showValidationErrors = true,
   onFormikReady,
   dateOnly = false,
-  manualLocation = false,
   allowPastDates = false,
   readOnlyMode = false,
   hideSubmitButton = false,
@@ -704,18 +704,16 @@ const JobForm = ({
           {/* ── Experience ── */}
           <Col span={6}>
             <label htmlFor="min_experience" className="form-label text-start mt-3 mb-1">Min Experience (Years)*</label>
-            <Input
+            <Select
               disabled={isFormDisabled}
-              id="min_experience" name="min_experience" type="number"
-              value={formik.values.min_experience}
-              onChange={formik.handleChange}
-              onBlur={(event) => {
-                formik.handleBlur(event);
-                if (onFieldBlur) onFieldBlur(event, 'min_experience', formik.values.min_experience);
-              }}
-              placeholder="Min Experience"
-              className="antd-input styled-input"
-              min={0} allowClear
+              id="min_experience" name="min_experience"
+              value={formik.values.min_experience == null || formik.values.min_experience === '' ? undefined : Number(formik.values.min_experience)}
+              options={jobExperienceOptions}
+              onChange={value => formik.setFieldValue('min_experience', value)}
+              onBlur={() => formik.setFieldTouched('min_experience', true)}
+              placeholder="Select experience"
+              className="antd-input dropdown"
+              style={{ width: '100%' }}
               status={(formik.errors.min_experience && formik.touched.min_experience) || experienceError ? 'error' : ''}
             />
             {formik.errors.min_experience && formik.touched.min_experience && <div className="text-red">{formik.errors.min_experience}</div>}
@@ -724,18 +722,16 @@ const JobForm = ({
 
           <Col span={6}>
             <label htmlFor="max_experience" className="form-label text-start mt-3 mb-1">Max Experience (Years)*</label>
-            <Input
+            <Select
               disabled={isFormDisabled}
-              id="max_experience" name="max_experience" type="number"
-              value={formik.values.max_experience}
-              onChange={formik.handleChange}
-              onBlur={(event) => {
-                formik.handleBlur(event);
-                if (onFieldBlur) onFieldBlur(event, 'max_experience', formik.values.max_experience);
-              }}
-              placeholder="Max Experience"
-              className="antd-input styled-input"
-              min={0} allowClear
+              id="max_experience" name="max_experience"
+              value={formik.values.max_experience == null || formik.values.max_experience === '' ? undefined : Number(formik.values.max_experience)}
+              options={jobExperienceOptions}
+              onChange={value => formik.setFieldValue('max_experience', value)}
+              onBlur={() => formik.setFieldTouched('max_experience', true)}
+              placeholder="Select experience"
+              className="antd-input dropdown"
+              style={{ width: '100%' }}
               status={(formik.errors.max_experience && formik.touched.max_experience) || experienceError ? 'error' : ''}
             />
             {formik.errors.max_experience && formik.touched.max_experience && <div className="text-red">{formik.errors.max_experience}</div>}
@@ -764,7 +760,7 @@ const JobForm = ({
 
           <Col span={6}>
             <label htmlFor="location_city" className="form-label text-start mt-3 mb-1">City*</label>
-            {manualLocation ? <Input
+            <Input
               id="location_city"
               name="location_city"
               disabled={isFormDisabled}
@@ -774,26 +770,13 @@ const JobForm = ({
               onChange={formik.handleChange}
               onBlur={getSelectBlur('location_city')}
               status={formik.errors.location_city && formik.touched.location_city ? 'error' : ''}
-            /> : (
-            <Select
-              disabled={isFormDisabled}
-              className="antd-input dropdown"
-              placeholder="Select City"
-              options={citiesNames}
-              showSearch
-              value={formik.values.location_city}
-              onChange={(value) => formik.setFieldValue('location_city', value)}
-              allowClear
-              status={formik.errors.location_city && formik.touched.location_city ? 'error' : ''}
-              onBlur={getSelectBlur('location_city')}
             />
-            )}
             {formik.errors.location_city && formik.touched.location_city && <div className="text-red">{formik.errors.location_city}</div>}
           </Col>
 
           <Col span={6}>
             <label htmlFor="location_country" className="form-label text-start mt-3 mb-1">Country*</label>
-            {manualLocation ? <Input
+            <Input
               id="location_country"
               name="location_country"
               disabled={isFormDisabled}
@@ -803,20 +786,7 @@ const JobForm = ({
               onChange={formik.handleChange}
               onBlur={getSelectBlur('location_country')}
               status={formik.errors.location_country && formik.touched.location_country ? 'error' : ''}
-            /> : (
-            <Select
-              disabled={isFormDisabled}
-              className="antd-input dropdown"
-              placeholder="Select Country"
-              options={countriesNames}
-              value={formik.values.location_country}
-              showSearch
-              allowClear
-              onChange={(value) => formik.setFieldValue('location_country', value)}
-              onBlur={getSelectBlur('location_country')}
-              status={formik.errors.location_country && formik.touched.location_country ? 'error' : ''}
             />
-            )}
             {formik.errors.location_country && formik.touched.location_country && (
               <div className="text-red">{formik.errors.location_country}</div>
             )}

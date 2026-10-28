@@ -1,3 +1,4 @@
+import ManualLocationInput from '../../components/manual-location-input.jsx';
 import React, { useEffect, useState } from 'react';
 import InputField from '../../components/input-field.component.jsx';
 import { Button } from '../../components/ui/button.jsx';
@@ -14,7 +15,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { getDataEntryById, updateDataEntryById } from '../shared/services/data-entry-service.js';
 const message = { success: toast.success, error: toast.error };
-import { citiesNames, countriesNames } from '../shared/utils/countries.js';
+import { countriesNames } from '../shared/utils/countries.js';
 import { useFormik } from 'formik';
 import useUserStore from '../shared/store/user-store.js';
 import { getRolePath } from '../auth/role-home.js';
@@ -266,7 +267,7 @@ const EditDataEntry = () => {
                     <div>
                       <Field name="city">
                         {({ field, form }) => (
-                          <SalesDataSelect
+                          <ManualLocationInput commitOnBlur
                             {...field}
                             value={field.value}
                             onChange={value => {
@@ -274,7 +275,6 @@ const EditDataEntry = () => {
                               form.setFieldValue('city', stringValue);
                               handleAutoSave(null, 'city', stringValue);
                             }}
-                            options={citiesNames}
                             placeholder='Select city'
                             style={{ width: '100%', color: '#000000' }}
                             showSearch
@@ -291,7 +291,7 @@ const EditDataEntry = () => {
                     <div>
                       <Field name="country">
                         {({ field, form }) => (
-                          <SalesDataSelect
+                          <ManualLocationInput commitOnBlur
                             {...field}
                             value={field.value}
                             onChange={value => {
@@ -299,7 +299,6 @@ const EditDataEntry = () => {
                               form.setFieldValue('country', stringValue);
                               handleAutoSave(null, 'country', stringValue);
                             }}
-                            options={countriesNames}
                             placeholder='Select country'
                             style={{ width: '100%', color: '#000000' }}
                             showSearch

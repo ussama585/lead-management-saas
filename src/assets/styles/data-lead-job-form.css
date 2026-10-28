@@ -1,6 +1,6 @@
 .data-job-form {
   display: grid;
-  gap: 20px;
+  gap: 12px;
   min-width: 0;
   container-type: inline-size;
 }
@@ -22,10 +22,10 @@
 .data-job-grid, .data-job-nature-grid, .data-job-skill-row, .data-job-paired-sections {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 16px 12px;
+  gap: 12px 10px;
   min-width: 0;
 }
-.data-job-stack { display: grid; gap: 16px; min-width: 0; }
+.data-job-stack { display: grid; gap: 12px; min-width: 0; }
 .data-job-field { min-width: 0; }
 .data-job-field > label {
   display: block;

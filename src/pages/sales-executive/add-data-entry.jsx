@@ -1,3 +1,4 @@
+import ManualLocationInput from '../../components/manual-location-input.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import { Select } from '../../components/ui/app-select.jsx';
 import React from 'react';
@@ -12,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { createDataEntry } from '../shared/services/data-entry-service.js';
 
-import { citiesNames, countriesNames } from '../shared/utils/countries.js';
+import { countriesNames } from '../shared/utils/countries.js';
 
 const initialState = {
   representative_name: '',
@@ -131,11 +132,10 @@ const AddDataEntry = () => {
                   <Form.Item name="city" style={{ marginBottom: 0 }}>
                     <Field name="city">
                       {({ field, form }) => (
-                        <Select
+                        <ManualLocationInput
                           {...field}
                           value={field.value}
                           onChange={value => form.setFieldValue('city', value)}
-                          options={citiesNames}
                           showSearch
                           placeholder="Select City"
                           allowClear
@@ -152,11 +152,10 @@ const AddDataEntry = () => {
                   <Form.Item name="country" style={{ marginBottom: 0 }}>
                     <Field name="country">
                       {({ field, form }) => (
-                        <Select
+                        <ManualLocationInput
                           {...field}
                           value={field.value}
                           onChange={value => form.setFieldValue('country', value)}
-                          options={countriesNames}
                           showSearch
                           placeholder="Select Country"
                           allowClear

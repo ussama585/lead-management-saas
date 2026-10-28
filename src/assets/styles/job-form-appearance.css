@@ -1,0 +1,73 @@
+/* Shared appearance for Website, Meta and Data Lead job forms only. */
+.job-form .job-form-section,
+.data-job-form .data-job-section {
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.job-form .job-form-section__title,
+.data-job-form .data-job-section > h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.job-form .job-form-section__divider {
+  margin: 12px 0 16px !important;
+  border-color: var(--border) !important;
+}
+
+.data-job-form .data-job-section > h2 {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.job-form label.form-label,
+.data-job-form .data-job-field > label {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.job-form .job-form-section__hint,
+.data-job-form .data-job-help {
+  margin-top: 4px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.job-form .job-form-section .relative.inline-flex,
+.data-job-form .data-job-field .relative.inline-flex {
+  width: 100%;
+}
+
+.data-job-form .data-job-working-days > .relative.inline-flex {
+  flex: 1;
+  min-width: 0;
+}
+
+.job-form .job-form-section textarea,
+.data-job-form .data-job-section textarea {
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@media (max-width: 480px) {
+  .job-form .job-form-section,
+  .data-job-form .data-job-section { padding: 14px; }
+}

@@ -1,3 +1,4 @@
+import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
@@ -10,8 +11,6 @@ import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { addLeadJobSchema } from "../../../shared/schemas/schema.js";
 import {
-  countriesNames,
-  citiesNames,
   nationalityOptions,
   currencyOptions,
   paymentTermOptions,
@@ -774,10 +773,9 @@ const DataLeadEditJob = () => {
                     <label htmlFor="location_city" className="form-label text-start mt-3 mb-1">
                       City*
                     </label>
-                    <Select
+                    <ManualLocationInput
                       className="antd-input dropdown"
                       placeholder="Select City"
-                      options={citiesNames}
                       showSearch
                       value={formik.values.location_city}
                       onChange={(value) => formik.setFieldValue("location_city", value)}
@@ -794,10 +792,9 @@ const DataLeadEditJob = () => {
                     <label htmlFor="location_country" className="form-label text-start mt-3 mb-1">
                       Country
                     </label>
-                    <Select
+                    <ManualLocationInput
                       className="antd-input dropdown"
                       placeholder="Select Country"
-                      options={countriesNames}
                       value={formik.values.location_country}
                       showSearch
                       allowClear

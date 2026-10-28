@@ -16,7 +16,7 @@ import {
   ClipboardCheck as CarryOutOutlined, ChartBar as AuditOutlined,
   FileSearch as FileSearchOutlined, SlidersHorizontal as SlidersOutlined,
   DollarSign as DollarOutlined, FileCheck as FileDoneOutlined,
-  FileText as FileTextOutlined, Building2,
+  FileText as FileTextOutlined, Building2, MonitorPlay,
 } from 'lucide-react';
 
 export default function AppLayout({ children, role }) {
@@ -125,6 +125,7 @@ export default function AppLayout({ children, role }) {
       path.includes('/job-headhunting') ||
       path.includes('/edit-client-headhunting')
     ) return '8';
+    if (path.includes('/demo-requests')) return '27';
     // Meta Leads
     if (path.includes('/meta-leads')) return '9';
     if (path.includes('/sales-executive/meta-leads')) return '9';
@@ -175,6 +176,9 @@ export default function AppLayout({ children, role }) {
     switch (key) {
       case '26':
         if (isSuperAdmin(signedInUser?.user_type)) navigate('/super-admin/companies');
+        break;
+      case '27':
+        if (isSuperAdmin(signedInUser?.user_type)) navigate('/super-admin/demo-requests');
         break;
       case '1':
         if (user.user_type === 'accountant') {
@@ -385,6 +389,7 @@ export default function AppLayout({ children, role }) {
       // { key: '3', icon: <UserPlus className={getIconStyle('3').className} />, label: 'Sales Managers' },
       // { key: '4', icon: <UserStar className={getIconStyle('4').className} />, label: 'Sales Executives' },
       ...(isSuperAdmin(signedInUser?.user_type) ? [{ key: '26', icon: <Building2 />, label: 'Companies' }] : []),
+      ...(isSuperAdmin(signedInUser?.user_type) ? [{ key: '27', icon: <MonitorPlay />, label: 'Demo Request' }] : []),
       { key: '14', icon: <FolderOpenOutlined className={getIconStyle('14').className} />, label: 'CV Pool' },
       { key: '16', icon: <AimOutlined className={getIconStyle('16').className} />, label: 'Questionnaires' },
       { key: '23', icon: <FileDoneOutlined className={getIconStyle('23').className} />, label: 'Deliverables' },
@@ -416,7 +421,7 @@ export default function AppLayout({ children, role }) {
   const menuGroupByKey = {
     '1': 'Overview', '19': 'Overview',
     '9': 'Leads & Sales', '10': 'Leads & Sales', '15': 'Leads & Sales',
-    '17': 'Leads & Sales', '11': 'Leads & Sales', '12': 'Leads & Sales', '22': 'Leads & Sales',
+    '17': 'Leads & Sales', '11': 'Leads & Sales', '12': 'Leads & Sales', '22': 'Leads & Sales', '27': 'Leads & Sales',
     '2': 'Team Management', '3': 'Team Management', '4': 'Team Management', '7': 'Team Management',
     '6': 'Clients & Projects', '8': 'Clients & Projects', '13': 'Clients & Projects',
     '18': 'Recruitment', '25': 'Recruitment', '14': 'Recruitment', '16': 'Recruitment', '23': 'Recruitment',

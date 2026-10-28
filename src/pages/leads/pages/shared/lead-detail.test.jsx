@@ -33,8 +33,8 @@ describe('Website Lead detail card API', () => {
   });
   it('deletes a job through the shared job endpoint', async () => {
     api.delete.mockResolvedValue({ data: { message: 'Job deleted successfully' } });
-    await expect(deleteWebsiteLeadJob(3)).resolves.toEqual({ message: 'Job deleted successfully' });
-    expect(api.delete).toHaveBeenLastCalledWith('/lead-generation/job/3');
+    await expect(deleteWebsiteLeadJob(3, '  Position cancelled  ')).resolves.toEqual({ message: 'Job deleted successfully' });
+    expect(api.delete).toHaveBeenLastCalledWith('/lead-generation/delete-job/3', { data: { delete_reason: 'Position cancelled' } });
   });
   it('loads the paginated jobs response from job-list using the parent lead ID', async () => {
     const data = { status: true, count: 1, next: null, previous: null, results: [{ id: 18, job_title: 'Python Developer' }] };
