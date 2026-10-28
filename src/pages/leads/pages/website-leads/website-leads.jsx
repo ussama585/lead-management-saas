@@ -738,17 +738,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       // Extra columns that should be placed at the end
       const extraColumns = [
         {
-          header: 'Promo Code',
-          id: 'promo_code',
-          accessorKey: 'promo_code',
-          size: 0.5,
-          sortUndefined: 'last',
-          sortDescFirst: false,
-          Cell: ({ cell }) => (
-            <span>{cell.getValue() ? cell.getValue() : '-'}</span>
-          ),
-        },
-        {
           header: 'Date',
           accessorKey: 'created_at',
           size: 0.5,

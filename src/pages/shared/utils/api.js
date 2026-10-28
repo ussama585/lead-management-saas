@@ -6,12 +6,12 @@ let API_URL;
 let MAIN_SYSTEM_BASE_URL;
 
 if (process.env.NODE_ENV === "production") {
-  API_URL = "https://waters-dependent-int-weekly.trycloudflare.com/api";
+  API_URL = "https://site-great-transport-spotlight.trycloudflare.com/api";
   // API_URL = "https://sop-crm-api-8dd4162d27d6.herokuapp.com/api";
   MAIN_SYSTEM_BASE_URL = "https://searchopal-dev-11311db4105f.herokuapp.com/";
 
 } else {
-  API_URL = "https://waters-dependent-int-weekly.trycloudflare.com/api";
+  API_URL = "https://site-great-transport-spotlight.trycloudflare.com/api";
   // API_URL = "https://crm-api.searchopal.ca/api";
   MAIN_SYSTEM_BASE_URL = "https://duplicate-api.searchopal.ca/";
 }
