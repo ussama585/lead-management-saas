@@ -328,14 +328,14 @@ export default function UserManagement() {
         accessorKey: 'email',
         Cell: ({ cell }) => <span style={{ display: 'flex', alignItems: 'center' }}>{cell.getValue()}</span>,
       },
-      {
+      ...(!isCompany ? [{
         header: 'Manager',
         accessorKey: 'manager',
         enableSorting: true,  // Add this line
         enableColumnFilter: true,  // Add this line
         enableColumnActions: true,  // Add this line
         Cell: ({ cell }) => <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cell.getValue() ? cell.getValue() : "-"}</span>,
-      },
+      }] : []),
       {
         header: 'Edit User',
         accessorFn: (row) => row,

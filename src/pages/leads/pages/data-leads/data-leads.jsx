@@ -407,7 +407,7 @@ const DataLeads = () => {
       if (!lead?.id || !nextStatus) return;
       if (isLeadConvertedToClient(lead)) return;
 
-      if (STATUSES_REQUIRING_REMARKS.has(nextStatus)) {
+      if (nextStatus !== 'Potential Client' && STATUSES_REQUIRING_REMARKS.has(nextStatus)) {
         setProposalFile(null);
         setRemarksModal({
           visible: true,
@@ -635,7 +635,8 @@ const DataLeads = () => {
   );
 
   const columns = useMemo(
-  () => [
+  () => {
+    const tableColumns = [
       {
         header: "#",
         accessorKey: "row_number",
@@ -674,7 +675,7 @@ const DataLeads = () => {
           />
         ),
       },
-      ...((user?.user_type === "sales_manager" || user?.user_type === "sales_executive") ? [{
+      ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
         header: "Follow Ups and Remarks",
         id: "follow_up",
         accessorKey: "follow_up",
@@ -683,9 +684,16 @@ const DataLeads = () => {
         Cell: ({ row }) => (
           <AntTooltip title="Follow Ups and Remarks">
             <ClockCircleOutlined size="1em" className="app-icon"
+              role="button" tabIndex={0} aria-label="Follow Ups and Remarks"
               style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
               onClick={() => {
                 setFollowUpModal({ visible: true, lead: row.original });
+              }}
+              onKeyDown={event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setFollowUpModal({ visible: true, lead: row.original });
+                }
               }}
             />
           </AntTooltip>
@@ -727,7 +735,7 @@ const DataLeads = () => {
             </AntTooltip>
           );
           const delayedInfoIcon = isFollowupDelayed && (
-            <AntTooltip title="This follow up is delayed">
+            <AntTooltip title="This follow up is delayed" color="#ff4d4f">
               <InfoCircleOutlined size="1em" className="app-icon" style={{ color: "#ff4d4f", fontSize: "14px" }} />
             </AntTooltip>
           );
@@ -741,9 +749,10 @@ const DataLeads = () => {
               >
                 {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
               </AntAvatar>
-              {name}
-              {delayedInfoIcon}
-              {duplicateIcon}
+              <span className="min-w-0">
+                <span className="flex items-center gap-2">{name}{delayedInfoIcon}{duplicateIcon}</span>
+                <span data-table-secondary className="block text-xs text-muted-foreground">{lead.email || '-'}</span>
+              </span>
             </span>
           );
         },
@@ -1041,7 +1050,13 @@ const DataLeads = () => {
           <AntButton size='small' disabled={isLeadConvertedToClient(row.original)} onClick={() => setLeadDialog({ mode: 'edit', id: row.original.id })}>Edit</AntButton>
         </Space>,
       },
-    ],
+    ];
+    const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
+    return [
+      ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
+      ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'email'),
+    ];
+  },
     [
       executivesList,
       assigneeOptions,

@@ -71,7 +71,7 @@ const LeadEditModal = ({
     updateLeadMutation.mutate(values);
   };
 
-  const canEdit = user?.user_type === 'admin' || user?.user_type === 'sales_manager' || 
+  const canEdit = user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || 
                  (user?.user_type === 'sales_executive' && user?.id === leadToUse?.assigned_to);
 
   if (!canEdit) {

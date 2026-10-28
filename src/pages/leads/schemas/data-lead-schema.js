@@ -1,5 +1,11 @@
 import * as Yup from 'yup';
 
+export const dataLeadEditFields = ['contact_person_name', 'company_name', 'phone_number', 'contact_person_designation', 'email'];
+
+export function dataLeadEditSchema() {
+  return dataLeadSchema(false).pick(dataLeadEditFields);
+}
+
 export function dataLeadSchema(superAdmin = false) {
   return Yup.object({
     company: superAdmin ? Yup.number().typeError('Choose a company.').integer().positive().required('Choose a company.') : Yup.mixed().nullable(),

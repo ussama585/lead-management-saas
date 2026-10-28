@@ -9,3 +9,26 @@
 .user-management-form .ant-select-focused:not(.ant-select-disabled) .ant-select-selector {
   border-color: var(--field-border-color, #d2d2d2) !important;
 }
+.user-management-form .form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.user-management-form .form-grid > .form-item,
+.user-management-form .ant-form-item-control,
+.user-management-form .ant-form-item-control-input-content {
+  min-width: 0;
+  width: 100%;
+}
+
+.user-management-form .dropdown-select,
+.user-management-form .form-item .relative.inline-flex,
+.user-management-form input[data-slot='input'] {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .user-management-form .form-grid { grid-template-columns: minmax(0, 1fr); }
+}
+

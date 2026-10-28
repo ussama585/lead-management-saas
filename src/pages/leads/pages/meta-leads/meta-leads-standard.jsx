@@ -3,6 +3,7 @@ import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button, Tooltip } from '../../../../components/ui/app-controls.jsx';
+import { Avatar, AvatarFallback } from '../../../../components/ui/avatar.jsx';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Space } from 'antd';
 import { MessageCircle as CommentOutlined, Pencil as EditOutlined, Calendar as CalendarOutlined, Upload as UploadOutlined, History as HistoryOutlined, Download as DownloadOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
@@ -553,14 +554,7 @@ export default function MetaLeadsStandard() {
   const handleStatusChange = (lead, newStatus) => {
     if (!lead) return;
     if (isLeadConvertedToClient(lead)) return;
-     if (
-    newStatus === "Potential Client" &&
-    (!lead.company_name || lead.company_name.trim() === "")
-  ) {
-    message.error("Please add a company name first.");
-    return;
-  }
-    if (STATUSES_REQUIRING_REMARKS.has(newStatus)) {
+    if (newStatus !== 'Potential Client' && STATUSES_REQUIRING_REMARKS.has(newStatus)) {
       setProposalFile(null);
       setRemarksModal({ visible: true, lead, newStatus, forStatusChange: true });
       return;
@@ -618,7 +612,7 @@ export default function MetaLeadsStandard() {
   };
 
   const columns = useMemo(() => {
-    return [
+    const tableColumns = [
     {
       header: 'ID',
       accessorKey: 'id',
@@ -657,7 +651,7 @@ export default function MetaLeadsStandard() {
         );
       },
     },
-    ...((user?.user_type === 'sales_manager' || user?.user_type === 'sales_executive') ? [{
+    ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
       header: 'Follow Ups and Remarks',
       id: 'follow_up',
       accessorKey: 'follow_up',
@@ -665,9 +659,16 @@ export default function MetaLeadsStandard() {
       Cell: ({ row }) => (
         <Tooltip title="Follow Ups and Remarks">
           <ClockCircleOutlined size="1em" className="app-icon"
+            role="button" tabIndex={0} aria-label="Follow Ups and Remarks"
             style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
             onClick={() => {
               setFollowUpModal({ visible: true, lead: row.original });
+            }}
+            onKeyDown={event => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setFollowUpModal({ visible: true, lead: row.original });
+              }
             }}
           />
         </Tooltip>
@@ -804,17 +805,21 @@ export default function MetaLeadsStandard() {
           </Tooltip>
         );
         const delayedInfoIcon = isFollowupDelayed && (
-          <Tooltip title="The follow up is delayed">
+          <Tooltip title="The follow up is delayed" color="#ff4d4f">
             <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#ff4d4f', fontSize: '14px' }} />
           </Tooltip>
         );
         
         return (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            {name}
-            {delayedInfoIcon}
-            {duplicateIcon}
-          </span>
+          <div className="flex items-center gap-3">
+            <Avatar className="size-10 shrink-0">
+              <AvatarFallback className="bg-primary text-primary-foreground">{String(name).trim().charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5"><span>{name}</span>{delayedInfoIcon}{duplicateIcon}</div>
+              <div data-table-secondary className="text-xs text-muted-foreground">{lead.work_email || lead.email || '-'}</div>
+            </div>
+          </div>
         );
       },
     },
@@ -1008,6 +1013,11 @@ export default function MetaLeadsStandard() {
         accessorKey: 'status_history_meta_standard',
       }),
     ] : []),
+    ];
+    const leadingKeys = ['id', 'full_name', 'job_title', 'company_name', 'phone_number'];
+    return [
+      ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
+      ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'work_email'),
     ];
   }, [canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
 

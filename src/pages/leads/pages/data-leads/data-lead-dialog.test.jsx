@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '../../../shared/services/api.js';
 import { dataLeadPayload, getDataLeadDetails, saveDataLead } from './data-lead-dialog.jsx';
-import { dataLeadSchema } from '../../schemas/data-lead-schema.js';
+import { dataLeadSchema, dataLeadEditSchema, dataLeadEditFields } from '../../schemas/data-lead-schema.js';
 
 vi.mock('../../../shared/services/api.js', () => ({ default: { get: vi.fn(), post: vi.fn(), patch: vi.fn() } }));
 vi.mock('../../../shared/store/user-store.js', () => ({ default: () => ({ user: null }) }));
@@ -28,7 +28,7 @@ describe('data lead API contract', () => {
   it('patches the same details endpoint', async () => {
     api.patch.mockResolvedValue({ data: { success: true } });
     await saveDataLead({ id: 1, values: sample, superAdmin: true });
-    expect(api.patch).toHaveBeenCalledWith('/data-leads/details/1', sample);
+    expect(api.patch).toHaveBeenCalledWith('/data-leads/details/1', Object.fromEntries(dataLeadEditFields.map(key => [key, sample[key]])));
   });
   it('normalizes numeric and empty fields without losing false values', () => {
     const payload = dataLeadPayload({ ...sample, assigned_to: '', contract_price: '0', is_accepting_response: false, followup_date: '' }, false);
@@ -43,6 +43,11 @@ describe('data lead API contract', () => {
 });
 
 describe('data lead validation', () => {
+  it('validates only editable contact fields when editing', async () => {
+    const values = Object.fromEntries(dataLeadEditFields.map(key => [key, sample[key]]));
+    await expect(dataLeadEditSchema().validate(values)).resolves.toBeTruthy();
+    await expect(dataLeadEditSchema().validate({ ...values, email: 'invalid' })).rejects.toThrow('email');
+  });
   it('requires company selection for super admins only', async () => {
     await expect(dataLeadSchema(true).validate(sample)).resolves.toBeTruthy();
     await expect(dataLeadSchema(true).validate({ ...sample, company: undefined })).rejects.toThrow('company');

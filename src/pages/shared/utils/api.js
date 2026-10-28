@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "production") {
   MAIN_SYSTEM_BASE_URL = "https://searchopal-dev-11311db4105f.herokuapp.com/";
 
 } else {
-  API_URL = "https://site-great-transport-spotlight.trycloudflare.com/api";
+  API_URL = "https://saas-lead-generations.vercel.app/api";
   // API_URL = "https://crm-api.searchopal.ca/api";
   MAIN_SYSTEM_BASE_URL = "https://duplicate-api.searchopal.ca/";
 }

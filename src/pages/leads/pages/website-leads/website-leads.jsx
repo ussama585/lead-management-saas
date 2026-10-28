@@ -13,7 +13,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
   import WebsiteStatusTabs from './website-status-tabs.jsx';
   import ExecutiveTabButton from '../../../../components/executive-tab-button.component.jsx';
   import NewTableComponent from '../../../../components/tables/new-table.jsx';
-  import { Avatar, Space } from 'antd';
+  import { Space } from 'antd';
+  import { Avatar, AvatarFallback } from '../../../../components/ui/avatar.jsx';
   import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
   import { createStatusColumn, isLeadConvertedToClient } from '../../../shared/utils/statusColumn.jsx';
   import { createAssignedToColumn } from '../../../shared/utils/assignedToColumn.jsx';
@@ -913,8 +914,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             updateStatusMutation.mutate({
               id: lead.id,
               status: newStatus,
-              total_vacancies: lead.total_vacancies,
-              selected_job_ids: [],
             });
           },
           isLoading: updateStatusMutation.isLoading,
@@ -952,12 +951,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           header: 'Company',
           accessorKey: 'company_name',
           size: 220,
-          Cell: ({ cell }) => <Space>
-            <Avatar size={40} style={{ flexShrink: 0, backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }} aria-hidden="true">
-              {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
-            </Avatar>
-            <span>{cell.getValue() || '-'}</span>
-          </Space>,
+          Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
         },
         // 7. Name
         {
@@ -967,6 +961,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           Cell: ({ cell, row }) => {
             const name = cell.getValue();
             const lead = row.original;
+            const avatar = <Avatar className="size-10 shrink-0" aria-hidden="true">
+              <AvatarFallback className="bg-primary text-primary-foreground">{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
+            </Avatar>;
             const isDuplicateLead = isDuplicate(lead);
             const isFollowupDelayed =
               lead?.is_followup_delayed === true || lead?.is_followed_delayed === true;
@@ -996,7 +993,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               </Tooltip>
             );
             const delayedInfoIcon = isFollowupDelayed && (
-              <Tooltip title="This follow up is delayed">
+              <Tooltip title="This follow up is delayed" color="#ff4d4f">
                 <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#ff4d4f', fontSize: '14px' }} />
               </Tooltip>
             );
@@ -1004,11 +1001,13 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             // Marketing managers see simple text, no hyperlink
             if (userType === 'marketing_manager') {
               return (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {name}
-                  {delayedInfoIcon}
-                  {duplicateIcon}
-                </span>
+                <div className="flex items-center gap-3">
+                  {avatar}
+                  <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">{name}{delayedInfoIcon}{duplicateIcon}</div>
+                  <div data-table-secondary className="text-xs text-muted-foreground">{lead.email || '-'}</div>
+                  </div>
+                </div>
               );
             }
 
@@ -1016,6 +1015,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             const identifierQuery = row.original.identifier ? `?identifier=${encodeURIComponent(row.original.identifier)}` : '';
             const leadHref = getRolePath(userType, `/leads/${row.original.id}${identifierQuery}`);
             return (
+              <div className="flex items-center gap-3">
+              {avatar}
+              <div className="min-w-0">
               <Tooltip title="View lead details">
                 <a
                   style={{ textDecoration: 'underline', color: '#3E6A9F', display: 'flex', alignItems: 'center', gap: '6px' }}
@@ -1027,6 +1029,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
                   {duplicateIcon}
                 </a>
               </Tooltip>
+              <div data-table-secondary className="text-xs text-muted-foreground">{lead.email || '-'}</div>
+              </div>
+              </div>
             );
           },
         },
@@ -1209,11 +1214,11 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // Extra columns at the end
         ...extraColumns,
       ];
-      const leadingKeys = ['row_number', 'company_name', 'contact_person_name'];
+      const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
       const adjacentKeys = ['project_size', 'assigned_to_name'];
       const ordered = [
         ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
-        ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && !adjacentKeys.includes(column.accessorKey)),
+        ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && !adjacentKeys.includes(column.accessorKey) && column.accessorKey !== 'email'),
       ];
       const statusIndex = ordered.findIndex(column => column.accessorKey === 'status');
       ordered.splice(statusIndex + 1, 0, ...adjacentKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean));

@@ -117,6 +117,7 @@ export default function CreateUser() {
 
         <div className="flex-container">
           <UserDetailCard
+            centerName
             type="general"
             name={name}
             phoneNumber={phone}
@@ -340,7 +341,8 @@ export default function CreateUser() {
                           {/* <span className="asterisk">*</span> */}
                         </label>
                         <Select
-                          className="dropdown-select"
+                          className="w-full"
+                          style={{ width: '100%' }}
                           popupMatchSelectWidth={false}
                           value={values.manager || undefined}
                           onBlur={() => setFieldTouched('manager', true)}

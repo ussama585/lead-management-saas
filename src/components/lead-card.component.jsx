@@ -7,6 +7,8 @@ import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as Upload
 import { Switch } from 'antd';
 
 import LeadEditModal from './LeadEditModal.jsx';
+import DataLeadDialog from '../pages/leads/pages/data-leads/data-lead-dialog.jsx';
+import { Button } from './ui/app-controls.jsx';
 import formatDate from "../pages/shared/utils/formatDate.js";
 import { formatDateTime } from "../pages/shared/utils/formatDate.js";
 import api from "../pages/shared/services/api.js";
@@ -15,10 +17,9 @@ import { getManangersExecutives, getAssigningUsersListing } from "../pages/share
 import useUserStore from "../pages/shared/store/user-store.js";
 import ConfirmationModal from "./confirmation-modal.component.jsx";
 import { updateLeadAcceptingResponse, updateLeadById } from '../pages/shared/services/manager-service.js';
-import { updateDataLeadStatus, getDataLeadJobs, getDataLead } from '../pages/shared/services/data-leads-service.js';
+import { updateDataLeadStatus, getDataLeadJobs } from '../pages/shared/services/data-leads-service.js';
 import { reassignMetaLead, updateMetaLead } from '../pages/shared/services/metaLeads.js';
 import { updateMetaLeadStatus } from '../pages/shared/services/headhunting.js';
-import { getConversionToPotential } from '../pages/shared/services/leads.js';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 import ShowRemarksLead from './show-remarks-lead.jsx';
 import { STATUS_OPTIONS as WEBSITE_STATUS_OPTIONS } from '../pages/leads/pages/website-leads/website-leads-constants.js';
@@ -95,12 +96,12 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const [proposalFile, setProposalFile] = useState(null);
   const [jobsList, setJobsList] = useState([]);
   const [jobsLeadId, setJobsLeadId] = useState(null);
-  const [editModalFreshLead, setEditModalFreshLead] = useState(null);
+  const [dataLeadEditOpen, setDataLeadEditOpen] = useState(false);
 
   const { user } = useUserStore();
-  // Allow admins, sales managers, and the person assigned to the lead to edit
+  // Allow super admins, sales managers, and the person assigned to the lead to edit
   const isConvertedToClient = isLeadConvertedToClient(lead);
-  const canEdit = !isConvertedToClient && (user?.user_type === 'admin' || user?.user_type === 'sales_manager' || user?.id === lead?.assigned_to);
+  const canEdit = !isConvertedToClient && (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || user?.id === lead?.assigned_to);
   const { Option } = Select;
   const queryClient = useQueryClient();
 
@@ -108,7 +109,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const isMetaLead = leadType === 'Meta Lead';
   const isWebsiteLead = !isDataLead && !isMetaLead;
   const statusOptions = isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
-  const canAssign = !isConvertedToClient && ['admin', 'super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
+  const canAssign = !isConvertedToClient && ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
 
   // Fetch jobs for the selected lead when modal opens
   const { isLoading: loadingJobs, data: jobsData, refetch: refetchJobs } = useQuery(
@@ -248,7 +249,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   // Fetch executives or managers/executives based on user type (do not call for sales_executive)
   const { data } = useQuery({
     queryKey: ['executiveList', user?.id, user?.user_type],
-    queryFn: () => user?.user_type === 'admin'
+    queryFn: () => user?.user_type === 'super_admin'
         ? getManangersExecutives()
         : getAssigningUsersListing('sales_executive'),
     enabled: user?.user_type !== 'sales_executive',
@@ -260,8 +261,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   const executivesList = useMemo(() => {
     if (isDataLead || isWebsiteLead || isMetaLead) return Array.isArray(data) ? data : [];
-    if (user?.user_type === 'admin') {
-      // For admin, data from getManangersExecutives() is directly the array
+    if (user?.user_type === 'super_admin') {
+      // For super admin, data from getManangersExecutives() is directly the array
       const allUsers = data || []; // Data is directly the array
       return Array.isArray(allUsers) ? allUsers : [];
     }
@@ -341,32 +342,11 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const handleStatusChange = async (value) => {
     if (isConvertedToClient || value === status) return;
 
-    // If converting to Potential Client, verify via API that jobs exist
-    let conversionData = null;
     if (value === 'Potential Client') {
-      try {
-        const jobs = isDataLead
-          ? (await getDataLeadJobs(lead.id, {})).results ?? []
-          : (await api.get(isMetaLead ? `/meta-leads/jobs/${lead.id}` : `/lead-generation/job-list/${lead.id}`)).data?.results || [];
-        if (!Array.isArray(jobs) || jobs.length === 0) {
-          message.error('At least 1 job must be present to convert lead to Potential Client');
-          return;
-        }
-        setJobsList(jobs);
-        setJobsLeadId(lead.id);
-      } catch (err) {
-        message.error('Failed to verify jobs for this lead');
-        return;
-      }
-
-      const leadTypeParam = isMetaLead ? 'meta-leads' : isDataLead ? 'data-leads' : undefined;
-      try {
-        conversionData = await getConversionToPotential(lead.id, leadTypeParam);
-      } catch (err) {
-        // 404 just means no conversion draft exists yet - that's fine for a new conversion
-        conversionData = null;
-      }
+      updateStatusMutation.mutate({ id: lead.id, status: value });
+      return;
     }
+    const conversionData = null;
 
     // Open remarks modal for status change
     setRemarksModal({
@@ -499,10 +479,10 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     if (isConvertedToClient) {
       return false;
     }
-    if (isDataLead || isWebsiteLead || isMetaLead) return ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type);
+    if (isDataLead || isWebsiteLead || isMetaLead) return ['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type);
 
-    // Admin can always edit
-    if (user?.user_type === 'admin') {
+    // Super admin can always edit
+    if (user?.user_type === 'super_admin') {
       return true;
     }
 
@@ -536,38 +516,18 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
         </div>
 
         <div className="lead-card__header-actions">
-          {canEdit && (
+          {canEdit && isDataLead && <>
+            <Button size="large" className="lead-card__edit-button" onClick={() => setDataLeadEditOpen(true)}>Edit Lead</Button>
+            {dataLeadEditOpen && <DataLeadDialog mode="edit" id={lead.id}
+              onClose={() => setDataLeadEditOpen(false)} onSaved={refetchLeadDetail} />}
+          </>}
+          {canEdit && !isDataLead && (
             <LeadEditModal
               lead={lead}
               leadType={leadType}
               user={user}
               trigger="button"
-              onBeforeOpen={
-                isDataLead && lead?.id
-                  ? async () => {
-                      const raw = await queryClient.fetchQuery(
-                        ['dataLeadDetail', lead.id],
-                        () => getDataLead(lead.id)
-                      );
-                      if (raw) {
-                        setEditModalFreshLead({ ...raw, id: raw.id ?? lead.id });
-                      }
-                    }
-                  : undefined
-              }
-              freshLead={editModalFreshLead}
-              onClose={() => setEditModalFreshLead(null)}
               onSubmit={(values) => {
-                if (isDataLead) {
-                  const dataLeadPayload = {
-                    contact_person_name: values.contact_person_name,
-                    company_name: values.company_name,
-                    phone_number: values.phone_number,
-                    contact_person_designation: values.contact_person_designation ?? '',
-                    email: values.email,
-                  };
-                  return updateDataLeadStatus(lead.id, dataLeadPayload);
-                }
                 if (isMetaLead) {
                   const metaPayload = {
                     full_name: values.contact_person_name,
@@ -581,17 +541,6 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                 return api.patch(`/lead-generation/update/${lead.id}`, values);
               }}
               onSuccess={async () => {
-                if (isDataLead) {
-                  queryClient.invalidateQueries(['dataLeadJobs', lead.id]);
-                  queryClient.invalidateQueries(['dataLeads']);
-                  queryClient.invalidateQueries(['dataLeadDetail', lead.id]);
-                  if (typeof refetchLeadDetail === 'function') {
-                    await refetchLeadDetail();
-                  } else {
-                    await queryClient.refetchQueries(['dataLeadDetail', lead.id]);
-                  }
-                  return;
-                }
                 if (isMetaLead) {
                   queryClient.invalidateQueries(['metaLeads']);
                   queryClient.invalidateQueries(['metaLead', lead.id]);

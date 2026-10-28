@@ -8,7 +8,7 @@ import Avatar from 'react-avatar';
 import { Pencil } from 'lucide-react';
 import '../assets/styles/legacy/create-user.css';
 
-export default function UserDetailCard({ type, name, phoneNumber, email, onEditPicture, isCreate = false, showPencil = true, isClient = false, status = "-", location, details, profileImg, editPictureByAvatar = false }) {
+export default function UserDetailCard({ type, name, phoneNumber, email, onEditPicture, isCreate = false, showPencil = true, isClient = false, status = "-", location, details, profileImg, editPictureByAvatar = false, centerName = false }) {
   return (
     <div className={details ? 'card user-detail-preview-card' : 'card'}>
       <div className="heading-section">
@@ -42,7 +42,7 @@ export default function UserDetailCard({ type, name, phoneNumber, email, onEditP
             </button>}
           </div>
           {(
-            <h3 className="general-name" style={{ color: '#3E6A9F', textAlign: details && name && !editPictureByAvatar ? 'left' : 'center', ...(details ? { alignSelf: 'stretch' } : {}) }}>
+            <h3 className="general-name" style={{ color: '#3E6A9F', textAlign: !centerName && details && name && !editPictureByAvatar ? 'left' : 'center', ...(details ? { alignSelf: 'stretch' } : {}) }}>
               {name || 'Not available'}
             </h3>
           )}

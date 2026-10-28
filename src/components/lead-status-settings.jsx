@@ -38,6 +38,10 @@ function LeadStatusManager({ user }) {
     },
   });
   const busy = save.isLoading || remove.isLoading;
+  const statusesNewestFirst = [...(list.data || [])].sort((a, b) => {
+    const dateDifference = Date.parse(b.created_at) - Date.parse(a.created_at);
+    return (Number.isFinite(dateDifference) ? dateDifference : 0) || Number(b.id) - Number(a.id);
+  });
   function openEditor(row = null) {
     save.reset();
     setNameError('');
@@ -62,7 +66,7 @@ function LeadStatusManager({ user }) {
     <Card title='Lead statuses' extra={<Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add status</Button>}>
       <p className='mb-4 text-sm text-muted-foreground'>Create and manage the statuses used for leads.</p>
       {list.isError ? <Alert type='error' showIcon message={leadStatusError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
-        <Table rowKey='id' columns={columns} dataSource={list.data || []} loading={list.isLoading || list.isFetching} scroll={{ x: 520 }} pagination={{ pageSize: 10, hideOnSinglePage: true }} locale={{ emptyText: 'No lead statuses yet. Add a status to get started.' }} />}
+        <Table rowKey='id' columns={columns} dataSource={statusesNewestFirst} loading={list.isLoading || list.isFetching} scroll={{ x: 520 }} pagination={{ pageSize: 10, hideOnSinglePage: true }} locale={{ emptyText: 'No lead statuses yet. Add a status to get started.' }} />}
     </Card>
     <SettingsDeleteModal title='Delete lead status' itemName={deleteTarget?.name} open={deleteTarget != null}
       loading={remove.isLoading} error={remove.isError ? leadStatusError(remove.error) : null}
@@ -80,7 +84,7 @@ function LeadStatusManager({ user }) {
         <Descriptions column={1} bordered size='small' className='mt-4' items={[
           { key: 'id', label: 'ID', children: detail.data.id },
           { key: 'name', label: 'Name', children: detail.data.name },
-          { key: 'company', label: 'Company', children: detail.data.company ?? '—' },
+          { key: 'company', label: 'Company', children: detail.data.company_name ?? '—' },
           { key: 'created', label: 'Created', children: detail.data.created_at ? formatDateUniversal(detail.data.created_at, true) : '—' },
           { key: 'updated', label: 'Updated', children: detail.data.updated_at ? formatDateUniversal(detail.data.updated_at, true) : '—' },
         ]} />}

@@ -38,9 +38,7 @@ export const STATUS_OPTIONS = [
  * Creates a status column definition for lead tables
  * Based on the logic from leads.jsx
  * 
- * When converting to "Potential Client", this uses the conversion-to-potential API endpoints:
- * - GET: getConversionToPotential(leadId) - fetches existing conversion data
- * - POST: createOrUpdateConversionToPotential(leadId, payload) - creates/updates conversion
+ * Selecting "Potential Client" updates status directly without a conversion modal.
  * 
  * @param {Object} config - Configuration object
  * @param {Set<string>} config.statusesRequiringRemarks - Set of statuses that require remarks
@@ -168,58 +166,14 @@ export const createStatusColumn = ({
           value={currentStatus || 'Select Status'}
           onChange={async value => {
             if (value === currentStatus) return;
+            if (value === 'Potential Client') {
+              (onDirectStatusUpdate || onStatusChange)?.(entry, value);
+              return;
+            }
             if (requireRemarksForAll) {
               onOpenRemarksModal?.(entry, value);
               return;
             }
-            // Check if converting to Potential Client and job count is 0
-            if (value === 'Potential Client') {
-              const jobCount = entry.job_count || 0;
-              if (jobCount === 0) {
-                message.error('At least 1 job must be present to convert lead to Potential Client');
-                return;
-              }
-              
-              // Show loading state while fetching conversion data
-              const loadingMessage = message.loading('Loading conversion data...', 0);
-              
-              // Fetch conversion-to-potential data if it exists (GET request)
-              const leadId = entry.id;
-              let conversionData = null;
-              
-              if (leadId) {
-                try {
-                  conversionData = await getConversionToPotential(leadId, leadType);
-                  console.log('[StatusColumn] Fetched conversion-to-potential data:', conversionData);
-                } catch (error) {
-                  // If conversion doesn't exist (404), that's okay - it's a new conversion
-                  if (error?.response?.status !== 404) {
-                    console.error('[StatusColumn] Error fetching conversion data:', error);
-                    message.error('Failed to load conversion data');
-                  }
-                  conversionData = null;
-                } finally {
-                  // Hide loading message
-                  loadingMessage();
-                }
-              } else {
-                loadingMessage();
-              }
-              
-              // Pass conversion data and leadType to modal if available
-              const leadWithConversion = {
-                ...entry,
-                conversionData: conversionData,
-                proposalData: conversionData, // Also set as proposalData for backward compatibility
-                leadType: leadType, // Pass leadType to modal
-              };
-              
-              if (onOpenRemarksModal) {
-                onOpenRemarksModal(leadWithConversion, value);
-              }
-              return;
-            }
-
             // Check if status requires remarks
             if (statusesRequiringRemarks && statusesRequiringRemarks.has(value)) {
               if (onOpenRemarksModal) {

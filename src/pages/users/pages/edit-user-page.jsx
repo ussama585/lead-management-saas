@@ -318,7 +318,8 @@ export default function EditUser() {
                             {/* <span className="asterisk">*</span> */}
                           </label>
                           <Select
-                            className="dropdown-select"
+                            className="w-full"
+                            style={{ width: '100%' }}
                             name="manager"
                             onBlur={() => setFieldTouched('manager', true)}
                             popupMatchSelectWidth={false}

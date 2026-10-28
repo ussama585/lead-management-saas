@@ -19,7 +19,13 @@ describe('Website Lead status dropdown', () => {
     expect(cell.props.value).toBe('Pending Contact');
     expect(cell.props.children.map(option => option.props.value)).toEqual(STATUS_OPTIONS);
   });
-  it.each(STATUS_OPTIONS.filter(status => status !== 'Pending Contact'))('opens remarks before saving %s', async status => {
+  it('updates Potential Client directly without jobs or a conversion modal', async () => {
+    const { cell, lead, onOpenRemarksModal, onDirectStatusUpdate } = render('super_admin', { job_count: 0 });
+    await cell.props.onChange('Potential Client');
+    expect(onDirectStatusUpdate).toHaveBeenCalledWith(lead, 'Potential Client');
+    expect(onOpenRemarksModal).not.toHaveBeenCalled();
+  });
+  it.each(STATUS_OPTIONS.filter(status => !['Pending Contact', 'Potential Client'].includes(status)))('opens remarks before saving %s', async status => {
     const { cell, lead, onOpenRemarksModal, onDirectStatusUpdate } = render('super_admin');
     await cell.props.onChange(status);
     expect(onOpenRemarksModal).toHaveBeenCalledWith(lead, status);

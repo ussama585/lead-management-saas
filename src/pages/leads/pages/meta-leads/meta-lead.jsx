@@ -801,7 +801,7 @@ const getMetaLeadUrl = () => {
               padding: "0 24px",
             }}
           >
-            Add new Job
+            Add New Job
           </Button>
         </Stack>
 

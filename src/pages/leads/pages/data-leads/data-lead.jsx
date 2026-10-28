@@ -790,7 +790,7 @@ const DataLead = () => {
                 fontWeight: 600,
               }}
             >
-              Add new Job
+              Add New Job
             </Button>
           </Stack>
         )}

@@ -76,10 +76,10 @@ Input.Password = React.forwardRef(function PasswordInput({ visibilityToggle = tr
     </UiButton>} />;
 });
 
-export function Tooltip({ title, children, placement = 'top', open, onOpenChange, className, ...props }) {
+export function Tooltip({ title, children, placement = 'top', open, onOpenChange, className, color, ...props }) {
   if (!title) return children;
   return <UiTooltip open={open} onOpenChange={onOpenChange}>
     <TooltipTrigger asChild><span className={cn('inline-flex items-center', className)} style={props.style}>{children}</span></TooltipTrigger>
-    <TooltipContent side={placement.startsWith('bottom') ? 'bottom' : placement.startsWith('left') ? 'left' : placement.startsWith('right') ? 'right' : 'top'}>{title}</TooltipContent>
+    <TooltipContent style={color ? { backgroundColor: color, color: '#fff', '--tooltip-background': color } : undefined} side={placement.startsWith('bottom') ? 'bottom' : placement.startsWith('left') ? 'left' : placement.startsWith('right') ? 'right' : 'top'}>{title}</TooltipContent>
   </UiTooltip>;
 }
