@@ -9,7 +9,6 @@ import { Separator } from '@/components/ui/separator.jsx';
 import useUserStore from '@/pages/shared/store/user-store.js';
 import { getRolePath } from '@/pages/auth/role-home.js';
 import { isSuperAdmin } from '@/pages/auth/role-access.js';
-import ThemeSwitcher from '@/components/theme-switcher.jsx';
 import ChangePasswordDialog from '@/components/change-password-dialog.jsx';
 
 function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
@@ -75,10 +74,9 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
       <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b bg-background px-4'>
         <SidebarTrigger /><Separator orientation='vertical' className='h-4' />
         <span className='min-w-0 truncate text-sm font-medium'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Workspace'}</span>
-        <div className='ml-auto'><ThemeSwitcher /></div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button type='button' aria-label='Open account menu' className='rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
+            <button type='button' aria-label='Open account menu' className='ml-auto shrink-0 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
               <Avatar className='size-8'><AvatarFallback>{initials}</AvatarFallback></Avatar>
             </button>
           </DropdownMenuTrigger>

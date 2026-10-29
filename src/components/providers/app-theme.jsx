@@ -3,7 +3,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { ConfigProvider, theme as antTheme } from 'antd';
 import { createAppTheme } from './theme.jsx';
 import { AppThemeContext } from './app-theme-context.js';
-import { DEFAULT_PRIMARY_COLOR, THEME_COLOR_STORAGE_KEY, normalizeThemeColor, primaryTextColor } from './theme-color.js';
+import { DEFAULT_PRIMARY_COLOR, THEME_COLOR_STORAGE_KEY, primaryTextColor } from './theme-color.js';
 import useUserStore from '../../pages/shared/store/user-store.js';
 
 const systemIsDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -11,10 +11,7 @@ const systemIsDark = () => window.matchMedia('(prefers-color-scheme: dark)').mat
 export default function AppThemeProvider({ children }) {
   const userKey = useUserStore(state => state.user?.id
     ? `${state.user.user_type}:${state.user.id}` : 'signed-out');
-  const [primaryColor, setPrimaryColorState] = useState(() => {
-    try { return normalizeThemeColor(localStorage.getItem(THEME_COLOR_STORAGE_KEY)) || DEFAULT_PRIMARY_COLOR; }
-    catch { return DEFAULT_PRIMARY_COLOR; }
-  });
+  const primaryColor = DEFAULT_PRIMARY_COLOR;
   const [selection, setSelection] = useState(() => ({ userKey, preference: 'system' }));
   const preference = selection.userKey === userKey ? selection.preference : 'system';
   useLayoutEffect(() => {
@@ -34,20 +31,15 @@ export default function AppThemeProvider({ children }) {
     document.documentElement.style.colorScheme = mode;
   }, [mode]);
   useLayoutEffect(() => {
+    try { localStorage.removeItem(THEME_COLOR_STORAGE_KEY); } catch { /* Storage may be unavailable. */ }
     document.documentElement.style.setProperty('--primary', primaryColor);
     document.documentElement.style.setProperty('--primary-foreground', primaryTextColor(primaryColor));
   }, [primaryColor]);
-  function setPrimaryColor(value) {
-    const normalized = normalizeThemeColor(value);
-    if (!normalized) return;
-    setPrimaryColorState(normalized);
-    try { localStorage.setItem(THEME_COLOR_STORAGE_KEY, normalized); } catch { /* Keep the in-memory preference. */ }
-  }
   function setTheme(value) {
     if (!['light', 'dark', 'system'].includes(value)) return;
     setSelection({ userKey, preference: value });
   }
-  return <AppThemeContext.Provider value={{ preference, mode, setTheme, primaryColor, setPrimaryColor }}>
+  return <AppThemeContext.Provider value={{ preference, mode, setTheme }}>
     <ThemeProvider theme={muiTheme}>
       <ConfigProvider theme={{ algorithm: mode === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
         token: { colorPrimary: primaryColor, colorTextLightSolid: primaryTextColor(primaryColor), borderRadius: 8, fontFamily: 'Inter, sans-serif' } }}>
