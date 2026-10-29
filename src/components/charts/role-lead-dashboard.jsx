@@ -26,7 +26,7 @@ export default function RoleLeadDashboard({ statsOnly = false }) {
   const [period, setPeriod] = useState('month');
   const [source, setSource] = useState('Meta');
   const [statsScope, setStatsScope] = useState('My Stats');
-  const isManager = user?.user_type === 'sales_manager';
+  const isManager = user?.user_type === 'sales_manager' && statsOnly;
   const key = [user?.id, user?.user_type];
   const enabled = ['company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type);
   const dates = range => ({ startDate: range?.[0]?.format('YYYY-MM-DDTHH:mm:ss'), endDate: range?.[1]?.format('YYYY-MM-DDTHH:mm:ss') });

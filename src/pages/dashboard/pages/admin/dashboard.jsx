@@ -225,7 +225,7 @@ export function DashboardTabsSection() {
   } = useQuery({
     queryKey: ['assigningSalesExecutives'],
     queryFn: () => getManangersExecutives('sales_manager'),
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
   });
@@ -244,7 +244,7 @@ export function DashboardTabsSection() {
         leadType: toLeadTypeLabel(leadsDistributionLeadType),
       });
     },
-    enabled: activeSection === 'systemLeads',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'systemLeads',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -263,7 +263,7 @@ export function DashboardTabsSection() {
         leadType: toLeadTypeLabel(systemLeadFunnelLeadType),
       });
     },
-    enabled: activeSection === 'systemLeads',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'systemLeads',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -338,7 +338,7 @@ export function DashboardTabsSection() {
         executiveId: clientsProjectsActivatedExecutive,
       });
     },
-    enabled: activeSection === 'salesExecutives' || activeSection === 'systemLeads',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && (activeSection === 'salesExecutives' || activeSection === 'systemLeads'),
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -357,7 +357,7 @@ export function DashboardTabsSection() {
         leadType: toLeadTypeLabel(overallConversionLeadType),
       });
     },
-    enabled: activeSection === 'systemLeads',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'systemLeads',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -441,7 +441,7 @@ export function DashboardTabsSection() {
         Website: Array.isArray(raw.Website) ? raw.Website : [],
       };
     },
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -460,7 +460,7 @@ export function DashboardTabsSection() {
         endDate: toDateString(end),
       });
     },
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -556,7 +556,7 @@ export function DashboardTabsSection() {
         type: selectedOverviewType,
       });
     },
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -575,7 +575,7 @@ export function DashboardTabsSection() {
         endDate: toDateString(end),
       });
     },
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -594,7 +594,7 @@ export function DashboardTabsSection() {
         endDate: toDateString(end),
       });
     },
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -618,7 +618,7 @@ export function DashboardTabsSection() {
             : executiveClientOwnershipStatus,
       });
     },
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -638,7 +638,7 @@ export function DashboardTabsSection() {
         status: executiveCostlyProjectsStatus,
       });
     },
-    enabled: activeSection === 'salesExecutives',
+    enabled: !superAdmin && currentUser?.user_type !== 'company_admin' && activeSection === 'salesExecutives',
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
@@ -911,6 +911,7 @@ export function DashboardTabsSection() {
       {/* SALES EXECUTIVES PERFORMANCE SECTION */}
       {activeSection === 'salesExecutives' && (
         <>
+          {!superAdmin && currentUser?.user_type !== 'company_admin' && <>
           {/* 1. Leaderboard */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             <ExecutivePerformanceLeaderboardChart
@@ -984,6 +985,7 @@ export function DashboardTabsSection() {
             />
           </div>
 
+          </>}
           {/* 6. Mobilisation Amounts per Executive */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             {executiveMobilisationError ? <div role="alert" className="flex items-center gap-3 rounded-md border p-4 text-destructive">
@@ -999,6 +1001,7 @@ export function DashboardTabsSection() {
             />}
           </div>
 
+          {!superAdmin && currentUser?.user_type !== 'company_admin' && <>
           {/* 7. Projects/Jobs Per status per executive */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             <ExecutiveProjectsStatusOverview
@@ -1043,6 +1046,7 @@ export function DashboardTabsSection() {
               emptyMessage="No average job project data to display"
             />
           </div>
+          </>}
         </>
       )}
 
@@ -1141,6 +1145,7 @@ export function DashboardTabsSection() {
             />}
           </div>
 
+          {!superAdmin && currentUser?.user_type !== 'company_admin' && <>
           {/* Clients and Projects Activated Per Day */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             <ClientsProjectsActivatedPerDayChart
@@ -1196,6 +1201,7 @@ export function DashboardTabsSection() {
             </div>
           </div>
 
+          </>}
           {/* Lead Status Distribution */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             {leadStatusDistributionError ? <div role="alert" className="flex items-center gap-3 rounded-md border p-4 text-destructive">
@@ -1216,6 +1222,7 @@ export function DashboardTabsSection() {
             />}
           </div>
 
+          {!superAdmin && currentUser?.user_type !== 'company_admin' && <>
           {/* Leads Distribution & Status Breakdown */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             <LeadsDistributionStatusBreakdownChart
@@ -1235,6 +1242,7 @@ export function DashboardTabsSection() {
             />
           </div>
 
+          </>}
           {/* Project Status Health (Horizontal) */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             {leadsStatusHealthError ? <div role="alert" className="p-4">
