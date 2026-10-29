@@ -1,3 +1,4 @@
+import { assignmentEndpoint } from './assignment-endpoint.js';
 import api from './api.js';
 
 
@@ -73,7 +74,7 @@ export const assignRecruiterToProject = async (project_id, recruiter_id) => {
 // Get recruiter assigning list
 export const getRecruiterAssigningList = async () => {
   try {
-    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
+    const endpoint = assignmentEndpoint();
     
     const response = await api.get(endpoint);
     

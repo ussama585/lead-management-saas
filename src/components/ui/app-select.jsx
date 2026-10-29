@@ -52,7 +52,7 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
   return <div className={cn('relative inline-flex min-w-0', className)} style={style}>
     <DropdownMenu modal={false} onOpenChange={open => { onDropdownVisibleChange?.(open); onOpenChange?.(open); if (!open) { setSearch(''); onBlur?.({ target: { name, value: current } }); } }}>
       <DropdownMenuTrigger asChild>
-        <Button id={id} type="button" variant="outline" disabled={disabled} aria-invalid={status === 'error' || undefined}
+        <Button data-slot="select-trigger" id={id} type="button" variant="outline" disabled={disabled} aria-invalid={status === 'error' || undefined}
           aria-label={typeof placeholder === 'string' ? placeholder : undefined} onFocus={onFocus}
           className={cn('w-full min-w-0 justify-between font-normal', multiple && 'h-auto min-h-10 whitespace-normal', allowClear && selected.length > 0 && 'pr-9')}>
           <span className={cn('min-w-0 text-left', !multiple && 'truncate', !selected.length && 'text-muted-foreground')}>

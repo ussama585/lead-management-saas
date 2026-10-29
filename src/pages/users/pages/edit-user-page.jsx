@@ -1,15 +1,15 @@
 import { message } from '../../../components/ui/notifications.jsx';
-import { Modal } from '../../../components/ui/app-modal.jsx';
+
 import { Select } from '../../../components/ui/app-select.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getRolePath } from '../../auth/role-home.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { Formik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { Form, Upload } from 'antd';
-import { LoaderCircle as LoadingOutlined, Upload as UploadOutlined } from 'lucide-react';
+import { Form } from 'antd';
+import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { editUserSchema } from '../schemas/edit-user-schema.js';
 import { userFormError, applyUserErrors, assertUserSuccess } from '../user-form-errors.js';
 import { editUser, getUserDetails } from '../../shared/services/users-service.js';
@@ -55,11 +55,11 @@ export default function EditUser() {
   const [email, setEmail] = useState('');
   const [previewValues, setPreviewValues] = useState({});
 
-  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const imageInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
 
-  const { data: userDetails, isLoading, error } = useQuery({
+
+  const { data: userDetails, isLoading, error, refetch: refetchUserDetails } = useQuery({
     queryKey: ['userDetails', userId],
     queryFn: () => getUserDetails(userId),
     keepPreviousData: true,
@@ -118,24 +118,13 @@ export default function EditUser() {
   };
 
   const handleImageEditClick = () => {
-    setIsImageModalVisible(true);
+    if (!isUploading) imageInputRef.current?.click();
   };
 
-  const handleFileChange = ({ file, fileList }) => {
-    if (file.status === 'removed') {
-
-      setSelectedFile(null);
-    } else {
-
-      setSelectedFile(file);
-    }
-  };
-
-  const handleImageUpload = () => {
-    if (!selectedFile) {
-      message.error("Please select a file before submitting.");
-      return;
-    }
+  const handleImageUpload = (event) => {
+    const selectedFile = event.target.files?.[0];
+    event.target.value = '';
+    if (!selectedFile || isUploading) return;
 
     setIsUploading(true);
     const formData = new FormData();
@@ -143,11 +132,13 @@ export default function EditUser() {
 
     // Call the mutation to upload the image
     editUserMutate(formData, {
-      onSuccess: () => {
-        setIsUploading(false);
-        setIsImageModalVisible(false);
-        message.success("Profile picture updated successfully");
-        setSelectedFile(null); // Reset selected file after successful upload
+      onSuccess: async () => {
+        try {
+          await refetchUserDetails();
+          message.success("Profile picture updated successfully");
+        } finally {
+          setIsUploading(false);
+        }
       },
       onError: (error) => {
         setIsUploading(false);
@@ -365,38 +356,7 @@ export default function EditUser() {
         </div>
       </Spin>
 
-      <Modal
-        title="Edit Profile Picture"
-        visible={isImageModalVisible}
-        onCancel={() => setIsImageModalVisible(false)}
-        footer={[
-          <Button key="cancel" disabled={isUploading} onClick={() => setIsImageModalVisible(false)} className="custom-button cancel-btn">
-            Cancel
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            onClick={handleImageUpload} // Call handleImageUpload on button click
-            disabled={isUploading}
-            loading={isUploading}
-            className="custom-button"
-          >
-            Edit
-          </Button>,
-        ]}
-      >
-        <Upload
-          beforeUpload={() => false} // Prevent automatic upload
-          onChange={handleFileChange} // Handle file change and store it
-          accept="image/*"
-          showUploadList={true}
-        >
-          <Button className="custom-button" icon={<UploadOutlined size="1em" className="app-icon" />} disabled={isUploading}>
-            Click to Upload
-          </Button>
-        </Upload>
-
-      </Modal>
+      <input ref={imageInputRef} type="file" accept="image/*" hidden aria-label="Upload profile picture" disabled={isUploading} onChange={handleImageUpload} />
     </>
   );
 }

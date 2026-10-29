@@ -1,0 +1,19 @@
+/* Dropdown fields only; menu buttons and ordinary inputs are unaffected. */
+:is(select, [data-slot='select-trigger'], .ant-select, .ant-select-selector,
+  .MuiOutlinedInput-root:has(.MuiSelect-select), .MuiAutocomplete-root .MuiOutlinedInput-root) {
+  height: 40px !important;
+  min-height: 40px !important;
+  box-sizing: border-box;
+  border-color: #d2d2d2 !important;
+}
+
+:is(.MuiOutlinedInput-root:has(.MuiSelect-select), .MuiAutocomplete-root .MuiOutlinedInput-root)
+  .MuiOutlinedInput-notchedOutline {
+  border-color: #d2d2d2 !important;
+}
+
+/* Keep selected tags inside the fixed-height multi-select field. */
+.ant-select-multiple .ant-select-selection-overflow {
+  max-height: 36px;
+  overflow-y: auto;
+}

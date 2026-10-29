@@ -1,3 +1,4 @@
+import { assignmentEndpoint } from './assignment-endpoint.js';
 import api from './api.js';
 
 export async function getAllUsers({ page = 1, pageSize = 10, userType = 'all', search = '', sorting = [], isActive = '' } = {}) {
@@ -192,7 +193,7 @@ export const toggleUserActivation = async (userId, isActive) => {
 export const getAssigningUsersListing = async (user_type = "sales_manager") => {
   try {
 
-    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
+    const endpoint = assignmentEndpoint();
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);
@@ -247,7 +248,7 @@ export const assignClient = async (clientId, userId) => {
 export const getManangersExecutives = async (userType = null) => {
   try {
     // Assignment dropdowns consistently request sales executives for every role.
-    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
+    const endpoint = assignmentEndpoint();
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);

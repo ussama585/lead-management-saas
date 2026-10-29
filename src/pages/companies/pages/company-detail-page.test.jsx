@@ -21,7 +21,7 @@ describe('company detail users', () => {
     expect(options.filter(option => option.name === 'Company 4 Manager')).toHaveLength(1);
   });
   const values = { name: 'Ali Ahmed', email: 'ali@example.com', phone: '+923001234567', password: 'secret123', confirmPassword: 'secret123', user_type: 'sales_executive', manager: 2, company_id: 999 };
-  it.each(['company_admin', 'sales_manager', 'sales_executive'])('creates %s against the route company, ignoring any submitted company ID', async user_type => {
+  it.each(['company_admin', 'sales_manager', 'sales_executive', 'data_entry_executive'])('creates %s against the route company, ignoring any submitted company ID', async user_type => {
     api.post.mockResolvedValue({ data: { success: true } });
     await createCompanyUser(3, { ...values, user_type });
     expect(api.post).toHaveBeenLastCalledWith('/accounts/signup', {
@@ -29,8 +29,8 @@ describe('company detail users', () => {
       ...(user_type === 'sales_executive' ? { manager_id: 2 } : {}),
     });
   });
-  it('allows only the three requested creation roles', async () => {
-    await expect(companyUserCreateSchema.validate({ ...values, user_type: 'data_entry_executive' })).rejects.toThrow('valid user type');
+  it('allows data entry executives while rejecting super admins', async () => {
+    await expect(companyUserCreateSchema.validate({ ...values, user_type: 'data_entry_executive' })).resolves.toBeTruthy();
     await expect(createCompanyUser(3, { ...values, user_type: 'super_admin' })).rejects.toThrow('valid user type');
   });
   it('uses the user-management edit endpoint and sends only changed editable fields', async () => {

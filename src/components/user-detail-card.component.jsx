@@ -33,7 +33,7 @@ export default function UserDetailCard({ type, name, phoneNumber, email, onEditP
 
       <div className="avatar-section">
         <div className="avatar-outer-container">
-          <div className="avatar-container" style={editPictureByAvatar ? { position: 'relative' } : undefined}>
+          <div className="avatar-container [&_img]:object-cover" style={editPictureByAvatar ? { position: 'relative' } : undefined}>
             <Avatar name={name || '?'} src={profileImg} round={true} />
             {editPictureByAvatar && showPencil && <button type="button" aria-label="Edit profile picture" title="Edit profile picture" onClick={onEditPicture}
               className="flex items-center justify-center rounded-full bg-background text-foreground"

@@ -1,3 +1,4 @@
+import { assignmentEndpoint } from './assignment-endpoint.js';
 import api from './api.js';
 
 export const getMetaLeadHistory = async (leadId) => {
@@ -38,7 +39,7 @@ export const reassignMetaLead = async (leadId, userId) => {
 // Meta Leads - Get assigning user list
 export const getMetaLeadsAssigningUserList = async () => {
   try {
-    const endpoint = `/accounts/users-for-assigning?user_type=sales_executive`;
+    const endpoint = assignmentEndpoint();
     const response = await api.get(endpoint);
     return response.data;
   } catch (error) {
