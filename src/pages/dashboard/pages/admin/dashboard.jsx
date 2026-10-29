@@ -37,6 +37,7 @@ import {
   getSuperAdminMobilisationAmounts,
   getRecruiterResumeSubmissionVolume,
   getLeadsStatusHealth,
+  getSuperAdminLeadsStatusHealth,
   getRecruiterStats,
   getRecruiterProjectInvolvement,
   getJobResumeHiredStats,
@@ -277,7 +278,8 @@ export function DashboardTabsSection() {
     queryKey: ['totalLeadsReceived', currentUser?.id, superAdmin, mobilisationCompanyId, totalLeadsReceivedDateRange, selectedTotalLeadsPeriod, superAdmin ? null : totalLeadsReceivedLeadType],
     queryFn: () => {
       const [start, end] = totalLeadsReceivedDateRange || [];
-      if (superAdmin) return getSuperAdminTotalLeadsReceived({
+      if (superAdmin || currentUser?.user_type === 'company_admin') return getSuperAdminTotalLeadsReceived({
+        userType: currentUser?.user_type,
         startDate: start?.format?.('YYYY-MM-DDTHH:mm:ss'),
         endDate: end?.format?.('YYYY-MM-DDTHH:mm:ss'),
         period: selectedTotalLeadsPeriod,
@@ -308,8 +310,9 @@ export function DashboardTabsSection() {
     queryKey: ['leadStatusDistribution', currentUser?.id, superAdmin, mobilisationCompanyId, leadStatusDistributionDateRange, leadStatusDistributionLeadType],
     queryFn: () => {
       const [start, end] = leadStatusDistributionDateRange || [];
-      const fetchDistribution = superAdmin ? getSuperAdminLeadStatusDistribution : getLeadStatusDistribution;
+      const fetchDistribution = (superAdmin || currentUser?.user_type === 'company_admin') ? getSuperAdminLeadStatusDistribution : getLeadStatusDistribution;
       return fetchDistribution({
+        userType: currentUser?.user_type,
         startDate: toDateString(start),
         endDate: toDateString(end),
         leadType: toLeadTypeLabel(leadStatusDistributionLeadType),
@@ -385,13 +388,18 @@ export function DashboardTabsSection() {
   const {
     data: leadsStatusHealthData = [],
     isLoading: loadingLeadsStatusHealth,
+    error: leadsStatusHealthError,
+    refetch: refetchLeadsStatusHealth,
   } = useQuery({
-    queryKey: ['leadsStatusHealth', leadsStatusHealthDateRange],
+    queryKey: ['leadsStatusHealth', currentUser?.id, superAdmin, mobilisationCompanyId, leadsStatusHealthDateRange],
     queryFn: () => {
       const [start, end] = leadsStatusHealthDateRange || [];
-      return getLeadsStatusHealth({
-        startDate: toDateString(start),
-        endDate: toDateString(end),
+      const fetchHealth = superAdmin ? getSuperAdminLeadsStatusHealth : getLeadsStatusHealth;
+      return fetchHealth({
+        userType: currentUser?.user_type,
+        startDate: superAdmin ? start?.format('YYYY-MM-DDTHH:mm:ss') : toDateString(start),
+        endDate: superAdmin ? end?.format('YYYY-MM-DDTHH:mm:ss') : toDateString(end),
+        ...(superAdmin && mobilisationCompanyId ? { companyId: mobilisationCompanyId } : {}),
       });
     },
     enabled: activeSection === 'systemLeads' || activeSection === 'systemClients',
@@ -468,8 +476,9 @@ export function DashboardTabsSection() {
     queryFn: () => {
       const [start, end] = executiveMobilisationDateRange || [];
       const toDateString = (d) => (d && d.format ? d.format('YYYY-MM-DD') : null);
-      const fetchAmounts = superAdmin ? getSuperAdminMobilisationAmounts : getExecutiveMobilisationAmounts;
+      const fetchAmounts = (superAdmin || currentUser?.user_type === 'company_admin') ? getSuperAdminMobilisationAmounts : getExecutiveMobilisationAmounts;
       return fetchAmounts({
+        userType: currentUser?.user_type,
         startDate: toDateString(start),
         endDate: toDateString(end),
         ...(superAdmin && mobilisationCompanyId ? { companyId: mobilisationCompanyId } : {}),
@@ -824,7 +833,7 @@ export function DashboardTabsSection() {
 
       {/* SYSTEM STATS SECTION (cards) */}
       {activeSection === 'systemStats' && (
-        superAdmin ? <SuperAdminStats userId={currentUser?.id} /> :
+        (superAdmin || currentUser?.user_type === 'company_admin') ? <SuperAdminStats userId={currentUser?.id} userType={currentUser?.user_type} /> :
         <>
           <SalesPerformancePreview />
           <div className="my-4 flex flex-wrap items-center justify-between gap-3">
@@ -1114,7 +1123,7 @@ export function DashboardTabsSection() {
               <span>{totalLeadsReceivedError.message || 'Could not load total leads received.'}</span>
               <Button variant="outline" onClick={() => refetchTotalLeadsReceived()}>Retry</Button>
             </div> : <TotalLeadsReceivedChart
-              showSourceFilter={!superAdmin}
+              showSourceFilter={!superAdmin && currentUser?.user_type !== 'company_admin'}
               title="Total Leads Received"
               totalCount={totalLeadsReceivedTotalCount}
               timeSeriesData={totalLeadsReceivedTimeSeries}
@@ -1228,15 +1237,18 @@ export function DashboardTabsSection() {
 
           {/* Project Status Health (Horizontal) */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
-            <ProjectStatusHealthHorizontalChart
+            {leadsStatusHealthError ? <div role="alert" className="p-4">
+              <p>{leadsStatusHealthError.message || 'Could not load lead status health.'}</p>
+              <Button variant="outline" onClick={() => refetchLeadsStatusHealth()}>Retry</Button>
+            </div> : <ProjectStatusHealthHorizontalChart
               title="Leads Status Health"
               subtitle="Sum of all system leads (Meta, Data and Website)"
               data={leadsStatusHealthData}
               isLoading={loadingLeadsStatusHealth}
               dateRange={leadsStatusHealthDateRange}
               onDateRangeChange={setLeadsStatusHealthDateRange}
-              emptyMessage="No project status data to display"
-            />
+              emptyMessage="No lead status data to display"
+            />}
           </div>
         </>
       )}

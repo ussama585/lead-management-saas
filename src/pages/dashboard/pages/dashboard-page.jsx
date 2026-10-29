@@ -1,6 +1,8 @@
+import RoleLeadDashboard from '../../../components/charts/role-lead-dashboard.jsx';
 import { Select } from '../../../components/ui/app-select.jsx';
 import { Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+import RoleLeadStatusHealth from '../../../components/charts/role-lead-status-health.jsx';
 import { useSearchParams } from 'react-router-dom';
 
 import dayjs from 'dayjs';
@@ -22,7 +24,8 @@ import {
   getExecutiveMobilisationAmounts,
 } from '../../shared/services/admin-graphs.js';
 import { getClientsAndProjectsActivatedPerDay } from '../../shared/services/admin-total-leads.js';
-import { getManangersExecutives } from '../../shared/services/users-service.js';
+import { getDashboardExecutiveStats } from '../../shared/services/dashboard-executive-stats.js';
+import DashboardExecutiveStats from '../../../components/dashboard-executive-stats.jsx';
 import { getLeadPotentialConversion } from '../../shared/services/leads.js';
 import ActiveClientsIcon from '../../../assets/images/stat-card-icons/active-clients.svg';
 import ActiveProjectsIcon from '../../../assets/images/stat-card-icons/active-projects.svg';
@@ -167,17 +170,16 @@ const DashboardPage = () => {
 
   // Executives list for Sales Executives Performance (sales manager sees their team)
   const { data: assigningExecutives } = useQuery({
-    queryKey: ['managerAssigningExecutives'],
-    queryFn: () => getManangersExecutives('sales_manager'),
+    queryKey: ['dashboardExecutiveStats', user?.id, user?.user_type],
+    queryFn: getDashboardExecutiveStats,
     enabled: activeSection === 'salesExecutives',
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 30,
   });
 
   const EXECUTIVES_LIST = useMemo(() => {
-    const raw = assigningExecutives?.data || assigningExecutives || [];
+    const raw = assigningExecutives?.executives || [];
     return (Array.isArray(raw) ? raw : [])
-      .filter((user) => user.user_type === 'sales_executive')
       .map((user) => ({
         id: user.id,
         name: user.name || user.full_name || user.username || user.email,
@@ -376,6 +378,8 @@ const DashboardPage = () => {
     <>
       <BreadCrumb linkText="Dashboard" />
       <div className="dashboard-container">
+      {activeSection === 'overview' && <><RoleLeadDashboard /><RoleLeadStatusHealth /></>}
+      {activeSection === 'salesExecutives' && <DashboardExecutiveStats />}
 
       <div className="admin-dashboard-section-tabs" style={{ marginBottom: 16 }}>
         <span style={{ marginLeft: 6, marginRight: 6 }}>

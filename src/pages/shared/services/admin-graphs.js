@@ -1,3 +1,4 @@
+import { dashboardEndpoint } from './dashboard-endpoint.js';
 import api from './api.js';
 import { MAIN_SYSTEM_BASE_URL } from '../utils/api.js';
 
@@ -265,13 +266,13 @@ export const getExecutiveMobilisationAmounts = async ({
   }
 };
 
-export const getSuperAdminMobilisationAmounts = async ({ startDate, endDate, companyId } = {}) => {
+export const getSuperAdminMobilisationAmounts = async ({ startDate, endDate, companyId, userType } = {}) => {
   const params = {
     ...(startDate ? { start_date: startDate } : {}),
     ...(endDate ? { end_date: endDate } : {}),
     ...(companyId ? { company_id: companyId } : {}),
   };
-  const { data } = await api.get('/accounts/leads-mobilisation-amounts', { params });
+  const { data } = await api.get(dashboardEndpoint('leads-mobilisation-amounts', userType), { params });
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load mobilisation amounts.');
   const groups = data?.data ?? data;
   if (!groups || !['Meta', 'Data', 'Website'].some(key => Array.isArray(groups[key]))) {
@@ -320,8 +321,21 @@ export const getSystemLeadFunnel = async ({
   }
 };
 
-export const getSuperAdminLeadStatusDistribution = async ({ startDate, endDate, leadType, companyId } = {}) => {
-  const { data } = await api.get('/accounts/lead-status-distribute', {
+export const getSuperAdminLeadsStatusHealth = async ({ startDate, endDate, companyId } = {}) => {
+  const { data } = await api.get('/accounts/leads-status-health', {
+    params: {
+      ...(companyId ? { company_id: companyId } : {}),
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+    },
+  });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead status health.');
+  if (!Array.isArray(data?.data)) throw new Error('Could not read lead status health.');
+  return data.data;
+};
+
+export const getSuperAdminLeadStatusDistribution = async ({ startDate, endDate, leadType, companyId, userType } = {}) => {
+  const { data } = await api.get(dashboardEndpoint('lead-status-distribute', userType), {
     params: {
       ...(leadType ? { lead_type: leadType } : {}),
       ...(companyId ? { company_id: companyId } : {}),
@@ -398,7 +412,16 @@ export const getRecruiterResumeSubmissionVolume = async ({
 export const getLeadsStatusHealth = async ({
   startDate,
   endDate,
+  userType,
 } = {}) => {
+  const rolePaths = { company_admin: 'company-admin', sales_manager: 'sales-manager', sales_executive: 'sales-executive' };
+  if (rolePaths[userType]) {
+    const { data } = await api.get(`/${rolePaths[userType]}/leads-status-health`, {
+      params: { ...(startDate ? { start_date: startDate } : {}), ...(endDate ? { end_date: endDate } : {}) },
+    });
+    if (data?.status === false || data?.success === false || !Array.isArray(data?.data)) throw new Error(data?.message || 'Could not load lead status health.');
+    return data.data;
+  }
   const query = new URLSearchParams();
   if (startDate) query.append('start_date', startDate);
   if (endDate) query.append('end_date', endDate);

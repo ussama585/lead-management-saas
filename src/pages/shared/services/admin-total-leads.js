@@ -1,7 +1,8 @@
+import { dashboardEndpoint } from './dashboard-endpoint.js';
 import api from './api.js';
 
-export const getSuperAdminTotalLeadsReceived = async ({ startDate, endDate, period = 'month', companyId } = {}) => {
-  const { data } = await api.get('/accounts/total-lead-received', {
+export const getSuperAdminTotalLeadsReceived = async ({ startDate, endDate, period = 'month', companyId, userType } = {}) => {
+  const { data } = await api.get(dashboardEndpoint('total-lead-received', userType), {
     params: {
       ...(companyId ? { company_id: companyId } : {}),
       ...(startDate ? { start_date: startDate } : {}),

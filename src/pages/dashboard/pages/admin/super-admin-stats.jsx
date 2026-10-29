@@ -4,13 +4,16 @@ import { Building2, Users, UserCog, UserPlus, UserStar, Database, Globe, Webhook
 import api from '../../../shared/services/api.js';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import { Button } from '../../../../components/ui/button.jsx';
+import { dashboardEndpoint } from '../../../shared/services/dashboard-endpoint.js';
 
-export async function getSuperAdminStats(endpoint) {
-  const { data } = await api.get(endpoint);
+export async function getSuperAdminStats(endpoint, params) {
+  const { data } = await (params ? api.get(endpoint, { params }) : api.get(endpoint));
   if (!data || typeof data !== 'object' || Array.isArray(data) || data.success === false || data.status === false) {
     throw new Error(data?.message || 'Could not load dashboard stats.');
   }
-  return data;
+  const stats = data.data ?? data;
+  if (!stats || typeof stats !== 'object' || Array.isArray(stats)) throw new Error('Could not read dashboard stats.');
+  return stats;
 }
 
 const hrLabels = {
@@ -42,9 +45,9 @@ function StatsSection({ title, endpoint, queryKey, labels, userId }) {
   </section>;
 }
 
-export default function SuperAdminStats({ userId }) {
+export default function SuperAdminStats({ userId, userType = 'super_admin' }) {
   return <>
-    <StatsSection title="HR Management" endpoint="/accounts/stats" queryKey="superAdminUserStats" labels={hrLabels} userId={userId} />
-    <StatsSection title="Leads" endpoint="/accounts/lead-stats" queryKey="superAdminLeadStats" labels={leadLabels} userId={userId} />
+    <StatsSection title="HR Management" endpoint={dashboardEndpoint('stats', userType)} queryKey={`${userType}UserStats`} labels={hrLabels} userId={userId} />
+    <StatsSection title="Leads" endpoint={dashboardEndpoint('lead-stats', userType)} queryKey={`${userType}LeadStats`} labels={leadLabels} userId={userId} />
   </>;
 }

@@ -1,5 +1,7 @@
+import RoleLeadDashboard from '../../../../components/charts/role-lead-dashboard.jsx';
 import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React from 'react';
+import RoleLeadStatusHealth from '../../../../components/charts/role-lead-status-health.jsx';
 
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import StatsCard from '../../../../components/stats-card.component.jsx';
@@ -124,6 +126,7 @@ const DashboardPage = () => {
             </div>
           </div>
         </Spin>
+        <><RoleLeadDashboard /><RoleLeadStatusHealth /></>
       </div>
     </>
   );
