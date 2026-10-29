@@ -76,7 +76,7 @@ export const patchDataLeadJob = async (jobId, payload) => {
 };
 
 export const createDataLeadFollowUp = async (leadId, payload) => {
-  const response = await api.post(`/lead-generation/follow-up/${encodeURIComponent(leadId)}`, payload);
+  const response = await api.post(`/data-leads/follow-up/${encodeURIComponent(leadId)}`, payload);
   if (response.data?.status === false || response.data?.success === false) throw new Error(response.data.message || 'Could not save follow-up.');
   return response.data;
 };

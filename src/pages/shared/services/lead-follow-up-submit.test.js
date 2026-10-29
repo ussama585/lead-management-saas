@@ -8,15 +8,15 @@ vi.mock('./api.js', () => ({ default: { post: vi.fn() } }));
 beforeEach(() => vi.clearAllMocks());
 
 describe.each([
-  ['Data', createDataLeadFollowUp],
-  ['Meta', createMetaLeadFollowUp],
-  ['Website', createWebsiteLeadFollowUp],
-])('%s lead follow-up submission', (_name, submit) => {
+  ['Data', createDataLeadFollowUp, '/data-leads/follow-up/12'],
+  ['Meta', createMetaLeadFollowUp, '/meta-leads/meta-follow-up/12'],
+  ['Website', createWebsiteLeadFollowUp, '/lead-generation/follow-up/12'],
+])('%s lead follow-up submission', (_name, submit, endpoint) => {
   it('posts remarks and scheduling fields to the lead follow-up endpoint', async () => {
     const payload = { current_followup_date: '2026-10-29T10:00:00', next_followup_date: null, is_next_followup_required: false, remarks: 'Called client' };
     api.post.mockResolvedValue({ data: { success: true } });
     await submit(12, payload);
-    expect(api.post).toHaveBeenCalledWith('/lead-generation/follow-up/12', payload);
+    expect(api.post).toHaveBeenCalledWith(endpoint, payload);
   });
   it('rejects unsuccessful responses', async () => {
     api.post.mockResolvedValue({ data: { success: false, message: 'Unable to save' } });
