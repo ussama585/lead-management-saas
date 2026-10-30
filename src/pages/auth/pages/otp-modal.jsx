@@ -10,7 +10,7 @@ import { loginUser } from '@/pages/shared/services/auth-service.js';
 import useUserStore from '@/pages/shared/store/user-store.js';
 import { getRoleHome } from '../role-home.js';
 
-export default function OtpModal({ openModal, setOpenModal, email, onSubmit }) {
+export default function OtpModal({ openModal, setOpenModal, email, onSubmit, title = 'Check your email', description, submitText = 'Verify and continue' }) {
   const [otp, setOtp] = useState('');
   const navigate = useNavigate();
   const { setUser } = useUserStore();
@@ -27,11 +27,11 @@ export default function OtpModal({ openModal, setOpenModal, email, onSubmit }) {
   } });
   useEffect(() => { if (!openModal) { setOtp(''); mutation.reset(); } }, [openModal]);
   return <Dialog open={openModal} onOpenChange={value => !mutation.isLoading && setOpenModal(value)}><DialogContent>
-    <DialogHeader><DialogTitle>Check your email</DialogTitle><DialogDescription>Enter the six digit verification code sent to {email}.</DialogDescription></DialogHeader>
+    <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description || <>Enter the six digit verification code sent to {email}.</>}</DialogDescription></DialogHeader>
     <form onSubmit={event => { event.preventDefault(); if (/^\d{6}$/.test(otp)) mutation.mutate(); }} className='grid gap-6'>
-      <OTPInput value={otp} onChange={setOtp} numInputs={6} inputType='tel' shouldAutoFocus containerStyle={{ display: 'flex', justifyContent: 'center', gap: 8 }} skipDefaultStyles renderInput={props => <Input {...props} aria-label={`Verification code digit ${props['aria-label'] || ''}`} className='h-12 w-10 text-center text-lg' disabled={mutation.isLoading} />} />
+      <OTPInput value={otp} onChange={setOtp} numInputs={6} inputType='tel' shouldAutoFocus containerStyle={{ display: 'flex', justifyContent: 'center', gap: 8 }} skipDefaultStyles renderInput={props => <Input {...props} aria-label={`Verification code digit ${props['aria-label'] || ''}`} className='h-12 w-10 px-2 text-center text-lg' disabled={mutation.isLoading} />} />
       {mutation.isError && <p role='alert' className='sop-field-error'>Verification failed. Check your code and try again.</p>}
-      <Button type='submit' disabled={mutation.isLoading || !/^\d{6}$/.test(otp)}>{mutation.isLoading && <Loader2 className='size-4 animate-spin' />}{mutation.isLoading ? 'Verifying...' : 'Verify and continue'}</Button>
+      <Button type='submit' disabled={mutation.isLoading || !/^\d{6}$/.test(otp)}>{mutation.isLoading && <Loader2 className='size-4 animate-spin' />}{mutation.isLoading ? 'Verifying...' : submitText}</Button>
     </form>
   </DialogContent></Dialog>;
 }

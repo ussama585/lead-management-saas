@@ -37,5 +37,5 @@ export const dataLeadJobSchema = Yup.object({
   cv_submission_deadline: date(), expected_joining_date: date(),
   degrees: Yup.array().of(Yup.object({ degree_name: Yup.string().trim().required('Enter the degree name') })),
   skills: Yup.array().of(Yup.object({ skill_name: Yup.string().trim().required('Enter the skill name'), experience: experience(),
-    last_used: number().integer().min(0).max(5).required('Select last used') })).min(1, 'Add at least one skill'),
+    last_used: number().integer().min(0).max(5).required('Select last used') })).min(4, 'Add at least 4 skills'),
 });

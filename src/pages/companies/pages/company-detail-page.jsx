@@ -1,3 +1,4 @@
+import OtpModal from '../../auth/pages/otp-modal.jsx';
 import { message } from '../../../components/ui/notifications.jsx';
 import { Modal } from '../../../components/ui/app-modal.jsx';
 import { Select } from '../../../components/ui/app-select.jsx';
@@ -17,10 +18,10 @@ import { isSuperAdmin } from '../../auth/role-access.js';
 import { companyError, getCompanyDetails } from './companies-page.jsx';
 import formatDateUniversal from '../../shared/utils/formatDate.js';
 import InputField from '../../../components/input-field.component.jsx';
-import SettingsDeleteModal from '../../../components/settings-delete-modal.jsx';
+
 import { assertUserSuccess, applyUserErrors, userFormError } from '../../users/user-form-errors.js';
 import { managerIdFromOptions } from '../../users/user-manager-options.js';
-import { companyUserRoles, companyUserCreateSchema, companyUserEditSchema, companyUserOtpSchema } from '../schemas/company-user-schema.js';
+import { companyUserRoles, companyUserCreateSchema, companyUserEditSchema } from '../schemas/company-user-schema.js';
 import '../../../assets/styles/user-management-form.css';
 
 export async function createCompanyUser(companyId, values) {
@@ -59,13 +60,9 @@ export async function editCompanyUser(id, values, initial) {
   const { data } = await api.patch(`/accounts/detail/${encodeURIComponent(id)}`, body);
   return assertUserSuccess(data);
 }
-export async function requestCompanyUserDelete(id) {
-  const { data } = await api.delete(`/accounts/detail/${encodeURIComponent(id)}`);
-  return assertUserSuccess(data);
-}
 export async function confirmCompanyUserDelete(id, otp) {
   const body = new FormData(); body.append('otp', otp.trim());
-  const { data } = await api.post(`/accounts/validate-delete-user/${encodeURIComponent(id)}`, body);
+  const { data } = await api.delete(`/accounts/detail/${encodeURIComponent(id)}`, { data: body });
   return assertUserSuccess(data);
 }
 export async function getCompanySalesManagers(companyId) {
@@ -174,23 +171,18 @@ function CompanyDetail({ companyId }) {
   const [search, setSearch] = useState('');
   const [sorting, setSorting] = useState({});
   const [userDialog, setUserDialog] = useState(null);
-  const [deleteTarget, setDeleteTarget] = useState(null);
+
   const [otpTarget, setOtpTarget] = useState(null);
   const refreshUsers = () => {
     queryClient.invalidateQueries(['companyUsers']); queryClient.invalidateQueries(['usersList']); queryClient.invalidateQueries(['userCount']);
   };
-  const requestDelete = useMutation(id => requestCompanyUserDelete(id), {
-    onSuccess: () => { setOtpTarget(deleteTarget); setDeleteTarget(null); }, onError: error => message.error(userFormError(error)),
-  });
   const deleteUser = useMutation(otp => confirmCompanyUserDelete(otpTarget.id, otp), {
     onSuccess: () => {
-      message.success('User deleted successfully'); setOtpTarget(null); otpForm.resetForm();
+      message.success('User deleted successfully'); setOtpTarget(null);
       if (users.data?.results?.length === 1 && pagination.current > 1) setPagination(previous => ({ ...previous, current: previous.current - 1 }));
       refreshUsers();
     }, onError: error => message.error(userFormError(error)),
   });
-  const otpForm = useFormik({ initialValues: { otp: '' }, validationSchema: companyUserOtpSchema,
-    onSubmit: async values => { try { await deleteUser.mutateAsync(values.otp); } catch { /* Keep OTP modal open for retry. */ } } });
   const enabled = isSuperAdmin(user?.user_type) && /^[1-9]\d*$/.test(companyId);
   const company = useQuery(['companyDetail', user?.id, user?.user_type, companyId], () => getCompanyDetails(companyId),
     { enabled, retry: 1, refetchOnWindowFocus: false });
@@ -209,7 +201,7 @@ function CompanyDetail({ companyId }) {
     { title: 'Status', dataIndex: 'is_active', render: value => value == null ? '—' : <Tag color={value ? 'green' : 'default'}>{value ? 'Active' : 'Inactive'}</Tag> },
     { title: 'Actions', key: 'actions', render: (_, row) => <Space>
       <Button aria-label={`Edit ${row.name}`} title="Edit user" icon={<Pencil size={16} />} onClick={() => setUserDialog({ mode: 'edit', id: row.id })} />
-      <Button danger aria-label={`Delete ${row.name}`} title="Delete user" icon={<Trash2 size={16} />} onClick={() => { requestDelete.reset(); setDeleteTarget(row); }} />
+      <Button danger aria-label={`Delete ${row.name}`} title="Delete user" icon={<Trash2 size={16} />} onClick={() => { deleteUser.reset(); setOtpTarget(row); }} />
     </Space> },
   ];
   return <div className="min-w-0 max-w-full space-y-4">
@@ -251,19 +243,9 @@ function CompanyDetail({ companyId }) {
       if (userDialog.mode === 'create') setPagination(previous => ({ ...previous, current: 1 }));
       refreshUsers();
     }} />}
-    <SettingsDeleteModal title="Delete company user" itemName={deleteTarget?.name} open={deleteTarget != null} loading={requestDelete.isLoading}
-      error={requestDelete.isError ? userFormError(requestDelete.error) : null} onCancel={() => { if (!requestDelete.isLoading) setDeleteTarget(null); }}
-      onConfirm={() => { if (deleteTarget && !requestDelete.isLoading) requestDelete.mutate(deleteTarget.id); }} />
-    <Modal open={otpTarget != null} title="Verify user deletion" footer={null} closable={!deleteUser.isLoading} maskClosable={!deleteUser.isLoading}
-      onCancel={() => { if (!deleteUser.isLoading) { setOtpTarget(null); otpForm.resetForm(); } }}>
-      <p className="mb-4">Enter the OTP sent for deleting {otpTarget?.name}.</p>
-      <form className="user-management-form" noValidate onSubmit={otpForm.handleSubmit}>
-        <label htmlFor="company-user-delete-otp">OTP</label>
-        <Input id="company-user-delete-otp" name="otp" autoComplete="one-time-code" value={otpForm.values.otp} onChange={otpForm.handleChange} onBlur={otpForm.handleBlur} disabled={deleteUser.isLoading} />
-        {otpForm.touched.otp && otpForm.errors.otp && <div role="alert" style={{ color: 'red' }}>{otpForm.errors.otp}</div>}
-        <Button danger type="primary" className="mt-4" htmlType="submit" loading={deleteUser.isLoading}>Verify and delete</Button>
-      </form>
-    </Modal>
+    <OtpModal openModal={otpTarget != null} setOpenModal={open => { if (!open) setOtpTarget(null); }}
+      title="Verify user deletion" description={`Enter the six digit OTP to delete ${otpTarget?.name || 'this user'}.`}
+      submitText="Verify and delete" onSubmit={otp => deleteUser.mutateAsync(otp)} />
   </div>;
 }
 

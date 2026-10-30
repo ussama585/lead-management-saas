@@ -124,56 +124,13 @@ export const editUser = async (userId, userData) => {
  * @param {string|number} userId
  * @returns {Promise<object>} API response
  */
-export const requestDeleteUserOtp = async (userId) => {
-  try {
-    // This endpoint triggers the OTP email (DELETE method, but only triggers OTP, does not delete)
-    const response = await api.delete(`/accounts/detail/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error requesting OTP for user deletion ${userId}:`, error);
-    throw new Error(`Error requesting OTP for user deletion: ${error.message}`);
-  }
-};
-
-/**
- * Step 2: Validate OTP and complete user deletion.
- * @param {string|number} userId
- * @param {string} otp
- * @returns {Promise<object>} API response
- */
 export const validateDeleteUserOtp = async (userId, otp) => {
-  try {
-    const formData = new FormData();
-    formData.append('otp', otp);
-    const response = await api.post(`/accounts/validate-delete-user/${userId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    console.log("response: ", response.data);
-    return response.data;
-  } catch (error) {
-    console.error(`Error validating OTP for user deletion ${userId}:`, error);
-    throw new Error(`Error validating OTP for user deletion: ${error.message}`);
-  }
+  const body = new FormData();
+  body.append('otp', String(otp).trim());
+  const { data } = await api.delete(`/accounts/detail/${encodeURIComponent(userId)}`, { data: body });
+  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not delete user.');
+  return data;
 };
-
-// DEPRECATED: This function does not use the OTP-based deletion flow. Use requestDeleteUserOtp and validateDeleteUserOtp instead.
-// export const deleteUser = async (userId) => {
-
-//   try {
-//     const response = await api.delete(`/accounts/update-user/${userId}`);
-//     return response.data;
-
-//   }
-
-//   catch (error) {
-
-//     console.error(`Error deleting user ${userId}:`, error);
-//     throw new Error(`Error deleting user: ${error.message}`);
-//   }
-// };
-
 export const toggleUserActivation = async (userId, isActive) => {
 
   try {

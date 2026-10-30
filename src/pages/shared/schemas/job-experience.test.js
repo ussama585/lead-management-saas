@@ -1,5 +1,26 @@
 import { describe, it, expect } from 'vitest';
 import { commonJobFormSchema, editJobHeadhuntingValidationSchema, EXPERIENCE_RANGE_ERROR } from './job.js';
+import { dataLeadJobSchema } from '../../leads/schemas/data-lead-job-schema.js';
+
+describe('Data Lead create/edit dropdown experience validation', () => {
+  const schema = dataLeadJobSchema.pick(['min_experience', 'max_experience']);
+  it.each([
+    { min_experience: 6, max_experience: 5 },
+    { min_experience: 2, max_experience: 1 },
+    { min_experience: 2, max_experience: 0 },
+    { min_experience: '', max_experience: 5 },
+    { min_experience: 2, max_experience: 12 },
+  ])('blocks an invalid selection %j', async values => {
+    await expect(schema.validate(values)).rejects.toThrow();
+  });
+  it.each([
+    { min_experience: 0, max_experience: 0 },
+    { min_experience: 3, max_experience: 3 },
+    { min_experience: '2', max_experience: '5' },
+  ])('accepts a valid selection %j', async values => {
+    await expect(schema.validate(values)).resolves.toBeDefined();
+  });
+});
 
 describe.each([
   ['create/common job form', commonJobFormSchema],

@@ -3,6 +3,7 @@
   gap: 12px;
   min-width: 0;
   container-type: inline-size;
+  width: 100%;
 }
 .data-job-section {
   min-width: 0;
@@ -27,6 +28,12 @@
 }
 .data-job-stack { display: grid; gap: 12px; min-width: 0; }
 .data-job-field { min-width: 0; }
+.data-job-form .data-job-field :is(input, textarea, .ant-input-number, [data-slot='select-trigger']) {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.data-job-form .data-job-field textarea { resize: vertical; }
 .data-job-field > label {
   display: block;
   margin-bottom: 4px;
@@ -48,6 +55,7 @@
 }
 @container (min-width: 800px) {
   .data-job-paired-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .data-job-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @container (min-width: 1000px) {
   .data-job-grid, .data-job-skill-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }

@@ -1,3 +1,6 @@
+import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
+import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
+import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
 import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.jsx';
@@ -44,7 +47,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     toStatusKey,
     statusColors,
     STATUSES_REQUIRING_REMARKS,
-    PROJECT_SIZE_OPTIONS
   } from './website-leads-constants.js';
   import { MARKETING_MANAGER_PAGE_SIZE_OPTIONS } from '../../constants/marketing-manager-table-page-sizes.js';
 
@@ -80,6 +82,10 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
 
   const LeadsPage = ({ isDashboard = false }) => {
+  const projectSizesQuery = useProjectSizeOptions();
+  const PROJECT_SIZE_OPTIONS = projectSizesQuery.options;
+  const statusList = useLeadStatusOptions();
+  const apiStatusOptions = statusList.options;
     const [searchParams, setSearchParams] = useSearchParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -237,7 +243,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
     const [statusTabs, setStatusTabs] = useState([]);
     const getStatusCount = useCallback(
-      (counts, key) => (counts && counts[key] !== undefined ? counts[key] : 0),
+      (counts, key) => normalizeLeadCounts(counts)[key] ?? 0,
       [],
     );
 
@@ -388,18 +394,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     }, [hearAboutUsOptionsData]);
 
     useEffect(() => {
-      const tabs = [
-        { label: 'All', value: '', apiKey: 'total_count' },
-        ...STATUS_OPTIONS.map((status) => ({
-          label: status,
-          value: status,
-          apiKey: toStatusKey(status),
-        })),
-        { label: 'Unassigned', value: 'Unassigned', apiKey: 'unassigned' },
-        { label: 'Other', value: 'Other', apiKey: 'other' },
-      ];
-      setStatusTabs(tabs);
-    }, []);
+      setStatusTabs(leadCountTabs(leadCounts));
+    }, [leadCounts]);
 
     // Only set title and mount component if we're actually on the leads page
     useEffect(() => {
@@ -895,7 +891,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // },
         // 2. Status — use createStatusColumn for all users (it handles permissions based on converted_to_client)
         createStatusColumn({
-          statusOptions: STATUS_OPTIONS,
+          statusOptions: apiStatusOptions,
+          readOnly: userType === 'super_admin',
+        additionalProps: { loading: statusList.isLoading, notFoundContent: statusList.isError ? 'Could not load statuses. Please retry.' : 'No statuses available.' },
           requireRemarksForAll: true,
           editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
           statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
@@ -957,7 +955,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         {
           header: 'Name',
           accessorKey: 'contact_person_name',
-          size: 0.5,
+          size: 320,
           Cell: ({ cell, row }) => {
             const name = cell.getValue();
             const lead = row.original;
@@ -970,26 +968,29 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
             const duplicateIcon = isDuplicateLead && (
               <Tooltip title="View duplicate information">
-                <span
+                <button type="button" aria-label="View duplicate information"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '2px',
                     padding: '2px 6px',
                     backgroundColor: '#fff',
+                  border: '2px solid #3e6a9f',
                     borderRadius: '8px',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
                     cursor: 'pointer',
                     flexShrink: 0,
                   }}
+                  onPointerDown={event => event.stopPropagation()}
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     openDuplicateModal(lead);
                   }}
                 >
                   <MinusOutlined size="1em" className="app-icon" style={{ color: '#595959', fontSize: '12px' }} />
                   <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#fa8c16', fontSize: '12px' }} />
-                </span>
+                </button>
               </Tooltip>
             );
             const delayedInfoIcon = isFollowupDelayed && (
@@ -1018,6 +1019,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               <div className="flex items-center gap-3">
               {avatar}
               <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
               <Tooltip title="View lead details">
                 <a
                   style={{ textDecoration: 'underline', color: '#3E6A9F', display: 'flex', alignItems: 'center', gap: '6px' }}
@@ -1025,10 +1027,11 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
                   onClick={(e) => { e.preventDefault(); navigate(leadHref); }}
                 >
                   {name}
-                  {delayedInfoIcon}
-                  {duplicateIcon}
                 </a>
               </Tooltip>
+              {delayedInfoIcon}
+              {duplicateIcon}
+              </div>
               <div data-table-secondary className="text-xs text-muted-foreground">{lead.email || '-'}</div>
               </div>
               </div>
@@ -1192,7 +1195,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             const isUpdating = updatingProjectSizeId === row.original.id;
 
             // Marketing managers can only view, not edit
-            if (userType === 'marketing_manager') {
+            if (['super_admin', 'marketing_manager'].includes(userType)) {
               return <span>{currentValue || '-'}</span>;
             }
 
@@ -1223,7 +1226,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       const statusIndex = ordered.findIndex(column => column.accessorKey === 'status');
       ordered.splice(statusIndex + 1, 0, ...adjacentKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean));
       return ordered;
-    }, [userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
+    }, [apiStatusOptions, statusList.isLoading, statusList.isError, userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
 
 
 
@@ -1402,7 +1405,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             </div>
             </section>
             {/* Status Tabs */}
-            <WebsiteStatusTabs
+            <div className="mt-3 w-full border-t border-border pt-3">
+<WebsiteStatusTabs
               statusFilter={selectedStatus}
               setStatusFilter={handleTabClick}
               statusChoices={statusTabs.filter(tab =>
@@ -1411,6 +1415,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               getTotalCount={() => getStatusCount(leadCounts, 'total_count')}
               getStatusCount={(apiKey) => getStatusCount(leadCounts, apiKey)}
             />
+</div>
           </div>
         )}
 

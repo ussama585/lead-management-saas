@@ -69,6 +69,7 @@ export const createStatusColumn = ({
   leadType, // 'meta-leads', 'data-leads', or undefined (for regular leads)
   statusOptions = STATUS_OPTIONS,
   requireRemarksForAll = false,
+  readOnly = false,
   editableRoles = ['admin', 'sales_manager', 'sales_executive'],
 }) => {
   console.log('[StatusColumn] createStatusColumn called with:', {
@@ -93,6 +94,7 @@ export const createStatusColumn = ({
     Cell: ({ cell, row }) => {
       const entry = row.original;
       const currentStatus = cell.getValue();
+      if (readOnly) return <span>{currentStatus || '-'}</span>;
       const isUpdating = updatingStatusId === entry.id || isLoading;
       const isConvertedToClient = isLeadConvertedToClient(entry);
 

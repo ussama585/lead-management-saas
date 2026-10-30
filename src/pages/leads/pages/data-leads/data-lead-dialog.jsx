@@ -8,6 +8,7 @@ import { Alert, Descriptions, Switch } from 'antd';
 import { useFormik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../shared/services/api.js';
+import { industryNames } from '../../../shared/utils/countries.js';
 import useUserStore from '../../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
 import { dataLeadSchema, dataLeadEditSchema, dataLeadEditFields } from '../../schemas/data-lead-schema.js';
@@ -87,6 +88,12 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
   if (detail.data?.company != null && !companyOptions.some(option => option.value === detail.data.company)) companyOptions.push({ value: detail.data.company, label: `Company ID: ${detail.data.company}` });
   function control(key) {
     const common = { id: `data-lead-${key}`, name: key, disabled: pending, value: formik.values[key], onBlur: formik.handleBlur, 'aria-invalid': Boolean(formik.touched[key] && formik.errors[key]), 'aria-describedby': formik.touched[key] && formik.errors[key] ? `data-lead-${key}-error` : undefined };
+    if (key === 'industry') return <Select {...common} className='w-full' showSearch optionFilterProp='label' placeholder='Select industry'
+      options={[...new Set([...industryNames.map(item => item.value), formik.values.industry].filter(Boolean))].map(value => ({ value, label: value }))}
+      onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} />;
+    if (key === 'contract_currency') return <Select {...common} className='w-full' placeholder='Select currency'
+      options={[{ value: 'PKR', label: 'Pakistani Rupee (PKR)' }, { value: 'USD', label: 'US Dollar (USD)' }, { value: 'CAD', label: 'Canadian Dollar (CAD)' }]}
+      onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} />;
     if (key === 'company') return <Select {...common} className='w-full' showSearch filterOption={false} onSearch={setCompanySearch} loading={companies.isFetching} options={companyOptions} onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} placeholder='Search for a company' />;
     if (['assigned_to', 'contract_price'].includes(key)) return key === 'assigned_to' && assignees.length ? <Select {...common} className='w-full' allowClear showSearch optionFilterProp='label' options={assignees.map(item => ({ value: item.id, label: item.name }))} onChange={value => formik.setFieldValue(key, value ?? null)} onBlur={() => formik.setFieldTouched(key, true)} /> : <Input {...common} type='number' className='h-10 w-full' min={key === 'assigned_to' ? 1 : 0} step={key === 'contract_price' ? 'any' : 1} onChange={event => formik.setFieldValue(key, event.target.value === '' ? null : Number(event.target.value))} />;
     if (key === 'is_accepting_response') return <Switch id={common.id} disabled={pending} checked={formik.values[key]} onChange={value => formik.setFieldValue(key, value)} />;

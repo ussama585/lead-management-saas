@@ -17,6 +17,7 @@ import SettingsDeleteModal from '../../../../components/settings-delete-modal.js
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
 import api from '../../../shared/services/api.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
+import { isLeadConvertedToClient } from '../../../shared/utils/statusColumn.jsx';
 import { getRolePath } from '../../../auth/role-home.js';
 import {
   getDataLeadJobs,
@@ -777,7 +778,7 @@ const DataLead = () => {
         }}
       >
         {leadForCard && <LeadCard lead={leadForCard} leadType="Data Lead" refetchLeadDetail={refetchLeadDetail} />}
-        {!isReadOnlyLead && (
+        {(!isReadOnlyLead || (isSuperAdmin(user?.user_type) && !isLeadConvertedToClient(leadForCard))) && (
           <Stack direction="row" spacing={1} sx={{ mb: 2, mt: 2 }}>
             <Button
               className="custom-button"

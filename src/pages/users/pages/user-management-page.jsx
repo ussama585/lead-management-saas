@@ -28,7 +28,7 @@ import TargetIcon from '../../../assets/images/table-icons/target-icon.svg';
 import GreenPencilIcon from '../../../assets/images/table-icons/green-pencil.svg';
 import BlueHamburgerIcon from '../../../assets/images/table-icons/blue-hamburger.svg';
 
-import { getUsers, getAllUsers, getCompanyManagementUsers, getUserCount, getUserTabCounts, toggleUserActivation, requestDeleteUserOtp, validateDeleteUserOtp } from '../../shared/services/users-service.js';
+import { getUsers, getAllUsers, getCompanyManagementUsers, getUserCount, getUserTabCounts, toggleUserActivation, validateDeleteUserOtp } from '../../shared/services/users-service.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { getTargetForUser } from '../../shared/services/stats-service.js';
@@ -210,7 +210,7 @@ export default function UserManagement() {
 
   const handleDeleteUser = async (userId, userName) => {
     console.log('[UserManagement] Requesting OTP for user deletion:', userId);
-    await requestDeleteUserOtp(userId);
+
     setUserToDelete({
       userId: userId,
       userName: userName
@@ -231,7 +231,8 @@ export default function UserManagement() {
         message.success('User deleted successfully ');
       } catch (error) {
         // Show OTP error message
-        message.error('Invalid OTP. Please try again.');
+        message.error(error?.message || 'Could not delete user. Please try again.');
+        throw error;
       }
     }
   };

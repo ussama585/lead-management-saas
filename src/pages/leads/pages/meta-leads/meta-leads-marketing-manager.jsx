@@ -1,3 +1,4 @@
+import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -151,6 +152,8 @@ const STATUSES_REQUIRING_REMARKS = new Set([
 ]);
 
 export default function MetaLeadsMarketingManager() {
+  const projectSizesQuery = useProjectSizeOptions();
+  const PROJECT_SIZE_OPTIONS = projectSizesQuery.options;
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Load persisted state from sessionStorage
@@ -256,12 +259,7 @@ export default function MetaLeadsMarketingManager() {
   };
 
   // Project size options
-  const PROJECT_SIZE_OPTIONS = [
-    { label: 'Under PKR 25,000', value: 'Below 25k' },
-    { label: 'PKR 25,000 - PKR 50,000', value: '25k - 50k' },
-    { label: 'PKR 50,000 - PKR 100,000', value: '50k - 100k' },
-    { label: 'PKR 100,000 +', value: 'Above 100k' }
-  ];
+
 
   // Helper function to format project size for display
   const formatProjectSize = (value) => {
@@ -1045,6 +1043,7 @@ export default function MetaLeadsMarketingManager() {
         header: 'Name',
         id: 'full_name', // Explicit id for sorting
         accessorKey: 'full_name',
+        size: 320,
         sortUndefined: 'last', // Handle undefined/null values
         sortDescFirst: false, // Start with ascending order (A to Z)
         Cell: ({ cell, row }) => {
@@ -1054,26 +1053,29 @@ export default function MetaLeadsMarketingManager() {
 
           const duplicateIcon = isDuplicateLead && (
             <Tooltip title="View duplicate information">
-              <span
+              <button type="button" aria-label="View duplicate information"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '2px',
                   padding: '2px 6px',
                   backgroundColor: '#fff',
+                  border: '2px solid #3e6a9f',
                   borderRadius: '8px',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
                   cursor: 'pointer',
                   flexShrink: 0,
                 }}
+                onPointerDown={event => event.stopPropagation()}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   openDuplicateModal(lead);
                 }}
               >
                 <MinusOutlined size="1em" className="app-icon" style={{ color: '#595959', fontSize: '12px' }} />
                 <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#fa8c16', fontSize: '12px' }} />
-              </span>
+              </button>
             </Tooltip>
           );
           

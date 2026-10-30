@@ -19,3 +19,4 @@ describe('Meta Lead detail card update endpoints', () => {
     expect(api.patch).toHaveBeenLastCalledWith('/meta-leads/lead/7', { assigned_to: 25 });
   });
 });
+vi.mock('../pages/shared/store/user-store.js', () => ({ default: { getState: () => ({ user: {} }) } }));

@@ -3,7 +3,7 @@ import { Select } from './ui/app-select.jsx';
 import React, { useEffect, useState, useMemo } from "react";
 import '../assets/styles/legacy/lead-card-component.css';
 import '../assets/styles/legacy/common.css';
-import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as UploadOutlined } from 'lucide-react';
+import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as UploadOutlined, Phone, BriefcaseBusiness, Mail, Globe, Clock3, UserRound, Pencil } from 'lucide-react';
 import { Switch } from 'antd';
 
 import LeadEditModal from './LeadEditModal.jsx';
@@ -504,20 +504,20 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
       {/* Header Section */}
       <div className="basic-info responsive-basic-info lead-card__basic-info">
         <div className="lead-info responsive-lead-info">
-          <div className="avatar responsive-avatar">{lead?.contact_person_name?.charAt(0) || '-'}</div>
-          <span className="responsive-lead-name-company">
+          <div className="avatar responsive-avatar">{lead?.contact_person_name?.trim().charAt(0).toUpperCase() || '-'}</div>
+          <div className="responsive-lead-name-company">
             <div className="lead-card__name-row">
               <h2 className="lead-card__name-heading">{lead?.contact_person_name || '-'}</h2>
             </div>
             <p className="lead-card__company-name">
               {lead?.company_name || '-'}
             </p>
-          </span>
+          </div>
         </div>
 
         <div className="lead-card__header-actions">
           {canEdit && isDataLead && <>
-            <Button size="large" className="lead-card__edit-button" onClick={() => setDataLeadEditOpen(true)}>Edit Lead</Button>
+            <Button icon={<Pencil size={20} />} size="large" className="lead-card__edit-button" onClick={() => setDataLeadEditOpen(true)}>Edit Lead</Button>
             {dataLeadEditOpen && <DataLeadDialog mode="edit" id={lead.id}
               onClose={() => setDataLeadEditOpen(false)} onSaved={refetchLeadDetail} />}
           </>}
@@ -563,12 +563,14 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               }}
             />
           )}
+          <div className="lead-card__status-control" data-potential={status === 'Potential Client'}>
           {canEditStatus ? (
             <Select
               value={status || "Select Status"}
               onChange={handleStatusChange}
               placeholder="Select Status"
-              className="select-fit-content"
+              className="lead-card__status-select"
+              labelRender={({ label }) => <span className="lead-card__status-label"><span className="lead-card__status-dot" />{label}</span>}
               popupMatchSelectWidth={false}
               disabled={updateStatusMutation.isLoading || remarksLoading}
               options={statusOptions.map((option) => ({
@@ -581,86 +583,40 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               className="lead-card__status-pill"
               style={{ '--status-pill-fg': statusColors[status] || '#666' }}
             >
-              {status || 'No Status'}
+              <span className="lead-card__status-dot" />{status || 'No Status'}
             </span>
           )}
-
-
+          </div>
         </div>
       </div>
 
       {/* Details Section: Two Columns */}
       <div className="lead-detail responsive-lead-detail lead-card__detail-row">
-        {/* Left Column: Contact Info */}
         <div className="div-1 responsive-div-1 lead-card__contact-info">
-          <div className="lead-card__contact-line">
-            <span>{lead?.phone_number ?? '-'}</span>
-            <CopyOutlined size="1em"
-              
-              className={["app-icon", "lead-card__copy-icon"].filter(Boolean).join(' ')}
-              onClick={() => {
-                navigator.clipboard.writeText(lead?.phone_number);
-                message.success('Number copied to clipboard');
-              }} style={{ rotate: (180) + 'deg' }}
-            />
+          <div className="lead-card__info-row"><span className="lead-card__info-icon"><Phone size={22} /></span>
+            <div className="lead-card__info-text"><div className="lead-card__label">Phone</div><div className="lead-card__value">{lead?.phone_number || '-'}
+              <button type="button" className="lead-card__copy-button" aria-label="Copy phone number" onClick={async () => {
+                try { await navigator.clipboard.writeText(lead?.phone_number || ''); message.success('Number copied to clipboard'); }
+                catch { message.error('Failed to copy phone number'); }
+              }}><CopyOutlined size={18} /></button></div></div>
           </div>
-          <div className="lead-card__designation">{lead?.contact_person_designation ?? '-'}</div>
-          <div className="lead-card__contact-line">
-            <span>{lead?.email ?? '-'}</span>
-            <CopyOutlined size="1em"
-              
-              className={["app-icon", "lead-card__copy-icon"].filter(Boolean).join(' ')}
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(lead?.email || "");
-                  message.success("Email copied to clipboard");
-                } catch (error) {
-                  message.error("Failed to copy email");
-                }
-              }} style={{ rotate: (180) + 'deg' }}
-            />
+          <div className="lead-card__info-row"><span className="lead-card__info-icon"><BriefcaseBusiness size={22} /></span>
+            <div className="lead-card__info-text"><div className="lead-card__label">Designation</div><div className="lead-card__value">{lead?.contact_person_designation || '-'}</div></div>
           </div>
-          {/* Accepting Response Toggle + Copy Client Response URL (commented out)
-          <div style={{ display: 'flex', alignItems: 'center', margin: '8px 0 0 0', gap: 8 }}>
-            <span style={{ color: '#3E6A9F', fontWeight: 500 }}>Accepting Response</span>
-            <Switch
-              checked={isAcceptingResponse}
-              loading={acceptingResponseMutation.isLoading}
-              onChange={(checked) => acceptingResponseMutation.mutate(checked)}
-              checkedChildren="Yes"
-              unCheckedChildren="No"
-              style={{
-                backgroundColor: isAcceptingResponse ? '#3E6A9F' : '#d9d9d9',
-                borderColor: isAcceptingResponse ? '#3E6A9F' : '#d9d9d9',
-              }}
-              trackStyle={{ backgroundColor: '#3E6A9F' }}
-              handleStyle={isAcceptingResponse ? { background: '#fdc800', borderColor: '#fdc800' } : {}}
-            />
+          <div className="lead-card__info-row"><span className="lead-card__info-icon"><Mail size={22} /></span>
+            <div className="lead-card__info-text"><div className="lead-card__label">Email</div><div className="lead-card__value">{lead?.email || '-'}
+              <button type="button" className="lead-card__copy-button" aria-label="Copy email" onClick={async () => {
+                try { await navigator.clipboard.writeText(lead?.email || ''); message.success('Email copied to clipboard'); }
+                catch { message.error('Failed to copy email'); }
+              }}><CopyOutlined size={18} /></button></div></div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ color: '#3E6A9F', fontWeight: 500 }}>Client Response URL</span>
-            <span style={{ color: '#3E6A9F', fontWeight: 400, wordBreak: 'break-all' }}>https://www.searchopal.com/lead-generation/{lead?.identifier}</span>
-            <CopyOutlined
-              style={{ cursor: 'pointer' }}
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(`https://www.searchopal.com/lead-generation/${lead?.identifier}`);
-                  message.success('Client Response URL copied');
-                } catch (error) {
-                  message.error('Failed to copy URL');
-                }
-              }}
-            />
-          </div>
-          */}
-
         </div>
-        {/* Right Column: Meta Info & Assignment */}
         <div className="div-2 responsive-div-2 lead-card__meta-info">
-          <div className="lead-card__meta-line">{leadType}</div>
-          <div className="lead-card__meta-line">{lead?.created_at ? formatDateUniversal(lead.created_at, true) : '-'}</div>
-          <div className="lead-card__assigned-label">Assigned To</div>
-          <div className="responsive-assigned-select lead-card__assigned-select-wrap">
+          <div className="lead-card__info-row"><span className="lead-card__info-icon"><Globe size={22} /></span><div className="lead-card__info-text"><div className="lead-card__label">Source</div><div className="lead-card__value">{leadType}</div></div></div>
+          <div className="lead-card__info-row"><span className="lead-card__info-icon"><Clock3 size={22} /></span><div className="lead-card__info-text"><div className="lead-card__label">Created At</div><div className="lead-card__value">{lead?.created_at ? formatDateUniversal(lead.created_at, true) : '-'}</div></div></div>
+          <div className="lead-card__assignment">
+            <div className="lead-card__label">Assigned To</div>
+            <div className="lead-card__assigned-control"><UserRound className="lead-card__assigned-icon" size={22} aria-hidden="true" />          <div className="responsive-assigned-select lead-card__assigned-select-wrap">
             {canAssign ?
               <Select
                 value={assignedTo?.id || undefined}
@@ -695,6 +651,9 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                     : assignedTo?.name || user?.name}
               </div>
             }
+          </div>
+
+            </div>
           </div>
         </div>
       </div>

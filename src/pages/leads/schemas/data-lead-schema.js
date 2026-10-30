@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-export const dataLeadEditFields = ['contact_person_name', 'company_name', 'phone_number', 'contact_person_designation', 'email'];
+export const dataLeadEditFields = ['contact_person_name', 'company_name', 'phone_number', 'contact_person_designation', 'email', 'contract_currency', 'industry'];
 
 export function dataLeadEditSchema() {
   return dataLeadSchema(false).pick(dataLeadEditFields);

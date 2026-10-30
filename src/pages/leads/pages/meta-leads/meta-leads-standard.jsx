@@ -1,3 +1,6 @@
+import { leadCountTabs, getLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
+import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
+import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -118,6 +121,10 @@ const STATUSES_REQUIRING_REMARKS = new Set([
 ]);
 
 export default function MetaLeadsStandard() {
+  const projectSizesQuery = useProjectSizeOptions();
+  const PROJECT_SIZE_OPTIONS = projectSizesQuery.options;
+  const statusList = useLeadStatusOptions();
+  const apiStatusOptions = statusList.options;
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Load persisted state from sessionStorage
@@ -181,12 +188,7 @@ export default function MetaLeadsStandard() {
   });
 
   // Project size options
-  const PROJECT_SIZE_OPTIONS = [
-    { label: 'Under PKR 25,000', value: 'Below 25k' },
-    { label: 'PKR 25,000 - PKR 50,000', value: '25k - 50k' },
-    { label: 'PKR 50,000 - PKR 100,000', value: '50k - 100k' },
-    { label: 'PKR 100,000 +', value: 'Above 100k' }
-  ];
+
 
   // Helper function to format project size for display
   const formatProjectSize = (value) => {
@@ -261,23 +263,13 @@ export default function MetaLeadsStandard() {
     refetch: refetchMetaLeadsCount
   } = useQuery(
     ['metaLeadsCount', dateRange, selectedExecId, statusFilter, projectSizeFilter, executiveFilter],
-    () => getMetaLeadsListCount(
-      1, // page
-      dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'),
-      dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ'),
-      selectedExecId,
-      null, // No campaign filter for standard users
-      null, // No adset filter for standard users
-      null, // No ad filter for standard users
-      null, // No history status for standard users
-      null, // No history start date for standard users
-      null, // No history end date for standard users
-      projectSizeFilter,
-      executiveFilter,
-      null,
-      null
-    ),
-    {
+    () => getLeadFilterCounts({
+      ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+      ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+      ...(selectedExecId ? { assigned_to: selectedExecId } : {}),
+      ...(projectSizeFilter ? { project_size: projectSizeFilter } : {}),
+      ...(executiveFilter ? { executive_filter: executiveFilter } : {}),
+    }),    {
       staleTime: 0, // Always consider data stale for count query
       cacheTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false
@@ -424,14 +416,7 @@ export default function MetaLeadsStandard() {
   };
 
   // Status choices for meta leads
-  const STATUS_CHOICES = [
-    ...STATUS_OPTIONS.map((status) => ({
-      label: status,
-      value: status,
-      apiKey: toApiKey(status),
-    })),
-    { label: 'Other', value: 'Other', apiKey: 'other' },
-  ];
+  const STATUS_CHOICES = leadCountTabs(metaLeadsCountData);
 
   // Function to get count for a status
   const getStatusCount = (apiKey) => {
@@ -677,7 +662,9 @@ export default function MetaLeadsStandard() {
     // Status column — use createStatusColumn for all users (it handles permissions based on converted_to_client)
       createStatusColumn({
         editableRoles: ['super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
-        statusOptions: STATUS_OPTIONS,
+        statusOptions: apiStatusOptions,
+        readOnly: user?.user_type === 'super_admin',
+
         statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
         statusColors,
         userType: user?.user_type,
@@ -697,6 +684,8 @@ export default function MetaLeadsStandard() {
         },
         isLoading: updateStatusMutation.isLoading,
         additionalProps: {
+          loading: statusList.isLoading,
+          notFoundContent: statusList.isError ? 'Could not load statuses.' : 'No statuses available.',
           listHeight: window.innerHeight * 0.7,
         },
       }),
@@ -710,6 +699,7 @@ export default function MetaLeadsStandard() {
   enableSorting: true,
   Cell: ({ cell, row }) => {
     const currentValue = cell.getValue();
+    if (user?.user_type === 'super_admin') return <span>{currentValue || '-'}</span>;
     const isUpdating = updatingProjectSizeId === row.original.id;
 
     // Admin, Sales Manager, Sales Executive - editable based on permissions
@@ -771,6 +761,7 @@ export default function MetaLeadsStandard() {
       header: 'Full Name',
       id: 'full_name', // Explicit id for sorting
       accessorKey: 'full_name',
+      size: 320,
       sortUndefined: 'last', // Handle undefined/null values
       sortDescFirst: false, // Start with ascending order (A to Z)
       Cell: ({ cell, row }) => {
@@ -782,26 +773,29 @@ export default function MetaLeadsStandard() {
 
         const duplicateIcon = isDuplicateLead && (
           <Tooltip title="View duplicate information">
-            <span
+            <button type="button" aria-label="View duplicate information"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '2px',
                 padding: '2px 6px',
                 backgroundColor: '#fff',
+                  border: '2px solid #3e6a9f',
                 borderRadius: '8px',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
                 cursor: 'pointer',
                 flexShrink: 0,
               }}
-              onClick={(e) => {
-                e.stopPropagation();
+              onPointerDown={event => event.stopPropagation()}
+                  onClick={(e) => {
+                e.preventDefault();
+                  e.stopPropagation();
                 openDuplicateModal(lead);
               }}
             >
               <MinusOutlined size="1em" className="app-icon" style={{ color: '#595959', fontSize: '12px' }} />
               <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#fa8c16', fontSize: '12px' }} />
-            </span>
+            </button>
           </Tooltip>
         );
         const delayedInfoIcon = isFollowupDelayed && (
@@ -1019,7 +1013,7 @@ export default function MetaLeadsStandard() {
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'work_email'),
     ];
-  }, [canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
+  }, [apiStatusOptions, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
 
   return (
     <>
@@ -1144,7 +1138,8 @@ export default function MetaLeadsStandard() {
               )}
 
       {/* Status filter tabs */}
-      <StatusFilterTabs
+      <div className="mt-3 w-full border-t border-border pt-3">
+<StatusFilterTabs
         statusFilter={statusFilter}
         setStatusFilter={(status) => {
           setStatusFilter(status);
@@ -1155,6 +1150,7 @@ export default function MetaLeadsStandard() {
         getTotalCount={getTotalCount}
         getStatusCount={getStatusCount}
       />
+</div>
 
 
         </div>

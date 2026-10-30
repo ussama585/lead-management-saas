@@ -14,7 +14,7 @@ const values = { ...emptyDataLeadJob, data_lead: 1, job_title: 'Senior Python De
   job_description: 'Develop APIs.', min_experience: 3, max_experience: 6, min_salary: 150000, max_salary: 250000,
   cv_submission_deadline: '2026-11-15T23:59', expected_joining_date: '2026-12-01T09:00',
   degrees: [{ degree_name: 'Bachelor of Computer Science' }, { degree_name: 'Master of Computer Science' }],
-  skills: [{ skill_name: 'Python', experience: 5, last_used: 0 }, { skill_name: 'Django', experience: 4, last_used: 0 }, { skill_name: 'PostgreSQL', experience: 3, last_used: 1 }],
+  skills: [{ skill_name: 'Python', experience: 5, last_used: 0 }, { skill_name: 'Django', experience: 4, last_used: 0 }, { skill_name: 'PostgreSQL', experience: 3, last_used: 1 }, { skill_name: 'Git', experience: 3, last_used: 0 }],
 };
 describe('data lead job route and API', () => {
   it('registers the requested super admin route with its lead ID', () => {

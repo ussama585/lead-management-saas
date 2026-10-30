@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '../../shared/services/api.js';
-import { getCompanyUsers, getCompanySalesManagers, createCompanyUser, editCompanyUser, requestCompanyUserDelete, confirmCompanyUserDelete } from './company-detail-page.jsx';
+import { getCompanyUsers, getCompanySalesManagers, createCompanyUser, editCompanyUser, confirmCompanyUserDelete } from './company-detail-page.jsx';
 import { managerIdFromOptions } from '../../users/user-manager-options.js';
 import { companyUserCreateSchema, companyUserEditSchema, companyUserOtpSchema } from '../schemas/company-user-schema.js';
 
@@ -52,14 +52,15 @@ describe('company detail users', () => {
     expect(Object.fromEntries(body)).toEqual({ name: 'Updated Name', manager_id: '4' });
     await expect(companyUserEditSchema.validate({ ...values, password: '' })).resolves.toBeDefined();
   });
-  it('requests an OTP before validating it to delete the selected user', async () => {
+  it('submits the OTP to the user detail DELETE endpoint', async () => {
     api.delete.mockResolvedValue({ data: { success: true } });
     api.post.mockResolvedValue({ data: { success: true } });
-    await requestCompanyUserDelete(8);
-    expect(api.delete).toHaveBeenCalledWith('/accounts/detail/8');
+
+
     await confirmCompanyUserDelete(8, ' 123456 ');
-    const [endpoint, body] = api.post.mock.calls[0];
-    expect(endpoint).toBe('/accounts/validate-delete-user/8');
+    const [endpoint, config] = api.delete.mock.calls[0];
+    const body = config.data;
+    expect(endpoint).toBe('/accounts/detail/8');
     expect(body.get('otp')).toBe('123456');
     await expect(companyUserOtpSchema.validate({ otp: '' })).rejects.toThrow('OTP');
   });

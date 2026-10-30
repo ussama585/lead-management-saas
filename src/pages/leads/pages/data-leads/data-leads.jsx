@@ -1,3 +1,6 @@
+import { leadCountTabs, getLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
+import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
+import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Select as AntSelect } from '../../../../components/ui/app-select.jsx';
 import { Tooltip as AntTooltip, Button as AntButton } from '../../../../components/ui/app-controls.jsx';
@@ -54,11 +57,7 @@ async function getDataLeadsList(params) {
   if (!Array.isArray(data?.results)) throw new Error('Could not read the data leads list.');
   return data;
 }
-async function getDataLeadsListCount(params) {
-  const { data } = await api.get('/data-leads/list-count', { params });
-  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load lead counts.');
-  return data;
-}
+const getDataLeadsListCount = getLeadFilterCounts;
 async function updateDataLeadStatus(id, payload, config = {}) {
   const { data } = await api.patch(`/data-leads/details/${encodeURIComponent(id)}`, payload, config);
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not update the lead.');
@@ -70,7 +69,6 @@ import {
   STATUS_API_KEYS,
   STATUS_TAB_COLORS,
   STATUSES_REQUIRING_REMARKS,
-  PROJECT_SIZE_OPTIONS,
 } from "./data-leads-constants.js";
 import MarketingManagerFilters from "../website-leads/components/marketing-manager-filters.jsx";
 import FollowUpModal from "../../../../components/follow-up-modal.component.jsx";
@@ -86,6 +84,10 @@ const mapStatusToApiKey = (status) =>
 
 
 const DataLeads = () => {
+  const projectSizesQuery = useProjectSizeOptions();
+  const PROJECT_SIZE_OPTIONS = projectSizesQuery.options;
+  const statusList = useLeadStatusOptions();
+  const apiStatusOptions = statusList.options;
   const navigate = useNavigate();
   const { user } = useUserStore();
   const [leadDialog, setLeadDialog] = useState(null);
@@ -290,23 +292,7 @@ const DataLeads = () => {
   const tableData = data?.results ?? [];
   const totalCount = data?.count ?? 0;
 
-  const statusTabs = useMemo(
-    () => [
-      { label: "All", value: "", apiKey: "total_count" },
-      ...[...new Set([...STATUS_OPTIONS, ...tableData.map(row => row.status), ...Object.keys(statusCounts).filter(key => !['total_count', 'assigned_count', 'unassigned', 'other'].includes(key)).map(key => key.replace(/_/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase()))])].filter(Boolean).map((status) => ({
-        label: status,
-        value: status,
-        apiKey: mapStatusToApiKey(status),
-      })),
-      {
-        label: "Unassigned",
-        value: "Unassigned",
-        apiKey: STATUS_API_KEYS.Unassigned,
-      },
-      { label: "Other", value: "Other", apiKey: STATUS_API_KEYS.Other },
-    ],
-    [tableData, statusCounts],
-  );
+  const statusTabs = useMemo(() => leadCountTabs(statusCounts), [statusCounts]);
 
   const { mutate: mutateStatus } = useMutation(
     ({ leadId, data, config }) => updateDataLeadStatus(leadId, data, config),
@@ -702,7 +688,7 @@ const DataLeads = () => {
       {
         header: "Name",
         accessorKey: "contact_person_name",
-        size: 200,
+        size: 320,
         Cell: ({ cell, row }) => {
           const name = cell.getValue() || "-";
           const lead = row.original;
@@ -712,26 +698,29 @@ const DataLeads = () => {
 
           const duplicateIcon = isDuplicateLead && (
             <AntTooltip title="View duplicate information">
-              <span
+              <button type="button" aria-label="View duplicate information"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '2px',
                   padding: '2px 6px',
                   backgroundColor: '#fff',
+                  border: '2px solid #3e6a9f',
                   borderRadius: '8px',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
                   cursor: 'pointer',
                   flexShrink: 0,
                 }}
-                onClick={(e) => {
+                onPointerDown={event => event.stopPropagation()}
+                  onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   openDuplicateModal(lead);
                 }}
               >
                 <MinusOutlined size="1em" className="app-icon" style={{ color: '#595959', fontSize: '12px' }} />
                 <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#fa8c16', fontSize: '12px' }} />
-              </span>
+              </button>
             </AntTooltip>
           );
           const delayedInfoIcon = isFollowupDelayed && (
@@ -793,7 +782,9 @@ const DataLeads = () => {
       },
       // Status column — use createStatusColumn for all users (it handles permissions based on converted_to_client)
       createStatusColumn({
-        statusOptions: STATUS_OPTIONS,
+        statusOptions: apiStatusOptions,
+        readOnly: user?.user_type === 'super_admin',
+
         editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
         statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
         statusColors: STATUS_TAB_COLORS,
@@ -815,6 +806,8 @@ const DataLeads = () => {
         updatingStatusId,
         size: 180,
         additionalProps: {
+          loading: statusList.isLoading,
+          notFoundContent: statusList.isError ? 'Could not load statuses.' : 'No statuses available.',
           style: { minWidth: 180, cursor: "pointer" },
           listHeight: window.innerHeight * 0.6,
           optionFilterProp: "children",
@@ -832,8 +825,8 @@ const DataLeads = () => {
           const currentValue = cell.getValue();
           const isUpdating = updatingProjectSizeId === row.original.id;
           
-          // Read-only for marketing managers
-          if (user?.user_type === 'marketing_manager') {
+          // Super admins and marketing managers see the API value directly.
+          if (['super_admin', 'marketing_manager'].includes(user?.user_type)) {
             return <span>{currentValue || "-"}</span>;
           }
           
@@ -1058,6 +1051,8 @@ const DataLeads = () => {
     ];
   },
     [
+      PROJECT_SIZE_OPTIONS,
+      apiStatusOptions, statusList.isLoading, statusList.isError,
       executivesList,
       assigneeOptions,
       copyToClipboard,
@@ -1309,13 +1304,15 @@ const DataLeads = () => {
               </Stack>
 
               {/* Status tabs */}
-              <StatusFilterTabs
+              <div className="mt-3 w-full border-t border-border pt-3">
+<StatusFilterTabs
                 statusFilter={selectedStatus}
                 setStatusFilter={handleStatusChange}
                 statusChoices={statusTabs}
                 getTotalCount={() => getStatusCount("total_count")}
                 getStatusCount={getStatusCount}
               />
+</div>
             </>
           )}
         </Stack>
