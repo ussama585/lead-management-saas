@@ -28,7 +28,6 @@ import {
   getMetaLeadFormNameList,
 } from '../../../shared/services/metaLeads.js';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import { ConfirmationModal, ShowRemarksLead } from '../../../clients/components/LazyModals.jsx';
 import {  updateMetaLeadStatus } from '../../../shared/services/headhunting.js';
 import { getManangersExecutives } from '../../../shared/services/users-service.js';
@@ -1284,9 +1283,8 @@ export default function MetaLeadsMarketingManager() {
 
   return (
     <>
-      <BreadCrumb linkText="Meta Leads" />
       <div className="leads">
-        <div className="container">
+        <>
             {/* Date Range Filter */}
           <div style={{ padding: '0 20px', marginTop: '20px',marginBottom: '20px' }}>
             <Space align="center">
@@ -1662,7 +1660,7 @@ export default function MetaLeadsMarketingManager() {
           </div>
         )}
 
-        <div className='container' style={{ marginTop: '0px',paddingTop: '0px' }} >
+        <>
           <NewTableComponent
             totalCount={metaLeadsData?.count || 0}
             columns={columns}
@@ -1686,7 +1684,7 @@ export default function MetaLeadsMarketingManager() {
             getRowStyle={getRowStyle}
             pageSizeOptions={MARKETING_MANAGER_PAGE_SIZE_OPTIONS}
           />
-        </div>
+        </>
 
         {/* Remarks Modal */}
      <Suspense fallback={null}>
@@ -1930,7 +1928,7 @@ export default function MetaLeadsMarketingManager() {
           onClose={closeDuplicateModal}
           leadType="meta-leads"
         />
-          </div>
+          </>
         </div>
     </>
   );

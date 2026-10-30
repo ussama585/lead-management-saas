@@ -238,7 +238,9 @@ export default function NewTableComponent({
                   sx: {
                       padding: '6px 12px',         // reduced padding
                       minHeight: '40px',           // reduce overall height
-                      backgroundColor: '#f5f5f5',  // light grey background
+                      backgroundColor: '#fff',
+                      alignItems: 'center',
+                      '& > .MuiBox-root': { alignItems: 'center' },
                       borderTopLeftRadius: '8px',
                       borderTopRightRadius: '8px',
                       display: 'flex'
@@ -294,6 +296,7 @@ export default function NewTableComponent({
                       overflowWrap: 'anywhere',
                       alignItems: 'center',
                       ...headingSx,
+                      fontSize: '18px',
                     }}
                   >
                     {heading} 

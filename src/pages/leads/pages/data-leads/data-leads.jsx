@@ -1,3 +1,7 @@
+import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
+import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
+import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, getLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
@@ -15,7 +19,7 @@ import {
 } from "@mui/material";
 import { getDataLeadsStats } from "../../../shared/services/data-leads-service.js";
 import StatusFilterTabs from "../../../../components/status-filter-tabs.jsx";
-import { File as InsertDriveFileOutlinedIcon } from 'lucide-react';
+import { File as InsertDriveFileOutlinedIcon, Ruler } from 'lucide-react';
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { alpha } from "@mui/material/styles";
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -24,7 +28,6 @@ import { Avatar as AntAvatar, Alert as AntAlert, Space } from 'antd';
 import { Info as InfoCircleOutlined, MessageCircle as CommentOutlined, Upload as UploadOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
 import DuplicateLeadModal from '../../../../components/duplicate-lead-modal.component.jsx';
 import { useDuplicateLead } from '../../../../components/hooks/useDuplicateLead.js';
-import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import NewTableComponent from "../../../../components/tables/new-table.jsx";
 import {
   createDataLeadFollowUp,
@@ -637,6 +640,7 @@ const DataLeads = () => {
       },
       {
         header: "Old Remarks",
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
         id: "remarks", // Explicit id for sorting
         accessorKey: "remarks",
         size: 200,
@@ -663,6 +667,7 @@ const DataLeads = () => {
       },
       ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
         header: "Follow Ups and Remarks",
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
         id: "follow_up",
         accessorKey: "follow_up",
         enableSorting: false,
@@ -904,12 +909,14 @@ const DataLeads = () => {
       ...(user?.user_type !== 'marketing_manager' ? [{
         header: "Jobs",
         accessorKey: "job_count",
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
         size: 140,
         Cell: ({ cell }) => <span>{cell.getValue() ?? "-"}</span>,
       }] : []),
       {
         header: "No. of Resources",
         accessorKey: "total_vacancies",
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
         size: 140,
         Cell: ({ cell }) => {
           const raw = cell.getValue();
@@ -983,6 +990,7 @@ const DataLeads = () => {
         header: "Contract Currency",
         id: "contract_currency", // Explicit id for sorting
         accessorKey: "contract_currency",
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
         size: 160,
         sortUndefined: "last", // Handle undefined/null values
         sortDescFirst: false, // Start with ascending order (A to Z)
@@ -1045,10 +1053,10 @@ const DataLeads = () => {
       },
     ];
     const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
-    return [
+    return dateBeforeStatusHistory([
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'email'),
-    ];
+    ]);
   },
     [
       PROJECT_SIZE_OPTIONS,
@@ -1127,21 +1135,23 @@ const DataLeads = () => {
           },
         }}
       />
-      <BreadCrumb linkText="Data Leads" goBack={() => navigate(-1)} />
       {isListError && <AntAlert type='error' showIcon message={listError?.response?.data?.message || listError?.message || 'Could not load data leads.'} action={<AntButton onClick={() => refetch()}>Retry</AntButton>} />}
       {isCountsError && <AntAlert type='error' showIcon message={countsError?.message || 'Could not load lead counts.'} action={<AntButton onClick={() => refetchCounts()}>Retry</AntButton>} />}
       {leadDialog && <DataLeadDialog {...leadDialog} onClose={() => setLeadDialog(null)}
         statuses={[...STATUS_OPTIONS, ...tableData.map(row => row.status)].filter(Boolean)}
         projectSizes={[...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean)}
         assignees={Array.isArray(assigningUsersData) ? assigningUsersData : Array.isArray(assigningUsersData?.results) ? assigningUsersData.results : []} />}
-      <div className='mb-4 flex flex-wrap items-center gap-3'>
+      <LeadProjectFilter><div className='lead-project-size-filter lead-company-filter'>
         <label htmlFor='data-leads-project-size'>Project size</label>
-        <AntSelect id='data-leads-project-size' style={{ minWidth: 180 }} allowClear placeholder='All project sizes' value={projectSizeFilter || undefined}
+        <div className='lead-project-size-filter__control lead-company-filter__control'>
+        <Ruler size={20} aria-hidden='true' className='shrink-0' />
+        <AntSelect id='data-leads-project-size' style={{ width: '100%' }} allowClear placeholder='All project sizes' value={projectSizeFilter || undefined}
           options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
           onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
-      </div>
+        </div>
+      </div></LeadProjectFilter>
       <div className="leads">
-        <div className="container">
+        <div className="min-w-0">
       <Box
         sx={{
          
@@ -1164,10 +1174,9 @@ const DataLeads = () => {
         </Box>
 
         {/* Date Range Filter and Add New Lead button */}
-        <div style={{ padding: '0 0 1rem 0', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <Space align="center">
-            <span style={{ fontWeight: '500', fontSize: '14px', padding: "8px 12px", borderRadius: "6px" }}>Filter by Date Range:</span>
-            <BootstrapDateRangeModal
+        <div className="lead-filter-toolbar">
+          <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
+<BootstrapDateRangeModal
               key={datePickerResetKey}
               value={dateRange}
               onChange={handleDateRangeChange}
@@ -1179,17 +1188,7 @@ const DataLeads = () => {
               }}
               triggerStyle={{ border: '1px solid #d9d9d9' }}
             />
-            
-            {dateRange && (
-              <AntButton
-                size="small"
-                danger
-                onClick={clearDateRange}
-              >
-                Clear
-              </AntButton>
-            )}
-          </Space>
+</LeadDateRangeField></LeadDateFilter>
           
           {/* Add New Lead button */}
           {user?.user_type !== 'marketing_manager' && (
@@ -1235,85 +1234,10 @@ const DataLeads = () => {
             />
           ) : (
             <>
-              {/* Executive filter tabs (All + per executive with counts) */}
-              <Stack
-                direction="row"
-                flexWrap="wrap"
-                spacing={1}
-                useFlexGap
-                sx={{ mb: 1 }}
-              >
-                <button
-                  key="all-executives"
-                  className={`tab ${selectedExecutive === "" ? "active" : ""}`}
-                  style={{
-                    flex: "0 0 auto",
-                    border:
-                      selectedExecutive === ""
-                        ? "1px solid #3e6a9f"
-                        : "1px solid #3e6a9f30",
-                    borderRadius: "4px",
-                    margin: "1px",
-                    padding: "6px 14px",
-                    minWidth: "min-content",
-                    whiteSpace: "nowrap",
-                    backgroundColor:
-                      selectedExecutive === "" ? "#3e6a9f" : "#3e6a9f15",
-                    color: selectedExecutive === "" ? "#ffffff" : "#3e6a9f",
-                    fontWeight: 500,
-                  }}
-                  onClick={() => handleExecutiveClick("")}
-                >
-                  All
-                </button>
-
-                {executivesList.map((executive) => {
-                  const isSelected =
-                    selectedExecutive === executive.id?.toString();
-                  const color = "#3e6a9f";
-                  const count = getExecutiveCount(executive.id);
-                  return (
-                    <button
-                      key={executive.id}
-                      className={`tab ${isSelected ? "active" : ""}`}
-                      style={{
-                        flex: "0 0 auto",
-                        border: isSelected
-                          ? `1px solid ${color}`
-                          : `1px solid ${color}30`,
-                        borderRadius: "4px",
-                        margin: "1px",
-                        padding: "6px 14px",
-                        minWidth: "min-content",
-                        whiteSpace: "nowrap",
-                        backgroundColor: isSelected ? color : `${color}15`,
-                        color: isSelected ? "#ffffff" : color,
-                        fontWeight: 500,
-                      }}
-                      onClick={() =>
-                        handleExecutiveClick(executive.id?.toString() || "")
-                      }
-                    >
-                      {executive.user_type
-                        ? `${executive.name} - ${executive.user_type === 'sales_manager' ? 'Manager' : 'Executive'}`
-                        : executive.name}{" "}
-                      {`(${count})`}
-                    </button>
-                  );
-                })}
-              </Stack>
-
-              {/* Status tabs */}
-              <div className="mt-3 w-full border-t border-border pt-3">
-<StatusFilterTabs
-                statusFilter={selectedStatus}
-                setStatusFilter={handleStatusChange}
-                statusChoices={statusTabs}
-                getTotalCount={() => getStatusCount("total_count")}
-                getStatusCount={getStatusCount}
-              />
-</div>
-            </>
+              <LeadListingFilters executives={executivesList} selectedExecutive={selectedExecutive}
+                onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
+                statusFilter={selectedStatus} setStatusFilter={handleStatusChange} statusChoices={statusTabs}
+                getTotalCount={() => getStatusCount('total_count')} getStatusCount={getStatusCount} />            </>
           )}
         </Stack>
 

@@ -729,14 +729,16 @@ const MetaLead = () => {
       sx: {
         padding: "6px 12px",
         minHeight: "40px",
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#fff",
+        alignItems: "center",
+        '& > .MuiBox-root': { alignItems: 'center' },
         borderTopLeftRadius: "8px",
         borderTopRightRadius: "8px",
         display: "flex",
       },
     },
     renderTopToolbarCustomActions: () => (
-      <div style={{ fontSize: "16px", fontWeight: "600", color: "#3E6A9F" }}>
+      <div style={{ fontSize: "18px", fontWeight: "bold", color: "#0f172a" }}>
         Jobs
       </div>
     ),

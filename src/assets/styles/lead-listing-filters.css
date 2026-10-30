@@ -1,0 +1,112 @@
+.lead-listing-filters { display: grid; gap: 20px; width: 100%; min-width: 0; margin-bottom: 24px; }
+.lead-listing-filters .lead-filter-card { min-width: 0; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 4px 18px rgba(15,23,42,.05) !important; }
+.lead-listing-filters .lead-filter-card__header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; min-width: 0; }
+.lead-listing-filters .lead-filter-card__icon { display: flex; align-items: center; justify-content: center; flex: 0 0 40px; height: 40px; border-radius: 50%; background: #f0f4f9; color: #3e6a9f; }
+.lead-listing-filters .lead-filter-card__heading { min-width: 0; flex: 1; }
+.lead-listing-filters .lead-filter-card__heading h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 22px; color: #0f172a; }
+.lead-listing-filters .lead-filter-card__heading p { margin: 2px 0 0; font-size: 13px; line-height: 18px; color: #64748b; }
+.lead-listing-filters .lead-filter-card__collapse { flex-shrink: 0; color: #64748b; }
+.lead-listing-filters [role='group'] { gap: 8px; }
+.lead-listing-filters [role='group'] > button { height: auto; min-height: 40px; max-width: 100%; padding: 8px 18px; border: 1px solid #dce4ee; border-radius: 12px; background: #fff; color: #0f172a; font-size: 14px; font-weight: 500; line-height: 20px; white-space: normal; overflow-wrap: anywhere; text-align: left; }
+.lead-listing-filters [role='group'] > button[aria-pressed='true'] { background: #3e6a9f; border-color: #3e6a9f; color: #fff; box-shadow: 0 2px 6px rgba(62,106,159,.18) !important; }
+.lead-listing-filters [role='group'] > button:hover { border-color: #3e6a9f; }
+.lead-listing-filters button:focus-visible { outline: 2px solid #3e6a9f !important; outline-offset: 2px; }
+.lead-filter-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 16px 0 24px; min-width: 0; }
+.lead-filter-toolbar > .ant-space { align-items: flex-start; flex-wrap: wrap; gap: 8px !important; }
+.lead-filter-toolbar > .ant-space > .ant-space-item:first-child { flex-basis: 100%; }
+.lead-filter-toolbar > .ant-space > .ant-space-item:first-child > span { display: block; padding: 0 !important; color: #0f172a; font-size: 13px !important; }
+.lead-filter-toolbar button { border-radius: 10px; }
+.lead-filter-toolbar > button, .lead-filter-toolbar > .lead-filter-toolbar__actions button { min-height: 46px; padding: 0 22px; font-weight: 600; }
+.lead-filter-toolbar > .ant-space > .ant-space-item > button { min-height: 46px; border-color: #dce4ee !important; border-radius: 10px; }
+.lead-filter-toolbar .date-range-trigger { display: flex !important; align-items: center; justify-content: space-between; gap: 12px; width: 400px; max-width: 100%; min-height: 46px; border: 1px solid #dce4ee !important; border-radius: 10px !important; background: #fff !important; color: #64748b !important; font-size: 14px; }
+.lead-filter-toolbar .date-range-trigger::before { content: ''; flex: 0 0 18px; height: 18px; background: #334155; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M3 11h18'/%3E%3C/svg%3E") center / contain no-repeat; }
+.lead-company-filter { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 16px; }
+.lead-company-filter label { font-size: 13px; color: #0f172a; }
+.lead-company-date-toolbar { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-bottom: 20px; }
+.lead-company-date-toolbar .lead-company-filter { flex: 1 1 320px; margin-bottom: 0; min-width: 0; }
+.lead-company-date-toolbar .lead-company-date-toolbar__date { flex: 1 1 320px; margin: 0; min-width: 0; justify-content: flex-end; }
+.lead-company-date-toolbar__date > .ant-space { max-width: 100%; }
+.lead-company-date-toolbar__date > .ant-space > .ant-space-item { max-width: 100%; }
+.lead-filter-toolbar:empty { display: none; }
+.lead-company-date-toolbar--compact .lead-company-filter { flex: 0 1 280px; }
+.lead-company-date-toolbar--compact .lead-company-date-toolbar__date { flex: 0 1 280px; margin-left: auto; }
+.lead-company-date-toolbar--compact .lead-company-filter__control,
+.lead-company-date-toolbar--compact .date-range-trigger { width: 280px; }
+.lead-company-date-toolbar--compact .lead-company-filter__control button { height: 40px !important; }
+.lead-company-date-toolbar--compact .date-range-trigger { min-height: 40px; padding-top: 6px !important; padding-bottom: 6px !important; }
+.lead-company-filter .lead-company-filter__control { display: flex; align-items: center; width: 400px; max-width: 100%; border: 1px solid #dce4ee; border-radius: 10px; padding-left: 14px; gap: 10px; color: #64748b; }
+.lead-company-filter .lead-company-filter__control > .relative { flex: 1; width: 100% !important; min-width: 0; }
+.lead-company-filter .lead-company-filter__control button { border: 0 !important; box-shadow: none !important; height: 38px !important; min-height: 38px !important; }
+@media (max-width: 767px) {
+  .lead-company-date-toolbar--compact { flex-direction: column; align-items: stretch; gap: 16px; }
+  .lead-company-date-toolbar--compact .lead-company-filter,
+  .lead-company-date-toolbar--compact .lead-company-date-toolbar__date { flex: 0 1 auto; width: 100%; margin-left: 0; }
+  .lead-company-date-toolbar--compact .lead-company-filter__control,
+  .lead-company-date-toolbar--compact .date-range-trigger { width: 100%; }
+  .lead-listing-filters { gap: 16px; }
+  .lead-listing-filters .lead-filter-card { padding: 14px; }
+  .lead-filter-toolbar { flex-direction: column; align-items: stretch; }
+  .lead-filter-toolbar > .ant-space, .lead-filter-toolbar > .ant-space > .ant-space-item { width: 100%; }
+  .lead-filter-toolbar > .ant-space button, .lead-filter-toolbar > button, .lead-filter-toolbar__actions { width: 100%; }
+  .lead-filter-toolbar .date-range-trigger { width: 100%; }
+  .lead-company-filter, .lead-company-filter .lead-company-filter__control { width: 100%; }
+}
+
+.lead-company-filter .lead-company-filter__control { height: 40px; box-sizing: border-box; }
+.lead-company-date-toolbar--compact .lead-company-filter__control button { height: 38px !important; min-height: 38px !important; }
+.lead-company-filter .lead-company-filter__control,
+.lead-filter-toolbar .date-range-trigger {
+  border-color: #94a3b8 !important;
+  color: #334155 !important;
+}
+.lead-company-filter .lead-company-filter__control button,
+.lead-company-filter .lead-company-filter__control button .text-muted-foreground {
+  color: #334155 !important;
+}
+.lead-date-range-field { width: 380px; max-width: 100%; min-width: 0; }
+.lead-date-range-field__label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: #0f172a; }
+.lead-date-range-field__controls { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.lead-date-range-field__picker { flex: 1; min-width: 0; }
+.lead-filter-toolbar .lead-date-range-field .date-range-trigger { width: 100%; min-height: 40px; box-sizing: border-box; white-space: nowrap; font-size: 13px; color: #334155 !important; border-color: #94a3b8 !important; }
+.lead-date-range-field__clear { display: inline-flex; justify-content: center; align-items: center; flex: 0 0 32px; width: 32px; height: 40px; padding: 0; border: 0; border-radius: 8px; background: #fff1f0; color: #ff4d4f; cursor: pointer; transition: background-color .15s, color .15s; }
+.lead-date-range-field__clear:hover { color: #fff; background: #ff4d4f; }
+.lead-date-range-field__clear:focus-visible { outline: 2px solid #3e6a9f; outline-offset: 2px; }
+.lead-company-date-toolbar .lead-company-date-toolbar__date { flex-basis: 380px; }
+@media (max-width: 767px) {
+  .lead-date-range-field { width: 100%; }
+  .lead-company-date-toolbar .lead-company-date-toolbar__date { flex: 0 1 auto; }
+}
+@media (max-width: 430px) {
+  .lead-filter-toolbar .lead-date-range-field .date-range-trigger { font-size: 11px; gap: 6px; padding-inline: 8px !important; }
+}
+@media (max-width: 450px) {
+  .lead-date-range-field,
+  .lead-date-range-field__controls,
+  .lead-date-range-field__picker,
+  .lead-date-range-field__picker > span {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .lead-filter-toolbar .lead-date-range-field .date-range-trigger {
+    width: 100% !important;
+    min-width: 0;
+  }
+}
+.lead-company-date-toolbar__left { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 16px; min-width: 0; }
+.lead-company-project-slot:empty { display: none; }
+.lead-project-size-filter { display: flex; flex-direction: column; gap: 8px; width: 220px; max-width: 100%; }
+.lead-project-size-filter label { font-size: 13px; font-weight: 500; color: #0f172a; }
+.lead-project-size-filter__control { display: flex; align-items: center; gap: 10px; padding-left: 14px; height: 40px; box-sizing: border-box; border: 1px solid #94a3b8; border-radius: 10px; color: #334155; background: #fff; }
+.lead-project-size-filter__control > .relative { flex: 1; min-width: 0; }
+.lead-project-size-filter__control button { height: 38px !important; min-height: 38px !important; border: 0 !important; box-shadow: none !important; color: #334155 !important; border-radius: 10px; }
+.lead-project-size-filter button .text-muted-foreground { color: #334155 !important; }
+.lead-company-date-toolbar .lead-project-size-filter { flex: none; margin-bottom: 0; }
+.lead-company-filter .lead-project-size-filter__control { width: 100%; border: 1px solid #94a3b8 !important; }
+.lead-project-size-filter__control > svg { flex: 0 0 20px; width: 20px; height: 20px; }
+.lead-filter-toolbar__actions--right { margin-left: auto; display: flex; justify-content: flex-end; }
+.lead-filter-toolbar__actions--right > * { display: flex; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 767px) {
+  .lead-company-date-toolbar__left { width: 100%; flex-direction: column; align-items: stretch; }
+  .lead-company-project-slot, .lead-project-size-filter { width: 100%; }
+}

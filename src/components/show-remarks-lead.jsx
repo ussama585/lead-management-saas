@@ -1387,7 +1387,7 @@ const validateJobs = (selectedJobIds, availableJobs, jobRowData, message) => {
                   key="save"
                   type="primary"
                   onClick={handleSave}
-                  className="custom-button"
+                  className="custom-button !mt-0"
                   loading={loading || convertingLead || savingData || loadingProposal || jobManagement.state.jobsLoading}
                 >
                   {saveButtonText}

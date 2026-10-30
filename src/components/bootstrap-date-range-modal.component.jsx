@@ -137,7 +137,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
         placement="top"
       >
         <div
-          className={`rounded-pill bg-light text-primary d-inline-block cursor-pointer px-3 py-2 date-range-trigger ${isBelowMinWidth ? 'disabled' : ''}`}
+          className={`rounded-pill bg-light d-inline-block cursor-pointer px-3 py-2 date-range-trigger ${isBelowMinWidth ? 'disabled' : ''}`}
           onClick={handleTriggerClick}
           style={triggerStyle}
         >

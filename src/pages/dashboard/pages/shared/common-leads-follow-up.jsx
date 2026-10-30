@@ -441,6 +441,9 @@ const CommonLeadsFollowUp = () => {
       {
         header: 'Contract Price/Amount',
         accessorKey: 'contract_price',
+        enableSorting: true,
+        // Keep the cycle stable when API rows mix numeric amounts and '-' placeholders.
+        sortDescFirst: false,
         size: 180,
       },
       {
@@ -498,7 +501,7 @@ const CommonLeadsFollowUp = () => {
 
             const roleBase =
               userType === 'super_admin'
-                ? '/super_admin'
+                ? '/super-admin'
                 : userType === 'sales_manager'
                   ? '/sales-manager'
                   : '/sales-executive';

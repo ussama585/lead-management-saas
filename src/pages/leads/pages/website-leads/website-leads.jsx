@@ -1,3 +1,7 @@
+import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
+import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
+import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
@@ -12,7 +16,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
   //components
   import { ConfirmationModal, ShowRemarksLead, ProposalModal } from '../../../clients/components/LazyModals.jsx';
-  import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
   import WebsiteStatusTabs from './website-status-tabs.jsx';
   import ExecutiveTabButton from '../../../../components/executive-tab-button.component.jsx';
   import NewTableComponent from '../../../../components/tables/new-table.jsx';
@@ -835,6 +838,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // 2. Old remarks (read-only for sales — use follow-up flow for new remarks)
         {
           header: 'Old Remarks',
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           id: 'remarks',
           accessorKey: 'remarks',
           size: 0.5,
@@ -851,6 +855,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         },
         ...(['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType) ? [{
           header: 'Follow Ups and Remarks',
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           id: 'follow_up',
           accessorKey: 'follow_up',
           enableSorting: false,
@@ -1096,6 +1101,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         ...(userType !== 'marketing_manager' ? [{
           header: 'Job',
           accessorKey: 'job_count',
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           size: 0.5,
           Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
         }] : []),
@@ -1103,6 +1109,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         {
           header: 'No. of Resources',
           accessorKey: 'total_vacancies',
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           size: 0.5,
           Cell: ({ cell }) => {
             const raw = cell.getValue();
@@ -1153,6 +1160,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           header: 'Contract Currency',
           id: 'contract_currency',
           accessorKey: 'contract_currency',
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           size: 0.5,
           sortUndefined: 'last',
           sortDescFirst: false,
@@ -1225,7 +1233,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       ];
       const statusIndex = ordered.findIndex(column => column.accessorKey === 'status');
       ordered.splice(statusIndex + 1, 0, ...adjacentKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean));
-      return ordered;
+      return dateBeforeStatusHistory(ordered);
     }, [apiStatusOptions, statusList.isLoading, statusList.isError, userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
 
 
@@ -1378,47 +1386,11 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             userType={userType}
           />
         ) : (
-          <div className="mb-4 grid gap-4">
-            <section aria-label="Executives">
-            <div className="flex flex-wrap items-center gap-2">
-            {/* All Executives Tab */}
-            <ExecutiveTabButton
-              isSelected={selectedExecutive === ''}
-              onClick={() => handleExecutiveClick('')}
-            />
-
-            {/* Individual Executive Tabs */}
-            {executivesList.map(executive => {
-              const isSelected = selectedExecutive === executive.id.toString();
-              const executiveCount = getExecutiveCount(executive.id);
-              return (
-                <ExecutiveTabButton
-                  key={executive.id}
-                  executive={executive}
-                  count={executiveCount}
-                  isSelected={isSelected}
-                  onClick={() => handleExecutiveClick(executive.id.toString())}
-                />
-              );
-            })}
-
-            </div>
-            </section>
-            {/* Status Tabs */}
-            <div className="mt-3 w-full border-t border-border pt-3">
-<WebsiteStatusTabs
-              statusFilter={selectedStatus}
-              setStatusFilter={handleTabClick}
-              statusChoices={statusTabs.filter(tab =>
-                tab.value !== 'Unassigned' || userType === 'super_admin' || userType === 'sales_manager' || userType === 'marketing_manager'
-              )}
-              getTotalCount={() => getStatusCount(leadCounts, 'total_count')}
-              getStatusCount={(apiKey) => getStatusCount(leadCounts, apiKey)}
-            />
-</div>
-          </div>
-        )}
-
+          <LeadListingFilters executives={executivesList} selectedExecutive={selectedExecutive}
+            onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
+            statusFilter={selectedStatus} setStatusFilter={handleTabClick}
+            statusChoices={statusTabs.filter(tab => tab.value !== 'Unassigned' || ['super_admin', 'sales_manager', 'marketing_manager'].includes(userType))}
+            getTotalCount={() => getStatusCount(leadCounts, 'total_count')} getStatusCount={key => getStatusCount(leadCounts, key)} />        )}
         {/* Export selected button */}
         {Object.keys(rowSelection).filter((key) => rowSelection[key]).length > 0 && (
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px', paddingRight: '20px' }}>
@@ -1596,13 +1568,11 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
     return (
       <>
-        <BreadCrumb linkText="Website Leads" />
 
         {/* Date Range Filter and Manage Assignees Button */}
-        <div style={{ padding: '0 20px', marginTop: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Space align="center">
-            <span style={{ fontWeight: '500', fontSize: '14px', padding: "8px 12px", borderRadius: "6px" }}>Filter by Date Range:</span>
-            <BootstrapDateRangeModal
+        <div className="lead-filter-toolbar">
+          <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
+<BootstrapDateRangeModal
               value={dateRange}
               showModal={showDateModal}
               setShowModal={setShowDateModal}
@@ -1612,32 +1582,12 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               }}
               triggerStyle={{ border: '1px solid #d9d9d9' }}
             />
+</LeadDateRangeField></LeadDateFilter>
 
-            {dateRange && (
-              <Button
-                size="small"
-                danger
-                onClick={clearDateRange}
-              >
-                Clear
-              </Button>
-            )}
-          </Space>
-
-          {/* Manage Assignees Button - Only for Admin */}
-          {isSuperAdmin(userType) && (
-            <Button
-              icon={<UserAddOutlined size="1em" className="app-icon" />}
-              onClick={() => setUserAssignmentModalVisible(true)}
-              style={{ backgroundColor: '#3E6A9F', borderColor: '#3E6A9F', color: 'white' }}
-            >
-              Manage Assignees
-            </Button>
-          )}
         </div>
 
         <div className="leads">
-          <div className="container">
+          <>
             {tableContent}
 
 
@@ -1770,7 +1720,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               });
             }}
             />
-          </div>
+          </>
         </div>
       </>
     );

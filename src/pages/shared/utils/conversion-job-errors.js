@@ -10,7 +10,7 @@ export const getLeadJobEditUrl = (leadId, jobId, leadType, userType) => {
   }
 
   let prefix = '/sales-manager';
-  if (userType === 'super_admin') prefix = '/super_admin';
+  if (userType === 'super_admin') prefix = '/super-admin';
   else if (userType === 'sales_executive') prefix = '/sales-executive';
 
   if (leadType === 'meta-leads') {

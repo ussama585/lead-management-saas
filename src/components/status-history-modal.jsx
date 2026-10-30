@@ -253,6 +253,8 @@ export const createStatusHistoryColumn = ({
   header,
   accessorKey,
   enableSorting: false,
+  muiTableHeadCellProps: { align: 'center', sx: { textAlign: 'center', '& .Mui-TableHeadCell-Content': { justifyContent: 'center' } } },
+  muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
   Cell: ({ row }) => (
     <Tooltip title={<span style={{ color: '#fff' }}>{buttonTitle}</span>}>
       <HistoryOutlined size="1em"

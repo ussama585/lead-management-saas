@@ -1,3 +1,7 @@
+import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
+import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
+import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, getLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
@@ -24,7 +28,6 @@ import {getMetaLeadsStats, getMetaLeadsListCount,updateMetaLeadProjectSize, crea
   // getMetaLeadsCampaignNameList, getMetaLeadsAdsetNameList, getMetaLeadsAdNameList, getMetaLeadsListWithHistory, getMetaLeadsAdsetListByCampaign, getMetaLeadsAdsListByAdset, 
 import { getMetaLeadsList } from '../../../shared/services/metaLeads.js';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import ConfirmationModal from '../../../../components/confirmation-modal.component.jsx';
 import {  updateMetaLeadStatus } from '../../../shared/services/headhunting.js';
 import { getManangersExecutives } from '../../../shared/services/users-service.js';
@@ -638,6 +641,7 @@ export default function MetaLeadsStandard() {
     },
     ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
       header: 'Follow Ups and Remarks',
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
       id: 'follow_up',
       accessorKey: 'follow_up',
       enableSorting: false,
@@ -835,6 +839,7 @@ export default function MetaLeadsStandard() {
     },
     {
       header: 'Old Remarks',
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
       id: 'remarks', // Explicit id for sorting
       accessorKey: 'remarks',
       sortUndefined: 'last', // Handle undefined/null values
@@ -1009,22 +1014,20 @@ export default function MetaLeadsStandard() {
     ] : []),
     ];
     const leadingKeys = ['id', 'full_name', 'job_title', 'company_name', 'phone_number'];
-    return [
+    return dateBeforeStatusHistory([
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'work_email'),
-    ];
+    ]);
   }, [apiStatusOptions, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
 
   return (
     <>
-      <BreadCrumb linkText="Meta Leads" />
       <div className="leads">
-        <div className="container">
+        <>
             {/* Date Range Filter */}
-          <div style={{ padding: '0 20px', marginTop: '20px',marginBottom: '20px' }}>
-            <Space align="center">
-              <span style={{ fontWeight: '500', fontSize: '14px', padding:"8px 12px", borderRadius:"6px" }}>Filter by Date Range:</span>
-                <BootstrapDateRangeModal
+          <div className="lead-filter-toolbar">
+            <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
+<BootstrapDateRangeModal
                   key={datePickerResetKey}
                   value={dateRange}
                   onChange={handleDateRangeChange}
@@ -1036,35 +1039,18 @@ export default function MetaLeadsStandard() {
                   }}
                   triggerStyle={{ border: '1px solid #d9d9d9' }}
                 />
-
-                {dateRange && (
-                  <Button
-                    size="small"
-                    danger
-                    onClick={clearDateRange}
-                  >
-                    Clear
-                  </Button>
-                )}
-
-            </Space>
-
-            </div>
-
-
+</LeadDateRangeField></LeadDateFilter>
 
       {/* Tabs Section (replaces stats cards) */}
-        {canAssign && <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingRight: '20px' }}>
-  <h2 style={{ margin: 0 }}></h2>
+        {canAssign && <div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right">
+  
   <Space>
     {user?.user_type === 'super_admin' && (
       <Button
         icon={<UserAddOutlined size="1em" className="app-icon" />}
         onClick={() => setUserAssignmentModalVisible(true)}
         style={{ backgroundColor: '#3E6A9F', borderColor: '#3E6A9F', color: 'white' }}
-      >
-        Manage Assignees
-      </Button>
+      >Manage Assignees</Button>
     )}
     {user?.user_type === 'super_admin' && (
       <ImportLeadsButton onSuccess={() => {
@@ -1076,86 +1062,18 @@ export default function MetaLeadsStandard() {
   </Space>
 </div> }
 
-      {/* Executive/Manager filter tabs */}
-        {Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0 && (
-        <div className="client-tabs-container" style={{ marginBottom: 12, borderRadius: '6px', padding: '8px' }}>
-          <div className="client-tabs">
-                    <button
-                      key="All"
-                      value="All"
-              className={`tab ${selectedExecId === null ? 'active' : ''}`}
-              style={{
-                border: selectedExecId === null ? '1px solid #3e6a9f' : '1px solid #3e6a9f30',
-                borderRadius: '4px',
-                margin: '2px',
-                padding: '6px 14px',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-                backgroundColor: selectedExecId === null ? '#3e6a9f' : '#3e6a9f15',
-                color: selectedExecId === null ? '#ffffff' : '#3e6a9f',
-                fontWeight: '500'
-              }}
-                      onClick={() => {
-                        setSelectedExecId(null);
-                        setPagination(previous => ({ ...previous, pageIndex: 0 }));
-                      }}
-                    >
-              All
-                    </button>
-                    {metaLeadsStatsData.map((userItem) => {
-                      const isSelected = selectedExecId === userItem.id;
-                      const executiveColor = '#3e6a9f';
-                      return (
-                        <button
-                          key={userItem.id}
-                          value={userItem.id}
-                  className={`tab ${isSelected ? 'active' : ''}`}
-                  style={{
-                    border: isSelected ? `1px solid ${executiveColor}` : `1px solid ${executiveColor}30`,
-                    borderRadius: '4px',
-                    margin: '2px',
-                    padding: '6px 14px',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0,
-                    backgroundColor: isSelected ? executiveColor : `${executiveColor}15`,
-                    color: isSelected ? '#ffffff' : executiveColor,
-                    fontWeight: '500'
-                  }}
-                        onClick={(e) => {
-                          const value = Number(e.currentTarget.value);
-                          setSelectedExecId((prev) => (prev === value ? null : value));
-                          setPagination(previous => ({ ...previous, pageIndex: 0 }));
-                        }}
-                      >
-                  {userItem.user_type
-                    ? `${userItem.name} - ${userItem.user_type === 'sales_manager' ? 'Manager' : 'Executive'}`
-                    : userItem.name} ({userItem.meta_leads_assigned || 0})
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-      {/* Status filter tabs */}
-      <div className="mt-3 w-full border-t border-border pt-3">
-<StatusFilterTabs
-        statusFilter={statusFilter}
-        setStatusFilter={(status) => {
-          setStatusFilter(status);
-          // Reset pagination to default values
-          setPagination({ pageIndex: 0, pageSize: 10 });
-        }}
-        statusChoices={STATUS_CHOICES}
-        getTotalCount={getTotalCount}
-        getStatusCount={getStatusCount}
-      />
-</div>
+            </div>
 
 
-        </div>
 
-        <div className='container' style={{ marginTop: '0px',paddingTop: '0px' }} >
+      <LeadListingFilters executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []} selectedExecutive={selectedExecId}
+        showExecutives={Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0}
+        onExecutiveChange={id => { setSelectedExecId(previous => id == null || previous === id ? null : id); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
+        getExecutiveCount={id => metaLeadsStatsData?.find(item => item.id === id)?.meta_leads_assigned || 0}
+        statusFilter={statusFilter} setStatusFilter={value => { setStatusFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
+        statusChoices={STATUS_CHOICES} getTotalCount={getTotalCount} getStatusCount={getStatusCount} />        </>
+
+        <>
           <NewTableComponent
             totalCount={metaLeadsData?.count || 0}
             columns={columns}
@@ -1178,7 +1096,7 @@ export default function MetaLeadsStandard() {
             heading={`Meta Leads (${metaLeadsData?.count || 0})`}
             getRowStyle={getRowStyle}
           />
-        </div>
+        </>
 
         {/* Remarks Modal */}
      <ShowRemarksLead
