@@ -369,26 +369,26 @@ export const getLeadStatusDistribution = async ({
   }
 };
 
-export const getProjectStatusHealth = async ({
-  startDate,
-  endDate,
-} = {}) => {
-  const query = new URLSearchParams();
-  if (startDate) query.append('start_date', startDate);
-  if (endDate) query.append('end_date', endDate);
+// export const getProjectStatusHealth = async ({
+//   startDate,
+//   endDate,
+// } = {}) => {
+//   const query = new URLSearchParams();
+//   if (startDate) query.append('start_date', startDate);
+//   if (endDate) query.append('end_date', endDate);
 
-  const endpoint = `/project-status-health${query.toString() ? `?${query.toString()}` : ''}`;
+//   const endpoint = `/project-status-health${query.toString() ? `?${query.toString()}` : ''}`;
 
-  try {
-    const response = await api.get(endpoint);
-    // API returns { data: [{ status, count }] } or array at top level
-    const raw = response?.data;
-    const list = Array.isArray(raw) ? raw : raw?.data;
-    return Array.isArray(list) ? list : [];
-  } catch (error) {
-    throw new Error(`Error fetching project status health: ${error.message}`);
-  }
-};
+//   try {
+//     const response = await api.get(endpoint);
+//     // API returns { data: [{ status, count }] } or array at top level
+//     const raw = response?.data;
+//     const list = Array.isArray(raw) ? raw : raw?.data;
+//     return Array.isArray(list) ? list : [];
+//   } catch (error) {
+//     throw new Error(`Error fetching project status health: ${error.message}`);
+//   }
+// };
 
 export const getRecruiterResumeSubmissionVolume = async ({
   startDate,

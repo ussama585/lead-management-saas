@@ -6,6 +6,7 @@ import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Avatar, Card, Descriptions, Space, Table, Tag } from 'antd';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Avatar as UserAvatar, AvatarImage, AvatarFallback } from '../../../components/ui/avatar.jsx';
 import { useFormik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -27,7 +28,13 @@ export async function createCompanyUser(companyId, values) {
   if (!companyUserRoles.includes(values.user_type)) throw new Error('Select a valid user type.');
   const payload = { company_id: Number(companyId), name: values.name.trim(), email: values.email.trim(), phone: values.phone.trim(), password: values.password, user_type: values.user_type };
   if (values.user_type === 'sales_executive' && values.manager) payload.manager_id = Number(values.manager);
-  const { data } = await api.post('/accounts/signup', payload);
+  let body = payload;
+  if (values.profile_file) {
+    body = new FormData();
+    Object.entries(payload).forEach(([key, value]) => body.append(key, value));
+    body.append('profile_pic', values.profile_file);
+  }
+  const { data } = await api.post('/accounts/signup', body);
   return assertUserSuccess(data);
 }
 export async function getCompanyUserDetails(id) {
@@ -106,12 +113,12 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
     {editing && details.isLoading ? <div className="py-6 text-center"><Spin /></div> : editing && details.isError
       ? <Alert type="error" message={userFormError(details.error)} action={<Button onClick={() => details.refetch()}>Retry</Button>} />
       : <form className="user-management-form" onSubmit={formik.handleSubmit} noValidate>
-        {editing && <div className="mb-5 flex justify-center">
+        <div className="mb-5 flex justify-center">
           <div className="relative inline-flex">
-            <Avatar size={80} src={picturePreview || details.data?.profile_pic || undefined}
-              style={{ background: 'var(--primary)', color: 'var(--primary-foreground)', fontSize: 30 }}>
-              {Array.from(String(formik.values.name || '').trim())[0]?.toUpperCase() || '?'}
-            </Avatar>
+            <UserAvatar className="size-20">
+              <AvatarImage src={picturePreview || details.data?.profile_pic || undefined} alt="User profile" className="object-cover" />
+              <AvatarFallback className="bg-primary text-3xl text-primary-foreground">{Array.from(String(formik.values.name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
+            </UserAvatar>
             <Button type="default" shape="circle" size="small" aria-label="Edit profile picture" title="Edit profile picture"
               icon={<Pencil size={14} />} disabled={save.isLoading} onClick={() => pictureInput.current?.click()}
               style={{ position: 'absolute', bottom: 0, right: 0 }} />
@@ -119,10 +126,11 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
           <input ref={pictureInput} id="company-user-picture" type="file" accept="image/*" hidden disabled={save.isLoading}
             onChange={event => {
               const file = event.target.files?.[0];
+              event.target.value = '';
               if (file && !file.type.startsWith('image/')) { message.error('Select an image file.'); event.target.value = ''; return; }
-              formik.setFieldValue('profile_file', file || null);
+              if (file) formik.setFieldValue('profile_file', file);
             }} />
-        </div>}
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {['name', 'email', 'phone', 'password', ...(!editing ? ['confirmPassword'] : [])].map(key => <div key={key}>
             <label htmlFor={`company-user-${key}`}>{({ name: 'Name', email: 'Email', phone: 'Phone', password: editing ? 'New Password (optional)' : 'Password', confirmPassword: 'Confirm Password' })[key]}{key !== 'password' || !editing ? ' *' : ''}</label>

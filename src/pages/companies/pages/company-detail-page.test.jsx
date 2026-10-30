@@ -21,6 +21,17 @@ describe('company detail users', () => {
     expect(options.filter(option => option.name === 'Company 4 Manager')).toHaveLength(1);
   });
   const values = { name: 'Ali Ahmed', email: 'ali@example.com', phone: '+923001234567', password: 'secret123', confirmPassword: 'secret123', user_type: 'sales_executive', manager: 2, company_id: 999 };
+  it('uploads a profile picture with the company user creation fields', async () => {
+    api.post.mockResolvedValue({ data: { success: true } });
+    await createCompanyUser(3, { ...values, profile_file: new Blob(['image'], { type: 'image/png' }) });
+    const [endpoint, body] = api.post.mock.calls[0];
+    expect(endpoint).toBe('/accounts/signup');
+    expect(body).toBeInstanceOf(FormData);
+    expect(body.get('profile_pic').type).toBe('image/png');
+    expect(body.get('company_id')).toBe('3');
+    expect(body.get('manager_id')).toBe('2');
+    expect(body.get('confirmPassword')).toBeNull();
+  });
   it.each(['company_admin', 'sales_manager', 'sales_executive', 'data_entry_executive'])('creates %s against the route company, ignoring any submitted company ID', async user_type => {
     api.post.mockResolvedValue({ data: { success: true } });
     await createCompanyUser(3, { ...values, user_type });

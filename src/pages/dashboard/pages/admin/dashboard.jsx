@@ -32,7 +32,7 @@ import {
   getSystemLeadFunnel,
   getLeadStatusDistribution,
   getSuperAdminLeadStatusDistribution,
-  getProjectStatusHealth,
+  // getProjectStatusHealth,
   getExecutiveMobilisationAmounts,
   getSuperAdminMobilisationAmounts,
   getRecruiterResumeSubmissionVolume,
@@ -366,24 +366,24 @@ export function DashboardTabsSection() {
   const overallConvertedCount = overallLeadConversionRaw?.convertedLeads ?? 0;
   const overallTotalCount = overallLeadConversionRaw?.totalLeads ?? 0;
 
-  const {
-    data: projectStatusHealthData = [],
-    isLoading: loadingProjectStatusHealth,
-  } = useQuery({
-    queryKey: ['projectStatusHealth', projectStatusHealthDateRange],
-    queryFn: () => {
-      const [start, end] = projectStatusHealthDateRange || [];
-      const toDateString = (d) => (d && d.format ? d.format('YYYY-MM-DD') : null);
-      return getProjectStatusHealth({
-        startDate: toDateString(start),
-        endDate: toDateString(end),
-      });
-    },
-    enabled: activeSection === 'systemClients' || activeSection === 'systemLeads',
-    keepPreviousData: true,
-    staleTime: 1000 * 60 * 5,
-    cacheTime: 1000 * 60 * 30,
-  });
+  // const {
+  //   data: projectStatusHealthData = [],
+  //   isLoading: loadingProjectStatusHealth,
+  // } = useQuery({
+  //   queryKey: ['projectStatusHealth', projectStatusHealthDateRange],
+  //   queryFn: () => {
+  //     const [start, end] = projectStatusHealthDateRange || [];
+  //     const toDateString = (d) => (d && d.format ? d.format('YYYY-MM-DD') : null);
+  //     return getProjectStatusHealth({
+  //       startDate: toDateString(start),
+  //       endDate: toDateString(end),
+  //     });
+  //   },
+  //   enabled: activeSection === 'systemClients' || activeSection === 'systemLeads',
+  //   keepPreviousData: true,
+  //   staleTime: 1000 * 60 * 5,
+  //   cacheTime: 1000 * 60 * 30,
+  // });
 
   const {
     data: leadsStatusHealthData = [],
@@ -1262,9 +1262,8 @@ export function DashboardTabsSection() {
       )}
 
       {/* SYSTEM CLIENTS SECTION */}
-      {activeSection === 'systemClients' && (
+      {/* {activeSection === 'systemClients' && (
         <>
-          {/* Project Status Health */}
           <div className="chart-container" style={{ marginBottom: 6 }}>
             <ProjectStatusHealthChart
               title="Project Status Health"
@@ -1276,7 +1275,7 @@ export function DashboardTabsSection() {
             />
           </div>
         </>
-      )}
+      )} */}
 
       {/* CV POOL SECTION */}
       {activeSection === 'cvPool' && (

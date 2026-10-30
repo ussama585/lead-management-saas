@@ -1,7 +1,7 @@
 import { message } from '../../../components/ui/notifications.jsx';
 import { Select } from '../../../components/ui/app-select.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getRolePath } from '../../auth/role-home.js';
 import { Formik } from 'formik';
@@ -17,6 +17,8 @@ import UserDetailCard from '../../../components/user-detail-card.component.jsx';
 import UserFormPreviewSync from '../../../components/user-form-preview-sync.jsx';
 import UserPlaceholderIcon from '../../../assets/images/user-card-icons/user-placeholder.svg';
 import InputField from '../../../components/input-field.component.jsx';
+import { Avatar, AvatarImage, AvatarFallback } from '../../../components/ui/avatar.jsx';
+import { Pencil } from 'lucide-react';
 import '../../../assets/styles/legacy/create-user.css';
 import '../../../assets/styles/user-management-form.css';
 
@@ -29,7 +31,13 @@ export async function createUser(values) {
   };
   if (values.company_id) payload.company_id = Number(values.company_id);
   if (values.user_type === 'sales_executive' && values.manager) payload.manager_id = Number(values.manager);
-  const { data } = await api.post('/accounts/signup', payload);
+  let body = payload;
+  if (values.profile_file) {
+    body = new FormData();
+    Object.entries(payload).forEach(([key, value]) => body.append(key, value));
+    body.append('profile_pic', values.profile_file);
+  }
+  const { data } = await api.post('/accounts/signup', body);
   return assertUserSuccess(data);
 }
 
@@ -62,6 +70,15 @@ export default function CreateUser() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [previewValues, setPreviewValues] = useState({});
+  const pictureInput = useRef(null);
+  const [profileFile, setProfileFile] = useState(null);
+  const [picturePreview, setPicturePreview] = useState(null);
+  useEffect(() => {
+    if (!profileFile) { setPicturePreview(null); return; }
+    const url = URL.createObjectURL(profileFile);
+    setPicturePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [profileFile]);
 
   const [hoveredOption, setHoveredOption] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -124,6 +141,7 @@ export default function CreateUser() {
             email={email}
             isCreate={false}
             showPencil={false}
+            profileImg={picturePreview || undefined}
             avatar={UserPlaceholderIcon}
             details={[
               { label: 'Name', value: previewValues.name }, { label: 'Email', value: previewValues.email },
@@ -137,6 +155,14 @@ export default function CreateUser() {
 
           />
 
+          <input ref={pictureInput} type="file" accept="image/*" hidden aria-label="Upload profile picture" disabled={isLoading}
+            onChange={event => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (!file) return;
+              if (!file.type.startsWith('image/')) { message.error('Select an image file.'); return; }
+              setProfileFile(file);
+            }} />
           <div className="form-container">
             <Formik
               initialValues={{
@@ -152,7 +178,7 @@ export default function CreateUser() {
               validationSchema={createUserSchema(superAdmin)}
               onSubmit={(values, helpers) => {
                 helpers.setStatus(null);
-                createUserMutate(values, {
+                createUserMutate({ ...values, profile_file: profileFile }, {
                   onError: error => {
                     applyUserErrors(error, helpers);
                   }
@@ -165,6 +191,17 @@ export default function CreateUser() {
               {({ handleSubmit, handleBlur, values, setFieldValue, setFieldTouched, errors, touched }) => (
                 <form className="user-management-form" onSubmit={handleSubmit} onBlur={handleBlur} noValidate>
                   <UserFormPreviewSync onChange={setPreviewValues} />
+                  <div className="mb-6 flex justify-center">
+                    <div className="relative">
+                      <Avatar className="size-20">
+                        <AvatarImage src={picturePreview || undefined} alt="Selected profile picture" className="object-cover" />
+                        <AvatarFallback className="bg-primary text-3xl text-primary-foreground">{values.name?.trim().charAt(0).toUpperCase() || '?'}</AvatarFallback>
+                      </Avatar>
+                      <Button shape="circle" size="small" aria-label="Upload profile picture" title="Upload profile picture"
+                        icon={<Pencil size={14} />} disabled={isLoading} onClick={() => pictureInput.current?.click()}
+                        style={{ position: 'absolute', bottom: 0, right: 0 }} />
+                    </div>
+                  </div>
                   <div className="form-grid">
                     {superAdmin && <Form.Item className="form-item">
                       <label className="label">Company <span className="asterisk">*</span></label>
