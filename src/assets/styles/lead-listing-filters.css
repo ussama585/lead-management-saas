@@ -6,6 +6,11 @@
 .lead-listing-filters .lead-filter-card__heading h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 22px; color: #0f172a; }
 .lead-listing-filters .lead-filter-card__heading p { margin: 2px 0 0; font-size: 13px; line-height: 18px; color: #64748b; }
 .lead-listing-filters .lead-filter-card__collapse { flex-shrink: 0; color: #64748b; }
+.lead-listing-filters .lead-filter-card__selected { max-width: 45%; min-width: 0; padding: 6px 12px; border-radius: 8px; background: #3e6a9f; color: #fff; font-size: 13px; line-height: 20px; overflow-wrap: anywhere; }
+@media (max-width: 450px) {
+  .lead-listing-filters .lead-filter-card__header { flex-wrap: wrap; }
+  .lead-listing-filters .lead-filter-card__selected { margin-left: auto; max-width: calc(100% - 52px); }
+}
 .lead-listing-filters [role='group'] { gap: 8px; }
 .lead-listing-filters [role='group'] > button { height: auto; min-height: 40px; max-width: 100%; padding: 8px 18px; border: 1px solid #dce4ee; border-radius: 12px; background: #fff; color: #0f172a; font-size: 14px; font-weight: 500; line-height: 20px; white-space: normal; overflow-wrap: anywhere; text-align: left; }
 .lead-listing-filters [role='group'] > button[aria-pressed='true'] { background: #3e6a9f; border-color: #3e6a9f; color: #fff; box-shadow: 0 2px 6px rgba(62,106,159,.18) !important; }
