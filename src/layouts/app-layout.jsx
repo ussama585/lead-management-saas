@@ -421,11 +421,11 @@ export default function AppLayout({ children, role }) {
   const menuGroupByKey = {
     '1': 'Overview', '19': 'Overview',
     '9': 'Leads & Sales', '10': 'Leads & Sales', '15': 'Leads & Sales',
-    '17': 'Leads & Sales', '11': 'Leads & Sales', '12': 'Leads & Sales', '22': 'Leads & Sales', '27': 'Leads & Sales',
+    '17': 'Leads & Sales', '11': 'Leads & Sales', '12': 'Leads & Sales', '22': 'Leads & Sales',
     '2': 'Team Management', '3': 'Team Management', '4': 'Team Management', '7': 'Team Management',
     '6': 'Clients & Projects', '8': 'Clients & Projects', '13': 'Clients & Projects',
     '18': 'Recruitment', '25': 'Recruitment', '14': 'Recruitment', '16': 'Recruitment', '23': 'Recruitment',
-    '24': 'Finance', '20': 'Administration', '21': 'Administration', '26': 'Administration',
+    '24': 'Finance', '20': 'Administration', '21': 'Administration', '26': 'Administration', '27': 'Administration',
   };
   const menuItems = [...baseMenu, ...(roleMenuMap[user.user_type] || [])]
     .filter(item => canAccessMenu(signedInUser?.user_type, item.key))

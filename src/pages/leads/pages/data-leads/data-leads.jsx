@@ -2,7 +2,7 @@ import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
-import { leadCountTabs, getLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
+import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
@@ -17,7 +17,7 @@ import {
   Link,
   IconButton,
 } from "@mui/material";
-import { getDataLeadsStats } from "../../../shared/services/data-leads-service.js";
+import { getDataLeadsStats, getDataLeadsListCount as fetchDataLeadsListCount } from "../../../shared/services/data-leads-service.js";
 import StatusFilterTabs from "../../../../components/status-filter-tabs.jsx";
 import { File as InsertDriveFileOutlinedIcon, Ruler } from 'lucide-react';
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -60,7 +60,11 @@ async function getDataLeadsList(params) {
   if (!Array.isArray(data?.results)) throw new Error('Could not read the data leads list.');
   return data;
 }
-const getDataLeadsListCount = getLeadFilterCounts;
+async function getDataLeadsListCount(params) {
+  const data = await fetchDataLeadsListCount(params);
+  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load lead counts.');
+  return normalizeLeadCounts(data);
+}
 async function updateDataLeadStatus(id, payload, config = {}) {
   const { data } = await api.patch(`/data-leads/details/${encodeURIComponent(id)}`, payload, config);
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not update the lead.');

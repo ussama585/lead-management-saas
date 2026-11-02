@@ -198,7 +198,7 @@ export default function LeadJobForm() {
     const props = { id: key, name: key, disabled: save.isLoading, onBlur: () => formik.setFieldTouched(key, true),
       status: typeof error === 'string' ? 'error' : undefined, 'aria-describedby': `${key}-error` };
     let control;
-    if (tagChoices[key]) control = <Select {...props} mode="tags" style={{ width: '100%' }} value={splitTags(value)} options={tagChoices[key]}
+    if (tagChoices[key]) control = <Select {...props} className="data-job-multiselect" mode="tags" style={{ width: '100%' }} value={splitTags(value)} options={tagChoices[key]}
       placeholder={`Select or enter ${key === 'department' ? 'departments' : key === 'languages_required' ? 'languages' : 'nationalities'}`} tokenSeparators={[',']}
       onChange={values => formik.setFieldValue(key, values.join(', '))} />;
     else if (choices) control = <Select {...props} allowClear={key === 'job_type' || key === 'contract_period'} showSearch optionFilterProp="label" style={{ width: '100%' }} value={value === '' ? undefined : value}
@@ -228,7 +228,7 @@ export default function LeadJobForm() {
         {field('job_title')}{field('number_of_vacancies', labels.number_of_vacancies, vacancyOptions)}{field('languages_required')}{field('gender_preference')}
         {field('nationality_preference')}{field('department')}{field('working_hours')}{field('cv_submission_deadline')}
         {field('expected_joining_date')}{field('timezone')}
-        <div className="data-job-field data-job-span-all">
+        <div className="data-job-field data-job-working-days-field">
           <label htmlFor="working-days-from">Working Days</label>
           <div className="data-job-working-days">
             <Select id="working-days-from" aria-label="Working days from" placeholder="From" value={workingFrom || undefined} disabled={save.isLoading}
