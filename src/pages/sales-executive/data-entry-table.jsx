@@ -466,9 +466,9 @@ const DataEntryTable = () => {
 }, [user.user_type]);
   const tabCounts = {
     ...statusCount,
-    all: statusCount?.all ?? statusCount?.total_count ?? statusCount?.count ?? 0,
+    all: statusCount?.all_count ?? statusCount?.all ?? statusCount?.total_count ?? statusCount?.count ?? 0,
   };
-  const statusChoices = leadCountTabs(statusCount).filter(choice => choice.apiKey !== 'all')
+  const statusChoices = leadCountTabs(statusCount).filter(choice => !['all', 'all_count'].includes(choice.apiKey))
     .map(choice => ({ ...choice, value: ['assigned', 'unassigned'].includes(choice.apiKey) ? choice.apiKey : choice.value }));
   // Assign when dropdown value changes and rows are selected
   React.useEffect(() => {
