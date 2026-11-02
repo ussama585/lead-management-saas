@@ -6,6 +6,7 @@ import { changePasswordSchema } from '../pages/auth/schemas/change-password-sche
 import { canAccessRoute } from '../pages/auth/role-access.js';
 
 vi.mock('../pages/shared/services/api.js', () => ({ default: { post: vi.fn() }, storeRefreshedTokens: vi.fn() }));
+vi.mock('../pages/shared/store/user-store.js', () => ({ default: selector => selector({ user: { user_type: 'super_admin' } }) }));
 vi.mock('antd', () => ({ Alert: () => null, Input: () => null, Modal: () => null, Button: () => null, Card: () => null, message: {} }));
 beforeEach(() => {
   vi.clearAllMocks();
@@ -14,6 +15,12 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('password reset for signed-in users', () => {
+  it('sends all three password fields for super admin', async () => {
+    api.post.mockResolvedValue({ data: { status: true } });
+    const payload = { old_password: 'old-secret', new_password: 'new-secret', confirm_password: 'new-secret' };
+    await changePassword(payload, 'super_admin');
+    expect(api.post).toHaveBeenCalledWith('/accounts/change-password', payload);
+  });
   it('sends only the old and new passwords as JSON', async () => {
     api.post.mockResolvedValue({ data: { success: true } });
     await changePassword({ old_password: 'old-secret', new_password: 'new-secret', confirm_password: 'new-secret' });

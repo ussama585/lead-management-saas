@@ -56,7 +56,15 @@ export default function EditUser() {
   const [previewValues, setPreviewValues] = useState({});
 
   const imageInputRef = useRef(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  useEffect(() => {
+    if (!selectedImage) { setImagePreview(''); return; }
+    const url = URL.createObjectURL(selectedImage);
+    setImagePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedImage]);
+  useEffect(() => { setSelectedImage(null); }, [userId]);
 
 
   const { data: userDetails, isLoading, error, refetch: refetchUserDetails } = useQuery({
@@ -104,9 +112,9 @@ export default function EditUser() {
 
     onMutate: () => setIsUpdating(true),
     onSettled: () => setIsUpdating(false),
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries('usersList');
-      message.success('User edited successfully');
+      message.success(result?.message || 'User edited successfully');
     },
     onError: (error) => {
       message.error(userFormError(error));
@@ -118,33 +126,18 @@ export default function EditUser() {
   };
 
   const handleImageEditClick = () => {
-    if (!isUploading) imageInputRef.current?.click();
+    if (!isUpdating) imageInputRef.current?.click();
   };
 
   const handleImageUpload = (event) => {
     const selectedFile = event.target.files?.[0];
     event.target.value = '';
-    if (!selectedFile || isUploading) return;
-
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append('profile_pic', selectedFile); // Assuming 'profile_pic' is the key expected by your backend
-
-    // Call the mutation to upload the image
-    editUserMutate(formData, {
-      onSuccess: async () => {
-        try {
-          await refetchUserDetails();
-          message.success("Profile picture updated successfully");
-        } finally {
-          setIsUploading(false);
-        }
-      },
-      onError: (error) => {
-        setIsUploading(false);
-        message.error(userFormError(error));
-      }
-    });
+    if (!selectedFile || isUpdating) return;
+    if (!selectedFile.type.startsWith('image/')) {
+      message.error('Please select an image file.');
+      return;
+    }
+    setSelectedImage(selectedFile);
   };
 
 
@@ -166,7 +159,7 @@ export default function EditUser() {
               type="user"
               name={previewValues.name || ''}
               isCreate={false}
-              profileImg={userDetails?.data?.profile_pic || undefined}
+              profileImg={imagePreview || userDetails?.data?.profile_pic || undefined}
               phoneNumber={phoneNumber}
               email={email}
               onEditPicture={handleImageEditClick}
@@ -207,7 +200,8 @@ export default function EditUser() {
                   });
 
 
-                  if (formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('password') || formData.has('manager_id')) {
+                  if (selectedImage) formData.append('profile_pic', selectedImage);
+                  if (formData.has('profile_pic') || formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('password') || formData.has('manager_id')) {
                     // If there are changes, make the API call
                     editUserMutate(formData, {
                       onSuccess: () => navigate(getRolePath(user?.user_type, '/user-management'), { replace: true }),
@@ -356,7 +350,7 @@ export default function EditUser() {
         </div>
       </Spin>
 
-      <input ref={imageInputRef} type="file" accept="image/*" hidden aria-label="Upload profile picture" disabled={isUploading} onChange={handleImageUpload} />
+      <input ref={imageInputRef} type="file" accept="image/*" hidden aria-label="Upload profile picture" disabled={isUpdating} onChange={handleImageUpload} />
     </>
   );
 }

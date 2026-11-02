@@ -15,7 +15,7 @@ import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import api from '../../shared/services/api.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
-import { companyError, getCompanyDetails } from './companies-page.jsx';
+import { companyError, getCompanyDetails, CompanyCardActions } from './companies-page.jsx';
 import formatDateUniversal from '../../shared/utils/formatDate.js';
 import InputField from '../../../components/input-field.component.jsx';
 
@@ -209,7 +209,8 @@ function CompanyDetail({ companyId }) {
     {!enabled ? <Alert type="error" message="Invalid company." /> : company.isLoading ? <div className="py-6 text-center"><Spin /></div>
       : company.isError ? <Alert type="error" showIcon message={companyError(company.error)} action={<Button onClick={() => company.refetch()}>Retry</Button>} />
       : company.data && <>
-        <Card title={<Space><Avatar size={40} style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>{Array.from(company.data.name.trim())[0]?.toUpperCase() || '?'}</Avatar>{company.data.name}</Space>}>
+        <Card extra={<CompanyCardActions company={company.data} onSaved={() => company.refetch()} onDeleted={() => navigate('/super-admin/companies')} />}
+          title={<Space><Avatar size={40} style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>{Array.from(company.data.name.trim())[0]?.toUpperCase() || '?'}</Avatar>{company.data.name}</Space>}>
           <Descriptions bordered column={{ xs: 1, sm: 1, md: 2 }} size="small" items={[
             { key: 'id', label: 'Company ID', children: company.data.id },
             { key: 'status', label: 'Status', children: <Tag color={company.data.is_active ? 'green' : 'default'}>{company.data.is_active ? 'Active' : 'Inactive'}</Tag> },

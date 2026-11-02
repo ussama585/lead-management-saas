@@ -33,12 +33,14 @@ import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { getTargetForUser } from '../../shared/services/stats-service.js';
 import OtpModal from '../../auth/pages/otp-modal.jsx';
+import ResetUserPasswordDialog from '../../../components/reset-user-password-dialog.jsx';
 
 export default function UserManagement() {
   const { user: currentUser } = useUserStore();
   console.log(currentUser, "useruseruser")
   const isSuperAdminViewer = isSuperAdmin(currentUser?.user_type);
   const isCompany = currentUser?.user_type === 'company_admin';
+  const [passwordResetUser, setPasswordResetUser] = useState(null);
   const companyId = isCompany ? currentUser?.company_id : undefined;
   const [activeFilter, setActiveFilter] = useState('');
 
@@ -618,7 +620,10 @@ export default function UserManagement() {
           onSortingChange={handleSortingChange}
           globalFilter={globalFilter}
           onGlobalFilterChange={handleGlobalFilterChange}
-          columns={isSuperAdminViewer ? columns.filter(column => column.accessorKey !== 'manager') : columns}
+          columns={currentUser?.user_type === 'super_admin' ? [...columns.filter(column => column.accessorKey !== 'manager'), {
+            id: 'reset_password', header: 'Reset Password', enableSorting: false, enableColumnFilter: false,
+            Cell: ({ row }) => <Button size="small" onClick={() => setPasswordResetUser(row.original)}>Reset Password</Button>,
+          }] : isSuperAdminViewer ? columns.filter(column => column.accessorKey !== 'manager') : columns}
           isLoading={isLoading}
           isFetching={isFetching}
           enableGlobalFilter={true}
@@ -631,6 +636,9 @@ export default function UserManagement() {
         />
       </div>
 
+      {currentUser?.user_type === 'super_admin' && passwordResetUser && <ResetUserPasswordDialog
+        key={passwordResetUser.user_slug ?? passwordResetUser.slug ?? passwordResetUser.id}
+        user={passwordResetUser} onClose={() => setPasswordResetUser(null)} />}
       <OtpModal
         openModal={otpModalVisible}
         setOpenModal={setOtpModalVisible}

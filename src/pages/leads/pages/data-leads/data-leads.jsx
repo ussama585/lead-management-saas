@@ -162,7 +162,10 @@ const DataLeads = () => {
   const {
     data: dataLeadsStats,
     isLoading: isStatsLoading,
-  } = useQuery("dataLeadsStats", () => getDataLeadsStats(), {
+  } = useQuery(['dataLeadsStats', dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => getDataLeadsStats({
+    ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+    ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+  }), {
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

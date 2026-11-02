@@ -94,6 +94,65 @@ export function companyError(error) {
   return body?.message || body?.detail || error?.message || 'The request failed. Please try again.';
 }
 
+export function CompanyCardActions({ company, onSaved, onDeleted }) {
+  const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const queryClient = useQueryClient();
+  const save = useMutation(values => updateCompany(company.id, values), {
+    onSuccess: async result => {
+      message.success(result?.message || 'Company updated successfully.');
+      setEditing(false);
+      await queryClient.invalidateQueries(['companiesList']);
+      await onSaved();
+    },
+    onError: error => {
+      const errors = companyFieldErrors(error);
+      formik.setErrors(errors);
+      formik.setTouched(Object.fromEntries(Object.keys(errors).map(field => [field, true])), false);
+      formik.setStatus(Object.keys(errors).length ? null : companyError(error));
+    },
+  });
+  const remove = useMutation(() => deleteCompany(company.id), {
+    onSuccess: async result => {
+      message.success(result?.message || 'Company deleted successfully.');
+      await queryClient.invalidateQueries(['companiesList']);
+      onDeleted();
+    },
+  });
+  const formik = useFormik({ initialValues: companyPayload(company), enableReinitialize: true, validationSchema: companySchema,
+    onSubmit: async values => { try { await save.mutateAsync(values); } catch { /* Display mutation errors in the form. */ } },
+  });
+  return <>
+    <Space wrap>
+      <Button size="small" icon={<Pencil size={16} />} disabled={save.isLoading || remove.isLoading} onClick={() => { formik.resetForm(); save.reset(); setEditing(true); }}>Edit</Button>
+      <Button size="small" danger icon={<Trash2 size={16} />} disabled={save.isLoading || remove.isLoading} onClick={() => { remove.reset(); setDeleting(true); }}>Delete</Button>
+    </Space>
+    <Modal title="Edit company" open={editing} width={680} onOk={formik.submitForm} okText="Save changes" confirmLoading={save.isLoading}
+      onCancel={() => { if (!save.isLoading) setEditing(false); }} closable={!save.isLoading} maskClosable={!save.isLoading} keyboard={!save.isLoading} cancelButtonProps={{ disabled: save.isLoading }}>
+      <form onSubmit={formik.handleSubmit} noValidate className="mt-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {Object.entries({ name: 'Company name', email: 'Email', phone: 'Phone', website: 'Website', country: 'Country', city: 'City', address: 'Address' }).map(([field, label]) => <div key={field} className={field === 'address' ? 'sm:col-span-2' : undefined}>
+            <label htmlFor={`edit-company-${field}`} className="mb-2 block text-sm font-medium">{label}{['name', 'email'].includes(field) ? ' *' : ''}</label>
+            {React.createElement(field === 'address' ? Input.TextArea : Input, {
+              id: `edit-company-${field}`, name: field, type: field === 'email' ? 'email' : field === 'website' ? 'url' : field === 'phone' ? 'tel' : 'text',
+              value: formik.values[field], onChange: formik.handleChange, onBlur: formik.handleBlur, disabled: save.isLoading,
+              'aria-invalid': Boolean(formik.touched[field] && formik.errors[field]),
+            })}
+            {formik.touched[field] && formik.errors[field] && <p role="alert" className="mt-1 text-sm text-destructive">{formik.errors[field]}</p>}
+          </div>)}
+        </div>
+        <div className="my-4 flex items-center gap-3"><label htmlFor="edit-company-active">Active company</label>
+          <Switch id="edit-company-active" checked={formik.values.is_active} disabled={save.isLoading} onChange={checked => formik.setFieldValue('is_active', checked)} />
+        </div>
+        {formik.status && <Alert type="error" showIcon message={formik.status} />}
+        <button type="submit" hidden disabled={save.isLoading}>Save changes</button>
+      </form>
+    </Modal>
+    <SettingsDeleteModal title="Delete company" itemName={company.name} open={deleting} loading={remove.isLoading}
+      error={remove.isError ? companyError(remove.error) : null} onCancel={() => setDeleting(false)} onConfirm={() => { if (!remove.isLoading) remove.mutate(); }} />
+  </>;
+}
+
 export default function CompaniesPage() {
   const navigate = useNavigate();
   const { user } = useUserStore();

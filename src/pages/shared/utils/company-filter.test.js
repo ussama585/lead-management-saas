@@ -14,6 +14,15 @@ describe('Super Admin company filter', () => {
     }
   });
   const location = { pathname: '/super-admin/data-leads', search: '?company_id=3' };
+  it.each([
+    ['leads', 'lead-generation'], ['data-leads', 'data-leads'], ['meta-leads', 'meta-leads'],
+  ])('scopes both assignee and status filter requests in %s', (section, resource) => {
+    for (const endpoint of ['stats', 'list-count']) {
+      const config = { url: `/${resource}/${endpoint}`, params: { start_date: '2026-11-01', assigned_to: 8 } };
+      applyCompanyFilter(config, 'super_admin', { pathname: `/super-admin/${section}`, search: '?company_id=5' });
+      expect(config.params).toEqual({ start_date: '2026-11-01', assigned_to: 8, company_id: '5' });
+    }
+  });
   it.each(['/data-leads/list', '/data-leads/list-count', '/data-leads/stats', '/meta-leads/list', '/lead-generation/list?page=2', '/accounts/all-users', '/sales-executive/list', '/follow-up/user-list', '/activity/list'])(
     'adds company_id to %s preserving existing filters', (url) => {
       const config = { url, params: { search: 'test', assigned: true } };

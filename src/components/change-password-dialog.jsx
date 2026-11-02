@@ -7,15 +7,19 @@ import { useFormik } from 'formik';
 import { useMutation } from 'react-query';
 import api from '../pages/shared/services/api.js';
 import { changePasswordSchema } from '../pages/auth/schemas/change-password-schema.js';
+import useUserStore from '../pages/shared/store/user-store.js';
 
-export async function changePassword({ old_password, new_password }) {
-  const { data } = await api.post('/accounts/change-password', { old_password, new_password });
+export async function changePassword({ old_password, new_password, confirm_password }, userType) {
+  const payload = { old_password, new_password };
+  if (userType === 'super_admin') payload.confirm_password = confirm_password;
+  const { data } = await api.post('/accounts/change-password', payload);
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not change password.');
   return data;
 }
 
 export default function ChangePasswordDialog({ open, onClose }) {
-  const mutation = useMutation(changePassword, {
+  const userType = useUserStore(state => state.user?.user_type);
+  const mutation = useMutation(values => changePassword(values, userType), {
     onSuccess: result => {
       message.success(result?.message || 'Password changed successfully.');
       formik.resetForm();
@@ -25,7 +29,7 @@ export default function ChangePasswordDialog({ open, onClose }) {
       const body = error?.response?.data;
       const fields = body?.errors || body;
       const errors = {};
-      for (const field of ['old_password', 'new_password']) {
+      for (const field of ['old_password', 'new_password', 'confirm_password']) {
         if (typeof fields?.[field] === 'string') errors[field] = fields[field];
         else if (Array.isArray(fields?.[field])) errors[field] = fields[field].join(' ');
       }

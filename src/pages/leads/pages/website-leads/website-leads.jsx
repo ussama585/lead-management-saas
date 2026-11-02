@@ -1,4 +1,5 @@
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import dayjs from 'dayjs';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
@@ -160,7 +161,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     // Restore date range from sessionStorage (convert ISO strings to dayjs objects)
     const [dateRange, setDateRange] = useState(() => {
       if (initialState.dateRange && Array.isArray(initialState.dateRange) && initialState.dateRange.length === 2) {
-        const dayjs = require('dayjs');
         return [
           initialState.dateRange[0] ? dayjs(initialState.dateRange[0]) : null,
           initialState.dateRange[1] ? dayjs(initialState.dateRange[1]) : null,
@@ -220,7 +220,10 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       data: leadStatsData,
       isLoading: loadingLeadStats,
       refetch: refetchLeadStats
-    } = useQuery('leadStats', fetchLeadStats, {
+    } = useQuery(['leadStats', dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => fetchLeadStats({
+      ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+      ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+    }), {
       staleTime: 5 * 60 * 1000, // 5 minutes - stats change when leads are updated
       cacheTime: 10 * 60 * 1000, // 10 minutes
       refetchOnWindowFocus: false

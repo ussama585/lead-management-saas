@@ -120,12 +120,12 @@ export const fetchLeadCounts = async (selectedExecutive = null, selectedStatus =
     params.end_date = dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ');
   }
 
-  const response = await api.get('lead-generation/list-count', { params });
+  const response = await api.get('/lead-generation/list-count', { params });
   return response.data;
 };
 
-export const fetchLeadStats = async () => {
-  const response = await api.get('lead-generation/stats');
+export const fetchLeadStats = async (params = {}) => {
+  const response = await api.get('/lead-generation/stats', { params });
   return response.data;
 };
 
