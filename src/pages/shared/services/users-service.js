@@ -147,10 +147,12 @@ export const toggleUserActivation = async (userId, isActive) => {
 
 
 
-export const getAssigningUsersListing = async (user_type = "sales_manager") => {
+export const getAssigningUsersListing = async (user_type = "sales_manager", { filterByUserType = false } = {}) => {
   try {
 
-    const endpoint = assignmentEndpoint();
+    const endpoint = filterByUserType
+      ? `/accounts/users-for-assigning?user_type=${encodeURIComponent(user_type)}`
+      : assignmentEndpoint();
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);

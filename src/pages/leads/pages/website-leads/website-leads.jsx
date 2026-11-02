@@ -1583,7 +1583,15 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               triggerStyle={{ border: '1px solid #d9d9d9' }}
             />
 </LeadDateRangeField></LeadDateFilter>
-
+          {['super_admin', 'company_admin'].includes(userType) && (
+            <div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right">
+              <Button
+                icon={<UserAddOutlined size="1em" className="app-icon" />}
+                onClick={() => setUserAssignmentModalVisible(true)}
+                style={{ backgroundColor: '#3e6a9f', borderColor: '#3e6a9f', color: '#fff' }}
+              >Manage Assignees</Button>
+            </div>
+          )}
         </div>
 
         <div className="leads">

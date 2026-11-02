@@ -2,7 +2,7 @@ import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
-import { leadCountTabs, getLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
+import { leadCountTabs, getMetaLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
@@ -266,7 +266,7 @@ export default function MetaLeadsStandard() {
     refetch: refetchMetaLeadsCount
   } = useQuery(
     ['metaLeadsCount', dateRange, selectedExecId, statusFilter, projectSizeFilter, executiveFilter],
-    () => getLeadFilterCounts({
+    () => getMetaLeadFilterCounts({
       ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
       ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
       ...(selectedExecId ? { assigned_to: selectedExecId } : {}),

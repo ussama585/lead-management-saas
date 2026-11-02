@@ -3,7 +3,7 @@ import { Modal } from './ui/app-modal.jsx';
 import { Select } from './ui/app-select.jsx';
 import { Button } from './ui/app-controls.jsx';
 import React, { useState, useMemo } from 'react';
-import { Space, Popconfirm } from 'antd';
+import { Space } from 'antd';
 import { Trash2 as DeleteOutlined, Plus as PlusOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
 import { useQuery, useMutation } from 'react-query';
 import { getAssigningUsersListing } from '../pages/shared/services/users-service.js';
@@ -37,7 +37,9 @@ const ManageAssigneesModal = ({
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [removingUserId, setRemovingUserId] = useState(null);
   const user = useUserStore((state) => state.user);
+  const canManage = isSuperAdmin(user?.user_type) || user?.user_type === 'company_admin';
 
   const isMetaLeads = leadType === 'meta-leads';
   const title = isMetaLeads ? 'Manage User Assignments' : 'Manage User Assignments - Lead Generation';
@@ -49,8 +51,8 @@ const ManageAssigneesModal = ({
     data: assignedUsersData,
     isLoading: loadingAssignedUsers,
     refetch: refetchAssignedUsers,
-  } = useQuery([queryKey], fetchAssigned, {
-    enabled: visible,
+  } = useQuery([queryKey, user?.id, user?.user_type], fetchAssigned, {
+    enabled: visible && canManage,
     staleTime: 0,
     cacheTime: 0,
     refetchOnWindowFocus: false,
@@ -58,8 +60,8 @@ const ManageAssigneesModal = ({
 
   const { data: allExecutivesData, isLoading: loadingExecutives } = useQuery({
     queryKey: ['executiveListOnly', user?.id, user?.user_type],
-    queryFn: () => getAssigningUsersListing('sales_executive'),
-    enabled: visible && isSuperAdmin(user?.user_type),
+    queryFn: () => getAssigningUsersListing('sales_executive', { filterByUserType: true }),
+    enabled: visible && canManage,
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -78,6 +80,7 @@ const ManageAssigneesModal = ({
 
   const removeUsersMutation = useMutation((ids) => removeAssigned(ids), {
     onSuccess: (data) => {
+      setRemovingUserId(null);
       message.success(data.message || 'User(s) removed successfully');
       refetchAssignedUsers();
     },
@@ -158,25 +161,24 @@ const ManageAssigneesModal = ({
         size: 120,
         enableSorting: false,
         Cell: ({ row }) => (
-          <Popconfirm
-            title="Remove this user?"
-            description="This user will no longer be available for assignment to leads."
-            onConfirm={() => handleRemoveUser(row.original.id)}
-            okText="Yes"
-            cancelText="No"
-            okButtonProps={{ danger: true }}
-          >
-            <Button type="text" danger icon={<DeleteOutlined size="1em" className="app-icon" />} loading={removeUsersMutation.isLoading} size="small">
+          removingUserId === row.original.id ? (
+            <div role="group" aria-label={`Confirm removing ${row.original.name}`} className="flex flex-wrap items-center gap-2">
+              <span>Remove this user?</span>
+              <Button danger size="small" loading={removeUsersMutation.isLoading} onClick={() => handleRemoveUser(row.original.id)}>Yes, remove</Button>
+              <Button size="small" disabled={removeUsersMutation.isLoading} onClick={() => setRemovingUserId(null)}>Cancel</Button>
+            </div>
+          ) : (
+            <Button type="text" danger icon={<DeleteOutlined size="1em" className="app-icon" />} disabled={removeUsersMutation.isLoading} size="small" onClick={() => setRemovingUserId(row.original.id)}>
               Remove
             </Button>
-          </Popconfirm>
+          )
         ),
       },
     ],
-    [removeUsersMutation.isLoading]
+    [removeUsersMutation.isLoading, removingUserId]
   );
 
-  if (!isSuperAdmin(user?.user_type)) return null;
+  if (!canManage) return null;
 
   return (
     <Modal

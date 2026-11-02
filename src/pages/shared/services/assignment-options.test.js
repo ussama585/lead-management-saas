@@ -8,6 +8,13 @@ import useUserStore from '../store/user-store.js';
 vi.mock('./api.js', () => ({ default: { get: vi.fn() } }));
 vi.mock('../store/user-store.js', () => ({ default: Object.assign(() => ({ user: {} }), { getState: vi.fn(() => ({ user: {} })) }) }));
 describe('assignment options across modules', () => {
+  it.each(['super_admin', 'company_admin'])('filters Manage Assignees options to executives for %s', async role => {
+    useUserStore.getState.mockReturnValue({ user: { user_type: role } });
+    api.get.mockResolvedValue({ data: [] });
+    await getAssigningUsersListing('sales_executive', { filterByUserType: true });
+    expect(api.get).toHaveBeenLastCalledWith('/accounts/users-for-assigning?user_type=sales_executive');
+    useUserStore.getState.mockReturnValue({ user: {} });
+  });
   it.each([getAssigningUsersListing, getManangersExecutives, getMetaLeadsAssigningUserList, getAssigningUserList, getAssignRecruiterList, getRecruiterAssigningList])(
     'omits user_type for company admins', async load => {
       useUserStore.getState.mockReturnValue({ user: { user_type: 'company_admin' } });

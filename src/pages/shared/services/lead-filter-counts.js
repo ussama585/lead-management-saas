@@ -21,3 +21,9 @@ export async function getLeadFilterCounts(params = {}) {
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load lead counts.');
   return normalizeLeadCounts(data);
 }
+
+export async function getMetaLeadFilterCounts(params = {}) {
+  const { data } = await api.get('/meta-leads/list-count', { params });
+  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load lead counts.');
+  return normalizeLeadCounts(data);
+}
