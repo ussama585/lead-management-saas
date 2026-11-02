@@ -13,10 +13,9 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Download as DownloadOutlined } from 'lucide-react';
 import { useQuery } from "react-query";
 import LeadListingFilters from "../../components/lead-listing-filters.jsx";
-import StatusFilterTabs from "../../components/status-filter-tabs.jsx";
+import { leadCountTabs, normalizeLeadCounts } from "../shared/services/lead-filter-counts.js";
 import {
   listDataEntry,
-  getStatusCount,
   bulkAssignDataEntry,
   listAssignedDataEntry,
 } from "../shared/services/data-entry-service.js";
@@ -156,11 +155,6 @@ const DataEntryTable = () => {
   const [executivesList, setExecutivesList] = useState([]); // for tabs
   const [assignableUsers, setAssignableUsers] = useState([]); // for dropdown
   const [isSaving, setIsSaving] = useState(false);
-  const [tabCounts, setTabCounts] = useState({
-    all: 0,
-    assigned: 0,
-    unassigned: 0,
-  });
 
  // Sync all state to URL params
   useEffect(() => {
@@ -224,8 +218,8 @@ const DataEntryTable = () => {
         params.assigned = false;
       }
 
-      const countData = await getStatusCount(params);
-      return countData;
+      const countData = await listDataEntryCount(params);
+      return normalizeLeadCounts(countData);
     },
     {
       enabled: !!selectedTab, // only run if tab is selected
@@ -470,21 +464,12 @@ const DataEntryTable = () => {
     fetchAssignableUsers();
   }
 }, [user.user_type]);
-  // Fetch tab counts
-  React.useEffect(() => {
-    let active = true;
-    if (user?.id) {
-      listDataEntryCount(companyParams).then((counts) => {
-        if (!active) return;
-        setTabCounts({
-          all: counts.all || 0,
-          assigned: counts.assigned || 0,
-          unassigned: counts.unassigned || 0,
-        });
-      }).catch(() => { if (active) setTabCounts({ all: 0, assigned: 0, unassigned: 0 }); });
-    }
-    return () => { active = false; };
-  }, [user.id, user.user_type, companyId]);
+  const tabCounts = {
+    ...statusCount,
+    all: statusCount?.all ?? statusCount?.total_count ?? statusCount?.count ?? 0,
+  };
+  const statusChoices = leadCountTabs(statusCount).filter(choice => choice.apiKey !== 'all')
+    .map(choice => ({ ...choice, value: ['assigned', 'unassigned'].includes(choice.apiKey) ? choice.apiKey : choice.value }));
   // Assign when dropdown value changes and rows are selected
   React.useEffect(() => {
     // Only show confirmation modal if a new assignee is selected (not cleared)
@@ -520,14 +505,6 @@ const DataEntryTable = () => {
       setSelectedAssignee(null);
       refetch();
       refetchStatusCount();
-      // Refresh tab counts after assignment
-      listDataEntryCount(companyParams).then((counts) => {
-        setTabCounts({
-          all: counts.all || 0,
-          assigned: counts.assigned || 0,
-          unassigned: counts.unassigned || 0,
-        });
-      });
       // Show skipped assignments if any
       if (res && Array.isArray(res.skipped) && res.skipped.length > 0) {
         setAssignSkippedResult({ skipped: res.skipped, message: res.message });
@@ -644,17 +621,17 @@ const DataEntryTable = () => {
     }
   };
   const handleScopeTabFilter = useCallback((valueOrUpdater) => {
-    setSelectedTab((prevTab) => {
-      const prevFilter = prevTab === "all" ? "" : prevTab;
-      const next =
-        typeof valueOrUpdater === "function" ? valueOrUpdater(prevFilter) : valueOrUpdater;
-      if (next === "" || next === "All") return "all";
-      if (next === "assigned") return "assigned";
-      if (next === "unassigned") return "unassigned";
-      return "all";
-    });
+    const current = statusFilter || (selectedTab === "all" ? "" : selectedTab);
+    const nextValue = typeof valueOrUpdater === "function" ? valueOrUpdater(current) : valueOrUpdater;
+    setStatusFilter(!nextValue || ['All', 'assigned', 'unassigned'].includes(nextValue) ? '' : nextValue);
+    if (nextValue && !['All', 'assigned', 'unassigned'].includes(nextValue)) {
+      setSelectedTab('assigned');
+      setPagination({ pageIndex: 0, pageSize: 10 });
+      return;
+    }
+    setSelectedTab(['assigned', 'unassigned'].includes(nextValue) ? nextValue : 'all');
     setPagination({ pageIndex: 0, pageSize: 10 });
-  }, []);
+  }, [statusFilter, selectedTab]);
 
   const handleRowClick = (row) => {
     if (!row || !row.id) return;
@@ -780,12 +757,9 @@ const DataEntryTable = () => {
             }
             setPagination({ pageIndex: 0, pageSize: 10 });
           }}
-          statusFilter={selectedTab === "all" ? "" : selectedTab}
+          statusFilter={statusFilter || (selectedTab === "all" ? "" : selectedTab)}
           setStatusFilter={handleScopeTabFilter}
-          statusChoices={[
-            { label: "Assigned", value: "assigned", apiKey: "assigned" },
-            { label: "Unassigned", value: "unassigned", apiKey: "unassigned" },
-          ]}
+          statusChoices={statusChoices}
           getTotalCount={() => tabCounts.all}
           getStatusCount={key => tabCounts[key] ?? 0}
         />
