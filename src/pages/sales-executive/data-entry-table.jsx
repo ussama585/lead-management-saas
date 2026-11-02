@@ -12,7 +12,7 @@ import api from '../shared/services/api.js';
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Download as DownloadOutlined } from 'lucide-react';
 import { useQuery } from "react-query";
-import ExecutiveTabButton from "../../components/executive-tab-button.component.jsx";
+import LeadListingFilters from "../../components/lead-listing-filters.jsx";
 import StatusFilterTabs from "../../components/status-filter-tabs.jsx";
 import {
   listDataEntry,
@@ -489,7 +489,7 @@ const DataEntryTable = () => {
   React.useEffect(() => {
     // Only show confirmation modal if a new assignee is selected (not cleared)
     if (
-      (user.user_type === "admin" || user.user_type === "sales_manager") &&
+      canViewUserTabs &&
       selectedAssignee &&
       !confirmAssignModalVisible // Prevent showing modal if it's already visible
     ) {
@@ -765,73 +765,32 @@ const DataEntryTable = () => {
           </div>
         </div>
 
-        {(
-          <>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 8,
-                alignItems: "center",
-                marginBottom: 8,
-              }}
-            >
-              <StatusFilterTabs
-                statusFilter={selectedTab === "all" ? "" : selectedTab}
-                setStatusFilter={handleScopeTabFilter}
-                statusChoices={[
-                  { label: "Assigned", value: "assigned", apiKey: "assigned" },
-                  { label: "Unassigned", value: "unassigned", apiKey: "unassigned" },
-                ]}
-                getTotalCount={() => tabCounts.all}
-                getStatusCount={(apiKey) => tabCounts[apiKey] ?? 0}
-                statusColors={DATA_ENTRY_SCOPE_TAB_COLORS}
-              />
-            </div>
+        <LeadListingFilters
+          executives={executivesList}
+          selectedExecutive={selectedExecId}
+          showExecutives={canViewUserTabs}
+          getExecutiveCount={id => executivesList.find(exec => String(exec.id) === String(id))?.count}
+          onExecutiveChange={id => {
+            if (id == null) {
+              setSelectedExecId(null);
+            } else {
+              setSelectedTab("assigned");
+              setStatusFilter("");
+              setSelectedExecId(selectedExecId === id ? null : id);
+            }
+            setPagination({ pageIndex: 0, pageSize: 10 });
+          }}
+          statusFilter={selectedTab === "all" ? "" : selectedTab}
+          setStatusFilter={handleScopeTabFilter}
+          statusChoices={[
+            { label: "Assigned", value: "assigned", apiKey: "assigned" },
+            { label: "Unassigned", value: "unassigned", apiKey: "unassigned" },
+          ]}
+          getTotalCount={() => tabCounts.all}
+          getStatusCount={key => tabCounts[key] ?? 0}
+        />
 
-            {canViewUserTabs && (
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 8,
-                  alignItems: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <ExecutiveTabButton
-                  isSelected={selectedExecId == null}
-                  onClick={() => {
-                    setSelectedExecId(null);
-                    setPagination({ pageIndex: 0, pageSize: 10 });
-                  }}
-                />
-                {executivesList.map((exec) => {
-                  const count =
-                    typeof exec.count === "number" ? exec.count : undefined;
-                  return (
-                    <ExecutiveTabButton
-                      key={exec.id}
-                      executive={exec}
-                      count={count}
-                      isSelected={selectedExecId === exec.id}
-                      onClick={() => {
-                        const next =
-                          selectedExecId === exec.id ? null : exec.id;
-                        setSelectedTab("assigned");
-                        setStatusFilter("");
-                        setSelectedExecId(next);
-                        setPagination({ pageIndex: 0, pageSize: 10 });
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
-
-        {(user.user_type === "admin" || user.user_type === "sales_manager") &&
+        {canViewUserTabs &&
           Object.keys(rowSelection).some((key) => rowSelection[key]) && (
             <div
               style={{
