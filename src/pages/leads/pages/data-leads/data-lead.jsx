@@ -187,7 +187,7 @@ const DataLead = () => {
     leadForCard?.converted_to_client === 1 ||
     leadForCard?.converted_to_client === '1' ||
     leadForCard?.converted_to_client === 'true';
-  const canDeleteJob = (isSuperAdmin(user?.user_type) || user?.user_type === "sales_manager") && !isReadOnlyLead;
+  const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_manager'].includes(user?.user_type)) && !isReadOnlyLead;
 
   const formatDate = useCallback((value) => {
     if (!value) return "—";
@@ -648,16 +648,15 @@ const DataLead = () => {
       ...(canDeleteJob
         ? [
             {
-              header: "Delete",
+              header: "Action",
               id: "delete",
               enableSorting: false,
               enableEditing: false,
-              size: 0.4,
+              size: 100,
               Cell: ({ row }) => (
-                <DeleteOutlined size="1em" className="app-icon"
-                  style={{ cursor: "pointer", color: "#ff4d4f", fontSize: "16px" }}
-                  onClick={() => handleDeleteJob(row.original)}
-                />
+                <AntButton type="text" danger title="Delete job" aria-label={`Delete ${row.original.job_title || 'job'}`}
+                  icon={<DeleteOutlined size={16} className="app-icon" />}
+                  onClick={event => { event.stopPropagation(); handleDeleteJob(row.original); }} />
               ),
             },
           ]
