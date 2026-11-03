@@ -19,7 +19,7 @@ export async function getCompanies() {
 function FilterContents({ children, options, loading, error, retry, companyId, onChange }) {
   const mutating = useIsMutating();
   const { pathname } = useLocation();
-  const leadListing = /\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname);
+  const leadListing = /\/(?:leads|data-leads|meta-leads|follow-up)\/?$/.test(pathname);
   const [dateSlot, setDateSlot] = useState(null);
   const [projectSlot, setProjectSlot] = useState(null);
   return <LeadDateFilterSlot.Provider value={leadListing ? dateSlot : null}>

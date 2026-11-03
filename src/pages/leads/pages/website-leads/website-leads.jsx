@@ -4,7 +4,7 @@ import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
 import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
-import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
+import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
@@ -224,7 +224,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       data: leadStatsData,
       isLoading: loadingLeadStats,
       refetch: refetchLeadStats
-    } = useQuery(['leadStats', selectedCompany(searchParams.toString()), dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => fetchLeadStats({
+    } = useQuery(['leadStats', selectedCompany(searchParams.toString()), projectSizeFilter, dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => fetchLeadStats({
+      ...(projectSizeFilter ? { project_size: projectSizeFilter } : {}),
       ...(userType === 'super_admin' && selectedCompany(searchParams.toString()) ? { company_id: selectedCompany(searchParams.toString()) } : {}),
       ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
       ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
@@ -1586,8 +1587,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
         {/* Date Range Filter and Manage Assignees Button */}
         <div className={`lead-filter-toolbar${userType === 'company_admin' ? ' website-company-filter-toolbar' : ''}`}>
-          {userType === 'company_admin' && <LeadProjectSizeFilter value={projectSizeFilter} options={PROJECT_SIZE_OPTIONS}
-            onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />}
+          <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
+            options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...(data?.data?.results || []).map(lead => lead.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
+            onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
           <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal
               value={dateRange}

@@ -1,6 +1,6 @@
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
-import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
+import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, getMetaLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
@@ -1035,8 +1035,9 @@ export default function MetaLeadsStandard() {
         <>
             {/* Date Range Filter */}
           <div className="lead-filter-toolbar">
-            {user?.user_type === 'company_admin' && <LeadProjectSizeFilter value={projectSizeFilter} options={PROJECT_SIZE_OPTIONS}
-              onChange={value => { setProjectSizeFilter(value || null); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />}
+            <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
+              options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...(metaLeadsData?.results || []).map(lead => lead.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
+              onChange={value => { setProjectSizeFilter(value || null); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
             <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal
                   key={datePickerResetKey}

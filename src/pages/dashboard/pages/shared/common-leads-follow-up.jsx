@@ -4,8 +4,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, Tag } from 'antd';
 import { MessageCircle as CommentOutlined, Clock as ClockCircleOutlined, FileText as FilePdfOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
+import { useNavigate, useLocation } from 'react-router-dom';
+import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
 import ExecutiveTabButton from '../../../../components/executive-tab-button.component.jsx';
 import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
@@ -77,6 +77,8 @@ const CommonLeadsFollowUp = () => {
   const queryClient = useQueryClient();
   const { user } = useUserStore();
   const userType = user?.user_type;
+  const { pathname } = useLocation();
+  const isCompanyFollowUp = userType === 'company_admin' && pathname.replace(/\/$/, '') === '/company-admin/follow-up';
   const [activeTab, setActiveTab] = useState('future');
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([]);
@@ -487,7 +489,7 @@ const CommonLeadsFollowUp = () => {
           const leadId = row.original?.object_id;
 
           const canOpenForRole =
-            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'super_admin';
+            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'super_admin' || isCompanyFollowUp;
 
           const handleOpenLead = () => {
             if (!leadId || !source) return;
@@ -497,13 +499,15 @@ const CommonLeadsFollowUp = () => {
             }
 
             if (source === 'data') {
-              navigate(`/data-lead/${leadId}`);
+              navigate(isCompanyFollowUp ? `/company-admin/data-lead/${leadId}` : `/data-lead/${leadId}`);
               return;
             }
 
             const roleBase =
               userType === 'super_admin'
                 ? '/super-admin'
+                : isCompanyFollowUp
+                  ? '/company-admin'
                 : userType === 'sales_manager'
                   ? '/sales-manager'
                   : '/sales-executive';
@@ -538,7 +542,7 @@ const CommonLeadsFollowUp = () => {
         },
       },
     ],
-    [navigate, userType, openFollowUpModal],
+    [navigate, userType, isCompanyFollowUp, openFollowUpModal],
   );
 
   const handleTabChange = (key) => {
@@ -549,13 +553,12 @@ const CommonLeadsFollowUp = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Follow ups" />
       {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load follow ups.'}
         action={<Button onClick={() => refetch()}>Retry</Button>} />}
       <div className="listing-page-content follow-up-page">
         <div className="lead-filter-toolbar" style={{ justifyContent: 'flex-end' }}>
          
-          <LeadDateRangeField hasValue={Boolean(dateRangeFilter)} onClear={() => {
+          <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRangeFilter)} onClear={() => {
             setDateRangeFilter(null);
             setPagination(prev => ({ ...prev, pageIndex: 0 }));
           }}>
@@ -569,7 +572,7 @@ const CommonLeadsFollowUp = () => {
                 setPagination((prev) => ({ ...prev, pageIndex: 0 }));
               }}
             />
-          </LeadDateRangeField>
+          </LeadDateRangeField></LeadDateFilter>
         </div>
 
         <div className="follow-up-section-tabs">

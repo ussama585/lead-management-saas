@@ -2,6 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 
 import NewTableComponent from "../../components/tables/new-table.jsx";
 import { Avatar, AvatarFallback } from "../../components/ui/avatar.jsx";
+import { Select as FilterSelect } from '../../components/ui/app-select.jsx';
+import LeadDateRangeField from '../../components/lead-date-range-field.jsx';
+import BootstrapDateRangeModal from '../../components/bootstrap-date-range-modal.component.jsx';
+import { Building2 } from 'lucide-react';
 import { Button } from "../../components/ui/button.jsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog.jsx";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select.jsx";
@@ -110,10 +114,16 @@ const DataEntryTable = () => {
   const superAdmin = isSuperAdmin(user?.user_type);
   const canViewUserTabs = superAdmin || ['company_admin', 'sales_manager'].includes(user?.user_type);
   const [companyId, setCompanyId] = useState(null);
-  const companyParams = superAdmin && companyId != null ? { company_id: companyId } : {};
-  // const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
-  //   enabled: superAdmin, refetchOnWindowFocus: false, keepPreviousData: true,
-  // });
+  const [dateRange, setDateRange] = useState(null);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const companyParams = superAdmin ? {
+    ...(companyId != null ? { company_id: companyId } : {}),
+    ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+    ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
+  } : {};
+  const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
+    enabled: superAdmin, refetchOnWindowFocus: false, staleTime: 300000,
+  });
   
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -368,21 +378,23 @@ const DataEntryTable = () => {
 
   // Fetch executives/managers for tabs (executive/manager filter buttons)
   React.useEffect(() => {
+    let active = true;
     async function fetchExecutivesForTabs() {
       try {
         let data = [];
         if (canViewUserTabs) {
-          data = await getExecutives();
+          data = await getExecutives(companyParams);
         }
-        setExecutivesList(Array.isArray(data) ? data : []);
+        if (active) setExecutivesList(Array.isArray(data) ? data : []);
       } catch (err) {
-        setExecutivesList([]);
+        if (active) setExecutivesList([]);
       }
     }
     if (canViewUserTabs) {
       fetchExecutivesForTabs();
     }
-  }, [user.id, user.user_type, canViewUserTabs]);
+    return () => { active = false; };
+  }, [user.id, user.user_type, canViewUserTabs, companyId, dateRange]);
 
   // Fetch assignable users for dropdowns (Assign to)
  React.useEffect(() => {
@@ -648,19 +660,29 @@ const DataEntryTable = () => {
         </DialogContent>
       </Dialog>
       <div className="listing-page-content">
-        {/* {superAdmin && <div className="flex flex-wrap items-center gap-3">
-          <label htmlFor="sales-data-company-filter">Company</label>
-          <Select id="sales-data-company-filter" aria-label="Filter sales data by company" showSearch allowClear
-            optionFilterProp="label" placeholder="All companies" value={companyId ?? undefined}
-            loading={companies.isFetching} style={{ width: 280, maxWidth: '100%' }}
-            options={(companies.data || []).map(company => ({ value: company.id, label: company.name, email: company.email }))}
-            virtual={false} optionRender={option => <CompanySelectOption option={option} />}
-            labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}
-            onChange={value => { setCompanyId(value ?? null); setPagination(previous => ({ ...previous, pageIndex: 0 }));
-              setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null); }} />
-          {companies.isError && <Alert type="error" message={companies.error?.message || 'Could not load companies.'}
-            action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}
-        </div>} */}
+        {superAdmin && <div className="lead-company-date-toolbar lead-company-date-toolbar--compact">
+          <div className="lead-company-filter">
+            <label htmlFor="sales-data-company-filter">Company</label>
+            <div className="lead-company-filter__control">
+              <Building2 size={20} className="shrink-0" aria-hidden="true" />
+              <FilterSelect id="sales-data-company-filter" showSearch allowClear placeholder="All companies"
+                value={companyId ?? undefined} loading={companies.isFetching} style={{ width: '100%' }}
+                options={(companies.data || []).map(company => ({ value: company.id, label: company.name }))}
+                onChange={value => {
+                  setCompanyId(value ?? null);
+                  setPagination(previous => ({ ...previous, pageIndex: 0 }));
+                  setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null);
+                }} />
+            </div>
+            {companies.isError && <div role="alert">Could not load companies. <Button onClick={() => companies.refetch()}>Retry</Button></div>}
+          </div>
+          <div className="lead-filter-toolbar lead-company-date-toolbar__date">
+            <LeadDateRangeField hasValue={Boolean(dateRange)} onClear={() => { setDateRange(null); setPagination(previous => ({ ...previous, pageIndex: 0 })); setRowSelection({}); }}>
+              <BootstrapDateRangeModal value={dateRange} showModal={showDateModal} setShowModal={setShowDateModal}
+                onDone={range => { setDateRange(range); setShowDateModal(false); setPagination(previous => ({ ...previous, pageIndex: 0 })); setRowSelection({}); }} />
+            </LeadDateRangeField>
+          </div>
+        </div>}
         <div className="listing-toolbar-flex">
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
             {user.user_type === "admin" && (

@@ -221,13 +221,13 @@ export const getManangersExecutives = async (userType = null, companyId = null, 
   }
 };
 
-export const getExecutives = async() => {
+export const getExecutives = async(params) => {
    try {
 
     const endpoint = `/data-entry/user-tabs-count`;
     console.log("endpoint: ", endpoint);
 
-    const response = await api.get(endpoint);
+    const response = params ? await api.get(endpoint, { params }) : await api.get(endpoint);
     return response.data;
   } catch (error) {
     console.error('Error fetching potential client details:', error);
