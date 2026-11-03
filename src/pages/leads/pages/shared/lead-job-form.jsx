@@ -157,13 +157,14 @@ export default function LeadJobForm() {
   const detail = useQuery(['leadJobForm', source, user?.id, user?.user_type, jobId], () => getLeadJob(source, jobId), {
     enabled: Boolean(jobId), refetchOnWindowFocus: false, refetchOnMount: 'always',
   });
-  const save = useMutation(values => saveLeadJob(source, values, jobId), { onSuccess: result => {
+  const save = useMutation(values => saveLeadJob(source, values, jobId), { onSuccess: async result => {
     message.success(result?.message || (jobId ? 'Job updated successfully' : 'Job created successfully'));
     queryClient.invalidateQueries(['dataLeadJobs']);
     queryClient.invalidateQueries(['dataLeadDetail']);
     queryClient.invalidateQueries(['dataLeadJobDetail']);
     queryClient.invalidateQueries(['leadJobForm', source]);
     queryClient.invalidateQueries(['metaLeadJobs']);
+    await queryClient.invalidateQueries([`metaLeadJobs-${dataLeadId}`]);
     queryClient.invalidateQueries(['metaLeadDetail']);
     queryClient.invalidateQueries([`leadjobs-${dataLeadId}`]);
     back();

@@ -1,16 +1,10 @@
 import { useState, useCallback } from 'react';
-import useUserStore from '../../pages/shared/store/user-store.js';
 
 /**
  * Reusable hook for managing duplicate lead modal state and utilities
  * @returns {Object} Object containing modal state, open/close handlers, and utilities
  */
 export function useDuplicateLead() {
-  const user = useUserStore((state) => state.user);
-  const canSeeDelayedHighlight =
-    user?.user_type === 'admin' ||
-    user?.user_type === 'sales_manager' ||
-    user?.user_type === 'sales_executive';
 
   const [duplicateModal, setDuplicateModal] = useState({
     visible: false,
@@ -46,16 +40,17 @@ export function useDuplicateLead() {
    * @param {Object} lead - The lead data
    * @returns {Object} Style props for the row
    */
-  const getRowStyle = useCallback((row, lead) => {
+  const getRowStyle = useCallback((row, lead = row?.original ?? row) => {
     const isFollowupDelayed =
       lead?.is_followup_delayed === true || lead?.is_followed_delayed === true;
 
-    if (canSeeDelayedHighlight && isFollowupDelayed) {
+    if (isFollowupDelayed) {
       return {
         sx: {
-          backgroundColor: '#ffd6d6', // darker red row background
+          backgroundColor: '#fff1f0',
+          '& > td': { backgroundColor: 'inherit' },
           '&:hover': {
-            backgroundColor: '#ffb3b3',
+            backgroundColor: '#ffccc7',
           },
         },
       };
@@ -73,7 +68,7 @@ export function useDuplicateLead() {
       };
     }
     return {};
-  }, [isDuplicate, canSeeDelayedHighlight]);
+  }, [isDuplicate]);
 
   return {
     duplicateModal,

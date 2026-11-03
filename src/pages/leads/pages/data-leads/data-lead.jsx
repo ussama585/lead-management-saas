@@ -13,7 +13,7 @@ import { Trash2 as DeleteOutlined } from 'lucide-react';
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
-import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
+import DeleteJobDialog from '../shared/delete-job-dialog.jsx';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
 import api from '../../../shared/services/api.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
@@ -40,8 +40,8 @@ async function updateDataLeadJob(jobId, payload) {
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not update job.');
   return data;
 }
-async function deleteDataLeadJob(jobId) {
-  const { data } = await api.delete(`/data-leads/update-job/${encodeURIComponent(jobId)}`);
+async function deleteDataLeadJob(jobId, reason) {
+  const { data } = await api.delete(`/data-leads/update-job/${encodeURIComponent(jobId)}`, { data: { delete_reason: reason } });
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not delete job.');
   return data;
 }
@@ -128,7 +128,7 @@ const DataLead = () => {
   const totalCount = data?.count ?? jobs.length;
 
   const deleteJobMutation = useMutation(
-    ({ jobId }) => deleteDataLeadJob(jobId),
+    ({ jobId, reason }) => deleteDataLeadJob(jobId, reason),
     {
       onSuccess: (res) => {
         message.success(res?.message || "Job deleted successfully");
@@ -149,10 +149,7 @@ const DataLead = () => {
     setDeleteModal({ visible: true, job });
   }, []);
 
-  const handleConfirmDeleteJob = useCallback(() => {
-    if (!deleteModal.job || deleteJobMutation.isLoading) return;
-    deleteJobMutation.mutate({ jobId: deleteModal.job.id });
-  }, [deleteModal.job, deleteJobMutation]);
+  const handleConfirmDeleteJob = (jobId, payload) => deleteJobMutation.mutateAsync({ jobId, reason: payload.delete_reason });
 
   const { data: leadDetail, refetch: refetchLeadDetail } = useQuery(
     ["dataLeadDetail", dataLeadId],
@@ -865,10 +862,8 @@ const DataLead = () => {
         queryKeyPrefix={`dataLeadJobHistory-${user?.id}-${user?.user_type}-${dataLeadId}`}
         emptyMessage="No job history available."
       />}
-      <SettingsDeleteModal title="Delete job" itemName={deleteModal.job?.job_title}
-        open={deleteModal.visible} loading={deleteJobMutation.isLoading}
-        error={deleteJobMutation.isError ? deleteJobMutation.error?.response?.data?.message || deleteJobMutation.error?.message || 'Could not delete job.' : null}
-        onCancel={() => setDeleteModal({ visible: false, job: null })} onConfirm={handleConfirmDeleteJob} />
+      {deleteModal.visible && deleteModal.job && <DeleteJobDialog key={deleteModal.job.id} job={deleteModal.job}
+        onClose={() => setDeleteModal({ visible: false, job: null })} onConfirm={handleConfirmDeleteJob} />}
     </>
   );
 };

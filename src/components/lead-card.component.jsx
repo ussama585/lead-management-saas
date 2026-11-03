@@ -25,6 +25,7 @@ import ShowRemarksLead from './show-remarks-lead.jsx';
 import { STATUS_OPTIONS as WEBSITE_STATUS_OPTIONS } from '../pages/leads/pages/website-leads/website-leads-constants.js';
 import { STATUS_OPTIONS as DATA_STATUS_OPTIONS } from '../pages/leads/pages/data-leads/data-leads-constants.js';
 import { updateLeadCardFields } from './lead-card-updates.js';
+import useLeadStatusOptions from '../pages/shared/services/use-lead-status-options.js';
 import { isLeadConvertedToClient } from '../pages/shared/utils/statusColumn.jsx';
 
 const STATUS_OPTIONS = [
@@ -108,7 +109,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const isDataLead = leadType === 'Data Lead';
   const isMetaLead = leadType === 'Meta Lead';
   const isWebsiteLead = !isDataLead && !isMetaLead;
-  const statusOptions = isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
+  const companyStatusList = useLeadStatusOptions({ enabled: user?.user_type === 'company_admin' });
+  const statusOptions = user?.user_type === 'company_admin' ? companyStatusList.options : isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
   const canAssign = !isConvertedToClient && ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
 
   // Fetch jobs for the selected lead when modal opens
@@ -475,6 +477,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   // Status is editable if converted_to_client is false, otherwise not editable
   // When editable, check user permissions
   const canEditStatus = useMemo(() => {
+    if (user?.user_type === 'super_admin') return false;
     // If lead is converted to client, no one can edit status
     if (isConvertedToClient) {
       return false;
@@ -576,7 +579,9 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               className="lead-card__status-select"
               labelRender={({ label }) => <span className="lead-card__status-label"><span className="lead-card__status-dot" />{label}</span>}
               popupMatchSelectWidth={false}
-              disabled={updateStatusMutation.isLoading || remarksLoading}
+              disabled={updateStatusMutation.isLoading || remarksLoading || (user?.user_type === 'company_admin' && companyStatusList.isLoading)}
+              loading={user?.user_type === 'company_admin' && companyStatusList.isLoading}
+              notFoundContent={companyStatusList.isError ? 'Could not load statuses.' : 'No statuses available.'}
               options={statusOptions.map((option) => ({
                 label: option,
                 value: option,
