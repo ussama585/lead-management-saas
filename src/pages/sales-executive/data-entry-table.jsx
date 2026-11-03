@@ -13,16 +13,15 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Download as DownloadOutlined } from 'lucide-react';
 import { useQuery } from "react-query";
 import LeadListingFilters from "../../components/lead-listing-filters.jsx";
+import { changeSalesDataStatus, salesDataFilterParams } from './sales-data-filters.js';
 import { leadCountTabs, normalizeLeadCounts } from "../shared/services/lead-filter-counts.js";
 import {
   listDataEntry,
   bulkAssignDataEntry,
-  listAssignedDataEntry,
 } from "../shared/services/data-entry-service.js";
 import { getAssigningUserList } from "../shared/services/headhunting.js";
 import "../../assets/styles/legacy/create-user.css";
 import "../../assets/styles/legacy/client-listing-page.css";
-import BreadCrumb from "../../components/breadcrumb.component.jsx";
 import {
   getExecutives,
 } from "../shared/services/users-service.js";
@@ -161,9 +160,7 @@ const DataEntryTable = () => {
     const newParams = {};
     
     // Tab
-    if (selectedTab !== "assigned") {
-      newParams.tab = selectedTab;
-    }
+    newParams.tab = selectedTab;
     
     // Status filter
     if (statusFilter) {
@@ -209,14 +206,7 @@ const DataEntryTable = () => {
         search: globalFilter,
       };
 
-      if (selectedTab === "assigned") {
-        params.assigned = true;
-        if (selectedExecId) {
-          params.assigned_to = selectedExecId;
-        }
-      } else if (selectedTab === "unassigned") {
-        params.assigned = false;
-      }
+      Object.assign(params, salesDataFilterParams('', selectedExecId, selectedTab));
 
       const countData = await listDataEntryCount(params);
       return normalizeLeadCounts(countData);
@@ -248,25 +238,17 @@ const DataEntryTable = () => {
         search: globalFilter,
         sort_by: sorting?.[0]?.["id"] ?? "",
         order: sorting?.[0]?.["desc"] ? "desc" : "asc",
+        ...salesDataFilterParams(statusFilter, selectedExecId, selectedTab),
       };
 
       if (selectedTab === "assigned") {
-        if (statusFilter !== "") {
-          params.status = statusFilter;
-        }
-        if (selectedExecId) {
-          params.assigned_to = selectedExecId;
-        }
-
-        // Use the assigned endpoint with params for sorting, pagination, and search
-        const assignedData = await listAssignedDataEntry(params);
+        const assignedData = await listDataEntry(params);
         return {
           results: assignedData.results || [],
           count: assignedData.count || 0,
         };
       } else if (selectedTab === "unassigned") {
-        // For unassigned tab, don't send status filter
-        // Use the main endpoint with assigned: false
+        // Keep restored URL filters while requesting unassigned records.
         const unassignedData = await listDataEntry({
           ...params,
           assigned: false,
@@ -621,17 +603,11 @@ const DataEntryTable = () => {
     }
   };
   const handleScopeTabFilter = useCallback((valueOrUpdater) => {
-    const current = statusFilter || (selectedTab === "all" ? "" : selectedTab);
-    const nextValue = typeof valueOrUpdater === "function" ? valueOrUpdater(current) : valueOrUpdater;
-    setStatusFilter(!nextValue || ['All', 'assigned', 'unassigned'].includes(nextValue) ? '' : nextValue);
-    if (nextValue && !['All', 'assigned', 'unassigned'].includes(nextValue)) {
-      setSelectedTab('assigned');
-      setPagination({ pageIndex: 0, pageSize: 10 });
-      return;
-    }
-    setSelectedTab(['assigned', 'unassigned'].includes(nextValue) ? nextValue : 'all');
+    const next = changeSalesDataStatus(statusFilter, valueOrUpdater);
+    setStatusFilter(next.status);
+    setSelectedTab(next.tab);
     setPagination({ pageIndex: 0, pageSize: 10 });
-  }, [statusFilter, selectedTab]);
+  }, [statusFilter]);
 
   const handleRowClick = (row) => {
     if (!row || !row.id) return;
@@ -642,7 +618,6 @@ const DataEntryTable = () => {
   };
   return (
     <>
-      <BreadCrumb linkText="Sales Data" />
       <Dialog open={assignSkippedModalVisible} onOpenChange={setAssignSkippedModalVisible}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[500px]" aria-describedby={undefined}>
           <DialogHeader><DialogTitle>Assignment Issues</DialogTitle></DialogHeader>
@@ -751,13 +726,11 @@ const DataEntryTable = () => {
             if (id == null) {
               setSelectedExecId(null);
             } else {
-              setSelectedTab("assigned");
-              setStatusFilter("");
               setSelectedExecId(selectedExecId === id ? null : id);
             }
             setPagination({ pageIndex: 0, pageSize: 10 });
           }}
-          statusFilter={statusFilter || (selectedTab === "all" ? "" : selectedTab)}
+          statusFilter={statusFilter}
           setStatusFilter={handleScopeTabFilter}
           statusChoices={statusChoices}
           getTotalCount={() => tabCounts.all}
