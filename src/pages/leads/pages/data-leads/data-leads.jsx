@@ -1,4 +1,5 @@
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
@@ -1055,13 +1056,10 @@ const DataLeads = () => {
             }),
           ]
         : []),
-      {
+      ...(['super_admin', 'company_admin'].includes(user?.user_type) ? [{
         header: 'Actions', id: 'lead_actions', enableSorting: false, size: 160,
-        Cell: ({ row }) => <Space wrap>
-          <AntButton size='small' onClick={() => setLeadDialog({ mode: 'view', id: row.original.id })}>View</AntButton>
-          <AntButton size='small' disabled={isLeadConvertedToClient(row.original)} onClick={() => setLeadDialog({ mode: 'edit', id: row.original.id })}>Edit</AntButton>
-        </Space>,
-      },
+        Cell: ({ row }) => <LeadListingActions lead={row.original} source="data" onView={() => setLeadDialog({ mode: 'view', id: row.original.id })} onEdit={() => setLeadDialog({ mode: 'edit', id: row.original.id })} />,
+      }] : []),
     ];
     const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
     return dateBeforeStatusHistory([

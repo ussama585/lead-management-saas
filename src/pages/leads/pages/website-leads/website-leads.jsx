@@ -2,6 +2,7 @@ import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx
 import dayjs from 'dayjs';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
+import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
@@ -1236,6 +1237,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // Extra columns at the end
         ...extraColumns,
       ];
+      if (['super_admin', 'company_admin'].includes(userType)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
+        Cell: ({ row }) => <LeadListingActions lead={row.original} source="website" /> });
       const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
       const adjacentKeys = ['project_size', 'assigned_to_name'];
       const ordered = [

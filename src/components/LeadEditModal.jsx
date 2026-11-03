@@ -123,7 +123,7 @@ const TriggerComponent = trigger === 'icon' ? (
     disabled={opening}
     {...restButtonProps}
   >
-    Edit Lead
+    {trigger !== 'icon-button' && 'Edit Lead'}
   </Button>
 );
 

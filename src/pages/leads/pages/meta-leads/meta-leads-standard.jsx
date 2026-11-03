@@ -5,6 +5,7 @@ import LeadListingFilters from '../../../../components/lead-listing-filters.jsx'
 import { leadCountTabs, getMetaLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
+import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
@@ -1019,6 +1020,8 @@ export default function MetaLeadsStandard() {
       }),
     ] : []),
     ];
+    if (['super_admin', 'company_admin'].includes(user?.user_type)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
+      Cell: ({ row }) => <LeadListingActions lead={row.original} source="meta" /> });
     const leadingKeys = ['id', 'full_name', 'job_title', 'company_name', 'phone_number'];
     return dateBeforeStatusHistory([
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
