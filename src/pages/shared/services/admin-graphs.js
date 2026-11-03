@@ -416,7 +416,7 @@ export const getLeadsStatusHealth = async ({
 } = {}) => {
   const rolePaths = { company_admin: 'company-admin', sales_manager: 'sales-manager', sales_executive: 'sales-executive' };
   if (rolePaths[userType]) {
-    const { data } = await api.get(`/${rolePaths[userType]}/leads-status-health`, {
+    const { data } = await api.get(dashboardEndpoint('leads-status-health', userType), {
       params: { ...(startDate ? { start_date: startDate } : {}), ...(endDate ? { end_date: endDate } : {}) },
     });
     if (data?.status === false || data?.success === false || !Array.isArray(data?.data)) throw new Error(data?.message || 'Could not load lead status health.');

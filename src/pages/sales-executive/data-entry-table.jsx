@@ -194,79 +194,39 @@ const DataEntryTable = () => {
     setSearchParams(newParams, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, selectedTab, selectedExecId, globalFilter, pagination.pageIndex, pagination.pageSize, sorting]);
-  const {
-    data: statusCount,
-    isLoading: isStatusCountLoading,
-    refetch: refetchStatusCount,
-  } = useQuery(
-    ["status-count", user?.id, user?.user_type, companyId, globalFilter, selectedTab, selectedExecId, statusFilter],
-    async () => {
-      const params = {
-        ...companyParams,
-        search: globalFilter,
-      };
-
-      Object.assign(params, salesDataFilterParams('', selectedExecId, selectedTab));
-
-      const countData = await listDataEntryCount(params);
-      return normalizeLeadCounts(countData);
-    },
-    {
-      enabled: !!selectedTab, // only run if tab is selected
-      keepPreviousData: true,
-    }
+  const countParams = {
+    ...companyParams,
+    search: globalFilter,
+    ...salesDataFilterParams('', selectedExecId, selectedTab),
+  };
+  const listingParams = {
+    ...companyParams,
+    page: pagination.pageIndex + 1,
+    size: pagination.pageSize,
+    search: globalFilter,
+    sort_by: sorting?.[0]?.id ?? '',
+    order: sorting?.[0]?.desc ? 'desc' : 'asc',
+    ...salesDataFilterParams(statusFilter, selectedExecId, selectedTab),
+  };
+  const queryOptions = {
+    enabled: Boolean(user?.id),
+    keepPreviousData: true,
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  };
+  const { data: statusCount, refetch: refetchStatusCount } = useQuery(
+    ['status-count', user?.id, user?.user_type, countParams],
+    async () => normalizeLeadCounts(await listDataEntryCount(countParams)),
+    queryOptions,
   );
-
   const { data, isLoading, refetch } = useQuery(
-    [
-      "data-entry-list",
-      user?.id,
-      user?.user_type,
-      companyId,
-      pagination,
-      sorting,
-      globalFilter,
-      statusFilter,
-      selectedTab,
-      selectedExecId,
-    ],
+    ['data-entry-list', user?.id, user?.user_type, listingParams],
     async () => {
-      const params = {
-        ...companyParams,
-        page: pagination.pageIndex + 1,
-        size: pagination.pageSize,
-        search: globalFilter,
-        sort_by: sorting?.[0]?.["id"] ?? "",
-        order: sorting?.[0]?.["desc"] ? "desc" : "asc",
-        ...salesDataFilterParams(statusFilter, selectedExecId, selectedTab),
-      };
-
-      if (selectedTab === "assigned") {
-        const assignedData = await listDataEntry(params);
-        return {
-          results: assignedData.results || [],
-          count: assignedData.count || 0,
-        };
-      } else if (selectedTab === "unassigned") {
-        // Keep restored URL filters while requesting unassigned records.
-        const unassignedData = await listDataEntry({
-          ...params,
-          assigned: false,
-        });
-        return {
-          results: unassignedData?.results || [],
-          count: unassignedData?.count || 0,
-        };
-      } else {
-        // All
-        const allData = await listDataEntry(params);
-        return {
-          results: allData?.results || [],
-          count: allData?.count || 0,
-        };
-      }
+      const result = await listDataEntry(listingParams);
+      return { results: result?.results || [], count: result?.count || 0 };
     },
-    { keepPreviousData: true }
+    queryOptions,
   );
   const [uploadResultModalVisible, setUploadResultModalVisible] =
     useState(false);
@@ -283,11 +243,6 @@ const DataEntryTable = () => {
   const [confirmAssignModalVisible, setConfirmAssignModalVisible] =
     useState(false);
   const [pendingAssignee, setPendingAssignee] = useState(null);
-  useEffect(() => {
-    if (selectedTab !== "assigned") {
-      setSelectedExecId(null);
-    }
-  }, [selectedTab]);
 
   const columns = React.useMemo(
     () =>

@@ -61,9 +61,9 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
   const save = useMutation(saveDataLead, {
     onSuccess: async result => {
       message.success(result?.message || 'Data lead saved.');
-      onClose();
       await Promise.all(['dataLeads', 'dataLeadsCounts', 'dataLeadDetail', 'dataLeadsStats'].map(key => queryClient.invalidateQueries([key])));
       await onSaved?.();
+      onClose();
     },
     onError: error => {
       const body = error?.response?.data;
@@ -79,7 +79,9 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
     },
   });
   const initial = id != null && detail.data ? Object.fromEntries(Object.entries(emptyLead).map(([key, fallback]) => [key, key === 'followup_date' ? (detail.data[key] || '').slice(0, 10) : detail.data[key] ?? fallback])) : emptyLead;
-  const formik = useFormik({ initialValues: initial, enableReinitialize: true, validationSchema: mode === 'edit' ? dataLeadEditSchema() : dataLeadSchema(superAdmin), onSubmit: async values => { try { await save.mutateAsync({ id, values, superAdmin }); } catch { /* Formik displays API errors. */ } } });
+  const validationSchema = mode === 'edit' ? dataLeadEditSchema() : dataLeadSchema(superAdmin);
+  const requiredFields = new Set(Object.entries(validationSchema.describe().fields).filter(([, field]) => field.optional === false).map(([key]) => key));
+  const formik = useFormik({ initialValues: initial, enableReinitialize: true, validationSchema, onSubmit: async values => { try { await save.mutateAsync({ id, values, superAdmin }); } catch { /* Formik displays API errors. */ } } });
   const pending = save.isLoading;
   function close() { if (!pending) onClose(); }
   const loading = id != null && detail.isFetching;
@@ -87,7 +89,7 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
   const companyOptions = (companies.data || []).map(company => ({ value: company.id, label: `${company.name} (ID: ${company.id})` }));
   if (detail.data?.company != null && !companyOptions.some(option => option.value === detail.data.company)) companyOptions.push({ value: detail.data.company, label: `Company ID: ${detail.data.company}` });
   function control(key) {
-    const common = { id: `data-lead-${key}`, name: key, disabled: pending, value: formik.values[key], onBlur: formik.handleBlur, 'aria-invalid': Boolean(formik.touched[key] && formik.errors[key]), 'aria-describedby': formik.touched[key] && formik.errors[key] ? `data-lead-${key}-error` : undefined };
+    const common = { id: `data-lead-${key}`, name: key, disabled: pending, value: formik.values[key], onBlur: formik.handleBlur, 'aria-required': requiredFields.has(key), 'aria-invalid': Boolean(formik.touched[key] && formik.errors[key]), 'aria-describedby': formik.touched[key] && formik.errors[key] ? `data-lead-${key}-error` : undefined };
     if (key === 'industry') return <Select {...common} className='w-full' showSearch optionFilterProp='label' placeholder='Select industry'
       options={[...new Set([...industryNames.map(item => item.value), formik.values.industry].filter(Boolean))].map(value => ({ value, label: value }))}
       onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} />;
@@ -108,7 +110,7 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
       <Descriptions column={1} bordered size='small' items={Object.entries(labels).map(([field, title]) => { const key = field === 'assigned_to' ? 'assigned_to_name' : field; const label = field === 'assigned_to' ? 'Assigned to' : title; return ({ key, label, children: String(detail.data?.[key] ?? '—') }); })} /> :
       <form onSubmit={formik.handleSubmit} noValidate className='mt-4 grid gap-x-6 gap-y-6 sm:grid-cols-2'>
         {(mode === 'edit' ? dataLeadEditFields.map(key => [key, labels[key]]) : [...(superAdmin ? [['company', 'Company']] : []), ...Object.entries(labels), ['is_accepting_response', 'Accepting responses']]).map(([key, label]) => <div key={key} className={key === 'remarks' ? 'sm:col-span-2' : undefined}>
-          <label htmlFor={`data-lead-${key}`} className='mb-2 block text-sm font-medium'>{label}</label>{control(key)}
+          <label htmlFor={`data-lead-${key}`} className='mb-2 block text-sm font-medium'>{label}{requiredFields.has(key) && <span className="text-destructive"> *</span>}</label>{control(key)}
           {formik.touched[key] && formik.errors[key] && <p id={`data-lead-${key}-error`} role='alert' className='mt-1 text-sm text-destructive'>{formik.errors[key]}</p>}
         </div>)}
         {companies.isError && superAdmin && mode === 'create' && <Alert className='sm:col-span-2' type='error' message='Could not load companies.' action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}

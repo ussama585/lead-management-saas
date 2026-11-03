@@ -519,7 +519,7 @@ export const createMetaLeadJob = async (payload) => {
 
 export const updateMetaLead = async (payload, leadID) => {
   try {
-    const endpoint = `/meta-leads/update/${leadID}`;
+    const endpoint = `/meta-leads/lead/${encodeURIComponent(leadID)}`;
     const response = await api.patch(endpoint, payload); // Use PATCH instead of POST
     return response.data;
   } catch (error) {

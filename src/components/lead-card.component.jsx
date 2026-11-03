@@ -101,7 +101,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const { user } = useUserStore();
   // Allow super admins, sales managers, and the person assigned to the lead to edit
   const isConvertedToClient = isLeadConvertedToClient(lead);
-  const canEdit = !isConvertedToClient && (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || user?.id === lead?.assigned_to);
+  const canEdit = !isConvertedToClient && (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || (user?.user_type === 'company_admin' && ['Website Lead', 'Data Lead', 'Meta Lead'].includes(leadType)) || user?.id === lead?.assigned_to);
   const { Option } = Select;
   const queryClient = useQueryClient();
 
@@ -553,8 +553,12 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                   return;
                 }
                 if (!isDataLead && !isMetaLead) {
-                  queryClient.invalidateQueries(`lead-${lead.id}`);
-                  await queryClient.refetchQueries(`lead-${lead.id}`);
+                  queryClient.invalidateQueries(['leads']);
+                  if (typeof refetchLeadDetail === 'function') {
+                    await refetchLeadDetail();
+                  } else {
+                    await queryClient.invalidateQueries(['websiteLeadDetail']);
+                  }
                 }
               }}
               buttonProps={{

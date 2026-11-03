@@ -8,7 +8,7 @@ vi.mock('./api.js', () => ({ default: { get: vi.fn() } }));
 vi.mock('../utils/api.js', () => ({ MAIN_SYSTEM_BASE_URL: 'https://example.com' }));
 
 describe.each(['company_admin', 'sales_manager', 'sales_executive', 'super_admin'])('%s dashboard endpoints', userType => {
-  const prefix = userType === 'super_admin' ? 'accounts' : userType.replaceAll('_', '-');
+  const prefix = userType === 'super_admin' ? 'accounts' : 'company-admin';
   it('uses the role prefix for lead counts', () => {
     expect(dashboardEndpoint('lead-stats', userType)).toBe(`/${prefix}/lead-stats`);
   });

@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import ExecutiveTabButton from '../../../../components/executive-tab-button.component.jsx';
 import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
+import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import '../../../../assets/styles/lead-listing-filters.css';
 import FollowUpModal from '../../../../components/follow-up-modal.component.jsx';
 import RemarksModal from '../../../clients/components/RemarksModal.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
@@ -551,9 +553,12 @@ const CommonLeadsFollowUp = () => {
       {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load follow ups.'}
         action={<Button onClick={() => refetch()}>Retry</Button>} />}
       <div className="listing-page-content follow-up-page">
-        <div className="listing-toolbar-flex">
+        <div className="lead-filter-toolbar" style={{ justifyContent: 'flex-end' }}>
          
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <LeadDateRangeField hasValue={Boolean(dateRangeFilter)} onClear={() => {
+            setDateRangeFilter(null);
+            setPagination(prev => ({ ...prev, pageIndex: 0 }));
+          }}>
             <BootstrapDateRangeModal
               value={dateRangeFilter}
               onChange={() => {}}
@@ -563,17 +568,8 @@ const CommonLeadsFollowUp = () => {
                 setDateRangeFilter(range);
                 setPagination((prev) => ({ ...prev, pageIndex: 0 }));
               }}
-              triggerStyle={{ border: '1px solid #d9d9d9', height: 32, display: 'inline-flex', alignItems: 'center' }}
             />
-            <Button
-              onClick={() => {
-                setDateRangeFilter(null);
-                setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-              }}
-            >
-              Clear Date Filter
-            </Button>
-          </div>
+          </LeadDateRangeField>
         </div>
 
         <div className="follow-up-section-tabs">

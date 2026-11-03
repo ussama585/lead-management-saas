@@ -3,6 +3,8 @@ import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order
 import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, getMetaLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
+import { selectedCompany } from '../../../shared/utils/company-filter.js';
+import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
@@ -226,9 +228,9 @@ export default function MetaLeadsStandard() {
   };
 
   // Project size permissions
-  const canViewProjectSize = ['super_admin', 'marketing_manager', 'sales_manager', 'sales_executive'].includes(user?.user_type);
+  const canViewProjectSize = ['super_admin', 'company_admin', 'marketing_manager', 'sales_manager', 'sales_executive'].includes(user?.user_type);
   const canEditProjectSize = (lead) => {
-    if (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager') {
+    if (['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type)) {
       return true;
     }
     if (user?.user_type === 'sales_executive') {
@@ -244,7 +246,7 @@ export default function MetaLeadsStandard() {
   const {
     data: metaLeadsStatsData,
     isLoading: loadingMetaLeadsStats,
-    refetch: refetchMetaLeadsStats
+    refetch: refetchMetaLeadsStatsQuery
   } = useQuery(
     ['metaLeadsStats', dateRange],
     () => getMetaLeadsStats(
@@ -253,11 +255,14 @@ export default function MetaLeadsStandard() {
       null // No campaign filter for standard users
     ),
     {
+      enabled: user?.user_type !== 'sales_executive',
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false
     }
   );
+
+  const refetchMetaLeadsStats = () => user?.user_type !== 'sales_executive' ? refetchMetaLeadsStatsQuery() : Promise.resolve();
 
   // Meta leads list count query
   const {
@@ -265,8 +270,9 @@ export default function MetaLeadsStandard() {
     isLoading: loadingMetaLeadsCount,
     refetch: refetchMetaLeadsCount
   } = useQuery(
-    ['metaLeadsCount', dateRange, selectedExecId, statusFilter, projectSizeFilter, executiveFilter],
+    ['metaLeadsCount', selectedCompany(searchParams.toString()), dateRange, selectedExecId, statusFilter, projectSizeFilter, executiveFilter],
     () => getMetaLeadFilterCounts({
+      ...(user?.user_type === 'super_admin' && selectedCompany(searchParams.toString()) ? { company_id: selectedCompany(searchParams.toString()) } : {}),
       ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
       ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
       ...(selectedExecId ? { assigned_to: selectedExecId } : {}),
@@ -382,8 +388,8 @@ export default function MetaLeadsStandard() {
 
   // Fetch executives/managers list for assignment (same as leads.jsx)
   const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
-    queryKey: ['executiveList', user?.id, user?.user_type],
-    queryFn: () => getManangersExecutives(user?.user_type),
+    queryKey: ['executiveList', user?.id, user?.user_type, selectedCompany(searchParams.toString())],
+    queryFn: () => getManangersExecutives(user?.user_type, selectedCompany(searchParams.toString())),
     enabled: ['sales_manager', 'super_admin', 'company_admin'].includes(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
@@ -1026,6 +1032,8 @@ export default function MetaLeadsStandard() {
         <>
             {/* Date Range Filter */}
           <div className="lead-filter-toolbar">
+            {user?.user_type === 'company_admin' && <LeadProjectSizeFilter value={projectSizeFilter} options={PROJECT_SIZE_OPTIONS}
+              onChange={value => { setProjectSizeFilter(value || null); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />}
             <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal
                   key={datePickerResetKey}
@@ -1067,7 +1075,7 @@ export default function MetaLeadsStandard() {
 
 
       <LeadListingFilters executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []} selectedExecutive={selectedExecId}
-        showExecutives={Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0}
+        showExecutives={user?.user_type !== 'sales_executive' && Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0}
         onExecutiveChange={id => { setSelectedExecId(previous => id == null || previous === id ? null : id); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
         getExecutiveCount={id => metaLeadsStatsData?.find(item => item.id === id)?.meta_leads_assigned || 0}
         statusFilter={statusFilter} setStatusFilter={value => { setStatusFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}

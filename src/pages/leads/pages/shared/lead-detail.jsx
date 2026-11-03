@@ -150,7 +150,7 @@ const LeadDetailPage = () => {
     const lead = data ?? {};
     console.log(lead,"leadleadlead")
     const isReadOnlyLead =lead?.converted_to_client === true
-    const canDeleteJob = (isSuperAdmin(user?.user_type) || user?.user_type === 'sales_manager') && !isReadOnlyLead;
+    const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type)) && !isReadOnlyLead;
 
     const deleteJobMutation = useMutation(
         ({ jobId, reason }) => deleteWebsiteLeadJob(jobId, reason),
@@ -627,20 +627,19 @@ const LeadDetailPage = () => {
                 </>
             ),
         },
-        // Delete column - only for admin and sales_manager
+        // Job actions use the existing delete confirmation and API.
         ...(canDeleteJob
             ? [
                 {
-                    header: 'Delete',
+                    header: 'Action',
                     id: 'delete',
                     enableSorting: false,
                     enableEditing: false,
-                    size: 0.4,
+                    size: 100,
                     Cell: ({ row }) => (
-                        <DeleteOutlined size="1em" className="app-icon"
-                            style={{ cursor: 'pointer', color: '#ff4d4f', fontSize: '16px' }}
-                            onClick={() => handleDeleteJob(row.original)}
-                        />
+                        <Button type="text" danger aria-label={`Delete ${row.original.job_title || 'job'}`} title="Delete job"
+                            icon={<DeleteOutlined size={16} className="app-icon" />}
+                            onClick={event => { event.stopPropagation(); handleDeleteJob(row.original); }} />
                     ),
                 },
             ]
@@ -683,7 +682,7 @@ const LeadDetailPage = () => {
                 padding: '4px 8px',
             },
         },
-        muiTableBodyCellProps: undefined, // overridden above
+        muiTableBodyCellProps: { sx: { '&:hover': { outline: 'none' } } },
         muiTopToolbarProps: {
             sx: {
                 padding: '6px 12px',

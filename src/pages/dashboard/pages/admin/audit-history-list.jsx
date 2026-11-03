@@ -5,8 +5,9 @@ import { Alert } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
+import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import '../../../../assets/styles/lead-listing-filters.css';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
 import { getAccountsAllUsers, getHistoryModelNames } from '../../../shared/services/admin-graphs.js';
@@ -359,12 +360,13 @@ export default function AuditHistoryListPage() {
 
   return (
     <>
-      <BreadCrumb linkText="User Activity" />
       {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load user activity.'}
         action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
       <div className="container">
-        <div style={{ display: 'flex', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div className="user-activity-filters mb-3 grid min-w-0 grid-cols-1 items-end gap-3 md:grid-cols-2">
+          <div className="order-1 min-w-0">
           <Select
+            className="user-activity-filter-select"
             placeholder="Filter by Category"
             value={modelNameFilter || undefined}
             onChange={(value) => {
@@ -377,7 +379,10 @@ export default function AuditHistoryListPage() {
             style={{ width: 'fit-content', minWidth: 240, maxWidth: '100%' }}
             allowClear
           />
+          </div>
+          <div className="order-3 min-w-0 md:col-span-2">
           <Select
+            className="user-activity-filter-select"
             placeholder="Filter by changed by user"
             mode="multiple"
             value={changedByFilter}
@@ -395,6 +400,12 @@ export default function AuditHistoryListPage() {
             style={{ width: 520, minWidth: 0, maxWidth: '100%' }}
             allowClear
           />
+          </div>
+          <div className="lead-filter-toolbar order-2 min-w-0 md:justify-self-end" style={{ margin: 0 }}>
+          <LeadDateRangeField hasValue={Boolean(dateRangeFilter)} onClear={() => {
+            setDateRangeFilter(null);
+            setPagination(previous => ({ ...previous, pageIndex: 0 }));
+          }}>
           <BootstrapDateRangeModal
             value={dateRangeFilter}
             onChange={() => {}}
@@ -404,9 +415,12 @@ export default function AuditHistoryListPage() {
               setDateRangeFilter(range);
               setPagination((prev) => ({ ...prev, pageIndex: 0 }));
             }}
-            triggerStyle={{ border: '1px solid #d9d9d9', height: 32, display: 'inline-flex', alignItems: 'center' }}
           />
-          <Button onClick={clearFilters}>Clear Filters</Button>
+          </LeadDateRangeField>
+          </div>
+          <div className="order-4 flex justify-end md:col-span-2">
+            <Button className="user-activity-clear-filters" onClick={clearFilters}>Clear Filters</Button>
+          </div>
         </div>
         {selectedUserPills.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>

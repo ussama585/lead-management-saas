@@ -724,7 +724,7 @@ const MetaLead = () => {
         padding: "4px 8px",
       },
     },
-    muiTableBodyCellProps: undefined,
+    muiTableBodyCellProps: { sx: { '&:hover': { outline: 'none' } } },
     muiTopToolbarProps: {
       sx: {
         padding: "6px 12px",

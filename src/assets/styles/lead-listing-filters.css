@@ -33,6 +33,39 @@
 .lead-company-date-toolbar__date > .ant-space { max-width: 100%; }
 .lead-company-date-toolbar__date > .ant-space > .ant-space-item { max-width: 100%; }
 .lead-filter-toolbar:empty { display: none; }
+.user-activity-filters .user-activity-filter-select > button,
+.user-activity-filters .user-activity-clear-filters {
+  border-color: #94a3b8 !important;
+  color: #334155 !important;
+}
+.user-activity-filters .user-activity-filter-select > button .text-muted-foreground {
+  color: #334155 !important;
+}
+html body .user-activity-filters .user-activity-filter-select {
+  --field-border-color: #94a3b8;
+}
+html body .user-activity-filters .user-activity-filter-select button[aria-haspopup],
+html body .user-activity-filters .user-activity-filter-select button[aria-haspopup]:hover,
+html body .user-activity-filters .user-activity-filter-select button[aria-haspopup]:focus,
+html body .user-activity-filters .user-activity-filter-select button[aria-haspopup][data-state='open'] {
+  border: 1px solid #94a3b8 !important;
+}
+.website-company-filter-toolbar .lead-project-size-filter { margin-bottom: 0; }
+.website-company-filter-toolbar .lead-date-range-field { margin-left: auto; }
+.website-company-filter-toolbar::after { content: ''; flex-basis: 100%; order: 1; }
+.website-company-filter-toolbar .lead-filter-toolbar__actions { order: 2; margin-left: auto; }
+@media (max-width: 767px) {
+  .website-company-filter-toolbar .lead-date-range-field { margin-left: 0; }
+  .website-company-filter-toolbar .lead-project-size-filter { width: 100%; }
+}
+.data-leads-executive-toolbar .lead-project-size-filter { margin-bottom: 0; }
+.data-leads-executive-toolbar .lead-date-range-field { margin-left: auto; }
+.data-leads-executive-toolbar::after { content: ''; flex-basis: 100%; order: 1; }
+.data-leads-executive-toolbar .data-leads-executive-add { order: 2; margin-left: auto; }
+@media (max-width: 767px) {
+  .data-leads-executive-toolbar .lead-date-range-field { margin-left: 0; }
+  .data-leads-executive-toolbar .lead-project-size-filter { width: 100%; }
+}
 .lead-company-date-toolbar--compact .lead-company-filter { flex: 0 1 280px; }
 .lead-company-date-toolbar--compact .lead-company-date-toolbar__date { flex: 0 1 280px; margin-left: auto; }
 .lead-company-date-toolbar--compact .lead-company-filter__control,

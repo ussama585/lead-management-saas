@@ -1,4 +1,5 @@
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
@@ -166,6 +167,7 @@ const DataLeads = () => {
     ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
     ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
   }), {
+    enabled: user?.user_type !== 'sales_executive',
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -176,8 +178,8 @@ const DataLeads = () => {
     data: assigningUsersData,
     isLoading: loadingAssigningUsers,
   } = useQuery({
-    queryKey: ["executiveList", user?.id, user?.user_type],
-    queryFn: () => getManangersExecutives(user?.user_type),
+    queryKey: ["executiveList", user?.id, user?.user_type, selectedCompany(searchParams.toString())],
+    queryFn: () => getManangersExecutives(user?.user_type, selectedCompany(searchParams.toString())),
     enabled: ['admin', 'super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
@@ -215,11 +217,12 @@ const DataLeads = () => {
 
 
   const { data: countsData, isLoading: isCountsLoading, isError: isCountsError, error: countsError, refetch: refetchCounts } = useQuery(
-    ["dataLeadsCounts", user?.id, user?.user_type, projectSizeFilter, selectedExecutive, duplicateCheck, dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')],
+    ["dataLeadsCounts", user?.id, user?.user_type, selectedCompany(searchParams.toString()), projectSizeFilter, selectedExecutive, duplicateCheck, dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')],
     () => {
       const params = {
         assigned_to: selectedExecutive || undefined,
         project_size: projectSizeFilter || undefined,
+        ...(user?.user_type === 'super_admin' && selectedCompany(searchParams.toString()) ? { company_id: selectedCompany(searchParams.toString()) } : {}),
       };
       if (duplicateCheck === "duplicate") {
         params.is_duplicate = true;
@@ -741,7 +744,8 @@ const DataLeads = () => {
             </AntTooltip>
           );
 
-          return (
+
+  return (
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <AntAvatar
                 size={40}
@@ -1133,6 +1137,19 @@ const DataLeads = () => {
     navigate("/data-leads/create-job");
   }, [navigate]);
 
+  const useInlineFilterToolbar = ['sales_executive', 'company_admin'].includes(user?.user_type);
+  const projectSizeFilterControl = (
+    <LeadProjectFilter><div className='lead-project-size-filter lead-company-filter'>
+        <label htmlFor='data-leads-project-size'>Project size</label>
+        <div className='lead-project-size-filter__control lead-company-filter__control'>
+        <Ruler size={20} aria-hidden='true' className='shrink-0' />
+        <AntSelect id='data-leads-project-size' style={{ width: '100%' }} allowClear placeholder='All project sizes' value={projectSizeFilter || undefined}
+          options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
+          onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
+        </div>
+      </div></LeadProjectFilter>
+  );
+
   return (
     <>
       <GlobalStyles
@@ -1148,15 +1165,7 @@ const DataLeads = () => {
         statuses={[...STATUS_OPTIONS, ...tableData.map(row => row.status)].filter(Boolean)}
         projectSizes={[...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean)}
         assignees={Array.isArray(assigningUsersData) ? assigningUsersData : Array.isArray(assigningUsersData?.results) ? assigningUsersData.results : []} />}
-      <LeadProjectFilter><div className='lead-project-size-filter lead-company-filter'>
-        <label htmlFor='data-leads-project-size'>Project size</label>
-        <div className='lead-project-size-filter__control lead-company-filter__control'>
-        <Ruler size={20} aria-hidden='true' className='shrink-0' />
-        <AntSelect id='data-leads-project-size' style={{ width: '100%' }} allowClear placeholder='All project sizes' value={projectSizeFilter || undefined}
-          options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
-          onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
-        </div>
-      </div></LeadProjectFilter>
+      {!useInlineFilterToolbar && projectSizeFilterControl}
       <div className="leads">
         <div className="min-w-0">
       <Box
@@ -1181,7 +1190,8 @@ const DataLeads = () => {
         </Box>
 
         {/* Date Range Filter and Add New Lead button */}
-        <div className="lead-filter-toolbar">
+        <div className={`lead-filter-toolbar${useInlineFilterToolbar ? ' data-leads-executive-toolbar' : ''}`}>
+          {useInlineFilterToolbar && projectSizeFilterControl}
           <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal
               key={datePickerResetKey}
@@ -1200,6 +1210,7 @@ const DataLeads = () => {
           {/* Add New Lead button */}
           {user?.user_type !== 'marketing_manager' && (
             <AntButton
+              className={useInlineFilterToolbar ? 'data-leads-executive-add' : undefined}
               type="primary"
               onClick={() => setLeadDialog({ mode: 'create' })}
               style={{
@@ -1242,6 +1253,7 @@ const DataLeads = () => {
           ) : (
             <>
               <LeadListingFilters executives={executivesList} selectedExecutive={selectedExecutive}
+                showExecutives={user?.user_type !== 'sales_executive'}
                 onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
                 statusFilter={selectedStatus} setStatusFilter={handleStatusChange} statusChoices={statusTabs}
                 getTotalCount={() => getStatusCount('total_count')} getStatusCount={getStatusCount} />            </>

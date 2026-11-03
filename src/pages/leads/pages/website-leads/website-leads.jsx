@@ -1,5 +1,7 @@
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import dayjs from 'dayjs';
+import { selectedCompany } from '../../../shared/utils/company-filter.js';
+import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
@@ -196,6 +198,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     const [updatingProjectSizeId, setUpdatingProjectSizeId] = useState(null);
     const [assignmentModal, setAssignmentModal] = useState({ visible: false, lead: null, newAssigneeId: null, newAssigneeName: null });
     const [columnVisibility, setColumnVisibility] = useState({});
+    const [projectSizeFilter, setProjectSizeFilter] = useState('');
     const [rowSelection, setRowSelection] = useState({});
     const [proposalModal, setProposalModal] = useState({ visible: false, data: null, loading: false });
     const [followUpModal, setFollowUpModal] = useState({ visible: false, lead: null });
@@ -220,10 +223,12 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       data: leadStatsData,
       isLoading: loadingLeadStats,
       refetch: refetchLeadStats
-    } = useQuery(['leadStats', dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => fetchLeadStats({
+    } = useQuery(['leadStats', selectedCompany(searchParams.toString()), dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => fetchLeadStats({
+      ...(userType === 'super_admin' && selectedCompany(searchParams.toString()) ? { company_id: selectedCompany(searchParams.toString()) } : {}),
       ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
       ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
     }), {
+      enabled: userType !== 'sales_executive',
       staleTime: 5 * 60 * 1000, // 5 minutes - stats change when leads are updated
       cacheTime: 10 * 60 * 1000, // 10 minutes
       refetchOnWindowFocus: false
@@ -232,8 +237,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     // Fetch executives/managers list for assignment (same as lead-card)
     // Marketing managers use leadStatsData instead, so they don't need this API
     const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
-      queryKey: ['executiveList', user?.id, user?.user_type],
-      queryFn: () => getManangersExecutives(userType),
+      queryKey: ['executiveList', user?.id, user?.user_type, selectedCompany(searchParams.toString())],
+      queryFn: () => getManangersExecutives(userType, selectedCompany(searchParams.toString()), { omitUserType: true }),
       enabled: ['sales_manager', 'admin', 'super_admin', 'company_admin'].includes(userType),
       staleTime: 10 * 60 * 1000,
       cacheTime: 15 * 60 * 1000,
@@ -350,9 +355,11 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       isLoading: isCountsLoading,
       refetch: refetchCounts
     } = useQueryApi({
-      key: ['leadCounts', selectedExecutive, duplicateCheck, hearAboutUs, dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')],
+      key: ['leadCounts', selectedCompany(searchParams.toString()), projectSizeFilter, selectedExecutive, duplicateCheck, hearAboutUs, dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')],
       url: '/lead-generation/list-count',
       params: {
+        ...(projectSizeFilter ? { project_size: projectSizeFilter } : {}),
+        ...(userType === 'super_admin' && selectedCompany(searchParams.toString()) ? { company_id: selectedCompany(searchParams.toString()) } : {}),
         ...(selectedExecutive && {
           assigned_to: Array.isArray(selectedExecutive)
             ? (selectedExecutive.length > 0 ? selectedExecutive[0] : '')
@@ -484,12 +491,13 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         userType,
         selectedStatus,
         selectedExecutive,
+        projectSizeFilter,
         duplicateCheck,
         hearAboutUs,
         dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'),
         dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')
       ],
-      async () => await api.get(apiEndpoint),
+      async () => await api.get(apiEndpoint, { params: projectSizeFilter ? { project_size: projectSizeFilter } : {} }),
       {
         enabled: (location.pathname.includes('/leads') || location.pathname.includes('/')),
         staleTime: 0, // Always consider data stale - ensures fresh data on every change
@@ -1390,6 +1398,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           />
         ) : (
           <LeadListingFilters executives={executivesList} selectedExecutive={selectedExecutive}
+            showExecutives={userType !== 'sales_executive'}
             onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
             statusFilter={selectedStatus} setStatusFilter={handleTabClick}
             statusChoices={statusTabs.filter(tab => tab.value !== 'Unassigned' || ['super_admin', 'sales_manager', 'marketing_manager'].includes(userType))}
@@ -1573,7 +1582,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       <>
 
         {/* Date Range Filter and Manage Assignees Button */}
-        <div className="lead-filter-toolbar">
+        <div className={`lead-filter-toolbar${userType === 'company_admin' ? ' website-company-filter-toolbar' : ''}`}>
+          {userType === 'company_admin' && <LeadProjectSizeFilter value={projectSizeFilter} options={PROJECT_SIZE_OPTIONS}
+            onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />}
           <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal
               value={dateRange}
