@@ -17,7 +17,7 @@ const text = value => typeof value === 'string' || typeof value === 'number' ? S
 
 export function Select({ value, defaultValue, options, children, onChange, onSelect, onDeselect, onSearch,
   onBlur, onFocus, onClear, onDropdownVisibleChange, onOpenChange, mode, showSearch, allowClear,
-  disabled, loading, placeholder = 'Select', className, style, id, name, status,
+  disabled, disabledReason, loading, placeholder = 'Select', className, style, id, name, status,
   filterOption, optionFilterProp = 'label', optionLabelProp, optionRender, labelRender,
   labelInValue, tokenSeparators = [], onInputKeyDown, notFoundContent, dropdownStyle }) {
   const [local, setLocal] = useState(defaultValue);
@@ -49,7 +49,7 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
     if (!values.length) return;
     emit([...new Set([...selected, ...values])]); setSearch(''); onSearch?.('');
   };
-  return <div className={cn('relative inline-flex min-w-0', className)} style={style}>
+  return <div className={cn('relative inline-flex min-w-0', className)} style={style} title={disabled ? disabledReason : undefined}>
     <DropdownMenu modal={false} onOpenChange={open => { onDropdownVisibleChange?.(open); onOpenChange?.(open); if (!open) { setSearch(''); onBlur?.({ target: { name, value: current } }); } }}>
       <DropdownMenuTrigger asChild>
         <Button data-slot="select-trigger" id={id} type="button" variant="outline" disabled={disabled} aria-invalid={status === 'error' || undefined}

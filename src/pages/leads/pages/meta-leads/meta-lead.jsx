@@ -6,7 +6,7 @@ import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useCallback, useEffect, Suspense } from "react";
 import { Box, Chip, Stack, Typography } from "@mui/material";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Trash2 as DeleteOutlined } from 'lucide-react';
@@ -32,6 +32,7 @@ const MetaLead = () => {
   const { id } = useParams();
   const leadId = id;
   const navigate = useNavigate();
+  const { state: navigationState } = useLocation();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useUserStore();
@@ -775,7 +776,7 @@ const getMetaLeadUrl = () => {
     <>
      <BreadCrumb 
   linkText="Meta Lead Jobs" 
-  goBack={() => navigate(getMetaLeadUrl())} 
+  goBack={() => navigate(navigationState?.followUpReturnTo || getMetaLeadUrl())}
 />
       <div className="leads">
         <div className="container">

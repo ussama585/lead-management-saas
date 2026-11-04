@@ -763,6 +763,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // Assigned To - editable for sales managers and admin, exclude for sales_executive
         ...(userType !== 'sales_executive' ? [
           createAssignedToColumn({
+            companyRequired: statusList.disabled,
             useAssigneeIds: true,
             userType,
             user,
@@ -894,7 +895,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         createStatusColumn({
           statusOptions: apiStatusOptions,
           readOnly: false,
-        additionalProps: { loading: statusList.isLoading, notFoundContent: statusList.isError ? 'Could not load statuses. Please retry.' : 'No statuses available.' },
+        additionalProps: { disabled: statusList.disabled, loading: statusList.isLoading, notFoundContent: statusList.isError ? 'Could not load statuses. Please retry.' : 'No statuses available.' },
           requireRemarksForAll: true,
           editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
           statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
@@ -1213,7 +1214,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
                 placeholder="Select Project Size"
                 popupMatchSelectWidth={false}
                 style={{ width: 'fit-content', minWidth: '120px' }}
-                disabled={isUpdating || isLeadConvertedToClient(row.original)}
+                disabledReason={projectSizesQuery.disabled ? 'To change project size, select company first' : undefined}
+              disabled={projectSizesQuery.disabled || isUpdating || isLeadConvertedToClient(row.original)}
               />
             );
           },
@@ -1232,7 +1234,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       const statusIndex = ordered.findIndex(column => column.accessorKey === 'status');
       ordered.splice(statusIndex + 1, 0, ...adjacentKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean));
       return dateBeforeStatusHistory(ordered);
-    }, [apiStatusOptions, statusList.isLoading, statusList.isError, userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
+    }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
 
 
 

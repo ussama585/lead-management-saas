@@ -31,6 +31,7 @@ export const createAssignedToColumn = ({
   size,
   editableRoles = ['sales_manager', 'admin', 'super_admin', 'company_admin'],
   useAssigneeIds = false,
+  companyRequired = false,
 }) => {
 
   return {
@@ -76,12 +77,13 @@ export const createAssignedToColumn = ({
             // Show loading spinner only while fetching executives list, not while updating a single row
             loading={loadingAssigningUsers}
             // Still disable the control during an in-progress assignment update
-            disabled={isLoading || isConvertedToClient}
             popupMatchSelectWidth={false}
             style={{ width: 'fit-content', minWidth: '150px' }}
             allowClear={false}
             className="antd-input dropdown"
             {...additionalProps}
+            disabled={companyRequired || isLoading || isConvertedToClient || additionalProps.disabled}
+            disabledReason={companyRequired ? 'To change assigned user, select company first' : undefined}
           >
             {optionsList.map((executive) => (
               <Option key={executive.id} value={useAssigneeIds ? String(executive.id) : executive.name}>

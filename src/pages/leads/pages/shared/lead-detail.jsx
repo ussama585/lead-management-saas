@@ -13,7 +13,7 @@ import LeadCard from '../../../../components/lead-card.component.jsx';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
 import DeleteJobDialog from './delete-job-dialog.jsx';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../shared/services/api.js';
@@ -171,8 +171,9 @@ const LeadDetailPage = () => {
     const handleConfirmDeleteJob = (jobId, payload) =>
         deleteJobMutation.mutateAsync({ jobId, reason: payload.delete_reason });
 
+    const { state: navigationState } = useLocation();
     const goBack = () => {
-        navigate(getRolePath(user?.user_type, '/leads'));
+        navigate(navigationState?.followUpReturnTo || getRolePath(user?.user_type, '/leads'));
     };
 
     // Options for dropdowns

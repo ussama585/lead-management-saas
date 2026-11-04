@@ -192,10 +192,11 @@ export const createStatusColumn = ({
             }
           }}
           loading={isUpdating}
-          disabled={isUpdating}
           popupMatchSelectWidth={false}
           className="antd-input dropdown"
           {...additionalProps}
+          disabled={isUpdating || additionalProps.disabled}
+          disabledReason={additionalProps.disabled ? 'To change status, select company first' : undefined}
         >
           {statusOptions.map((status) => (
             <Option key={status} value={status}>

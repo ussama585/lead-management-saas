@@ -586,7 +586,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               className="lead-card__status-select"
               labelRender={({ label }) => <span className="lead-card__status-label"><span className="lead-card__status-dot" />{label}</span>}
               popupMatchSelectWidth={false}
-              disabled={updateStatusMutation.isLoading || remarksLoading || (['super_admin', 'company_admin'].includes(user?.user_type) && companyStatusList.isLoading)}
+              disabledReason={companyStatusList.disabled ? 'To change status, select company first' : undefined}
+              disabled={companyStatusList.disabled || updateStatusMutation.isLoading || remarksLoading || (['super_admin', 'company_admin'].includes(user?.user_type) && companyStatusList.isLoading)}
               loading={['super_admin', 'company_admin'].includes(user?.user_type) && companyStatusList.isLoading}
               notFoundContent={companyStatusList.isError ? 'Could not load statuses.' : 'No statuses available.'}
               options={statusOptions.map((option) => ({
@@ -635,7 +636,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               <div className="lead-card__label">Project Size</div>
               <Select className="w-full" value={lead.project_size || undefined} placeholder="Select project size"
                 options={projectSizeList.options} onChange={value => projectSizeMutation.mutate(value)}
-                loading={projectSizeList.isLoading} disabled={isConvertedToClient || projectSizeMutation.isLoading || projectSizeList.isLoading} />
+                disabledReason={projectSizeList.disabled ? 'To change project size, select company first' : undefined}
+                loading={projectSizeList.isLoading} disabled={projectSizeList.disabled || isConvertedToClient || projectSizeMutation.isLoading || projectSizeList.isLoading} />
             </div>}
             <div className="lead-card__label">Assigned To</div>
             <div className="lead-card__assigned-control"><UserRound className="lead-card__assigned-icon" size={22} aria-hidden="true" />          <div className="responsive-assigned-select lead-card__assigned-select-wrap">
@@ -649,7 +651,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                 }}
                 popupMatchSelectWidth={false}
                 className="lead-card__assigned-select-wrap"
-                disabled={isConvertedToClient || updateAssigneeMutation.isLoading}
+                disabledReason={companyStatusList.disabled ? 'To change assigned user, select company first' : undefined}
+                disabled={companyStatusList.disabled || isConvertedToClient || updateAssigneeMutation.isLoading}
                 optionLabelProp="label"
               >
                 {/* Include current assignee in options if not in executivesList (so dropdown shows assigned_to_name) */}

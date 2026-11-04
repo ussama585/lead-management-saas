@@ -797,6 +797,7 @@ const DataLeads = () => {
         updatingStatusId,
         size: 180,
         additionalProps: {
+          disabled: statusList.disabled,
           loading: statusList.isLoading,
           notFoundContent: statusList.isError ? 'Could not load statuses.' : 'No statuses available.',
           style: { minWidth: 180, cursor: "pointer" },
@@ -831,7 +832,8 @@ const DataLeads = () => {
               popupMatchSelectWidth={false}
               className="ant-select-pointer antd-input dropdown"
               style={{ minWidth: 160 }}
-              disabled={isUpdating || isLeadConvertedToClient(row.original)}
+              disabledReason={projectSizesQuery.disabled ? 'To change project size, select company first' : undefined}
+              disabled={projectSizesQuery.disabled || isUpdating || isLeadConvertedToClient(row.original)}
             />
           );
         },
@@ -839,6 +841,7 @@ const DataLeads = () => {
       // Assigned To column - exclude for sales_executive
       ...(user?.user_type !== 'sales_executive' ? [
         createAssignedToColumn({
+            companyRequired: statusList.disabled,
           editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager'],
           useAssigneeIds: true,
           userType: user?.user_type,

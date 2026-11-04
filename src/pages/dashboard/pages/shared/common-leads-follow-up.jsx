@@ -76,7 +76,7 @@ const CommonLeadsFollowUp = () => {
   const queryClient = useQueryClient();
   const { user } = useUserStore();
   const userType = user?.user_type;
-  const { pathname } = useLocation();
+  const { pathname, search: locationSearch } = useLocation();
   const isCompanyFollowUp = userType === 'company_admin' && pathname.replace(/\/$/, '') === '/company-admin/follow-up';
   const [activeTab, setActiveTab] = useState('future');
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
@@ -465,7 +465,7 @@ const CommonLeadsFollowUp = () => {
             }
 
             if (source === 'data') {
-              navigate(isCompanyFollowUp ? `/company-admin/data-lead/${leadId}` : `/data-lead/${leadId}`);
+              navigate(isCompanyFollowUp ? `/company-admin/data-lead/${leadId}` : `/data-lead/${leadId}`, { state: { followUpReturnTo: `${pathname}${locationSearch}` } });
               return;
             }
 
@@ -479,11 +479,11 @@ const CommonLeadsFollowUp = () => {
                   : '/sales-executive';
 
             if (source === 'meta') {
-              navigate(`${roleBase}/meta-leads/${leadId}`);
+              navigate(`${roleBase}/meta-leads/${leadId}`, { state: { followUpReturnTo: `${pathname}${locationSearch}` } });
               return;
             }
 
-            navigate(`${roleBase}/leads/${leadId}`);
+            navigate(`${roleBase}/leads/${leadId}`, { state: { followUpReturnTo: `${pathname}${locationSearch}` } });
           };
 
           const missingTarget = !leadId || !source;
@@ -508,7 +508,7 @@ const CommonLeadsFollowUp = () => {
         },
       },
     ],
-    [navigate, userType, isCompanyFollowUp, openFollowUpModal],
+    [navigate, userType, isCompanyFollowUp, pathname, locationSearch, openFollowUpModal],
   );
 
   const handleTabChange = (key) => {

@@ -696,6 +696,7 @@ export default function MetaLeadsStandard() {
         },
         isLoading: updateStatusMutation.isLoading,
         additionalProps: {
+          disabled: statusList.disabled,
           loading: statusList.isLoading,
           notFoundContent: statusList.isError ? 'Could not load statuses.' : 'No statuses available.',
           listHeight: window.innerHeight * 0.7,
@@ -723,7 +724,8 @@ export default function MetaLeadsStandard() {
         placeholder="Select Project Size"
         popupMatchSelectWidth={false}
         style={{ width: 'fit-content', minWidth: '200px' }}
-        disabled={!canEditProjectSize(row.original) || isUpdating || isLeadConvertedToClient(row.original)}
+        disabledReason={projectSizesQuery.disabled ? 'To change project size, select company first' : undefined}
+              disabled={projectSizesQuery.disabled || !canEditProjectSize(row.original) || isUpdating || isLeadConvertedToClient(row.original)}
       />
     );
   },
@@ -731,6 +733,7 @@ export default function MetaLeadsStandard() {
     // Assigned To column - shows combined name and type for all users except marketing_manager and sales_executive
     ...(user?.user_type !== 'marketing_manager' && user?.user_type !== 'sales_executive' ? [
       createAssignedToColumn({
+            companyRequired: statusList.disabled,
         useAssigneeIds: true,
         userType: user?.user_type,
         user,
@@ -996,7 +999,7 @@ export default function MetaLeadsStandard() {
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'work_email'),
     ]);
-  }, [apiStatusOptions, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
+  }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
 
   return (
     <>

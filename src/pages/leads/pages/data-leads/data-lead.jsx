@@ -6,7 +6,7 @@ import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button as AntButton } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback, useEffect, Suspense } from "react";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Trash2 as DeleteOutlined } from 'lucide-react';
@@ -50,6 +50,7 @@ const DataLead = () => {
   const { id } = useParams();
   const dataLeadId = id;
   const navigate = useNavigate();
+  const { state: navigationState } = useLocation();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useUserStore();
@@ -766,7 +767,7 @@ const DataLead = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Data Lead Jobs" goBack={() => navigate(-1)} />
+      <BreadCrumb linkText="Data Lead Jobs" goBack={() => navigationState?.followUpReturnTo ? navigate(navigationState.followUpReturnTo) : navigate(-1)} />
       <div className="leads">
         <div className="container">
       <Box
