@@ -26,6 +26,8 @@ import { STATUS_OPTIONS as WEBSITE_STATUS_OPTIONS } from '../pages/leads/pages/w
 import { STATUS_OPTIONS as DATA_STATUS_OPTIONS } from '../pages/leads/pages/data-leads/data-leads-constants.js';
 import { updateLeadCardFields } from './lead-card-updates.js';
 import useLeadStatusOptions from '../pages/shared/services/use-lead-status-options.js';
+import useProjectSizeOptions from '../pages/shared/services/use-project-size-options.js';
+import { updateMetaLeadProjectSize } from '../pages/shared/services/metaLeads.js';
 import { isLeadConvertedToClient } from '../pages/shared/utils/statusColumn.jsx';
 
 const STATUS_OPTIONS = [
@@ -109,8 +111,14 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const isDataLead = leadType === 'Data Lead';
   const isMetaLead = leadType === 'Meta Lead';
   const isWebsiteLead = !isDataLead && !isMetaLead;
-  const companyStatusList = useLeadStatusOptions({ enabled: user?.user_type === 'company_admin' });
-  const statusOptions = user?.user_type === 'company_admin' ? companyStatusList.options : isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
+  const optionCompanyId = lead?.company_id ?? lead?.company?.id ?? (typeof lead?.company === 'object' ? null : lead?.company);
+  const companyStatusList = useLeadStatusOptions({ enabled: ['super_admin', 'company_admin'].includes(user?.user_type), companyId: optionCompanyId });
+  const projectSizeList = useProjectSizeOptions({ enabled: user?.user_type === 'super_admin', companyId: optionCompanyId });
+  const statusOptions = ['super_admin', 'company_admin'].includes(user?.user_type) ? companyStatusList.options : isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
+  const projectSizeMutation = useMutation(value => isMetaLead ? updateMetaLeadProjectSize(lead.id, value) : updateLeadCardFields(leadType, lead.id, { project_size: value }), {
+    onSuccess: async result => { message.success(result?.message || 'Project size updated.'); await refetchLeadDetail?.(); },
+    onError: error => message.error(error?.response?.data?.message || error.message || 'Could not update project size.'),
+  });
   const canAssign = !isConvertedToClient && ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
 
   // Fetch jobs for the selected lead when modal opens
@@ -477,7 +485,6 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   // Status is editable if converted_to_client is false, otherwise not editable
   // When editable, check user permissions
   const canEditStatus = useMemo(() => {
-    if (user?.user_type === 'super_admin') return false;
     // If lead is converted to client, no one can edit status
     if (isConvertedToClient) {
       return false;
@@ -579,8 +586,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               className="lead-card__status-select"
               labelRender={({ label }) => <span className="lead-card__status-label"><span className="lead-card__status-dot" />{label}</span>}
               popupMatchSelectWidth={false}
-              disabled={updateStatusMutation.isLoading || remarksLoading || (user?.user_type === 'company_admin' && companyStatusList.isLoading)}
-              loading={user?.user_type === 'company_admin' && companyStatusList.isLoading}
+              disabled={updateStatusMutation.isLoading || remarksLoading || (['super_admin', 'company_admin'].includes(user?.user_type) && companyStatusList.isLoading)}
+              loading={['super_admin', 'company_admin'].includes(user?.user_type) && companyStatusList.isLoading}
               notFoundContent={companyStatusList.isError ? 'Could not load statuses.' : 'No statuses available.'}
               options={statusOptions.map((option) => ({
                 label: option,
@@ -624,6 +631,12 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
           <div className="lead-card__info-row"><span className="lead-card__info-icon"><Globe size={22} /></span><div className="lead-card__info-text"><div className="lead-card__label">Source</div><div className="lead-card__value">{leadType}</div></div></div>
           <div className="lead-card__info-row"><span className="lead-card__info-icon"><Clock3 size={22} /></span><div className="lead-card__info-text"><div className="lead-card__label">Created At</div><div className="lead-card__value">{lead?.created_at ? formatDateUniversal(lead.created_at, true) : '-'}</div></div></div>
           <div className="lead-card__assignment">
+            {user?.user_type === 'super_admin' && <div className="mb-3">
+              <div className="lead-card__label">Project Size</div>
+              <Select className="w-full" value={lead.project_size || undefined} placeholder="Select project size"
+                options={projectSizeList.options} onChange={value => projectSizeMutation.mutate(value)}
+                loading={projectSizeList.isLoading} disabled={isConvertedToClient || projectSizeMutation.isLoading || projectSizeList.isLoading} />
+            </div>}
             <div className="lead-card__label">Assigned To</div>
             <div className="lead-card__assigned-control"><UserRound className="lead-card__assigned-icon" size={22} aria-hidden="true" />          <div className="responsive-assigned-select lead-card__assigned-select-wrap">
             {canAssign ?

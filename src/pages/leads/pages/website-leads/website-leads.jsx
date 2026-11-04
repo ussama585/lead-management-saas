@@ -893,7 +893,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // 2. Status — use createStatusColumn for all users (it handles permissions based on converted_to_client)
         createStatusColumn({
           statusOptions: apiStatusOptions,
-          readOnly: userType === 'super_admin',
+          readOnly: false,
         additionalProps: { loading: statusList.isLoading, notFoundContent: statusList.isError ? 'Could not load statuses. Please retry.' : 'No statuses available.' },
           requireRemarksForAll: true,
           editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
@@ -1199,7 +1199,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             const isUpdating = updatingProjectSizeId === row.original.id;
 
             // Marketing managers can only view, not edit
-            if (['super_admin', 'marketing_manager'].includes(userType)) {
+            if (userType === 'marketing_manager') {
               return <span>{currentValue || '-'}</span>;
             }
 

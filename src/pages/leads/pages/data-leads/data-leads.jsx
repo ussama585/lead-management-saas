@@ -774,7 +774,7 @@ const DataLeads = () => {
       // Status column — use createStatusColumn for all users (it handles permissions based on converted_to_client)
       createStatusColumn({
         statusOptions: apiStatusOptions,
-        readOnly: user?.user_type === 'super_admin',
+        readOnly: false,
 
         editableRoles: ['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
         statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
@@ -817,7 +817,7 @@ const DataLeads = () => {
           const isUpdating = updatingProjectSizeId === row.original.id;
           
           // Super admins and marketing managers see the API value directly.
-          if (['super_admin', 'marketing_manager'].includes(user?.user_type)) {
+          if (user?.user_type === 'marketing_manager') {
             return <span>{currentValue || "-"}</span>;
           }
           

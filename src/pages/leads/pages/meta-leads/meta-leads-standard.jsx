@@ -675,7 +675,7 @@ export default function MetaLeadsStandard() {
       createStatusColumn({
         editableRoles: ['super_admin', 'company_admin', 'sales_manager', 'sales_executive'],
         statusOptions: apiStatusOptions,
-        readOnly: user?.user_type === 'super_admin',
+        readOnly: false,
 
         statusesRequiringRemarks: STATUSES_REQUIRING_REMARKS,
         statusColors,
@@ -711,7 +711,6 @@ export default function MetaLeadsStandard() {
   enableSorting: true,
   Cell: ({ cell, row }) => {
     const currentValue = cell.getValue();
-    if (user?.user_type === 'super_admin') return <span>{currentValue || '-'}</span>;
     const isUpdating = updatingProjectSizeId === row.original.id;
 
     // Admin, Sales Manager, Sales Executive - editable based on permissions
