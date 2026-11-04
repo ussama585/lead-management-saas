@@ -46,14 +46,6 @@ function resolveFollowUpLeadSource(lead) {
   return null;
 }
 
-function isLeadConvertedToClient(lead) {
-  return (
-    lead?.converted_to_client === true ||
-    lead?.converted_to_client === 1 ||
-    lead?.converted_to_client === '1' ||
-    lead?.converted_to_client === 'true'
-  );
-}
 
 function getWebsiteLeadStatusColor(status) {
   const rawStatus = String(status || '').trim();
@@ -247,19 +239,9 @@ const CommonLeadsFollowUp = () => {
         Cell: ({ row }) => {
           const canUseFollowUp =
             userType === 'sales_manager' || userType === 'sales_executive' || userType === 'super_admin';
-          const isConverted = isLeadConvertedToClient(row.original);
+
 
           if (!canUseFollowUp) return <span>-</span>;
-
-          if (isConverted) {
-            return (
-              <Tooltip title="Follow-up disabled for converted client">
-                <ClockCircleOutlined size="1em" className="app-icon"
-                  style={{ cursor: 'not-allowed', fontSize: 18, color: '#bfbfbf' }}
-                />
-              </Tooltip>
-            );
-          }
 
           return (
             <Tooltip title="Open follow-up">
@@ -592,10 +574,10 @@ const CommonLeadsFollowUp = () => {
         onClose={() => setFollowUpModal({ visible: false, lead: null, leadType: 'website' })}
         lead={followUpModal.lead}
         leadType={followUpModal.leadType}
-        readOnlyMode={isLeadConvertedToClient(followUpModal.lead)}
+        readOnlyMode={false}
         onSubmit={async (values, lead) => {
           const leadId = lead?.id ?? lead?.object_id ?? lead?.lead_id;
-          if (!leadId || isLeadConvertedToClient(lead)) return false;
+          if (!leadId) return false;
 
           const leadType = resolveFollowUpLeadSource(lead) || followUpModal.leadType;
           if (!leadType) return false;

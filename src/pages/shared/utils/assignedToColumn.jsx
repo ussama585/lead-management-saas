@@ -1,7 +1,6 @@
 import { Select } from '../../../components/ui/app-select.jsx';
 import React from 'react';
 
-import { isLeadConvertedToClient } from './statusColumn.jsx';
 
 const { Option } = Select;
 
@@ -45,7 +44,6 @@ export const createAssignedToColumn = ({
       const entry = row.original;
       const assignedName = entry.assigned_to_name || '-';
       const assignedType = entry.assigned_to_type || '';
-      const isConvertedToClient = isLeadConvertedToClient(entry);
       
       // Editable dropdown for sales managers and admin
       if (editableRoles.includes(userType)) {
@@ -82,7 +80,7 @@ export const createAssignedToColumn = ({
             allowClear={false}
             className="antd-input dropdown"
             {...additionalProps}
-            disabled={companyRequired || isLoading || isConvertedToClient || additionalProps.disabled}
+            disabled={companyRequired || isLoading || additionalProps.disabled}
             disabledReason={companyRequired ? 'To change assigned user, select company first' : undefined}
           >
             {optionsList.map((executive) => (

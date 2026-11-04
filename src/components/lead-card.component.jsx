@@ -1,3 +1,4 @@
+import { leadOptionCompanyId } from '../pages/shared/utils/lead-option-company.js';
 import { message } from './ui/notifications.jsx';
 import { Select } from './ui/app-select.jsx';
 import React, { useEffect, useState, useMemo } from "react";
@@ -28,7 +29,6 @@ import { updateLeadCardFields } from './lead-card-updates.js';
 import useLeadStatusOptions from '../pages/shared/services/use-lead-status-options.js';
 import useProjectSizeOptions from '../pages/shared/services/use-project-size-options.js';
 import { updateMetaLeadProjectSize } from '../pages/shared/services/metaLeads.js';
-import { isLeadConvertedToClient } from '../pages/shared/utils/statusColumn.jsx';
 
 const STATUS_OPTIONS = [
   "Pending Contact",
@@ -103,15 +103,14 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   const { user } = useUserStore();
   // Allow super admins, sales managers, and the person assigned to the lead to edit
-  const isConvertedToClient = isLeadConvertedToClient(lead);
-  const canEdit = !isConvertedToClient && (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || (user?.user_type === 'company_admin' && ['Website Lead', 'Data Lead', 'Meta Lead'].includes(leadType)) || user?.id === lead?.assigned_to);
+  const canEdit = (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || (user?.user_type === 'company_admin' && ['Website Lead', 'Data Lead', 'Meta Lead'].includes(leadType)) || user?.id === lead?.assigned_to);
   const { Option } = Select;
   const queryClient = useQueryClient();
 
   const isDataLead = leadType === 'Data Lead';
   const isMetaLead = leadType === 'Meta Lead';
   const isWebsiteLead = !isDataLead && !isMetaLead;
-  const optionCompanyId = lead?.company_id ?? lead?.company?.id ?? (typeof lead?.company === 'object' ? null : lead?.company);
+  const optionCompanyId = leadOptionCompanyId(lead?.company_id ?? lead?.company?.id ?? (typeof lead?.company === 'object' ? null : lead?.company));
   const companyStatusList = useLeadStatusOptions({ enabled: ['super_admin', 'company_admin'].includes(user?.user_type), companyId: optionCompanyId });
   const projectSizeList = useProjectSizeOptions({ enabled: user?.user_type === 'super_admin', companyId: optionCompanyId });
   const statusOptions = ['super_admin', 'company_admin'].includes(user?.user_type) ? companyStatusList.options : isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
@@ -119,7 +118,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     onSuccess: async result => { message.success(result?.message || 'Project size updated.'); await refetchLeadDetail?.(); },
     onError: error => message.error(error?.response?.data?.message || error.message || 'Could not update project size.'),
   });
-  const canAssign = !isConvertedToClient && ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
+  const canAssign = ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
 
   // Fetch jobs for the selected lead when modal opens
   const { isLoading: loadingJobs, data: jobsData, refetch: refetchJobs } = useQuery(
@@ -258,15 +257,15 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   // Fetch executives or managers/executives based on user type (do not call for sales_executive)
   const { data } = useQuery({
-    queryKey: ['executiveList', user?.id, user?.user_type, lead?.company_id ?? lead?.company?.id ?? lead?.company],
+    queryKey: ['executiveList', user?.id, user?.user_type, optionCompanyId],
     queryFn: () => user?.user_type === 'super_admin'
-        ? getManangersExecutives(user.user_type, lead?.company_id ?? lead?.company?.id ?? lead?.company)
+        ? getManangersExecutives(user.user_type, optionCompanyId)
         : getAssigningUsersListing('sales_executive'),
-    enabled: user?.user_type !== 'sales_executive',
-    staleTime: 0,
-    cacheTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    enabled: Boolean(user) && user.user_type !== 'sales_executive' && (user.user_type !== 'super_admin' || Boolean(optionCompanyId)),
+    staleTime: 60000,
+    cacheTime: 300000,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   const executivesList = useMemo(() => {
@@ -350,7 +349,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   // Handle status change with remarks modal
   const handleStatusChange = async (value) => {
-    if (isConvertedToClient || value === status) return;
+    if (value === status) return;
 
     if (value === 'Potential Client') {
       updateStatusMutation.mutate({ id: lead.id, status: value });
@@ -486,9 +485,6 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   // When editable, check user permissions
   const canEditStatus = useMemo(() => {
     // If lead is converted to client, no one can edit status
-    if (isConvertedToClient) {
-      return false;
-    }
     if (isDataLead || isWebsiteLead || isMetaLead) return ['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type);
 
     // Super admin can always edit
@@ -507,7 +503,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     }
 
     return false;
-  }, [user?.user_type, isAssignedToCurrentUser, isAssignedToExecutive, isConvertedToClient, isDataLead, isWebsiteLead, isMetaLead]);
+  }, [user?.user_type, isAssignedToCurrentUser, isAssignedToExecutive, isDataLead, isWebsiteLead, isMetaLead]);
 
   return (
     <div className="lead-card responsive-lead-card">
@@ -637,7 +633,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               <Select className="w-full" value={lead.project_size || undefined} placeholder="Select project size"
                 options={projectSizeList.options} onChange={value => projectSizeMutation.mutate(value)}
                 disabledReason={projectSizeList.disabled ? 'To change project size, select company first' : undefined}
-                loading={projectSizeList.isLoading} disabled={projectSizeList.disabled || isConvertedToClient || projectSizeMutation.isLoading || projectSizeList.isLoading} />
+                loading={projectSizeList.isLoading} disabled={projectSizeList.disabled || projectSizeMutation.isLoading || projectSizeList.isLoading} />
             </div>}
             <div className="lead-card__label">Assigned To</div>
             <div className="lead-card__assigned-control"><UserRound className="lead-card__assigned-icon" size={22} aria-hidden="true" />          <div className="responsive-assigned-select lead-card__assigned-select-wrap">
@@ -652,7 +648,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                 popupMatchSelectWidth={false}
                 className="lead-card__assigned-select-wrap"
                 disabledReason={companyStatusList.disabled ? 'To change assigned user, select company first' : undefined}
-                disabled={companyStatusList.disabled || isConvertedToClient || updateAssigneeMutation.isLoading}
+                disabled={companyStatusList.disabled || updateAssigneeMutation.isLoading}
                 optionLabelProp="label"
               >
                 {/* Include current assignee in options if not in executivesList (so dropdown shows assigned_to_name) */}

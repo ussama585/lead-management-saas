@@ -37,7 +37,7 @@ import {
 import formatDateUniversal from "../../../shared/utils/formatDate.js";
 import { getManangersExecutives } from "../../../shared/services/users-service.js";
 import ShowRemarksLead from "../../../../components/show-remarks-lead.jsx";
-import { createStatusColumn, isLeadConvertedToClient } from "../../../shared/utils/statusColumn.jsx";
+import { createStatusColumn } from "../../../shared/utils/statusColumn.jsx";
 import { createAssignedToColumn } from "../../../shared/utils/assignedToColumn.jsx";
 import useUserStore from "../../../shared/store/user-store.js";
 import { ConfirmationModal } from "../../../clients/components/LazyModals.jsx";
@@ -406,7 +406,7 @@ const DataLeads = () => {
   const handleInlineStatusChange = useCallback(
     (lead, nextStatus) => {
       if (!lead?.id || !nextStatus) return;
-      if (isLeadConvertedToClient(lead)) return;
+      
 
       if (nextStatus !== 'Potential Client' && STATUSES_REQUIRING_REMARKS.has(nextStatus)) {
         setProposalFile(null);
@@ -577,7 +577,7 @@ const DataLeads = () => {
   // Handle assignment change - show confirmation modal
   const handleAssignedToChange = useCallback(
     (lead, newAssigneeName) => {
-      if (isLeadConvertedToClient(lead)) return;
+      
       const newAssignee = assigneeOptions.find((user) => String(user.id) === String(newAssigneeName));
       if (!newAssignee) {
         message.error("Selected assignee not found");
@@ -629,7 +629,7 @@ const DataLeads = () => {
   const handleProjectSizeChange = useCallback(
     (lead, newSize) => {
       if (!lead?.id) return;
-      if (isLeadConvertedToClient(lead)) return;
+      
       mutateProjectSize({ leadId: lead.id, projectSize: newSize });
     },
     [mutateProjectSize],
@@ -833,7 +833,7 @@ const DataLeads = () => {
               className="ant-select-pointer antd-input dropdown"
               style={{ minWidth: 160 }}
               disabledReason={projectSizesQuery.disabled ? 'To change project size, select company first' : undefined}
-              disabled={projectSizesQuery.disabled || isUpdating || isLeadConvertedToClient(row.original)}
+              disabled={projectSizesQuery.disabled || isUpdating}
             />
           );
         },
@@ -1281,7 +1281,6 @@ const DataLeads = () => {
               : "Save Remarks"
           }
           viewOnlyMode={
-            isLeadConvertedToClient(remarksModal.lead) ||
             (user?.user_type === 'marketing_manager' && !remarksModal.forStatusChange) ||
             ((user?.user_type === 'sales_manager' || user?.user_type === 'sales_executive') &&
               !remarksModal.forStatusChange)
@@ -1397,9 +1396,9 @@ const DataLeads = () => {
           onClose={() => setFollowUpModal({ visible: false, lead: null })}
           lead={followUpModal.lead}
           leadType="data"
-          readOnlyMode={isLeadConvertedToClient(followUpModal.lead)}
+          readOnlyMode={false}
           onSubmit={async (values, lead) => {
-            if (!lead?.id || isLeadConvertedToClient(lead)) return false;
+            if (!lead?.id) return false;
 
             const isNextFollowupRequired = !values?.addFollowUp;
             await mutateDataLeadFollowUpAsync({

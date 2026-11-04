@@ -17,7 +17,6 @@ import DeleteJobDialog from '../shared/delete-job-dialog.jsx';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
 import api from '../../../shared/services/api.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
-import { isLeadConvertedToClient } from '../../../shared/utils/statusColumn.jsx';
 import { getRolePath } from '../../../auth/role-home.js';
 import {
   getDataLeadJobs,
@@ -179,12 +178,7 @@ const DataLead = () => {
       converted_to_client: leadMeta.converted_to_client ?? false,
     };
   }, [leadMeta, dataLeadId]);
-  const isReadOnlyLead =
-    leadForCard?.status === 'Potential Client' ||
-    leadForCard?.converted_to_client === true ||
-    leadForCard?.converted_to_client === 1 ||
-    leadForCard?.converted_to_client === '1' ||
-    leadForCard?.converted_to_client === 'true';
+  const isReadOnlyLead = leadForCard?.status === 'Potential Client';
   const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_manager'].includes(user?.user_type)) && !isReadOnlyLead;
 
   const formatDate = useCallback((value) => {
@@ -777,7 +771,7 @@ const DataLead = () => {
         }}
       >
         {leadForCard && <LeadCard lead={leadForCard} leadType="Data Lead" refetchLeadDetail={refetchLeadDetail} />}
-        {(!isReadOnlyLead || (isSuperAdmin(user?.user_type) && !isLeadConvertedToClient(leadForCard))) && (
+        {(!isReadOnlyLead || isSuperAdmin(user?.user_type)) && (
           <Stack direction="row" spacing={1} sx={{ mb: 2, mt: 2 }}>
             <Button
               className="custom-button"

@@ -36,7 +36,9 @@ describe('Website Lead status dropdown', () => {
     await cell.props.onChange('Pending Contact');
     expect(onOpenRemarksModal).not.toHaveBeenCalled();
   });
-  it('keeps converted leads read-only', () => {
-    expect(render('super_admin', { converted_to_client: true }).cell.type).toBe('span');
+  it.each([true, 1, '1', 'true'])('allows status updates for converted flag %s', flag => {
+    const { cell } = render('super_admin', { converted_to_client: flag });
+    expect(cell.props.onChange).toBeTypeOf('function');
+    expect(cell.props.disabled).toBeFalsy();
   });
 });

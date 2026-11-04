@@ -26,7 +26,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
   import { Space } from 'antd';
   import { Avatar, AvatarFallback } from '../../../../components/ui/avatar.jsx';
   import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
-  import { createStatusColumn, isLeadConvertedToClient } from '../../../shared/utils/statusColumn.jsx';
+  import { createStatusColumn } from '../../../shared/utils/statusColumn.jsx';
   import { createAssignedToColumn } from '../../../shared/utils/assignedToColumn.jsx';
   import DuplicateLeadModal from '../../../../components/duplicate-lead-modal.component.jsx';
   import MarketingManagerFilters from './components/marketing-manager-filters.jsx';
@@ -614,7 +614,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
     // Handle project size change
     const handleProjectSizeChange = (lead, newProjectSize) => {
-      if (isLeadConvertedToClient(lead)) return;
+      
       updateProjectSizeMutation.mutate({
         leadId: lead.id,
         projectSize: newProjectSize
@@ -661,7 +661,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
     // Handle assignment change - show confirmation modal
     const handleAssignmentChange = (lead, newAssigneeName) => {
-      if (isLeadConvertedToClient(lead)) return;
+      
       const newAssignee = assigneeOptions.find((user) => String(user.id) === String(newAssigneeName));
       if (!newAssignee) {
         message.error("Selected assignee not found");
@@ -1215,7 +1215,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
                 popupMatchSelectWidth={false}
                 style={{ width: 'fit-content', minWidth: '120px' }}
                 disabledReason={projectSizesQuery.disabled ? 'To change project size, select company first' : undefined}
-              disabled={projectSizesQuery.disabled || isUpdating || isLeadConvertedToClient(row.original)}
+              disabled={projectSizesQuery.disabled || isUpdating}
               />
             );
           },
@@ -1623,7 +1623,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
                 saveButtonText="Update"
                 viewOnlyMode={
                   userType === 'marketing_manager' ||
-                  isLeadConvertedToClient(remarksModal.lead) ||
                   ((userType === 'sales_manager' || userType === 'sales_executive') && !remarksModal.forStatusChange)
                 }
               />
@@ -1714,9 +1713,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               onClose={() => setFollowUpModal({ visible: false, lead: null })}
               lead={followUpModal.lead}
               leadType="website"
-              readOnlyMode={isLeadConvertedToClient(followUpModal.lead)}
+              readOnlyMode={false}
             onSubmit={async (values, lead) => {
-              if (!lead?.id || isLeadConvertedToClient(lead)) return false;
+              if (!lead?.id) return false;
 
               const isNextFollowupRequired = !values?.addFollowUp;
               await followUpMutation.mutateAsync({

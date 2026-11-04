@@ -21,7 +21,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import StatusFilterTabs from '../../../../components/status-filter-tabs.jsx'
 import ImportLeadsButton from '../../../../components/import-leads-button.jsx'
-import { createStatusColumn, isLeadConvertedToClient } from '../../../shared/utils/statusColumn.jsx';
+import { createStatusColumn } from '../../../shared/utils/statusColumn.jsx';
 import ManageAssigneesModal from '../../../../components/manage-assignees-modal.jsx';
 import { getMetaLeadsAssignedUsers, addMetaLeadsUserAssignments, removeMetaLeadsUserAssignments } from '../../../shared/services/leads.js';
 import { createAssignedToColumn } from '../../../shared/utils/assignedToColumn.jsx';
@@ -549,7 +549,7 @@ export default function MetaLeadsStandard() {
   // Handle status change
   const handleStatusChange = (lead, newStatus) => {
     if (!lead) return;
-    if (isLeadConvertedToClient(lead)) return;
+    
     if (newStatus !== 'Potential Client' && STATUSES_REQUIRING_REMARKS.has(newStatus)) {
       setProposalFile(null);
       setRemarksModal({ visible: true, lead, newStatus, forStatusChange: true });
@@ -564,7 +564,7 @@ export default function MetaLeadsStandard() {
 
   // Handle assignment change - show confirmation modal
   const handleAssignmentChange = (lead, newAssigneeName) => {
-    if (isLeadConvertedToClient(lead)) return;
+    
     const newAssignee = executivesList?.find((user) => String(user.id) === String(newAssigneeName));
     if (!newAssignee) {
       message.error("Selected assignee not found");
@@ -600,7 +600,7 @@ export default function MetaLeadsStandard() {
 
   // Handle project size change
   const handleProjectSizeChange = (lead, newProjectSize) => {
-    if (isLeadConvertedToClient(lead)) return;
+    
     updateProjectSizeMutation.mutate({
       leadId: lead.id,
       projectSize: newProjectSize
@@ -725,7 +725,7 @@ export default function MetaLeadsStandard() {
         popupMatchSelectWidth={false}
         style={{ width: 'fit-content', minWidth: '200px' }}
         disabledReason={projectSizesQuery.disabled ? 'To change project size, select company first' : undefined}
-              disabled={projectSizesQuery.disabled || !canEditProjectSize(row.original) || isUpdating || isLeadConvertedToClient(row.original)}
+              disabled={projectSizesQuery.disabled || !canEditProjectSize(row.original) || isUpdating}
       />
     );
   },
@@ -1218,7 +1218,6 @@ export default function MetaLeadsStandard() {
     STATUSES_REQUIRING_REMARKS.has(remarksModal.newStatus)
   }
   viewOnlyMode={
-    isLeadConvertedToClient(remarksModal.lead) ||
     ((user?.user_type === 'sales_manager' || user?.user_type === 'sales_executive') &&
       !remarksModal.forStatusChange)
   }
@@ -1370,9 +1369,9 @@ export default function MetaLeadsStandard() {
           onClose={() => setFollowUpModal({ visible: false, lead: null })}
           lead={followUpModal.lead}
           leadType="meta"
-          readOnlyMode={isLeadConvertedToClient(followUpModal.lead)}
+          readOnlyMode={false}
           onSubmit={async (values, lead) => {
-            if (!lead?.id || isLeadConvertedToClient(lead)) return false;
+            if (!lead?.id) return false;
 
             const isNextFollowupRequired = !values?.addFollowUp;
             await followUpMutation.mutateAsync({

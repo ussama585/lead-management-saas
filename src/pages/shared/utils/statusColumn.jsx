@@ -96,42 +96,18 @@ export const createStatusColumn = ({
       const currentStatus = cell.getValue();
       if (readOnly) return <span>{currentStatus || '-'}</span>;
       const isUpdating = updatingStatusId === entry.id || isLoading;
-      const isConvertedToClient = isLeadConvertedToClient(entry);
 
       console.log('[StatusColumn] Rendering status cell:', {
         entryId: entry.id,
         currentStatus,
         userType,
         converted_to_client: entry.converted_to_client,
-        isConvertedToClient,
         isUpdating,
         isLoading
       });
       
       // Force log to console even if filtered
-      console.warn('[StatusColumn] CELL RENDERED - Entry ID:', entry.id, 'UserType:', userType, 'Converted:', isConvertedToClient);
 
-      // If lead is converted to client, no one can edit status (read-only for everyone)
-      if (isConvertedToClient) {
-        console.log('[StatusColumn] Read-only because converted_to_client is true');
-        return (
-          <span style={{ 
-            color: statusColors[currentStatus] || '#666',
-            fontWeight: 500,
-            padding: '2px 8px',
-            borderRadius: '4px',
-            backgroundColor: '#f0f0f0'
-          }}>
-            {currentStatus || '-'}
-          </span>
-        );
-      }
-
-      // Role-based access control (only if not converted to client):
-      // - Marketing managers cannot edit status
-      // - Sales executives can edit status if converted_to_client is false
-      // - Admin can always edit all leads
-      // - Sales managers can edit all leads (including executives' leads)
       const canEdit = userType !== 'marketing_manager' && editableRoles.includes(userType);
 
       console.log('[StatusColumn] canEdit evaluation:', {

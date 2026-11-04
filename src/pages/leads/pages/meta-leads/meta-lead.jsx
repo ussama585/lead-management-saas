@@ -173,11 +173,8 @@ const MetaLead = () => {
       converted_to_client: leadMeta.converted_to_client ?? false,
     };
   }, [leadMeta, leadId]);
-  const isReadOnlyLead =
-
-    leadForCard?.converted_to_client === true
-
-  const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type) && !isReadOnlyLead;
+  const isReadOnlyLead = false;
+const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type) && !isReadOnlyLead;
 
   const formatDate = useCallback((value) => {
     if (!value) return "—";
