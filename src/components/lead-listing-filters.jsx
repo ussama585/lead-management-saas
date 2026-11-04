@@ -11,7 +11,7 @@ function FilterCard({ title, subtitle, Icon, selectedLabel, children }) {
     <div className="lead-filter-card__header">
       <span className="lead-filter-card__icon"><Icon size={20} /></span>
       <div className="lead-filter-card__heading"><h2>{title}</h2><p>{subtitle}</p></div>
-      <span className="lead-filter-card__selected" title={selectedLabel}>{selectedLabel}</span>
+      {selectedLabel && <span className="lead-filter-card__selected" title={selectedLabel}>{selectedLabel}</span>}
       <Button type="button" variant="ghost" size="icon" className="lead-filter-card__collapse" aria-label={`${expanded ? 'Collapse' : 'Expand'} ${title}`}
         aria-expanded={expanded} aria-controls={id} onClick={() => setExpanded(value => !value)}>{expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}</Button>
     </div>
@@ -20,7 +20,15 @@ function FilterCard({ title, subtitle, Icon, selectedLabel, children }) {
 }
 
 export default function LeadListingFilters({ executives = [], selectedExecutive, onExecutiveChange, getExecutiveCount,
-  statusFilter, setStatusFilter, statusChoices, getTotalCount, getStatusCount, showExecutives = true }) {
+  statusFilter, setStatusFilter, statusChoices, getTotalCount, getStatusCount, showExecutives = true, requiresCompany = false }) {
+  if (requiresCompany) return <div className="lead-listing-filters">
+    <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound}>
+      <p className="py-3 text-sm text-muted-foreground">Select company first</p>
+    </FilterCard>
+    <FilterCard title="Status Filters" subtitle="Filter leads by current status" Icon={ListFilter}>
+      <p className="py-3 text-sm text-muted-foreground">Select company first</p>
+    </FilterCard>
+  </div>;
   const isAll = selectedExecutive == null || selectedExecutive === '';
   const selectedAssignee = executives.find(executive => String(executive.id) === String(selectedExecutive));
   const assigneeLabel = isAll ? 'All' : selectedAssignee

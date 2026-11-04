@@ -1386,7 +1386,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             userType={userType}
           />
         ) : (
-          <LeadListingFilters executives={executivesList} selectedExecutive={selectedExecutive}
+          <LeadListingFilters requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
             showExecutives={userType !== 'sales_executive'}
             onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
             statusFilter={selectedStatus} setStatusFilter={handleTabClick}

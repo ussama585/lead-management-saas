@@ -1227,7 +1227,7 @@ const DataLeads = () => {
             />
           ) : (
             <>
-              <LeadListingFilters executives={executivesList} selectedExecutive={selectedExecutive}
+              <LeadListingFilters requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
                 showExecutives={user?.user_type !== 'sales_executive'}
                 onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
                 statusFilter={selectedStatus} setStatusFilter={handleStatusChange} statusChoices={statusTabs}

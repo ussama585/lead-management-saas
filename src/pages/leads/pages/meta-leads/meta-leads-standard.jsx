@@ -1050,7 +1050,7 @@ export default function MetaLeadsStandard() {
 
 
 
-      <LeadListingFilters executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []} selectedExecutive={selectedExecId}
+      <LeadListingFilters requiresCompany={statusList.disabled} executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []} selectedExecutive={selectedExecId}
         showExecutives={user?.user_type !== 'sales_executive' && Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0}
         onExecutiveChange={id => { setSelectedExecId(previous => id == null || previous === id ? null : id); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
         getExecutiveCount={id => metaLeadsStatsData?.find(item => item.id === id)?.meta_leads_assigned || 0}
