@@ -147,7 +147,7 @@ export default function AuditHistoryListPage() {
   const [globalFilter, setGlobalFilter] = useState('');
   const [modelNameFilter, setModelNameFilter] = useState('');
   const [changedByFilter, setChangedByFilter] = useState([]);
-  const [dateRangeFilter, setDateRangeFilter] = useState(getCurrentMonthRange);
+  const [dateRangeFilter, setDateRangeFilter] = useState(() => ['super_admin', 'company_admin'].includes(user?.user_type) ? null : getCurrentMonthRange());
   const [showDateRangeModal, setShowDateRangeModal] = useState(false);
   const [columnVisibility, setColumnVisibility] = useState({});
   const sortBy = resolveSortField(sorting);
