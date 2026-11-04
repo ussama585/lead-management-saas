@@ -46,7 +46,6 @@ export default function EditUser() {
     email: '',
     phone: '',
     profile_pic: '',
-    password: '',
     manager: '',
   });
 
@@ -97,7 +96,6 @@ export default function EditUser() {
         name: userDetails.data.name || '',
         email: userDetails.data.email || '',
         phone: userDetails.data.phone || '',
-        password: '',
         profile_pic: userDetails.data.profile_pic || '',
         manager: managerIdFromOptions(managerList, userDetails?.data),
 
@@ -167,7 +165,6 @@ export default function EditUser() {
               details={[
                 { label: 'Name', value: previewValues.name }, { label: 'Email', value: previewValues.email },
                 { label: 'Phone', value: previewValues.phone },
-                { label: 'New Password', value: previewValues.password, secret: true },
                 { label: 'User Type', value: ManagerType?.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) },
                 ...(['sales_executive', 'recruitment_executive'].includes(ManagerType) ? [
                   { label: 'Manager', value: managerOptions.find(manager => String(manager.user_id) === String(previewValues.manager))?.name },
@@ -201,7 +198,7 @@ export default function EditUser() {
 
 
                   if (selectedImage) formData.append('profile_pic', selectedImage);
-                  if (formData.has('profile_pic') || formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('password') || formData.has('manager_id')) {
+                  if (formData.has('profile_pic') || formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('manager_id')) {
                     // If there are changes, make the API call
                     editUserMutate(formData, {
                       onSuccess: () => navigate(getRolePath(user?.user_type, '/user-management'), { replace: true }),
@@ -280,21 +277,6 @@ export default function EditUser() {
 
 
 
-                      <Form.Item className="form-item">
-                        <label className="label">New Password (optional)</label>
-                        <InputField
-                          type="password"
-                          placeholder="Enter a new password"
-                          value={values.password}
-                          onChange={(e) => setFieldValue('password', e.target.value)}
-                          name="password"
-                        />
-                        {touched.password && errors.password && (
-                          <div className="error" style={{ color: 'red' }}>
-                            {errors.password}
-                          </div>
-                        )}
-                      </Form.Item>
 
                       {(ManagerType == "sales_executive" || ManagerType == "recruitment_executive") ? (
                         <Form.Item className="form-item">

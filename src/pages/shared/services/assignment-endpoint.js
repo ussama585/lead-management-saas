@@ -1,7 +1,14 @@
 import useUserStore from '../store/user-store.js';
 
-export function assignmentEndpoint() {
-  return useUserStore.getState().user?.user_type === 'company_admin'
-    ? '/accounts/users-for-assigning'
-    : '/accounts/users-for-assigning?user_type=sales_executive';
+export function assignmentEndpoint(companyId = null) {
+  const role = useUserStore.getState().user?.user_type;
+  const base = '/accounts/users-for-assigning';
+  if (role === 'company_admin') return base;
+  if (role === 'super_admin' || role === 'admin') {
+    let savedCompanyId = null;
+    try { savedCompanyId = sessionStorage.getItem('assignmentCompanyId'); } catch { /* Storage may be unavailable. */ }
+    const selectedId = companyId ?? (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('company_id') : null) ?? savedCompanyId;
+    return /^[1-9]\d*$/.test(String(selectedId ?? '')) ? `${base}?company_id=${encodeURIComponent(selectedId)}` : base;
+  }
+  return `${base}?user_type=sales_executive`;
 }

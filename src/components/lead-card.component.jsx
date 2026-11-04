@@ -250,9 +250,9 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   // Fetch executives or managers/executives based on user type (do not call for sales_executive)
   const { data } = useQuery({
-    queryKey: ['executiveList', user?.id, user?.user_type],
+    queryKey: ['executiveList', user?.id, user?.user_type, lead?.company_id ?? lead?.company?.id ?? lead?.company],
     queryFn: () => user?.user_type === 'super_admin'
-        ? getManangersExecutives()
+        ? getManangersExecutives(user.user_type, lead?.company_id ?? lead?.company?.id ?? lead?.company)
         : getAssigningUsersListing('sales_executive'),
     enabled: user?.user_type !== 'sales_executive',
     staleTime: 0,

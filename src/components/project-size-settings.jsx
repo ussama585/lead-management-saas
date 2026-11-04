@@ -7,37 +7,38 @@ import { Alert, Card, Descriptions, Space, Table } from 'antd';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
-import { canManageProjectSizes } from '../pages/auth/role-access.js';
+import { canManageProjectSizes, isSuperAdmin } from '../pages/auth/role-access.js';
 import { createProjectSize, deleteProjectSize, getProjectSize, projectSizeError, listProjectSizes, updateProjectSize } from '../pages/shared/services/project-size-service.js';
 import SettingsDeleteModal from './settings-delete-modal.jsx';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 
-function ProjectSizeManager({ user }) {
+export function ProjectSizeManager({ user, companyId = null }) {
   const queryClient = useQueryClient();
-  const queryKey = ['settingsProjectSizes', user.id, user.user_type];
+  const needsCompany = isSuperAdmin(user.user_type) && !companyId;
+  const queryKey = ['settingsProjectSizes', user.id, user.user_type, companyId];
   const [editor, setEditor] = useState(null);
   const [viewId, setViewId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [valueError, setValueError] = useState('');
-  const list = useQuery(queryKey, listProjectSizes, { refetchOnWindowFocus: false, retry: 1 });
-  const detail = useQuery([...queryKey, 'detail', viewId], () => getProjectSize(viewId), {
-    enabled: viewId != null, refetchOnWindowFocus: false, retry: 1,
+  const list = useQuery(queryKey, () => listProjectSizes(companyId ? { company_id: companyId } : undefined), { refetchOnWindowFocus: false, retry: 1 });
+  const detail = useQuery([...queryKey, 'detail', viewId], () => getProjectSize(viewId, companyId), {
+    enabled: viewId != null && !needsCompany, refetchOnWindowFocus: false, retry: 1,
   });
-  const save = useMutation(({ id, value }) => id == null ? createProjectSize(value) : updateProjectSize(id, value), {
+  const save = useMutation(({ id, value }) => id == null ? createProjectSize(value, companyId) : updateProjectSize(id, value, companyId), {
     onSuccess: async result => {
       message.success(result?.message || 'Project size saved.');
       setEditor(null);
       await queryClient.invalidateQueries(queryKey);
     },
   });
-  const remove = useMutation(deleteProjectSize, {
+  const remove = useMutation(id => deleteProjectSize(id, companyId), {
     onSuccess: async result => {
       message.success(result?.message || 'Project size deleted.');
       setDeleteTarget(null);
       await queryClient.invalidateQueries(queryKey);
     },
   });
-  const busy = save.isLoading || remove.isLoading;
+  const busy = needsCompany || save.isLoading || remove.isLoading;
   function openEditor(row = null) {
     save.reset();
     setValueError('');
@@ -53,13 +54,13 @@ function ProjectSizeManager({ user }) {
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
     { title: 'Project size', dataIndex: 'value', key: 'value' },
     { title: 'Actions', key: 'actions', width: 260, render: (_, row) => <Space wrap>
-      <Button icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy}>View</Button>
-      <Button icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy}>Edit</Button>
-      <Button danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }}>Delete</Button>
+      <span title={needsCompany ? 'Select company first' : 'View project size'}><Button aria-label="View project size" icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy} /></span>
+      <span title={needsCompany ? 'Select company first' : 'Edit project size'}><Button aria-label="Edit project size" icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy} /></span>
+      <span title={needsCompany ? 'Select company first' : 'Delete project size'}><Button aria-label="Delete project size" danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} /></span>
     </Space> },
   ];
   return <>
-    <Card title='Project sizes' extra={<Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add size</Button>}>
+    <Card title='Project sizes' extra={<span title={needsCompany ? 'Select company first' : 'Add size'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add size</Button></span>}>
       <p className='mb-4 text-sm text-muted-foreground'>Create and manage the available project size choices.</p>
       {list.isError ? <Alert type='error' showIcon message={projectSizeError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
         <Table rowKey='id' columns={columns} dataSource={list.data || []} loading={list.isLoading || list.isFetching} scroll={{ x: 520 }} pagination={{ pageSize: 10, hideOnSinglePage: true }} locale={{ emptyText: 'No project sizes yet. Add a size to get started.' }} />}

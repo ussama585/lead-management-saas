@@ -20,6 +20,7 @@ export function applyCompanyFilter(config, role, location) {
   // Never send tenant parameters to external systems, auth, mutations, or company options.
   if (!config.url?.startsWith('/') || config.url.startsWith('//')) return config;
   const path = config.url.split('?')[0].replace(/\/$/, '');
+  if (path === '/accounts/users-for-assigning' && new URLSearchParams(config.url.split('?')[1] || '').has('company_id')) return config;
   const overview = /^\/(?:lead-generation|data-leads|meta-leads)\/[^/]+$/.test(path)
     && !/\/(?:create|update|conversion|bulk-)/.test(path);
   const people = /^\/(?:accounts\/(?:all-users|user-listing|user-count|users-count|users-for-assigning)|sales-(?:manager|executive)\/list|sales-(?:manager|executive)-stats|overall-users)$/.test(path);

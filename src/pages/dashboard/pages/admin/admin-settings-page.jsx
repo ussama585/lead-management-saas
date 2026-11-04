@@ -17,6 +17,7 @@ import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 // import AppearanceSettings from '../../../../components/appearance-settings.jsx';
 import LeadStatusSettings from '../../../../components/lead-status-settings.jsx';
 import ProjectSizeSettings from '../../../../components/project-size-settings.jsx';
+import CompanyLeadSettingsList from '../../../../components/company-lead-settings-list.jsx';
 // import RefreshTokenSettings from '../../../../components/refresh-token-settings.jsx';
 import useUserStore from '../../../shared/store/user-store.js';
 import { isSuperAdmin, canManageLeadStatuses, canManageProjectSizes, getLayoutRole } from '../../../auth/role-access.js';
@@ -60,8 +61,8 @@ const AdminSettingsPage = () => {
   // const canManageAppearance = isSuperAdmin(user?.user_type);
   const settingsSections = [
     // ...(canManageAppearance ? [{ key: 'appearance', label: 'Appearance', icon: Palette }] : []),
-    ...(canManageLeadStatuses(user?.user_type) ? [{ key: 'leads', label: 'Leads', icon: ListFilter }] : []),
-    ...(canManageProjectSizes(user?.user_type) ? [{ key: 'project-size', label: 'Project Size', icon: Ruler }] : []),
+    ...(canManageLeadStatuses(user?.user_type) || isSuperAdmin(user?.user_type) ? [{ key: 'leads', label: 'Leads', icon: ListFilter }] : []),
+    ...(canManageProjectSizes(user?.user_type) || isSuperAdmin(user?.user_type) ? [{ key: 'project-size', label: 'Project Size', icon: Ruler }] : []),
     ...(getLayoutRole(user?.user_type) === 'admin' ? [{ key: 'follow-up-duration', label: 'Follow-up Duration', icon: Clock }] : []),
     // { key: 'refresh-token', label: 'Refresh Token', icon: RefreshCw },
   ];
@@ -149,8 +150,8 @@ const AdminSettingsPage = () => {
           <div id="settings-panel" className="settings-panel" role="region" aria-label={selectedSection ? `${selectedSection.label} settings` : 'Settings'}>
         {!selectedSection && <p className="text-muted-foreground">No settings are available for your role at the moment.</p>}
         {/* {canManageAppearance && section === 'appearance' && <AppearanceSettings />} */}
-        {section === 'leads' && <LeadStatusSettings />}
-        {section === 'project-size' && <ProjectSizeSettings />}
+        {section === 'leads' && (isSuperAdmin(user?.user_type) ? <CompanyLeadSettingsList key="leads" type="leads" /> : <LeadStatusSettings />)}
+        {section === 'project-size' && (isSuperAdmin(user?.user_type) ? <CompanyLeadSettingsList key="project-size" type="project-size" /> : <ProjectSizeSettings />)}
         {/* {section === 'refresh-token' && <RefreshTokenSettings />} */}
         
 

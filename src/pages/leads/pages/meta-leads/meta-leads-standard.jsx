@@ -249,11 +249,12 @@ export default function MetaLeadsStandard() {
     isLoading: loadingMetaLeadsStats,
     refetch: refetchMetaLeadsStatsQuery
   } = useQuery(
-    ['metaLeadsStats', dateRange],
+    ['metaLeadsStats', dateRange, projectSizeFilter],
     () => getMetaLeadsStats(
       dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'),
       dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ'),
-      null // No campaign filter for standard users
+      null, // No campaign filter for standard users
+      projectSizeFilter,
     ),
     {
       enabled: user?.user_type !== 'sales_executive',
@@ -843,37 +844,6 @@ export default function MetaLeadsStandard() {
       sortUndefined: 'last', // Handle undefined/null values
       sortDescFirst: false, // Start with ascending order (A to Z)
       Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
-    },
-    {
-      header: 'Old Remarks',
-        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
-      id: 'remarks', // Explicit id for sorting
-      accessorKey: 'remarks',
-      sortUndefined: 'last', // Handle undefined/null values
-      sortDescFirst: false, // Start with ascending order (A to Z)
-      Cell: ({ row }) => {
-        const hasRemarks =
-          row.original.remarks && row.original.remarks.trim() !== '';
-
-        return (
-          <CommentOutlined size="1em" className="app-icon"
-            style={{
-              cursor: 'pointer',
-              color: hasRemarks ? '#1890ff' : '#aaa',
-              fontSize: 18,
-            }}
-            onClick={() => {
-              setRemarksModal({
-               visible: true,
-               lead: row.original,
-               newStatus: row.original.status,
-                forStatusChange: false,
-              });
-            }}
-            title={hasRemarks ? 'View/Edit Remarks' : 'Add Remarks'}
-          />
-        );
-      },
     },
     {
       header: 'Company Name',

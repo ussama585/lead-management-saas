@@ -1,3 +1,4 @@
+import ResetUserPasswordDialog from '../../../components/reset-user-password-dialog.jsx';
 import OtpModal from '../../auth/pages/otp-modal.jsx';
 import { message } from '../../../components/ui/notifications.jsx';
 import { Modal } from '../../../components/ui/app-modal.jsx';
@@ -45,6 +46,13 @@ export async function getCompanyUserDetails(id) {
   if (user?.id == null) throw new Error('Could not read user details.');
   return user;
 }
+export async function resetCompanyUserPassword(id, values) {
+  const body = new FormData();
+  body.append('password', values.new_password);
+  const { data } = await api.patch(`/accounts/detail/${encodeURIComponent(id)}`, body);
+  return assertUserSuccess(data);
+}
+
 export async function editCompanyUser(id, values, initial) {
   const body = new FormData();
   for (const key of ['name', 'phone', 'password', 'manager']) {
@@ -129,8 +137,8 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
             }} />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {['name', 'email', 'phone', 'password', ...(!editing ? ['confirmPassword'] : [])].map(key => <div key={key}>
-            <label htmlFor={`company-user-${key}`}>{({ name: 'Name', email: 'Email', phone: 'Phone', password: editing ? 'New Password (optional)' : 'Password', confirmPassword: 'Confirm Password' })[key]}{key !== 'password' || !editing ? ' *' : ''}</label>
+          {['name', 'email', 'phone', ...(!editing ? ['password', 'confirmPassword'] : [])].map(key => <div key={key}>
+            <label htmlFor={`company-user-${key}`}>{({ name: 'Name', email: 'Email', phone: 'Phone', password: 'Password', confirmPassword: 'Confirm Password' })[key]} *</label>
             <InputField id={`company-user-${key}`} name={key} type={key.toLowerCase().includes('password') ? 'password' : key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'}
               value={formik.values[key]} onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={save.isLoading || (editing && key === 'email')} />
             {fieldError(key)}
@@ -171,6 +179,7 @@ function CompanyDetail({ companyId }) {
   const [search, setSearch] = useState('');
   const [sorting, setSorting] = useState({});
   const [userDialog, setUserDialog] = useState(null);
+  const [passwordResetUser, setPasswordResetUser] = useState(null);
 
   const [otpTarget, setOtpTarget] = useState(null);
   const refreshUsers = () => {
@@ -199,6 +208,7 @@ function CompanyDetail({ companyId }) {
     { title: 'Email', dataIndex: 'email', render: value => value || '—' },
     { title: 'Phone', dataIndex: 'phone', render: value => value || '—' },
     { title: 'Status', dataIndex: 'is_active', render: value => value == null ? '—' : <Tag color={value ? 'green' : 'default'}>{value ? 'Active' : 'Inactive'}</Tag> },
+    { title: 'Reset Password', key: 'reset_password', render: (_, row) => <Button size="small" onClick={() => setPasswordResetUser(row)}>Reset Password</Button> },
     { title: 'Actions', key: 'actions', render: (_, row) => <Space>
       <Button aria-label={`Edit ${row.name}`} title="Edit user" icon={<Pencil size={16} />} onClick={() => setUserDialog({ mode: 'edit', id: row.id })} />
       <Button danger aria-label={`Delete ${row.name}`} title="Delete user" icon={<Trash2 size={16} />} onClick={() => { deleteUser.reset(); setOtpTarget(row); }} />
@@ -240,6 +250,8 @@ function CompanyDetail({ companyId }) {
           </div>
         </section>
       </>}
+    {passwordResetUser && <ResetUserPasswordDialog key={passwordResetUser.id} user={passwordResetUser}
+      onReset={resetCompanyUserPassword} onClose={() => setPasswordResetUser(null)} />}
     {userDialog && <CompanyUserForm key={`${companyId}:${userDialog.mode}:${userDialog.id ?? 'new'}`} companyId={companyId} target={userDialog} onClose={() => setUserDialog(null)} onSaved={() => {
       if (userDialog.mode === 'create') setPagination(previous => ({ ...previous, current: 1 }));
       refreshUsers();

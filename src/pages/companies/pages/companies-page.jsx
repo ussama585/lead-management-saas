@@ -125,7 +125,7 @@ export function CompanyCardActions({ company, onSaved, onDeleted }) {
   return <>
     <Space wrap>
       <Button size="small" icon={<Pencil size={16} />} disabled={save.isLoading || remove.isLoading} onClick={() => { formik.resetForm(); save.reset(); setEditing(true); }}>Edit</Button>
-      <Button size="small" danger icon={<Trash2 size={16} />} disabled={save.isLoading || remove.isLoading} onClick={() => { remove.reset(); setDeleting(true); }}>Delete</Button>
+      <Button size="small" danger icon={<Trash2 size={16} />} disabled={save.isLoading || remove.isLoading} onClick={() => { remove.reset(); setDeleting(true); }} />
     </Space>
     <Modal title="Edit company" open={editing} width={680} onOk={formik.submitForm} okText="Save changes" confirmLoading={save.isLoading}
       onCancel={() => { if (!save.isLoading) setEditing(false); }} closable={!save.isLoading} maskClosable={!save.isLoading} keyboard={!save.isLoading} cancelButtonProps={{ disabled: save.isLoading }}>
@@ -221,9 +221,9 @@ export default function CompaniesPage() {
     { title: 'Status', dataIndex: 'is_active', key: 'is_active', render: value => <Tag color={value ? 'green' : 'default'}>{value ? 'Active' : 'Inactive'}</Tag> },
     { title: 'Created', dataIndex: 'created_at', key: 'created_at', sorter: true, render: value => value ? formatDateUniversal(value, true) : '?' },
     { title: 'Actions', key: 'actions', width: 250, render: (_, row) => <Space wrap size={8} style={{ maxWidth: '100%' }}>
-      <Button size='small' icon={<Eye size={16} />} disabled={busy} onClick={() => navigate(`/super-admin/companies/${row.id}`)}>View</Button>
-      <Button size='small' icon={<Pencil size={16} />} disabled={busy} onClick={() => openDialog('edit', row)}>Edit</Button>
-      <Button size='small' danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }}>Delete</Button>
+      <Button title='View company' aria-label={`View ${row.name}`} size='small' icon={<Eye size={16} />} disabled={busy} onClick={() => navigate(`/super-admin/companies/${row.id}`)} />
+      <Button title='Edit company' aria-label={`Edit ${row.name}`} size='small' icon={<Pencil size={16} />} disabled={busy} onClick={() => openDialog('edit', row)} />
+      <Button title='Delete company' aria-label={`Delete ${row.name}`} size='small' danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} />
     </Space> },
   ];
   const detailReady = dialog?.id == null || (!detail.isFetching && !detail.isError && detail.data);

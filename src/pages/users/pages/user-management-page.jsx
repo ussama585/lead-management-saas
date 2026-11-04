@@ -620,7 +620,7 @@ export default function UserManagement() {
           onSortingChange={handleSortingChange}
           globalFilter={globalFilter}
           onGlobalFilterChange={handleGlobalFilterChange}
-          columns={currentUser?.user_type === 'super_admin' ? [...columns.filter(column => column.accessorKey !== 'manager'), {
+          columns={['super_admin', 'company_admin'].includes(currentUser?.user_type) ? [...(isSuperAdminViewer ? columns.filter(column => column.accessorKey !== 'manager') : columns), {
             id: 'reset_password', header: 'Reset Password', enableSorting: false, enableColumnFilter: false,
             Cell: ({ row }) => <Button size="small" onClick={() => setPasswordResetUser(row.original)}>Reset Password</Button>,
           }] : isSuperAdminViewer ? columns.filter(column => column.accessorKey !== 'manager') : columns}
@@ -636,7 +636,7 @@ export default function UserManagement() {
         />
       </div>
 
-      {currentUser?.user_type === 'super_admin' && passwordResetUser && <ResetUserPasswordDialog
+      {['super_admin', 'company_admin'].includes(currentUser?.user_type) && passwordResetUser && <ResetUserPasswordDialog
         key={passwordResetUser.user_slug ?? passwordResetUser.slug ?? passwordResetUser.id}
         user={passwordResetUser} onClose={() => setPasswordResetUser(null)} />}
       <OtpModal

@@ -848,24 +848,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             return <span>{pageIndex * pageSize + rowIndex + 1}</span>;
           },
         },
-        // 2. Old remarks (read-only for sales — use follow-up flow for new remarks)
-        {
-          header: 'Old Remarks',
-        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
-          id: 'remarks',
-          accessorKey: 'remarks',
-          size: 0.5,
-          sortUndefined: 'last',
-          sortDescFirst: false,
-          Cell: ({ row }) => (
-            <CommentOutlined size="1em"
-              className={["app-icon", `table-remarks-icon ${row.original.remarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
-              onClick={() => {
-                setRemarksModal({ visible: true, lead: row.original, forStatusChange: false, newStatus: null });
-              }}
-            />
-          ),
-        },
+
         ...(['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType) ? [{
           header: 'Follow Ups and Remarks',
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },

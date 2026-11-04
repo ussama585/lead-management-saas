@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '../../shared/services/api.js';
-import { getCompanyUsers, getCompanySalesManagers, createCompanyUser, editCompanyUser, confirmCompanyUserDelete } from './company-detail-page.jsx';
+import { getCompanyUsers, getCompanySalesManagers, createCompanyUser, editCompanyUser, confirmCompanyUserDelete, resetCompanyUserPassword } from './company-detail-page.jsx';
 import { managerIdFromOptions } from '../../users/user-manager-options.js';
 import { companyUserCreateSchema, companyUserEditSchema, companyUserOtpSchema } from '../schemas/company-user-schema.js';
 
@@ -11,6 +11,13 @@ vi.mock('../../../components/breadcrumb.component.jsx', () => ({ default: () => 
 vi.mock('../../../components/settings-delete-modal.jsx', () => ({ default: () => null }));
 
 beforeEach(() => vi.clearAllMocks());
+it('resets the selected company user password through account details', async () => {
+  api.patch.mockResolvedValue({ data: { status: true, message: 'Password updated' } });
+  await resetCompanyUserPassword(8, { new_password: 'new-password', confirm_password: 'new-password' });
+  const [path, body] = api.patch.mock.calls[0];
+  expect(path).toBe('/accounts/detail/8');
+  expect(Object.fromEntries(body)).toEqual({ password: 'new-password' });
+});
 describe('company detail users', () => {
   it('loads company-scoped manager IDs without injecting account IDs into the options', async () => {
     api.get.mockResolvedValue({ data: [{ id: 6, user_id: 21, name: 'Company 4 Manager' }, { id: 8, user_id: 30, name: 'sales manager 1' }] });

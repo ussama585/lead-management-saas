@@ -18,8 +18,8 @@ export async function resetUserPassword(userSlug, values) {
   return data;
 }
 
-export default function ResetUserPasswordDialog({ user, onClose }) {
-  const mutation = useMutation(values => resetUserPassword(user.user_slug ?? user.slug, values));
+export default function ResetUserPasswordDialog({ user, onClose, onReset }) {
+  const mutation = useMutation(values => onReset ? onReset(user.id, values) : resetUserPassword(user.user_slug ?? user.slug, values));
   const formik = useFormik({
     initialValues: { new_password: '', confirm_password: '' },
     validationSchema: resetUserPasswordSchema,

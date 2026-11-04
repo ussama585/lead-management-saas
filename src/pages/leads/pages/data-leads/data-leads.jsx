@@ -164,7 +164,8 @@ const DataLeads = () => {
   const {
     data: dataLeadsStats,
     isLoading: isStatsLoading,
-  } = useQuery(['dataLeadsStats', dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => getDataLeadsStats({
+  } = useQuery(['dataLeadsStats', projectSizeFilter, dateRange?.[0]?.format('YYYY-MM-DDTHH:mm:ssZ'), dateRange?.[1]?.format('YYYY-MM-DDTHH:mm:ssZ')], () => getDataLeadsStats({
+    ...(projectSizeFilter ? { project_size: projectSizeFilter } : {}),
     ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
     ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
   }), {
@@ -649,33 +650,6 @@ const DataLeads = () => {
           return <span>{pageIndex * pageSize + rowIndex + 1}</span>;
         },
       },
-      {
-        header: "Old Remarks",
-        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
-        id: "remarks", // Explicit id for sorting
-        accessorKey: "remarks",
-        size: 200,
-        sortUndefined: "last", // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ row }) => (
-          <CommentOutlined size="1em" className="app-icon"
-            style={{
-              cursor: "pointer",
-              color: row.original.remarks ? "#1890ff" : "#aaa",
-              fontSize: 18,
-            }}
-            onClick={() => {
-              setProposalFile(null);
-              setRemarksModal({
-                visible: true,
-                lead: row.original,
-                forStatusChange: false,
-                newStatus: null,
-              });
-            }}
-          />
-        ),
-      },
       ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
         header: "Follow Ups and Remarks",
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
@@ -1058,7 +1032,7 @@ const DataLeads = () => {
         : []),
       ...(['super_admin', 'company_admin'].includes(user?.user_type) ? [{
         header: 'Actions', id: 'lead_actions', enableSorting: false, size: 160,
-        Cell: ({ row }) => <LeadListingActions lead={row.original} source="data" onView={() => setLeadDialog({ mode: 'view', id: row.original.id })} onEdit={() => setLeadDialog({ mode: 'edit', id: row.original.id })} />,
+        Cell: ({ row }) => <LeadListingActions lead={row.original} source="data" onEdit={() => setLeadDialog({ mode: 'edit', id: row.original.id })} />,
       }] : []),
     ];
     const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];

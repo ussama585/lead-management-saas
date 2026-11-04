@@ -33,6 +33,23 @@
 .lead-company-date-toolbar__date > .ant-space { max-width: 100%; }
 .lead-company-date-toolbar__date > .ant-space > .ant-space-item { max-width: 100%; }
 .lead-filter-toolbar:empty { display: none; }
+.sales-data-company-toolbar .lead-company-filter__control {
+  height: 40px;
+  min-height: 40px;
+  overflow: hidden;
+  border: 1px solid #94a3b8 !important;
+  background: #fff;
+}
+.sales-data-company-toolbar .lead-company-filter__control > .relative {
+  height: 38px;
+  min-height: 0;
+}
+.sales-data-company-toolbar .lead-company-filter__control button {
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px;
+  border-radius: 0;
+}
 .user-activity-filters .user-activity-filter-select > button,
 .user-activity-filters .user-activity-clear-filters {
   border-color: #94a3b8 !important;

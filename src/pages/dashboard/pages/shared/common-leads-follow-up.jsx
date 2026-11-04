@@ -11,7 +11,6 @@ import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import '../../../../assets/styles/lead-listing-filters.css';
 import FollowUpModal from '../../../../components/follow-up-modal.component.jsx';
-import RemarksModal from '../../../clients/components/RemarksModal.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import '../../../../assets/styles/legacy/admin-dashboard-page.css';
 import '../../../../assets/styles/legacy/client-listing-page.css';
@@ -90,10 +89,6 @@ const CommonLeadsFollowUp = () => {
     visible: false,
     lead: null,
     leadType: 'website',
-  });
-  const [remarksModal, setRemarksModal] = useState({
-    visible: false,
-    remarks: '',
   });
 
   const followUpSaveMutation = useMutation(
@@ -243,35 +238,6 @@ const CommonLeadsFollowUp = () => {
         size: 130,
         enableSorting: false,
         Cell: ({ row }) => <span>{row.original.next_followup_time_display}</span>,
-      },
-      {
-        header: 'Old Remarks',
-        id: 'remarks_action',
-        accessorKey: 'remarks',
-        size: 90,
-        enableSorting: false,
-        Cell: ({ row }) => {
-          const hasRemarks = row.original.remarks && row.original.remarks !== '-';
-          return (
-            <CommentOutlined size="1em"
-              role="button"
-              tabIndex={0}
-              aria-label={hasRemarks ? 'View old remarks' : 'No remarks'}
-              className={["app-icon", `table-remarks-icon ${hasRemarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
-              onClick={() => {
-                const nextRemarks = hasRemarks ? row.original.remarks : '';
-                setRemarksModal({ visible: true, remarks: nextRemarks });
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  const nextRemarks = hasRemarks ? row.original.remarks : '';
-                  setRemarksModal({ visible: true, remarks: nextRemarks });
-                }
-              }}
-            />
-          );
-        },
       },
       {
         header: 'Follow Ups and Remarks',
@@ -650,15 +616,6 @@ const CommonLeadsFollowUp = () => {
         }}
       />
 
-      <RemarksModal
-        visible={remarksModal.visible}
-        title="Old Remarks"
-        remarks={remarksModal.remarks}
-        canEdit={false}
-        showCount
-        placeholder="No remarks"
-        onCancel={() => setRemarksModal({ visible: false, remarks: '' })}
-      />
     </>
   );
 };

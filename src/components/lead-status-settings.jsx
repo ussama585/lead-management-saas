@@ -7,37 +7,38 @@ import { Alert, Card, Descriptions, Space, Table } from 'antd';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
-import { canManageLeadStatuses } from '../pages/auth/role-access.js';
+import { canManageLeadStatuses, isSuperAdmin } from '../pages/auth/role-access.js';
 import { createLeadStatus, deleteLeadStatus, getLeadStatus, leadStatusError, listLeadStatuses, updateLeadStatus } from '../pages/shared/services/lead-status-service.js';
 import SettingsDeleteModal from './settings-delete-modal.jsx';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 
-function LeadStatusManager({ user }) {
+export function LeadStatusManager({ user, companyId = null }) {
   const queryClient = useQueryClient();
-  const queryKey = ['settingsLeadStatuses', user.id, user.user_type];
+  const needsCompany = isSuperAdmin(user.user_type) && !companyId;
+  const queryKey = ['settingsLeadStatuses', user.id, user.user_type, companyId];
   const [editor, setEditor] = useState(null);
   const [viewId, setViewId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [nameError, setNameError] = useState('');
-  const list = useQuery(queryKey, listLeadStatuses, { refetchOnWindowFocus: false, retry: 1 });
-  const detail = useQuery([...queryKey, 'detail', viewId], () => getLeadStatus(viewId), {
-    enabled: viewId != null, refetchOnWindowFocus: false, retry: 1,
+  const list = useQuery(queryKey, () => listLeadStatuses(companyId ? { company_id: companyId } : undefined), { refetchOnWindowFocus: false, retry: 1 });
+  const detail = useQuery([...queryKey, 'detail', viewId], () => getLeadStatus(viewId, companyId), {
+    enabled: viewId != null && !needsCompany, refetchOnWindowFocus: false, retry: 1,
   });
-  const save = useMutation(({ id, name }) => id == null ? createLeadStatus(name) : updateLeadStatus(id, name), {
+  const save = useMutation(({ id, name }) => id == null ? createLeadStatus(name, companyId) : updateLeadStatus(id, name, companyId), {
     onSuccess: async result => {
       message.success(result?.message || 'Lead status saved.');
       setEditor(null);
       await queryClient.invalidateQueries(queryKey);
     },
   });
-  const remove = useMutation(deleteLeadStatus, {
+  const remove = useMutation(id => deleteLeadStatus(id, companyId), {
     onSuccess: async result => {
       message.success(result?.message || 'Lead status deleted.');
       setDeleteTarget(null);
       await queryClient.invalidateQueries(queryKey);
     },
   });
-  const busy = save.isLoading || remove.isLoading;
+  const busy = needsCompany || save.isLoading || remove.isLoading;
   const statusesNewestFirst = [...(list.data || [])].sort((a, b) => {
     const dateDifference = Date.parse(b.created_at) - Date.parse(a.created_at);
     return (Number.isFinite(dateDifference) ? dateDifference : 0) || Number(b.id) - Number(a.id);
@@ -57,13 +58,13 @@ function LeadStatusManager({ user }) {
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
     { title: 'Status name', dataIndex: 'name', key: 'name' },
     { title: 'Actions', key: 'actions', width: 260, render: (_, row) => <Space wrap>
-      <Button icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy}>View</Button>
-      <Button icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy}>Edit</Button>
-      <Button danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }}>Delete</Button>
+      <span title={needsCompany ? 'Select company first' : 'View status'}><Button aria-label="View status" icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy} /></span>
+      <span title={needsCompany ? 'Select company first' : 'Edit status'}><Button aria-label="Edit status" icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy} /></span>
+      <span title={needsCompany ? 'Select company first' : 'Delete status'}><Button danger aria-label="Delete status" icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} /></span>
     </Space> },
   ];
   return <>
-    <Card title='Lead statuses' extra={<Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add status</Button>}>
+    <Card title='Lead statuses' extra={<span title={needsCompany ? 'Select company first' : 'Add status'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add status</Button></span>}>
       <p className='mb-4 text-sm text-muted-foreground'>Create and manage the statuses used for leads.</p>
       {list.isError ? <Alert type='error' showIcon message={leadStatusError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
         <Table rowKey='id' columns={columns} dataSource={statusesNewestFirst} loading={list.isLoading || list.isFetching} scroll={{ x: 520 }} pagination={{ pageSize: 10, hideOnSinglePage: true }} locale={{ emptyText: 'No lead statuses yet. Add a status to get started.' }} />}

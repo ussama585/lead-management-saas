@@ -147,12 +147,10 @@ export const toggleUserActivation = async (userId, isActive) => {
 
 
 
-export const getAssigningUsersListing = async (user_type = "sales_manager", { filterByUserType = false } = {}) => {
+export const getAssigningUsersListing = async (user_type = "sales_manager", { filterByUserType = false, companyId = null } = {}) => {
   try {
 
-    const endpoint = filterByUserType
-      ? `/accounts/users-for-assigning?user_type=${encodeURIComponent(user_type)}`
-      : assignmentEndpoint();
+    const endpoint = assignmentEndpoint(companyId);
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);
@@ -207,12 +205,10 @@ export const assignClient = async (clientId, userId) => {
 export const getManangersExecutives = async (userType = null, companyId = null, { omitUserType = false } = {}) => {
   try {
     // Assignment dropdowns consistently request sales executives for every role.
-    const endpoint = userType === 'super_admin' && omitUserType ? '/accounts/users-for-assigning' : assignmentEndpoint();
+    const endpoint = assignmentEndpoint(companyId);
     console.log("endpoint: ", endpoint);
 
-    const response = userType === 'super_admin' && companyId
-      ? await api.get(endpoint, { params: { company_id: companyId } })
-      : await api.get(endpoint);
+    const response = await api.get(endpoint);
     console.log("Response from getManangersExecutives:", response.data);
     return response.data;
   } catch (error) {

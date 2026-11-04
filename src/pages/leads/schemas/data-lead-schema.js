@@ -15,13 +15,9 @@ export function dataLeadSchema(superAdmin = false) {
     contact_person_designation: Yup.string().trim().required('Enter the designation.'),
     email: Yup.string().trim().email('Enter a valid email address.').required('Enter the email address.'),
     phone_number: Yup.string().trim().required('Enter the phone number.'),
-    status: Yup.string().trim().required('Enter or select a status.'),
-    remarks: Yup.string(),
     project_size: Yup.string().trim(),
     assigned_to: Yup.number().transform((value, original) => original === '' || original == null ? null : value).nullable().integer('Use a valid user ID.').positive('Use a valid user ID.'),
     contract_currency: Yup.string().trim(),
     contract_price: Yup.number().transform((value, original) => original === '' || original == null ? null : value).nullable().min(0, 'Price cannot be negative.'),
-    is_accepting_response: Yup.boolean(),
-    followup_date: Yup.string().nullable().test('date', 'Use a valid date.', value => !value || /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value),
   });
 }

@@ -13,8 +13,8 @@ import useUserStore from '../../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
 import { dataLeadSchema, dataLeadEditSchema, dataLeadEditFields } from '../../schemas/data-lead-schema.js';
 
-const emptyLead = { company: undefined, industry: '', company_name: '', contact_person_name: '', contact_person_designation: '', email: '', phone_number: '', status: '', remarks: '', project_size: '', assigned_to: null, contract_currency: 'PKR', contract_price: null, is_accepting_response: true, followup_date: '' };
-const labels = { industry: 'Industry', company_name: 'Company name', contact_person_name: 'Contact name', contact_person_designation: 'Designation', email: 'Email', phone_number: 'Phone number', status: 'Status', project_size: 'Project size', assigned_to: 'Assigned user ID', contract_currency: 'Currency', contract_price: 'Contract price', followup_date: 'Follow-up date', remarks: 'Remarks' };
+const emptyLead = { company: undefined, industry: '', company_name: '', contact_person_name: '', contact_person_designation: '', email: '', phone_number: '', project_size: '', assigned_to: null, contract_currency: 'PKR', contract_price: null };
+const labels = { industry: 'Industry', company_name: 'Company name', contact_person_name: 'Contact name', contact_person_designation: 'Designation', email: 'Email', phone_number: 'Phone number', status: 'Status', project_size: 'Project size', assigned_to: 'Assigned user', contract_currency: 'Currency', contract_price: 'Contract price', followup_date: 'Follow-up date', remarks: 'Remarks' };
 
 export function dataLeadPayload(values, superAdmin) {
   const payload = {};
@@ -109,7 +109,7 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
     {loading ? <div className='py-6 text-center'><Spin /></div> : detailError ? <Alert type='error' showIcon message={dataLeadError(detail.error)} action={<Button onClick={() => detail.refetch()}>Retry</Button>} /> : mode === 'view' ?
       <Descriptions column={1} bordered size='small' items={Object.entries(labels).map(([field, title]) => { const key = field === 'assigned_to' ? 'assigned_to_name' : field; const label = field === 'assigned_to' ? 'Assigned to' : title; return ({ key, label, children: String(detail.data?.[key] ?? '—') }); })} /> :
       <form onSubmit={formik.handleSubmit} noValidate className='mt-4 grid gap-x-6 gap-y-6 sm:grid-cols-2'>
-        {(mode === 'edit' ? dataLeadEditFields.map(key => [key, labels[key]]) : [...(superAdmin ? [['company', 'Company']] : []), ...Object.entries(labels), ['is_accepting_response', 'Accepting responses']]).map(([key, label]) => <div key={key} className={key === 'remarks' ? 'sm:col-span-2' : undefined}>
+        {(mode === 'edit' ? dataLeadEditFields.map(key => [key, labels[key]]) : [...(superAdmin ? [['company', 'Company']] : []), ...Object.entries(labels).filter(([key]) => !['status', 'followup_date', 'remarks'].includes(key))]).map(([key, label]) => <div key={key} className={key === 'remarks' ? 'sm:col-span-2' : undefined}>
           <label htmlFor={`data-lead-${key}`} className='mb-2 block text-sm font-medium'>{label}{requiredFields.has(key) && <span className="text-destructive"> *</span>}</label>{control(key)}
           {formik.touched[key] && formik.errors[key] && <p id={`data-lead-${key}-error`} role='alert' className='mt-1 text-sm text-destructive'>{formik.errors[key]}</p>}
         </div>)}

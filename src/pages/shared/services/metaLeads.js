@@ -84,10 +84,11 @@ export const getMetaLeadAllJobs = async (leadId) => {
 
 
 // Meta Leads - Get stats
-export const getMetaLeadsStats = async (startDate, endDate, campaignName = null) => {
+export const getMetaLeadsStats = async (startDate, endDate, campaignName = null, projectSize = null) => {
   try {
     const endpoint = `/meta-leads/stats`;
     const params = {
+      ...(projectSize ? { project_size: projectSize } : {}),
       start_date: startDate,
       end_date: endDate,
     };

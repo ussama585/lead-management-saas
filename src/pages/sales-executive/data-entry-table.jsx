@@ -113,7 +113,11 @@ const DataEntryTable = () => {
   const { user } = useUserStore();
   const superAdmin = isSuperAdmin(user?.user_type);
   const canViewUserTabs = superAdmin || ['company_admin', 'sales_manager'].includes(user?.user_type);
-  const [companyId, setCompanyId] = useState(null);
+  const [selectedCompanyId, setCompanyId] = useState(undefined);
+  const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
+    enabled: superAdmin, refetchOnWindowFocus: false, staleTime: 300000,
+  });
+  const companyId = selectedCompanyId === undefined ? (superAdmin ? companies.data?.[0]?.id ?? null : null) : selectedCompanyId;
   const [dateRange, setDateRange] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const companyParams = superAdmin ? {
@@ -121,9 +125,6 @@ const DataEntryTable = () => {
     ...(dateRange?.[0] ? { start_date: dateRange[0].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
     ...(dateRange?.[1] ? { end_date: dateRange[1].format('YYYY-MM-DDTHH:mm:ssZ') } : {}),
   } : {};
-  const companies = useQuery(['sales-data-company-options', user?.id, user?.user_type], getSalesDataCompanies, {
-    enabled: superAdmin, refetchOnWindowFocus: false, staleTime: 300000,
-  });
   
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -219,7 +220,7 @@ const DataEntryTable = () => {
     ...salesDataFilterParams(statusFilter, selectedExecId, selectedTab),
   };
   const queryOptions = {
-    enabled: Boolean(user?.id),
+    enabled: Boolean(user?.id) && (!superAdmin || !companies.isLoading),
     keepPreviousData: true,
     staleTime: 30000,
     refetchOnWindowFocus: false,
@@ -660,7 +661,7 @@ const DataEntryTable = () => {
         </DialogContent>
       </Dialog>
       <div className="listing-page-content">
-        {superAdmin && <div className="lead-company-date-toolbar lead-company-date-toolbar--compact">
+        {superAdmin && <div className="lead-company-date-toolbar lead-company-date-toolbar--compact sales-data-company-toolbar">
           <div className="lead-company-filter">
             <label htmlFor="sales-data-company-filter">Company</label>
             <div className="lead-company-filter__control">

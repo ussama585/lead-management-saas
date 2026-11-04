@@ -13,7 +13,8 @@ describe('data lead API contract', () => {
   it('creates a JSON lead with all documented fields for super admins', async () => {
     api.post.mockResolvedValue({ data: { success: true, message: 'Lead created successfully.' } });
     await saveDataLead({ values: sample, superAdmin: true });
-    expect(api.post).toHaveBeenCalledWith('/data-leads/create', sample);
+    const { status, remarks, followup_date, is_accepting_response, ...expected } = sample;
+    expect(api.post).toHaveBeenCalledWith('/data-leads/create', expected);
   });
   it('omits company for other roles even if present in form values', async () => {
     api.post.mockResolvedValue({ data: { success: true } });
@@ -32,7 +33,8 @@ describe('data lead API contract', () => {
   });
   it('normalizes numeric and empty fields without losing false values', () => {
     const payload = dataLeadPayload({ ...sample, assigned_to: '', contract_price: '0', is_accepting_response: false, followup_date: '' }, false);
-    expect(payload).toMatchObject({ assigned_to: null, contract_price: 0, is_accepting_response: false, followup_date: null });
+    expect(payload).toMatchObject({ assigned_to: null, contract_price: 0 });
+    for (const key of ['status', 'remarks', 'followup_date', 'is_accepting_response']) expect(payload).not.toHaveProperty(key);
   });
   it('rejects API failures and malformed details', async () => {
     api.post.mockResolvedValue({ data: { success: false, message: 'Invalid lead' } });
@@ -56,6 +58,7 @@ describe('data lead validation', () => {
   it('validates contact email, price and calendar date', async () => {
     await expect(dataLeadSchema(false).validate({ ...sample, email: 'invalid' })).rejects.toThrow('email');
     await expect(dataLeadSchema(false).validate({ ...sample, contract_price: -1 })).rejects.toThrow('negative');
-    await expect(dataLeadSchema(false).validate({ ...sample, followup_date: '2026-02-31' })).rejects.toThrow('date');
+    const { status, remarks, followup_date, is_accepting_response, ...values } = sample;
+    await expect(dataLeadSchema(false).validate(values)).resolves.toBeTruthy();
   });
 });

@@ -51,15 +51,38 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
 function ScopedPage({ children, section, user }) {
   const [search, setSearch] = useSearchParams();
   const companyId = selectedCompany(search.toString());
+  useEffect(() => {
+    try {
+      if (companyId) sessionStorage.setItem('assignmentCompanyId', companyId);
+      else if (search.has('company_id')) sessionStorage.removeItem('assignmentCompanyId');
+    } catch { /* Storage may be unavailable. */ }
+  }, [companyId, search]);
+  const defaultToFirstCompany = ['leads', 'meta-leads', 'data-leads', 'follow-up'].includes(section);
+  const [companyDefaultReady, setCompanyDefaultReady] = useState(!defaultToFirstCompany || Boolean(companyId));
   const parentClient = useQueryClient();
   const { data: options = [], isFetching, isError, refetch } = useQuery(
     ['overviewCompanies', user.id], getCompanies, { staleTime: 300000, refetchOnWindowFocus: false },
   );
+  useEffect(() => {
+    if (companyDefaultReady || isFetching || isError) return;
+    if (!companyId && options.length) {
+      const next = new URLSearchParams(search);
+      next.set('company_id', options[0].value);
+      next.set('page', '0');
+      setSearch(next, { replace: true });
+      return;
+    }
+    setCompanyDefaultReady(true);
+  }, [companyDefaultReady, isFetching, isError, companyId, options, search, setSearch]);
   // Each scope owns its cache and page state. In-flight results cannot populate another company.
   const client = useMemo(() => new QueryClient({ defaultOptions: parentClient.getDefaultOptions() }),
     [parentClient, user.id, section, companyId]);
   useEffect(() => () => { client.cancelQueries(); client.clear(); }, [client]);
   const onChange = (id) => {
+    try {
+      if (id) sessionStorage.setItem('assignmentCompanyId', String(id));
+      else sessionStorage.removeItem('assignmentCompanyId');
+    } catch { /* Storage may be unavailable. */ }
     const storageKey = { leads: 'leads-page', 'data-leads': 'data-leads-page', 'meta-leads': 'meta-leads-page' }[section];
     if (storageKey) {
       try {
@@ -75,7 +98,7 @@ function ScopedPage({ children, section, user }) {
   };
   return <QueryClientProvider client={client} key={`${user.id}:${section}:${companyId ?? 'all'}`}>
     <FilterContents options={options} loading={isFetching} error={isError} retry={refetch}
-      companyId={companyId} onChange={onChange}>{children}</FilterContents>
+      companyId={companyId} onChange={onChange}>{companyDefaultReady ? children : null}</FilterContents>
   </QueryClientProvider>;
 }
 
@@ -83,5 +106,5 @@ export default function CompanyFilteredPage({ children }) {
   const { user } = useUserStore();
   const { pathname } = useLocation();
   const section = companyFilterSection(user?.user_type, pathname);
-  return section ? <ScopedPage section={section} user={user}>{children}</ScopedPage> : children;
+  return section ? <ScopedPage key={`${user.id}:${section}`} section={section} user={user}>{children}</ScopedPage> : children;
 }
