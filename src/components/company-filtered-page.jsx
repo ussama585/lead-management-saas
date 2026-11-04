@@ -57,7 +57,7 @@ function ScopedPage({ children, section, user }) {
       else if (search.has('company_id')) sessionStorage.removeItem('assignmentCompanyId');
     } catch { /* Storage may be unavailable. */ }
   }, [companyId, search]);
-  const defaultToFirstCompany = ['leads', 'meta-leads', 'data-leads', 'follow-up'].includes(section);
+  const defaultToFirstCompany = ['leads', 'meta-leads', 'data-leads', 'follow-up', 'audit-history-list'].includes(section);
   const [companyDefaultReady, setCompanyDefaultReady] = useState(!defaultToFirstCompany || Boolean(companyId));
   const parentClient = useQueryClient();
   const { data: options = [], isFetching, isError, refetch } = useQuery(
