@@ -55,12 +55,10 @@ export const STATUS_OPTIONS = [
  * @returns {Object} Column definition object
  */
 export const createStatusColumn = ({
-  statusesRequiringRemarks,
   statusColors,
   userType,
   user,
   onStatusChange,
-  onOpenRemarksModal,
   onDirectStatusUpdate,
   isLoading = false,
   updatingStatusId = null,
@@ -68,7 +66,6 @@ export const createStatusColumn = ({
   size,
   leadType, // 'meta-leads', 'data-leads', or undefined (for regular leads)
   statusOptions = STATUS_OPTIONS,
-  requireRemarksForAll = false,
   readOnly = false,
   editableRoles = ['admin', 'sales_manager', 'sales_executive'],
 }) => {
@@ -139,27 +136,11 @@ export const createStatusColumn = ({
       // Editable dropdown
       console.log('[StatusColumn] Rendering editable dropdown for entry:', entry.id);
       return (
-        <Select
+        <Select placeholder="Select status"
           style={{ width: 'fit-content' }}
           value={currentStatus || 'Select Status'}
           onChange={async value => {
             if (value === currentStatus) return;
-            if (value === 'Potential Client') {
-              (onDirectStatusUpdate || onStatusChange)?.(entry, value);
-              return;
-            }
-            if (requireRemarksForAll) {
-              onOpenRemarksModal?.(entry, value);
-              return;
-            }
-            // Check if status requires remarks
-            if (statusesRequiringRemarks && statusesRequiringRemarks.has(value)) {
-              if (onOpenRemarksModal) {
-                onOpenRemarksModal(entry, value);
-              }
-              return;
-            }
-
             // Direct status update without remarks
             if (onDirectStatusUpdate) {
               onDirectStatusUpdate(entry, value);

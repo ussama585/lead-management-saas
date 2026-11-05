@@ -277,7 +277,7 @@ export default function SalesDataForExecutive() {
           const status = row.original.status;
           return (
             <div className="select-box">
-            <Select
+            <Select placeholder="Select status"
               value={status || "Select Status"}
               onChange={(value) => {
                 if (value === 'potential' || value === 'active') {

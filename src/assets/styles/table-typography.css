@@ -1,4 +1,11 @@
 /* Shared typography for native, Material and Ant Design table cells. */
+/* Navigation values remain visibly linked inside shared UI containers. */
+html body table td :is(a[href]:not([data-slot="button"]), .link-style, .sop-brand-table-link) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
 html body table :is(th, td) {
   font-size: 14px !important;
 }

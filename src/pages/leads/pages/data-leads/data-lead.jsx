@@ -9,8 +9,9 @@ import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
-import { Trash2 as DeleteOutlined } from 'lucide-react';
+import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
 import DeleteJobDialog from '../shared/delete-job-dialog.jsx';
@@ -39,8 +40,8 @@ async function updateDataLeadJob(jobId, payload) {
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not update job.');
   return data;
 }
-async function deleteDataLeadJob(jobId, reason) {
-  const { data } = await api.delete(`/data-leads/update-job/${encodeURIComponent(jobId)}`, { data: { delete_reason: reason } });
+async function deleteDataLeadJob(jobId) {
+  const { data } = await api.delete(`/data-leads/update-job/${encodeURIComponent(jobId)}`);
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not delete job.');
   return data;
 }
@@ -179,7 +180,8 @@ const DataLead = () => {
     };
   }, [leadMeta, dataLeadId]);
   const isReadOnlyLead = leadForCard?.status === 'Potential Client';
-  const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_manager'].includes(user?.user_type)) && !isReadOnlyLead;
+  const canDeleteJob = isSuperAdmin(user?.user_type) || user?.user_type === 'company_admin'
+    || (user?.user_type === 'sales_manager' && !isReadOnlyLead);
 
   const formatDate = useCallback((value) => {
     if (!value) return "—";
@@ -266,7 +268,7 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue() === "101" ? "100+" : cell.getValue());
           return (
-            <Select
+            <Select placeholder="Select number of vacancies"
               className="antd-input dropdown"
               value={value}
               options={vacancyOptions}
@@ -294,7 +296,7 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <Select placeholder="Select job type"
               className="antd-input dropdown"
               value={value}
               options={jobTypeOptions}
@@ -322,7 +324,7 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(normalizeEmploymentType(cell.getValue()));
           return (
-            <Select
+            <Select placeholder="Select employment type"
               className="antd-input dropdown"
               value={value}
               options={employmentTypeOptions}
@@ -533,7 +535,7 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <Select placeholder="Select currency"
               className="antd-input dropdown"
               value={value}
               options={currencyOptions}
@@ -561,7 +563,7 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <Select placeholder="Select payment terms"
               className="antd-input dropdown"
               value={value}
               options={paymentTermOptions}
@@ -589,7 +591,7 @@ const DataLead = () => {
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
-            <Select
+            <Select placeholder="Select gender preference"
               className="antd-input dropdown"
               value={value}
               options={genderOptions}
@@ -640,15 +642,20 @@ const DataLead = () => {
       ...(canDeleteJob
         ? [
             {
-              header: "Action",
-              id: "delete",
+              header: "Actions",
+              id: "actions",
               enableSorting: false,
               enableEditing: false,
-              size: 100,
+              size: 120,
               Cell: ({ row }) => (
+                <div className="flex items-center gap-1">
+                {['super_admin', 'company_admin'].includes(user?.user_type) && <AntButton type="text" title="Edit job" aria-label={`Edit ${row.original.job_title || 'job'}`} className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
+                  icon={<Pencil size={16} className="app-icon" />}
+                  onClick={event => { event.stopPropagation(); navigate(getRolePath(user?.user_type, `/data-leads/${dataLeadId}/edit/${row.original.id}`)); }} />}
                 <AntButton type="text" danger title="Delete job" aria-label={`Delete ${row.original.job_title || 'job'}`}
                   icon={<DeleteOutlined size={16} className="app-icon" />}
                   onClick={event => { event.stopPropagation(); handleDeleteJob(row.original); }} />
+                </div>
               ),
             },
           ]
@@ -789,7 +796,7 @@ const DataLead = () => {
           </Stack>
         )}
 
-            <MaterialReactTable table={table} />
+            <JobListingTabs><MaterialReactTable table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>
@@ -799,7 +806,7 @@ const DataLead = () => {
         onCancel={() => setDescModalOpen(false)}
         footer={null}
       >
-        <Input.TextArea
+        <Input.TextArea placeholder="Enter job description"
           rows={6}
           value={descEditValue}
           disabled={isReadOnlyLead}

@@ -56,7 +56,7 @@ export default function ChangePasswordDialog({ open, onClose }) {
         ['old_password', 'Current password', 'current-password'], ['new_password', 'New password', 'new-password'], ['confirm_password', 'Confirm new password', 'new-password'],
       ].map(([field, label, autoComplete]) => <div key={field}>
         <label htmlFor={`change-${field}`} className='mb-2 block text-sm font-medium'>{label}</label>
-        <Input.Password id={`change-${field}`} name={field} autoComplete={autoComplete} value={formik.values[field]} onChange={formik.handleChange} onBlur={formik.handleBlur}
+        <Input.Password placeholder={`Enter ${label.toLowerCase()}`} id={`change-${field}`} name={field} autoComplete={autoComplete} value={formik.values[field]} onChange={formik.handleChange} onBlur={formik.handleBlur}
           disabled={mutation.isLoading} status={formik.touched[field] && formik.errors[field] ? 'error' : undefined}
           aria-invalid={Boolean(formik.touched[field] && formik.errors[field])} aria-describedby={formik.touched[field] && formik.errors[field] ? `${field}-error` : undefined} />
         {formik.touched[field] && formik.errors[field] && <p id={`${field}-error`} role='alert' className='mt-1 text-sm text-destructive'>{formik.errors[field]}</p>}

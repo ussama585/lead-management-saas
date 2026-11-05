@@ -1560,6 +1560,7 @@ export const updateMetaLeadStatus = async (leadId, data = {}) => {
     } = data;
 
     const formData = new FormData();
+    if (data.company_id != null) formData.append('company_id', data.company_id);
     if (status) formData.append('status', status);
     if (remarks !== undefined && remarks !== null && remarks !== '') {
       formData.append('remarks', remarks);
@@ -2034,9 +2035,10 @@ export const getJobResumeCount = async (jobId) => {
 
 export const deleteHeadhuntingJob = async (jobId, reason) => {
   try {
-    const response = await api.delete(`/headhunting/delete-job/${jobId}`, {
+    const endpoint = `/headhunting/delete-job/${jobId}`;
+    const response = await (reason?.trim() ? api.delete(endpoint, {
       data: { delete_reason: reason }
-    });
+    }) : api.delete(endpoint));
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: error.response?.data };

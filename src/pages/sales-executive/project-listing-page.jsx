@@ -186,7 +186,7 @@ export default function ProjectListing() {
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
-            <div onClick={() => navigate(`/sales-executive/project-detail/${row.id}/${row.job_slug}`)}>
+            <div className="cursor-pointer underline underline-offset-2" onClick={() => navigate(`/sales-executive/project-detail/${row.id}/${row.job_slug}`)}>
               <span style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} className="link-style" >{row.title}</span>
             </div>
           );
@@ -331,7 +331,7 @@ export default function ProjectListing() {
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
-            <div onClick={() => navigate(`/sales-executive/project-detail/${row.id}/${row.job_slug}`)}>
+            <div className="cursor-pointer underline underline-offset-2" onClick={() => navigate(`/sales-executive/project-detail/${row.id}/${row.job_slug}`)}>
               <span style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} className="link-style" >{row.title}</span>
             </div>
           );
@@ -466,7 +466,7 @@ export default function ProjectListing() {
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
-            <div onClick={() => navigate(`/sales-executive/project-detail/${row.id}/${row.job_slug}`)}>
+            <div className="cursor-pointer underline underline-offset-2" onClick={() => navigate(`/sales-executive/project-detail/${row.id}/${row.job_slug}`)}>
               <span style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} className="link-style" >{row.title}</span>
             </div>
           );

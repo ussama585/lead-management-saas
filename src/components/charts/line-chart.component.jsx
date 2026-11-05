@@ -159,7 +159,7 @@ const LineChart = ({
         <h2 className="line-chart-title">{title}</h2>
         <div className="dropdown-section">
 
-        <Select
+        <Select placeholder="Select time period"
           defaultValue={selectedTimeFrame}
           style={{ width: 200 }}
           onChange={handleTimeFrameChange}
@@ -172,7 +172,7 @@ const LineChart = ({
 
       { addOrderByFilter && 
       
-          <Select defaultValue={statsFilter} style={{ width: 200 }} onChange={(value) => handleStatsFilterChange(value)}>
+          <Select placeholder="Select statistics scope" defaultValue={statsFilter} style={{ width: 200 }} onChange={(value) => handleStatsFilterChange(value)}>
           <Option value="All">All</Option>
           <Option value="My Stats">My Stats</Option>
           <Option value="Executive Stats">Executive Stats</Option>

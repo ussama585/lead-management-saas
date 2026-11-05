@@ -61,7 +61,7 @@ export function ExperienceFilterPill({ title, yearsDisplay, onYearsChange, onRem
         <Typography variant="body2" className="rf-exp-chip-label" title={title}>
           {title}
         </Typography>
-        <TextField
+        <TextField placeholder="Enter years"
           size="small"
           type="number"
           value={yearsDisplay}

@@ -6,6 +6,11 @@ import { updateMetaLeadStatus } from '../pages/shared/services/headhunting.js';
 vi.mock('../pages/shared/services/api.js', () => ({ default: { patch: vi.fn() } }));
 
 describe('Meta Lead detail card update endpoints', () => {
+  it('preserves company ID in remarks FormData when supplied', async () => {
+    api.patch.mockResolvedValue({ data: { success: true } });
+    await updateMetaLeadStatus(7, { remarks: 'Called client', company_id: 8 });
+    expect(Object.fromEntries(api.patch.mock.lastCall[1])).toEqual({ remarks: 'Called client', company_id: '8' });
+  });
   it('sends status and remarks to the Meta Lead status endpoint', async () => {
     api.patch.mockResolvedValue({ data: { success: true } });
     await updateMetaLeadStatus(7, { status: 'SaaS Client', remarks: 'Discussed requirements' });

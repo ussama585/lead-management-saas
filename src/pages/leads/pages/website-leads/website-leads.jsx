@@ -8,6 +8,8 @@ import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-d
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
+import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
+import { leadModalCompanyPayload } from '../../../shared/utils/lead-modal-company.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -531,6 +533,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       }
 
       const fieldsToCopy = [
+        'company_id',
         'total_vacancies',
         'job_count',
         'contract_currency',
@@ -1007,7 +1010,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               <div className="min-w-0">
               <div className="flex items-center gap-1.5">
               <Tooltip title="View lead details">
-                <a
+                <a className="cursor-pointer"
                   style={{ textDecoration: 'underline', color: '#3E6A9F', display: 'flex', alignItems: 'center', gap: '6px' }}
                   href={leadHref}
                   onClick={(e) => { e.preventDefault(); navigate(leadHref); }}
@@ -1289,6 +1292,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     };
 
     // Don't render anything if we're not on the leads page
+    const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, data?.data?.results || [], projectSizeFilter);
     if (!isVisible) {
       return null;
     }
@@ -1409,6 +1413,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
           const payload = {
             id: remarksModal.lead.id,
+            ...leadModalCompanyPayload(user, remarksModal.lead),
 
           };
 
@@ -1516,7 +1521,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         {/* Date Range Filter and Manage Assignees Button */}
         <div className={`lead-filter-toolbar${userType === 'company_admin' ? ' website-company-filter-toolbar' : ''}`}>
           <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
-            options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...(data?.data?.results || []).map(lead => lead.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
+            options={projectSizeFilterOptions}
             onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
           <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal
@@ -1665,6 +1670,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               await followUpMutation.mutateAsync({
                 leadId: lead.id,
                 payload: {
+                  ...leadModalCompanyPayload(user, lead),
                   current_followup_date: new Date().toISOString(),
                   next_followup_date: isNextFollowupRequired && values?.followUpDate
                     ? new Date(values.followUpDate).toISOString()

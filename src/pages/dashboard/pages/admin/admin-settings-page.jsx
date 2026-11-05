@@ -1,6 +1,8 @@
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Button } from '../../../../components/ui/app-controls.jsx';
+import { Select } from '../../../../components/ui/app-select.jsx';
+import { getCompanies } from '../../../../components/company-filtered-page.jsx';
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import api from '../../../shared/services/api.js';
@@ -25,16 +27,17 @@ import '../../../../assets/styles/legacy/table-client-actions.css';
 import '../../../../assets/styles/legacy/admin-dashboard-page.css';
 import '../../../../assets/styles/settings-page.css';
 
-export async function listCheckupDurations() {
-  const { data } = await api.get('/follow-up/checkup-duration-list');
+export async function listCheckupDurations(companyId = null) {
+  const { data } = await api.get('/follow-up/checkup-duration-list', { params: companyId ? { company_id: Number(companyId) } : {} });
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load durations.');
   if (!Array.isArray(data?.results)) throw new Error('Could not read the duration list.');
   return data;
 }
 
-export async function createCheckupDuration(durationMinutes) {
+export async function createCheckupDuration(durationMinutes, companyId = null) {
   const { data } = await api.post('/follow-up/checkup-duration', {
     duration_minutes: Number(durationMinutes),
+    ...(companyId ? { company_id: Number(companyId) } : {}),
   });
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not create duration.');
   return data;
@@ -58,6 +61,8 @@ const durationError = error => error?.response?.data?.message || error?.response
 
 const AdminSettingsPage = () => {
   const { user } = useUserStore();
+  const superAdmin = isSuperAdmin(user?.user_type);
+  const [companyId, setCompanyId] = useState(null);
   // const canManageAppearance = isSuperAdmin(user?.user_type);
   const settingsSections = [
     // ...(canManageAppearance ? [{ key: 'appearance', label: 'Appearance', icon: Palette }] : []),
@@ -69,15 +74,18 @@ const AdminSettingsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedSection = settingsSections.find(item => item.key === searchParams.get('section')) || settingsSections[0];
   const section = selectedSection?.key;
+  const companies = useQuery(['overviewCompanies', user?.id], getCompanies, {
+    enabled: superAdmin && section === 'follow-up-duration', staleTime: 300000, refetchOnWindowFocus: false,
+  });
   const queryClient = useQueryClient();
-  const durationQueryKey = ['checkupDurationList', user?.id, user?.user_type];
+  const durationQueryKey = ['checkupDurationList', user?.id, user?.user_type, superAdmin ? companyId : null];
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const { data: durations, isLoading, isFetching, isError, error, refetch } = useQuery(durationQueryKey, listCheckupDurations, {
-    enabled: section === 'follow-up-duration', refetchOnWindowFocus: false,
+  const { data: durations, isLoading, isFetching, isError, error, refetch } = useQuery(durationQueryKey, () => listCheckupDurations(superAdmin ? companyId : null), {
+    enabled: section === 'follow-up-duration' && (!superAdmin || Boolean(companyId)), refetchOnWindowFocus: false,
   });
 
-  const createMutation = useMutation((durationMinutes) => createCheckupDuration(durationMinutes), {
+  const createMutation = useMutation((durationMinutes) => createCheckupDuration(durationMinutes, superAdmin ? companyId : null), {
     onSuccess: (res) => {
       message.success(res?.message || 'Created successfully');
       queryClient.invalidateQueries(durationQueryKey);
@@ -91,6 +99,8 @@ const AdminSettingsPage = () => {
     initialValues: { duration_minutes: null },
     validationSchema: followUpDurationSchema,
     onSubmit: async (values, helpers) => {
+      if (superAdmin && !companyId) { helpers.setStatus('Select a company first.'); return; }
+      if (createMutation.isLoading) return;
       try {
         await createMutation.mutateAsync(values.duration_minutes);
         helpers.resetForm();
@@ -157,6 +167,16 @@ const AdminSettingsPage = () => {
 
         {section === 'follow-up-duration' && <Card title="Check-up follow-up duration">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            {superAdmin && <div>
+              <label htmlFor="duration-company" className="mb-2 block text-sm font-medium">Company</label>
+              <Select id="duration-company" placeholder="Select company" showSearch allowClear
+                style={{ width: 280, maxWidth: '100%' }} options={companies.data || []}
+                value={companyId ?? undefined} loading={companies.isFetching}
+                disabled={createMutation.isLoading || updateMutation.isLoading || deleteMutation.isLoading}
+                onChange={value => { setCompanyId(value || null); createForm.resetForm(); setEditTarget(null); setDeleteTarget(null); }} />
+              {companies.isError && <Alert type="error" message="Could not load companies." action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}
+              {!companyId && <p className="mt-2 text-sm text-muted-foreground">Select a company to manage its follow-up duration.</p>}
+            </div>}
             {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load durations.'}
               action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
             <Table rowKey="id" dataSource={durations?.results || []} loading={isLoading || isFetching}
@@ -184,6 +204,7 @@ const AdminSettingsPage = () => {
                       id="create-duration-minutes"
                       aria-label="Create duration (minutes)"
                       value={createForm.values.duration_minutes}
+                      disabled={createMutation.isLoading || (superAdmin && !companyId)}
                       onChange={(v) => createForm.setFieldValue('duration_minutes', v)}
                       onBlur={() => createForm.setFieldTouched('duration_minutes', true)}
                       status={createForm.touched.duration_minutes && createForm.errors.duration_minutes ? 'error' : undefined}
@@ -195,6 +216,7 @@ const AdminSettingsPage = () => {
                       type="primary"
                       htmlType="submit"
                       loading={createMutation.isLoading}
+                      disabled={superAdmin && !companyId}
                       className="sop-brand-primary"
                     >
                       Create
@@ -202,6 +224,7 @@ const AdminSettingsPage = () => {
                   </Space>
                   {createForm.touched.duration_minutes && createForm.errors.duration_minutes &&
                     <div id="duration-create-error" role="alert" className="text-sm text-destructive">{createForm.errors.duration_minutes}</div>}
+                  {createForm.status && <div role="alert" className="text-sm text-destructive">{createForm.status}</div>}
                 </form>
           </Space>
         </Card>}
@@ -211,7 +234,7 @@ const AdminSettingsPage = () => {
           closable={!updateMutation.isLoading} maskClosable={!updateMutation.isLoading} keyboard={!updateMutation.isLoading}>
           <form onSubmit={editForm.handleSubmit} className="grid gap-3 py-3">
             <label htmlFor="edit-duration-minutes">Duration (minutes)</label>
-            <InputNumber id="edit-duration-minutes" min={1} max={1440} value={editForm.values.duration_minutes}
+            <InputNumber placeholder="Enter duration (minutes)" id="edit-duration-minutes" min={1} max={1440} value={editForm.values.duration_minutes}
               disabled={updateMutation.isLoading} onChange={value => editForm.setFieldValue('duration_minutes', value)}
               onBlur={() => editForm.setFieldTouched('duration_minutes', true)}
               aria-describedby="edit-duration-error" status={editForm.touched.duration_minutes && editForm.errors.duration_minutes ? 'error' : undefined} />

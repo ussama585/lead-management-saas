@@ -712,7 +712,7 @@ const projectStatusColors = {
         ]}
         centered
       >
-        <Input.TextArea
+        <Input.TextArea placeholder="Enter remarks"
   rows={4}
   value={remarksValue}
   onChange={(e) => setRemarksValue(e.target.value)}

@@ -288,7 +288,7 @@ export default function HeadhuntingProjectsListingForExecutive() {
           const status = row.original.status;
           return (
             <div className="select-box" style={{ width: "150px" }}>
-            <Select
+            <Select placeholder="Select status"
               value={status || ""}
               onChange={(value) => {
                 statusChangeMutation({ value, id: row.original.id });

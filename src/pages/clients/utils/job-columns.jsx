@@ -133,7 +133,7 @@ export const createJobColumns = ({
         return isRestricted || !canEdit ? (
           <StatusBadge status={cell.getValue()} statusColors={statusColors} />
         ) : (
-          <Select
+          <Select placeholder="Select get value"
             key={`status-${row.original.id}`}
             value={cell.getValue()}
             style={{ width: 'fit-content', minWidth: compactColumns ? 100 : 120 }}

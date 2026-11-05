@@ -15,6 +15,20 @@ describe('Super Admin company filter', () => {
   });
   const location = { pathname: '/super-admin/data-leads', search: '?company_id=3' };
   it.each([
+    { url: '/accounts/users-for-assigning', params: { company_id: 9 } },
+    { url: '/accounts/users-for-assigning', params: new URLSearchParams('company_id=9') },
+    { url: '/accounts/users-for-assigning?company_id=9' },
+  ])('keeps the modal company instead of the listing company: %j', config => {
+    const before = config.params instanceof URLSearchParams ? config.params.toString() : config.params;
+    applyCompanyFilter(config, 'super_admin', location);
+    expect(config.params instanceof URLSearchParams ? config.params.toString() : config.params).toEqual(before);
+  });
+  it('still scopes assignees to the listing company when no company is explicitly supplied', () => {
+    const config = { url: '/accounts/users-for-assigning' };
+    applyCompanyFilter(config, 'super_admin', location);
+    expect(config.params).toEqual({ company_id: '3' });
+  });
+  it.each([
     ['leads', 'lead-generation'], ['data-leads', 'data-leads'], ['meta-leads', 'meta-leads'],
   ])('scopes both assignee and status filter requests in %s', (section, resource) => {
     for (const endpoint of ['stats', 'list-count']) {

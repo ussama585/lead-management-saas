@@ -204,7 +204,7 @@ export default function LeadJobForm() {
       onChange={values => formik.setFieldValue(key, values.join(', '))} />;
     else if (choices) control = <Select {...props} allowClear={key === 'job_type' || key === 'contract_period'} showSearch optionFilterProp="label" style={{ width: '100%' }} value={value === '' ? undefined : value}
       options={choices.map(option => ({ value: option, label: String(option) }))} placeholder={`Select ${label?.toLowerCase() || 'option'}`} onChange={value => key === 'job_type' ? formik.setValues(previous => jobNatureValues(previous, value)) : formik.setFieldValue(key, value ?? '')} />;
-    else if (numericFields.includes(key)) control = <InputNumber {...props} min={key === 'number_of_vacancies' || key === 'hours_per_week' ? 1 : 0} style={{ width: '100%' }} value={value} onChange={value => formik.setFieldValue(key, value)} />;
+    else if (numericFields.includes(key)) control = <InputNumber placeholder={`Enter ${label?.toLowerCase() || 'a value'}`} {...props} min={key === 'number_of_vacancies' || key === 'hours_per_week' ? 1 : 0} style={{ width: '100%' }} value={value} onChange={value => formik.setFieldValue(key, value)} />;
     else if (multiline.includes(key)) control = <Input.TextArea {...props} rows={key === 'key_skills_required' ? 4 : 6} placeholder={label} value={value} onChange={formik.handleChange} />;
     else control = <Input {...props} disabled={props.disabled || key === 'job_shift'} readOnly={key === 'job_shift'} type={dates.includes(key) ? 'datetime-local' : 'text'} placeholder={['hours_per_week', 'contract_length'].includes(key) ? '10, 20-40, etc.' : label} value={value ?? ''} onChange={formik.handleChange} />;
     return <div key={key} className={`data-job-field ${className}`}>

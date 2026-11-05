@@ -87,6 +87,7 @@ const QuestionTypeSelect = ({
             e.target.style.boxShadow = 'none';
           }}
         >
+          <option value="" disabled>Select question type</option>
           {QUESTION_TYPES.map((type) => (
             <option key={type.value} value={type.value}>
               {type.label}

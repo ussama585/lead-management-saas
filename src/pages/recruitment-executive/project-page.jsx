@@ -1485,7 +1485,7 @@ export default function AssignedProjectsPage() {
                   }
                   description={
                     editingPmRemarkId === item.id && userType === 'project_manager' ? (
-                      <TextArea
+                      <TextArea placeholder="Enter remarks"
                         rows={2}
                         value={editingPmRemarkText}
                         onChange={(e) => setEditingPmRemarkText(e.target.value)}

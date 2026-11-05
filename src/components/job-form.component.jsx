@@ -1053,8 +1053,8 @@ const JobForm = ({
                     <div className="job-form__skill-chip-experience">{getSkillExperienceLabel(skill.experience)}</div>
                     {!readOnlyMode && (
                       <div className="job-form__skill-chip-actions">
-                        <span className="job-form__skill-chip-edit" onClick={() => handleSkillEdit(skill)}>✏️</span>
-                        <span className="job-form__skill-chip-remove" onClick={() => handleSkillRemove(skillName)}>✕</span>
+                        <span className="job-form__skill-chip-edit cursor-pointer" onClick={() => handleSkillEdit(skill)}>✏️</span>
+                        <span className="job-form__skill-chip-remove cursor-pointer" onClick={() => handleSkillRemove(skillName)}>✕</span>
                       </div>
                     )}
                   </div>

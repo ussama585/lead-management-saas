@@ -1,5 +1,6 @@
 // src/components/DatePickerField.jsx
 import React from 'react';
+import { fieldPlaceholder } from './lib/field-placeholder.js';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import './DatePickerField.css';
@@ -40,7 +41,7 @@ const DatePickerField = (props) => {
         name={name}
         showTime={resolvedShowTime}
         format={format}
-        placeholder={placeholder}
+        placeholder={fieldPlaceholder({ placeholder, label: label || name || (showTime ? 'date and time' : 'date') }, 'Select')}
         value={value ? dayjs(value) : null}
         onChange={onChange}
         onBlur={onBlur}

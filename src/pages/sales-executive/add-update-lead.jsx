@@ -549,7 +549,7 @@ const AddUpdateLead = () => {
                 </Col>}
                 <Col xs={24} sm={12} lg={8}>
                   <label htmlFor="data-entry-status" className="form-label">Status {requiredMark}</label>
-                  <Field name="status">{({ field, form }) => <Select id="data-entry-status" value={field.value}
+                  <Field name="status">{({ field, form }) => <Select placeholder="Select status" id="data-entry-status" value={field.value}
                     onChange={value => form.setFieldValue('status', value)} style={{ width: '100%' }}
                     options={['Pending', 'Converted', 'Contacted But No Response'].map(value => ({ value, label: value }))} />}</Field>
                   <ErrorMessage name="status" component="div" className="form-error" />

@@ -7,6 +7,7 @@ import { Alert, Space } from 'antd';
 import { LoaderCircle as LoadingOutlined, RotateCw as ReloadOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
+import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import { ConfirmationModal, ShowRemarksLead } from '../../components/LazyModals.jsx';
 import ProjectDetailCard from '../../../../components/project-detail-card.component.jsx';
 import JobFollowupsModal from '../../../../components/job-followups-modal.component.jsx';
@@ -363,6 +364,7 @@ export default function ProjectListing() {
           currentUser={user}
           projectId={clientId}
         />
+        <JobListingTabs>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <StatusTabsContainer
             tabs={statusTabs}
@@ -426,6 +428,7 @@ export default function ProjectListing() {
             />
           </Spin>
         </div>
+        </JobListingTabs>
       </div>
 
       {/* Status Change Confirmation Modal */}
@@ -557,8 +560,8 @@ export default function ProjectListing() {
             if (!visible) setDeleteReason('');
           }}
           mutation={deleteMutation}
-          onConfirm={() => deleteMutation.mutate({ jobId: deleteModal.job?.id, reason: deleteReason })}
-          showReasonField={true}
+          onConfirm={() => deleteMutation.mutate({ jobId: deleteModal.job?.id })}
+          showReasonField={false}
           reason={deleteReason}
           setReason={setDeleteReason}
           message={

@@ -1,5 +1,6 @@
 import { formatSalaryBudget } from '../../../shared/utils/salary-budget.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
+import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -1261,6 +1262,7 @@ export default function MetaLeadsMarketingManager() {
     ];
   }, [canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize]);
 
+  const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, metaLeadsData?.results || [], projectSizeFilter);
   return (
     <>
       <div className="leads">
@@ -1510,7 +1512,7 @@ export default function MetaLeadsMarketingManager() {
                   style={{ width: 'fit-content', minWidth: '200px' }}
                   allowClear
                   popupMatchSelectWidth={false}
-                  options={PROJECT_SIZE_OPTIONS}
+                  options={projectSizeFilterOptions}
                 />
               </Space>
             </div>

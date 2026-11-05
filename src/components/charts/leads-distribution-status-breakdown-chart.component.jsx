@@ -176,7 +176,7 @@ const LeadsDistributionStatusBreakdownChart = ({
             setShowModal={setShowDateRangeModal}
             onDone={handleDateRangeDone}
           />
-          <Select
+          <Select placeholder="Select lead source"
             value={selectedSource}
             style={{ width: 120 }}
             onChange={onSourceChange}

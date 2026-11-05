@@ -132,7 +132,7 @@ const ExecutiveProjectsStatusOverview = ({
             setShowModal={setShowDateRangeModal}
             onDone={handleDateRangeDone}
           />
-          <Select
+          <Select placeholder="Select projects or jobs"
             value={selectedType}
             style={{ width: 140 }}
             onChange={onTypeChange}

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '../../../shared/services/api.js';
-import { dataLeadPayload, getDataLeadDetails, saveDataLead } from './data-lead-dialog.jsx';
+import { dataLeadPayload, getDataLeadDetails, getLeadCreateAssignees, saveDataLead } from './data-lead-dialog.jsx';
 import { dataLeadSchema, dataLeadEditSchema, dataLeadEditFields } from '../../schemas/data-lead-schema.js';
 
 vi.mock('../../../shared/services/api.js', () => ({ default: { get: vi.fn(), post: vi.fn(), patch: vi.fn() } }));
@@ -10,6 +10,17 @@ beforeEach(() => vi.clearAllMocks());
 const sample = { company: 3, industry: 'Information Technology', company_name: 'ABC Solutions', contact_person_name: 'Ali Khan', contact_person_designation: 'Project Manager', email: 'ali@example.com', phone_number: '+923001243867', status: 'Activated', remarks: 'Interested', project_size: '25k', assigned_to: 1, contract_currency: 'PKR', contract_price: 5000, is_accepting_response: true, followup_date: '2026-10-25' };
 
 describe('data lead API contract', () => {
+  it('loads assignees for the company selected in the create form', async () => {
+    const users = [{ id: 8, name: 'Ali', user_type: 'sales_manager' }];
+    api.get.mockResolvedValue({ data: users });
+    expect(await getLeadCreateAssignees('3')).toEqual(users);
+    expect(api.get).toHaveBeenCalledWith('/accounts/users-for-assigning', { params: { company_id: '3' } });
+  });
+  it('uses the authenticated company for company admins', async () => {
+    api.get.mockResolvedValue({ data: [] });
+    await getLeadCreateAssignees();
+    expect(api.get).toHaveBeenCalledWith('/accounts/users-for-assigning', { params: {} });
+  });
   it('creates a JSON lead with all documented fields for super admins', async () => {
     api.post.mockResolvedValue({ data: { success: true, message: 'Lead created successfully.' } });
     await saveDataLead({ values: sample, superAdmin: true });

@@ -167,7 +167,7 @@ export default function JobDescriptionRequestPage() {
           const value = cell.getValue() || 'Pending';
           if (!canReview) return <Tag color={STATUS_COLORS[value] || 'default'}>{value}</Tag>;
           return (
-            <Select
+            <Select placeholder="Select status"
               size="small"
               value={value}
               style={{ width: 120 }}

@@ -44,7 +44,7 @@ export default function RoleLeadDashboard({ statsOnly = false }) {
   }));
   return <section className="space-y-4">
     {isManager && <div className="flex items-center gap-3"><label htmlFor="manager-lead-stats-scope">Lead statistics</label>
-      <Select id="manager-lead-stats-scope" value={statsScope} onChange={setStatsScope} options={['My Stats', 'Executive Stats'].map(value => ({ value, label: value }))} />
+      <Select placeholder="Select lead statistics" id="manager-lead-stats-scope" value={statsScope} onChange={setStatsScope} options={['My Stats', 'Executive Stats'].map(value => ({ value, label: value }))} />
     </div>}
     <Result query={stats}><div className="admin-stat-cards-grid">
       {stats.isLoading ? <p role="status">Loading lead statistics...</p> : dashboardStatCards(stats.data, { data_leads: ['Data Leads'], meta_leads: ['Meta Leads'], web_leads: ['Website Leads'], website_leads_stats: ['Website Leads'], data_leads_stats: ['Data Leads'], meta_leads_stats: ['Meta Leads'] }).map(card => <StatsCard key={card.key} title={card.title} value={card.count} percentage={card.trend} />)}

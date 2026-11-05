@@ -258,7 +258,7 @@ const ManageAssigneesModal = ({
                   <div className="manage-assignees-modal__selected-card-email">{exec.email}</div>
                   <div className="manage-assignees-modal__skip-round-row">
                     <span className="manage-assignees-modal__skip-round-label">Skip Round:</span>
-                    <Select
+                    <Select placeholder="Select id"
                       size="small"
                       value={typeof selectedUsersSkipRounds[exec.id] === 'number' ? selectedUsersSkipRounds[exec.id] : 0}
                       onChange={(value) =>

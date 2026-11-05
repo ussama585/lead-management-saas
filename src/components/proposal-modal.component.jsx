@@ -334,7 +334,7 @@ const ProposalModal = ({
             {customizeMode ? (
               <p className="proposal-modal__date-text">
                 <strong>Date:</strong>{' '}
-                <Input
+                <Input placeholder="Enter proposal date"
                   className="proposal-field-input proposal-modal__date-input"
                   type="date"
                   value={datePickerValue}
@@ -365,7 +365,7 @@ const ProposalModal = ({
             <h3 className="proposal-modal__proposal-for">
               Proposal for the Recruitment of{' '}
               {customizeMode ? (
-                <Input
+                <Input placeholder="Enter company name"
                   className="proposal-field-input proposal-modal__inline-input--company"
                   value={client?.company_name ?? ''}
                   onChange={(e) =>
@@ -386,7 +386,7 @@ const ProposalModal = ({
           <p className="proposal-modal__greeting">
               Dear{' '}
               {customizeMode ? (
-                <Input
+                <Input placeholder="Enter recipient name"
                   className="proposal-field-input proposal-modal__inline-input--salutation"
                   value={salutationName}
                   onChange={(e) =>
@@ -405,7 +405,7 @@ const ProposalModal = ({
               We sincerely thank you for considering <strong>Search O Pal</strong> as your trusted recruitment partner
               for your upcoming hiring needs in{' '}
               {customizeMode ? (
-                <Input
+                <Input placeholder="Enter hiring city"
                   className="proposal-field-input proposal-modal__inline-input--city"
                   value={hiringCity}
                   onChange={(e) =>
@@ -429,7 +429,7 @@ const ProposalModal = ({
               specific requirement of hiring{' '}
               {customizeMode ? (
                 <strong className="proposal-modal__inline-strong--normal">
-                  <InputNumber
+                  <InputNumber placeholder="Enter number of positions"
                     className="proposal-field-input proposal-modal__inline-input--positions"
                     min={1}
                     value={totalPositions}
@@ -441,7 +441,7 @@ const ProposalModal = ({
                     }
                   />{' '}
                   professional{totalPositions > 1 ? 's' : ''} in{' '}
-                  <Input
+                  <Input placeholder="Enter hiring city"
                     className="proposal-field-input proposal-modal__inline-input--city"
                     value={hiringCity}
                     onChange={(e) =>
@@ -490,7 +490,7 @@ const ProposalModal = ({
                   <tr key={index}>
                     <td className="proposal-modal__table-td--position">
                       {customizeMode ? (
-                        <Input
+                        <Input placeholder="Enter job title"
                           className="proposal-field-input"
                           value={job.job_title ?? ''}
                           onChange={(e) =>
@@ -507,7 +507,7 @@ const ProposalModal = ({
                     </td>
                     <td className="proposal-modal__table-td--center">
                       {customizeMode ? (
-                        <Input
+                        <Input placeholder="Enter salary range"
                           className="proposal-field-input"
                           value={salaryCellDisplay(job)}
                           onChange={(e) =>
@@ -529,7 +529,7 @@ const ProposalModal = ({
                     </td>
                     <td className="proposal-modal__table-td--center">
                       {customizeMode ? (
-                        <InputNumber
+                        <InputNumber placeholder="Enter number of vacancies"
                           className="proposal-field-input proposal-modal__inline-input--full-width"
                           min={1}
                           value={job.number_of_vacancies ?? 1}
@@ -598,7 +598,7 @@ const ProposalModal = ({
                   <li>
                     Free of charge, one-time replacement in case a hired candidate resigns or leaves within{' '}
                     {customizeMode ? (
-                      <Input
+                      <Input placeholder="Enter replacement guarantee duration"
                         className="proposal-field-input proposal-modal__inline-input--replacement"
                         value={replacementGuarantee}
                         onChange={(e) =>
@@ -627,7 +627,7 @@ const ProposalModal = ({
                   <li>
                     Submission of the initial batch of screened candidates within{' '}
                     {customizeMode ? (
-                      <Input
+                      <Input placeholder="Enter turnaround time"
                         className="proposal-field-input proposal-modal__inline-input--turnaround"
                         value={turnaroundText}
                         onChange={(e) =>
@@ -676,7 +676,7 @@ const ProposalModal = ({
                   </td>
                   <td className="proposal-modal__financial-value">
                     {customizeMode ? (
-                      <Input
+                      <Input placeholder="Enter service charges description"
                         className="proposal-field-input"
                         value={discountedServiceChargesText}
                         onChange={(e) =>
@@ -705,7 +705,7 @@ const ProposalModal = ({
                     {customizeMode ? (
                       <>
                         <span>{currencyCode} </span>
-                        <InputNumber
+                        <InputNumber placeholder="Enter mobilization charges"
                           className="proposal-field-input proposal-modal__inline-input--charges"
                           min={0}
                           value={mobilizationCharges}
@@ -744,7 +744,7 @@ const ProposalModal = ({
                       <>
                         <strong className="proposal-modal__inline-strong--normal">
                           {currencyCode}{' '}
-                          <InputNumber
+                          <InputNumber placeholder="Enter remaining payment"
                             className="proposal-field-input proposal-modal__inline-input--charges"
                             min={0}
                             value={remainingPayment}
@@ -816,7 +816,7 @@ const ProposalModal = ({
             <p className="proposal-modal__section-text--bottom-15">
               Once we receive the above, we will immediately commence the recruitment cycle and share the first pool of shortlisted candidates for one position within{' '}
               {customizeMode ? (
-                <Input
+                <Input placeholder="Enter turnaround time"
                   className="proposal-field-input proposal-modal__inline-input--turnaround"
                   value={turnaroundText}
                   onChange={(e) =>
@@ -847,7 +847,7 @@ const ProposalModal = ({
             <div className="proposal-modal__signature-col">
               <p className="proposal-modal__signature-name">
                 {customizeMode ? (
-                  <Input
+                  <Input placeholder="Enter representative name"
                     className="proposal-field-input proposal-modal__inline-input--signature"
                     value={search_o_pal_representative?.name || ''}
                     onChange={(e) =>
@@ -866,7 +866,7 @@ const ProposalModal = ({
               </p>
               <p className="proposal-modal__signature-designation">
                 {customizeMode ? (
-                  <Input
+                  <Input placeholder="Enter designation"
                     className="proposal-field-input proposal-modal__inline-input--signature"
                     value={search_o_pal_representative?.designation || ''}
                     onChange={(e) =>
@@ -894,7 +894,7 @@ const ProposalModal = ({
             <div className="proposal-modal__signature-col">
               <p className="proposal-modal__signature-name">
                 {customizeMode ? (
-                  <Input
+                  <Input placeholder="Enter contact person name"
                     className="proposal-field-input proposal-modal__inline-input--signature"
                     value={client?.contact_person_name ?? ''}
                     onChange={(e) =>
@@ -910,7 +910,7 @@ const ProposalModal = ({
               </p>
               <p className="proposal-modal__signature-designation">
                 {customizeMode ? (
-                  <Input
+                  <Input placeholder="Enter contact person designation"
                     className="proposal-field-input proposal-modal__inline-input--signature"
                     value={client?.contact_person_designation ?? ''}
                     onChange={(e) =>
@@ -926,7 +926,7 @@ const ProposalModal = ({
               </p>
               <p className="proposal-modal__signature-company--spaced">
                 {customizeMode ? (
-                  <Input
+                  <Input placeholder="Enter company name"
                     className="proposal-field-input proposal-modal__inline-input--signature"
                     value={client?.company_name ?? ''}
                     onChange={(e) =>

@@ -810,7 +810,7 @@ export default function MainStatsPage() {
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{ fontSize: 12 }}>Series:</span>
-                <Select
+                <Select placeholder="Select metric"
                   value={activeSeriesKey}
                   onChange={setSelectedSeries}
                   options={seriesOptions}
@@ -818,7 +818,7 @@ export default function MainStatsPage() {
                   size="small"
                 />
                 <span style={{ fontSize: 12 }}>Period:</span>
-                <Select
+                <Select placeholder="Select time period"
                   value={selectedPeriod}
                   onChange={setSelectedPeriod}
                   options={PERIOD_OPTIONS}

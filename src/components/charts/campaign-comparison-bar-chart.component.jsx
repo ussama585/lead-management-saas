@@ -346,7 +346,7 @@ const CampaignComparisonBarChart = () => {
       }}>
         <div className="donut-chart-filter-group">
           <span className="donut-chart-filter-label">Campaign 1</span>
-          <Select
+          <Select placeholder="Select first campaign"
             value={campaign1}
             style={{ width: '100%', minWidth: 0 }}
             onChange={(value) => {
@@ -366,7 +366,7 @@ const CampaignComparisonBarChart = () => {
                 <Option key={name} value={name}>{name}</Option>
               ))}
           </Select>
-          <Select
+          <Select placeholder="Select first campaign ad set"
             value={adset1}
             style={{ width: '100%', minWidth: 0, marginTop: 6 }}
             onChange={(value) => setAdset1(value)}
@@ -381,7 +381,7 @@ const CampaignComparisonBarChart = () => {
 
         <div className="donut-chart-filter-group">
           <span className="donut-chart-filter-label">Campaign 2</span>
-          <Select
+          <Select placeholder="Select second campaign"
             value={campaign2}
             style={{ width: '100%', minWidth: 0 }}
             onChange={(value) => {
@@ -401,7 +401,7 @@ const CampaignComparisonBarChart = () => {
                 <Option key={name} value={name}>{name}</Option>
               ))}
           </Select>
-          <Select
+          <Select placeholder="Select second campaign ad set"
             value={adset2}
             style={{ width: '100%', minWidth: 0, marginTop: 6 }}
             onChange={(value) => setAdset2(value)}
@@ -416,7 +416,7 @@ const CampaignComparisonBarChart = () => {
 
         <div className="donut-chart-filter-group">
           <span className="donut-chart-filter-label">Campaign 3</span>
-          <Select
+          <Select placeholder="Select third campaign"
             value={campaign3}
             style={{ width: '100%', minWidth: 0 }}
             onChange={(value) => {
@@ -436,7 +436,7 @@ const CampaignComparisonBarChart = () => {
                 <Option key={name} value={name}>{name}</Option>
               ))}
           </Select>
-          <Select
+          <Select placeholder="Select third campaign ad set"
             value={adset3}
             style={{ width: '100%', minWidth: 0, marginTop: 6 }}
             onChange={(value) => setAdset3(value)}

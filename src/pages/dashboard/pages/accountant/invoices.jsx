@@ -72,7 +72,7 @@ const AccountantInvoices = () => {
         const title = cell.getValue();
         if (!isAdmin || !row.original.project_id) return <span>{title}</span>;
         return (
-          <a
+          <a className="cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
               navigate(`/edit-project-headhunting/${row.original.project_id}`);
@@ -137,7 +137,7 @@ const AccountantInvoices = () => {
         const value = cell.getValue() || 'Pending';
         if (!canEditStatus) return <span>{value}</span>;
         return (
-          <Select
+          <Select placeholder="Select status"
             size="small"
             value={value}
             style={{ width: 120 }}

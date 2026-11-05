@@ -6,6 +6,7 @@ import React, { useMemo, useState, useEffect, useRef, useCallback, Suspense } fr
 import { LoaderCircle as LoadingOutlined, Pencil as EditOutlined, MessageSquare as MessageOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';
+import JobListingTabs from '../../components/job-listing-tabs.jsx';
 import { ConfirmationModal } from '../clients/components/LazyModals.jsx';
 import ProjectDetailCard from '../../components/project-detail-card.component.jsx';
 import '../../assets/styles/legacy/client-listing-page.css';
@@ -704,7 +705,7 @@ useEffect(() => {
                   return isRestricted || !canEdit ? (
                     <span>{cell.getValue()}</span> // 👀 only text for restricted roles or when project is not Active
                   ) : (
-                    <Select
+                    <Select placeholder="Select get value"
                       key={`status-${row.original.id}`}
                       value={cell.getValue()}
                       style={{ width: 120 }}
@@ -816,6 +817,7 @@ useEffect(() => {
          projectId={clientId}
        />
 
+      <JobListingTabs>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ width: '70%' }}>
           <StatusFilterTabs
@@ -880,6 +882,7 @@ useEffect(() => {
           />
           </Spin>
         </div>
+        </JobListingTabs>
       </div>
 
       {/* Status Change Confirmation Modal */}

@@ -6,6 +6,8 @@ import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-d
 import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
+import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
+import { leadModalCompanyPayload } from '../../../shared/utils/lead-modal-company.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Select as AntSelect } from '../../../../components/ui/app-select.jsx';
@@ -308,6 +310,7 @@ const DataLeads = () => {
   );
 
   const tableData = data?.results ?? [];
+  const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, tableData, projectSizeFilter);
   const totalCount = data?.count ?? 0;
 
   const statusTabs = useMemo(() => leadCountTabs(statusCounts), [statusCounts]);
@@ -411,17 +414,6 @@ const DataLeads = () => {
       if (!lead?.id || !nextStatus) return;
       
 
-      if (nextStatus !== 'Potential Client' && STATUSES_REQUIRING_REMARKS.has(nextStatus)) {
-        setProposalFile(null);
-        setRemarksModal({
-          visible: true,
-          lead,
-          forStatusChange: true,
-          newStatus: nextStatus,
-        });
-        return;
-      }
-
       // Status change without remarks modal - don't include remarks in payload
       setUpdatingStatusId(lead.id);
       mutateStatus(
@@ -472,6 +464,7 @@ const DataLeads = () => {
         }
 
         const dataPayload = {
+          ...leadModalCompanyPayload(user, remarksModal.lead),
           remarks: trimmed,
         };
 
@@ -574,7 +567,7 @@ const DataLeads = () => {
           setRemarksLoading(false);
         });
     },
-    [handleCloseRemarksModal, mutateStatus, proposalFile, remarksModal],
+    [handleCloseRemarksModal, mutateStatus, proposalFile, remarksModal, user],
   );
 
   // Handle assignment change - show confirmation modal
@@ -1122,7 +1115,7 @@ const DataLeads = () => {
         <div className='lead-project-size-filter__control lead-company-filter__control'>
         <Ruler size={20} aria-hidden='true' className='shrink-0' />
         <AntSelect id='data-leads-project-size' style={{ width: '100%' }} allowClear placeholder='All project sizes' value={projectSizeFilter || undefined}
-          options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
+          options={projectSizeFilterOptions}
           onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
         </div>
       </div></LeadProjectFilter>
@@ -1407,6 +1400,7 @@ const DataLeads = () => {
             await mutateDataLeadFollowUpAsync({
               leadId: lead.id,
               payload: {
+                ...leadModalCompanyPayload(user, lead),
                 current_followup_date: new Date().toISOString(),
                 next_followup_date: isNextFollowupRequired && values?.followUpDate
                   ? new Date(values.followUpDate).toISOString()

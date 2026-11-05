@@ -26,7 +26,7 @@ const OverallExperienceFilter = ({
             backgroundColor: '#fff',
           }}
         >
-          <TextField
+          <TextField placeholder="Select experience"
             select
             size="small"
             value={value}
@@ -62,7 +62,7 @@ const OverallExperienceFilter = ({
               </MenuItem>
             ))}
           </TextField>
-          <TextField
+          <TextField placeholder="Select comparison"
             select
             size="small"
             value={mode}

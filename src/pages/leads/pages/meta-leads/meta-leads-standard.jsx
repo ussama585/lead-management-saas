@@ -8,6 +8,8 @@ import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
 import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
+import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
+import { leadModalCompanyPayload } from '../../../shared/utils/lead-modal-company.js';
 import useLeadStatusOptions from '../../../shared/services/use-lead-status-options.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
@@ -556,11 +558,6 @@ export default function MetaLeadsStandard() {
   const handleStatusChange = (lead, newStatus) => {
     if (!lead) return;
     
-    if (newStatus !== 'Potential Client' && STATUSES_REQUIRING_REMARKS.has(newStatus)) {
-      setProposalFile(null);
-      setRemarksModal({ visible: true, lead, newStatus, forStatusChange: true });
-      return;
-    }
     // Status change without remarks modal - don't include remarks in payload
     updateStatusMutation.mutate({
       leadId: lead.id,
@@ -628,7 +625,7 @@ export default function MetaLeadsStandard() {
         if (!leadId) return <span>{value}</span>;
         return (
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <a
+            <a className="cursor-pointer"
               style={{ color: '#3E6A9F', fontWeight: 600, textDecoration: 'underline' }}
               href={`${metaLeadDetailBasePath}/meta-leads/${leadId}`}
               onClick={(e) => { e.preventDefault(); navigate(`${metaLeadDetailBasePath}/meta-leads/${leadId}`); }}
@@ -983,6 +980,7 @@ export default function MetaLeadsStandard() {
     ]);
   }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
 
+  const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, metaLeadsData?.results || [], projectSizeFilter);
   return (
     <>
       <div className="leads">
@@ -990,7 +988,7 @@ export default function MetaLeadsStandard() {
             {/* Date Range Filter */}
           <div className="lead-filter-toolbar">
             <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
-              options={[...new Set([...PROJECT_SIZE_OPTIONS.map(option => option.value), ...(metaLeadsData?.results || []).map(lead => lead.project_size)].filter(Boolean))].map(value => ({ value, label: value }))}
+              options={projectSizeFilterOptions}
               onChange={value => { setProjectSizeFilter(value || null); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
             <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal
@@ -1111,6 +1109,7 @@ export default function MetaLeadsStandard() {
 
         const payload = {
           leadId: remarksModal.lead.id,
+          ...leadModalCompanyPayload(user, remarksModal.lead),
         };
 
         // Only add remarks if provided
@@ -1360,6 +1359,7 @@ export default function MetaLeadsStandard() {
             await followUpMutation.mutateAsync({
               leadId: lead.id,
               payload: {
+                ...leadModalCompanyPayload(user, lead),
                 current_followup_date: new Date().toISOString(),
                 next_followup_date: isNextFollowupRequired && values?.followUpDate
                   ? new Date(values.followUpDate).toISOString()

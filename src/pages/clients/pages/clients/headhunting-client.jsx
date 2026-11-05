@@ -837,18 +837,18 @@ export default function HeadhuntingForAdmin() {
               </p>
               <div style={{ marginBottom: 12 }}>
                 <label className="form-label text-start mb-1" style={{ color: '#3E6A9F' }}>Name</label>
-                <Input
+                <Input placeholder="Enter name"
                   value={saasClientDetailData?.company_name || saasClientDetailData?.contact_person_name || saasClientDetailData?.name || ''}
                   disabled
                 />
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label className="form-label text-start mb-1" style={{ color: '#3E6A9F' }}>Email</label>
-                <Input value={saasClientDetailData?.email || ''} disabled />
+                <Input placeholder="Enter email" value={saasClientDetailData?.email || ''} disabled />
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label className="form-label text-start mb-1" style={{ color: '#3E6A9F' }}>Phone</label>
-                <Input value={saasClientDetailData?.phone_number || saasClientDetailData?.phone || ''} disabled />
+                <Input placeholder="Enter phone" value={saasClientDetailData?.phone_number || saasClientDetailData?.phone || ''} disabled />
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label className="form-label text-start mb-1" style={{ color: '#3E6A9F' }}>City<sup>*</sup></label>

@@ -50,7 +50,7 @@ export const createClientColumns = ({
 
         if (canEdit) {
           return (
-            <Select
+            <Select placeholder="Select status"
               value={currentStatus}
               className="table-client-status-select"
               popupMatchSelectWidth={false}
@@ -111,7 +111,7 @@ export const createClientColumns = ({
       sortDescFirst: false,
       Cell: ({ cell, row }) => (
         <a
-          className="link-style"
+          className="link-style cursor-pointer"
           href={`/client-head-hunting/${row.original.id}`}
           onClick={(e) => {
             e.preventDefault();

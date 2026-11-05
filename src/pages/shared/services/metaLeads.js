@@ -555,10 +555,11 @@ export const updateMetaLeadJobById = async (jobId, payload) => {
 export const deleteMetaLeadJob = async (jobId, reason) => {
   try {
     const formData = new FormData();
-    formData.append('delete_reason', reason);
-    const response = await api.delete(`/meta-leads/delete-meta-lead-job/${jobId}`, {
+    if (reason?.trim()) formData.append('delete_reason', reason.trim());
+    const endpoint = `/meta-leads/delete-meta-lead-job/${jobId}`;
+    const response = await (reason?.trim() ? api.delete(endpoint, {
       data: formData,
-    });
+    }) : api.delete(endpoint));
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: error.response?.data };

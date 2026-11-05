@@ -75,7 +75,7 @@ const ColumnChart = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2 style={{ color: '#333' }}>{title}</h2>
 
-        <Select
+        <Select placeholder="Select metric"
           defaultValue={selectedCategory}
           style={{ width: 200 }}
           onChange={handleCategoryChange}

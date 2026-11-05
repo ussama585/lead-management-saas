@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { timezoneOptions } from '../../shared/utils/job-form-options.js';
+import { currencyOptions } from '../../shared/utils/countries.js';
 
 export const dataLeadJobChoices = {
   job_type: ['Full-Time', 'Part-Time', 'Contract', 'Temporary', 'Internship'],
@@ -8,7 +9,7 @@ export const dataLeadJobChoices = {
   payment_term: ['Per Hour', 'Per Month', 'Per Year'],
   degree_level: ['Middle School', 'High School', 'Intermediate', 'Intermediate In Progress', "Bachelor's", "Bachelor's In Progress", "Master's", "Master's In Progress", 'Doctorate', 'Doctorate In Progress'],
   contract_period: ['Day(s)', 'Week(s)', 'Month(s)'],
-  currency: ['Pakistani Rupee (PKR)', 'US Dollar (USD)', 'Saudi Riyal (SAR)', 'Australian Dollar (AUD)', 'Bangladeshi Taka (BDT)', 'British Pound (GBP)', 'Canadian Dollar (CAD)', 'Chinese Yuan (CNY)', 'Egyptian Pound (EGP)', 'Euro (EUR)', 'Indian Rupee (INR)', 'Japanese Yen (JPY)', 'Malaysian Ringgit (MYR)', 'Nigerian Naira (NGN)', 'Russian Ruble (RUB)', 'Singapore Dollar (SGD)', 'South African Rand (ZAR)', 'Swiss Franc (CHF)', 'Turkish Lira (TRY)', 'UAE Dirham (AED)'],
+  currency: currencyOptions.map(option => option.value),
   timezone: timezoneOptions.map(option => option.value),
   min_experience: Array.from({ length: 12 }, (_, index) => index),
   max_experience: Array.from({ length: 12 }, (_, index) => index),

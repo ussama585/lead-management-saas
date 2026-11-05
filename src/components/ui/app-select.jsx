@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { fieldPlaceholder } from '../lib/field-placeholder.js';
 import { Check, ChevronDown, LoaderCircle, X } from 'lucide-react';
 import { Button } from './button.jsx';
 import { Input } from './input.jsx';
@@ -17,14 +18,17 @@ const text = value => typeof value === 'string' || typeof value === 'number' ? S
 
 export function Select({ value, defaultValue, options, children, onChange, onSelect, onDeselect, onSearch,
   onBlur, onFocus, onClear, onDropdownVisibleChange, onOpenChange, mode, showSearch, allowClear,
-  disabled, disabledReason, loading, placeholder = 'Select', className, style, id, name, status,
+  disabled, disabledReason, loading, placeholder, className, style, id, name, status,
   filterOption, optionFilterProp = 'label', optionLabelProp, optionRender, labelRender,
   labelInValue, tokenSeparators = [], onInputKeyDown, notFoundContent, dropdownStyle }) {
+  placeholder = fieldPlaceholder({ placeholder, name }, 'Select');
   const [local, setLocal] = useState(defaultValue);
   const [search, setSearch] = useState('');
   const multiple = mode === 'multiple' || mode === 'tags';
   const current = value === undefined ? local : value;
-  const selected = (multiple ? current || [] : current == null ? [] : [current]).map(item => labelInValue && typeof item === 'object' ? item.value : item);
+  const selected = (multiple ? current || [] : current == null ? [] : [current])
+    .map(item => labelInValue && typeof item === 'object' ? item.value : item)
+    .filter(item => item !== '' && item != null);
   const allOptions = selectOptions(options, children);
   const known = selected.map(item => allOptions.find(option => String(option.value) === String(item))
     || { value: item, label: labelInValue ? (Array.isArray(current) ? current : [current]).find(entry => entry?.value === item)?.label || item : item });

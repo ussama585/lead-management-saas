@@ -282,7 +282,7 @@ const DataEntryTable = () => {
                 </AvatarFallback>
               </Avatar>
             {superAdmin ? (
-              <a
+              <a className="cursor-pointer"
                 style={{ textDecoration: "underline", color: "#3E6A9F" }}
                 href={getRolePath(user?.user_type, `/data-entry/edit/${row.original.id}`)}
                 onClick={(e) => { e.preventDefault(); navigate(getRolePath(user?.user_type, `/data-entry/edit/${row.original.id}`)); }}
@@ -733,7 +733,7 @@ const DataEntryTable = () => {
               >
                 Assign to
               </label>
-              <Select value={selectedAssignee == null ? '' : String(selectedAssignee)}
+              <Select placeholder="Select assign to" value={selectedAssignee == null ? '' : String(selectedAssignee)}
                 onValueChange={value => setSelectedAssignee(Number(value))} disabled={isSaving}>
                 <SelectTrigger id="assign-to-select" className="min-w-[220px]">
                   <SelectValue placeholder="Select Executive/Manager" />

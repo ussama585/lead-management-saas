@@ -381,7 +381,7 @@ const CampaignLeadsChart = () => {
         {/* Campaign dropdown */}
         <div className="donut-chart-filter-group">
           <span className="donut-chart-filter-label">Campaign</span>
-          <Select
+          <Select placeholder="Select campaign"
             value={selectedCampaign || undefined}
             onChange={(value) => {
               setSelectedCampaign(value);
@@ -402,7 +402,7 @@ const CampaignLeadsChart = () => {
         {/* Adset dropdown (cascades from campaign) */}
         <div className="donut-chart-filter-group">
           <span className="donut-chart-filter-label">Adset</span>
-          <Select
+          <Select placeholder="Select ad set"
             value={selectedAdset}
             onChange={(value) => {
               setSelectedAdset(value);
@@ -423,7 +423,7 @@ const CampaignLeadsChart = () => {
         {/* Ad dropdown (cascades from adset) */}
         <div className="donut-chart-filter-group">
           <span className="donut-chart-filter-label">Ad</span>
-          <Select
+          <Select placeholder="Select ad"
             value={selectedAd}
             onChange={(value) => setSelectedAd(value)}
             style={{ width: '100%', minWidth: 0 }}

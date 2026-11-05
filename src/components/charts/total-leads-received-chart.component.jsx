@@ -99,13 +99,13 @@ const TotalLeadsReceivedChart = ({
             setShowModal={setShowDateRangeModal}
             onDone={handleDateRangeDone}
           />
-          <Select
+          <Select placeholder="Select time period"
             value={selectedPeriod}
             style={{ width: 120 }}
             onChange={onPeriodChange}
             options={PERIOD_OPTIONS}
           />
-          {showSourceFilter && <Select
+          {showSourceFilter && <Select placeholder="Select lead source"
             value={selectedSource}
             style={{ width: 140 }}
             onChange={onSourceChange}

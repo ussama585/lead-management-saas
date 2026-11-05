@@ -93,7 +93,7 @@ const TotalLeadsConvertedChart = ({
             setShowModal={setShowDateRangeModal}
             onDone={handleDateRangeDone}
           />
-          <Select
+          <Select placeholder="Select lead source"
             value={selectedSource}
             style={{ width: 140 }}
             onChange={onSourceChange}

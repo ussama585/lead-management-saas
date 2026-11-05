@@ -16,6 +16,7 @@ const SelectGroup = React.forwardRef(function SelectGroup({ ...props }, ref) {
 });
 const SelectValue = React.forwardRef(function SelectValue({ ...props }, ref) {
     props.ref = ref;
+    if (!props.placeholder) props.placeholder = 'Select an option';
 
     return <SelectPrimitive.Value data-slot='select-value' {...props}/>;
 

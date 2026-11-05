@@ -48,7 +48,7 @@ export default function ResetUserPasswordDialog({ user, onClose, onReset }) {
     <form onSubmit={formik.handleSubmit} noValidate className="grid gap-4 py-4">
       {[['new_password', 'New password'], ['confirm_password', 'Confirm password']].map(([field, label]) => <div key={field}>
         <label htmlFor={`reset-user-${field}`} className="mb-2 block text-sm font-medium">{label}</label>
-        <Input.Password id={`reset-user-${field}`} name={field} autoComplete="new-password" value={formik.values[field]}
+        <Input.Password placeholder={`Enter ${label.toLowerCase()}`} id={`reset-user-${field}`} name={field} autoComplete="new-password" value={formik.values[field]}
           onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={mutation.isLoading}
           aria-invalid={Boolean(formik.touched[field] && formik.errors[field])} />
         {formik.touched[field] && formik.errors[field] && <p role="alert" className="mt-1 text-sm text-destructive">{formik.errors[field]}</p>}

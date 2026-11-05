@@ -35,7 +35,7 @@ export default function DuplicateCheckFilter({
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <span style={{ fontWeight: '500', fontSize: '14px' }}>{label}</span>
-      <Select
+      <Select placeholder="Select duplicate status"
         value={normalizedValue}
         onChange={(next) => onChange?.(next)}
         style={{ width: 'fit-content', minWidth, ...style }}

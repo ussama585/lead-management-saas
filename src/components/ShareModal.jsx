@@ -163,7 +163,7 @@ const ShareModal = ({
               <Text className="share-modal__link-label">
                 Link:
               </Text>
-              <Input
+              <Input placeholder="Enter share link"
                 value={link}
                 readOnly
                 className="share-modal__link-input"
@@ -243,7 +243,7 @@ const ShareModal = ({
             {shareOptions.map(option => (
               <Col key={option.key} xs={8} sm={8} md={8}>
                 <div
-                  className="share-modal__option-tile"
+                  className="share-modal__option-tile cursor-pointer"
                   onClick={option.action}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = '#1890ff';

@@ -127,18 +127,18 @@ const CreateSaasClientModal = ({ open, clientId, onClose, onSuccess }) => {
           )}
           <div className="saas-client-modal__field">
             <label className="form-label text-start mb-1 saas-client-modal__field-label">Name</label>
-            <Input
+            <Input placeholder="Enter name"
               value={clientDetail?.company_name || clientDetail?.contact_person_name || clientDetail?.name || ''}
               disabled
             />
           </div>
           <div className="saas-client-modal__field">
             <label className="form-label text-start mb-1 saas-client-modal__field-label">Email</label>
-            <Input value={clientDetail?.email || ''} disabled />
+            <Input placeholder="Enter email" value={clientDetail?.email || ''} disabled />
           </div>
           <div className="saas-client-modal__field">
             <label className="form-label text-start mb-1 saas-client-modal__field-label">Phone</label>
-            <Input value={clientDetail?.phone_number || clientDetail?.phone || ''} disabled />
+            <Input placeholder="Enter phone" value={clientDetail?.phone_number || clientDetail?.phone || ''} disabled />
           </div>
           <div className="saas-client-modal__field">
             <label className="form-label text-start mb-1 saas-client-modal__field-label">City<sup>*</sup></label>

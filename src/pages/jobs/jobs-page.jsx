@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';
+import JobListingTabs from '../../components/job-listing-tabs.jsx';
 import { Trash2 as DeleteOutlined, Pencil as EditOutlined, MessageSquare as MessageOutlined } from 'lucide-react';
 import '../../assets/styles/legacy/table-client-actions.css';
 import { ConfirmationModal } from '../clients/components/LazyModals.jsx';
@@ -77,9 +78,6 @@ export default function JobsPage() {
   // Optional filters for count/list APIs (sales_manager, sales_executive query params)
   const salesManagerId = '';
   const salesExecutiveId = '';
-  const openDeletedJobsList = useCallback(() => {
-    navigate('/admin/deleted-jobs');
-  }, [navigate]);
 
   const handleGlobalFilterChange = useCallback((value) => {
     setGlobalFilter(value ?? '');
@@ -182,7 +180,7 @@ export default function JobsPage() {
           const title = cell.getValue();
           const id = row.original?.id;
           return id ? (
-            <a
+            <a className="cursor-pointer"
               style={{ textDecoration: 'underline', color: '#3E6A9F' }}
               href={`/job-headhunting/${id}`}
               onClick={(e) => { e.preventDefault(); navigate(`/job-headhunting/${id}`); }}
@@ -461,6 +459,7 @@ export default function JobsPage() {
     <>
       <BreadCrumb linkText="Jobs" />
       <div className="listing-page-content">
+        <JobListingTabs>
         <div className="listing-toolbar-flex">
           <StatusTabs
             tabs={JOB_STATUS_TABS}
@@ -474,17 +473,6 @@ export default function JobsPage() {
             }}
           />
         </div>
-        {userType === 'super_admin' && (
-          <div className="listing-action-bar-end">
-            <button
-              type="button"
-              className="listing-btn-warn"
-              onClick={openDeletedJobsList}
-            >
-              Deleted Jobs
-            </button>
-          </div>
-        )}
         <div className="table-container">
           <NewTableComponent
             totalCount={totalCount}
@@ -506,6 +494,7 @@ export default function JobsPage() {
             heading={`Jobs (${totalCount})`}
           />
         </div>
+        </JobListingTabs>
       </div>
       <Suspense fallback={null}>
         <ConfirmationModal
@@ -515,8 +504,8 @@ export default function JobsPage() {
             if (!visible) setDeleteReason('');
           }}
           mutation={deleteMutation}
-          onConfirm={() => deleteMutation.mutate({ jobId: deleteModal.job?.id, reason: deleteReason })}
-          showReasonField={true}
+          onConfirm={() => deleteMutation.mutate({ jobId: deleteModal.job?.id })}
+          showReasonField={false}
           reason={deleteReason}
           setReason={setDeleteReason}
           message={

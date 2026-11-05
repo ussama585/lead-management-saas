@@ -297,7 +297,7 @@ const ResponseAnalysisContent = forwardRef(({ jobId, email, resumeId, onEditStat
     if (qType === 'dropdown') {
       if (isEditing) {
         return (
-          <Select
+          <Select placeholder="Select answer"
             value={editVal ?? undefined}
             onChange={(v) => setEditValues(prev => ({ ...prev, [answer.question_id]: v }))}
             style={{ width: '100%' }}
@@ -313,7 +313,7 @@ const ResponseAnalysisContent = forwardRef(({ jobId, email, resumeId, onEditStat
     if (qType === 'paragraph') {
       if (isEditing) {
         return (
-          <Input.TextArea
+          <Input.TextArea placeholder="Enter answer"
             value={editVal ?? ''}
             onChange={e => setEditValues(prev => ({ ...prev, [answer.question_id]: e.target.value }))}
             rows={4}
@@ -329,7 +329,7 @@ const ResponseAnalysisContent = forwardRef(({ jobId, email, resumeId, onEditStat
     // SHORT TEXT / OTHER
     if (isEditing) {
       return (
-        <Input
+        <Input placeholder="Enter answer"
           value={editVal ?? ''}
           onChange={e => setEditValues(prev => ({ ...prev, [answer.question_id]: e.target.value }))}
           autoFocus
@@ -543,14 +543,14 @@ const RecruiterScreeningFormContent = forwardRef(({ jobId, email, resumeId, onSu
           onChange={(v) => handleChange(question.id, v)}
           style={{ width: '100%' }}
           options={options.map((o) => ({ label: o.label, value: o.value }))}
-          placeholder="Select an option"
+          placeholder="Select answer"
         />
       );
     }
 
     if (qType === 'paragraph') {
       return (
-        <Input.TextArea
+        <Input.TextArea placeholder="Enter answer"
           value={val ?? ''}
           onChange={(e) => handleChange(question.id, e.target.value)}
           rows={4}
@@ -576,7 +576,7 @@ const RecruiterScreeningFormContent = forwardRef(({ jobId, email, resumeId, onSu
 
     // SHORT TEXT / OTHER
     return (
-      <Input
+      <Input placeholder="Enter answer"
         value={val ?? ''}
         onChange={(e) => handleChange(question.id, e.target.value)}
       />
@@ -2036,7 +2036,7 @@ export default function JobHeadhunting() {
         }
 
         return (
-          <Select
+          <Select placeholder="Select candidate status"
             style={{ width: "fit-content" }}
             value={val}
             onChange={value => handleStatusChange(batchId, record.id, value)}
@@ -2685,7 +2685,7 @@ export default function JobHeadhunting() {
       align: 'left',
       responsive: ['xs', 'sm'],
       render: (_, record) => (
-        <span
+        <span className="cursor-pointer"
           style={saasActionButtonStyle}
           title="AI Profile Summary"
           role="button"

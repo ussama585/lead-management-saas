@@ -240,7 +240,7 @@ const JobRemarksModal = ({ visible, onClose, jobId, readOnly = false }) => {
               }
               description={
                 !readOnly && editingRemarkId === item.id ? (
-                  <TextArea
+                  <TextArea placeholder="Enter remarks"
                     rows={2}
                     value={editingRemarkText}
                     onChange={(e) => setEditingRemarkText(e.target.value)}

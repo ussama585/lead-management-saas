@@ -148,7 +148,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
       {showModal && createPortal(
         <>
           <div
-            className="modal-backdrop fade show modal-backdrop-custom"
+            className="modal-backdrop fade show modal-backdrop-custom cursor-pointer"
             onClick={handleClose}
           ></div>
 
@@ -165,7 +165,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
               role="document"
             >
               <div
-                className="modal-content modal-content-custom"
+                className="modal-content modal-content-custom cursor-pointer"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button

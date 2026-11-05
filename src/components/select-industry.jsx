@@ -29,7 +29,7 @@ export default function IndustryAutoSelect ({ name, value, onChange }) {
       placeholder="Select or type an industry"
       filterOption={false} // manual filtering
     >
-      <Input />
+      <Input placeholder="Enter industry" />
     </AutoComplete>
   );
 }

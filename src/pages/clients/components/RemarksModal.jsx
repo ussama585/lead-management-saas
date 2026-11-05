@@ -56,7 +56,7 @@ const RemarksModal = ({
     if (showCount && canEdit) {
       return (
         <div>
-          <TextArea {...textAreaProps} style={{ borderColor: BRAND_COLOR, marginBottom: 4 }} />
+          <TextArea placeholder="Enter remarks" {...textAreaProps} style={{ borderColor: BRAND_COLOR, marginBottom: 4 }} />
           <div style={{ textAlign: 'right', fontSize: 12, color: BRAND_COLOR }}>
             {remarksValue.length} / {maxLength}
           </div>
@@ -66,7 +66,7 @@ const RemarksModal = ({
     }
     return (
       <>
-        <TextArea {...textAreaProps} showCount={!showCount} />
+        <TextArea placeholder="Enter remarks" {...textAreaProps} showCount={!showCount} />
         <RemarksError message={error} />
       </>
     );

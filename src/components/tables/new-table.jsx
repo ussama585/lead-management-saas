@@ -58,7 +58,7 @@ export default function NewTableComponent({
   pagination = { pageIndex: 0, pageSize: 10 }, // Receive pagination state from parent
   onPaginationChange, // Callback to parent
   onPageSizeChange, // Callback to parent
-  sorting, // Receive sorting state from parent
+  sorting = [], // MRT expects an array even when sorting is not configured.
   onSortingChange, // Callback for sorting updates
   globalFilter, // Current search query
   onGlobalFilterChange, // Callback for search updates

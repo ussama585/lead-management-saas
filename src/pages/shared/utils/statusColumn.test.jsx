@@ -25,11 +25,17 @@ describe('Website Lead status dropdown', () => {
     expect(onDirectStatusUpdate).toHaveBeenCalledWith(lead, 'Potential Client');
     expect(onOpenRemarksModal).not.toHaveBeenCalled();
   });
-  it.each(STATUS_OPTIONS.filter(status => !['Pending Contact', 'Potential Client'].includes(status)))('opens remarks before saving %s', async status => {
+  it.each(STATUS_OPTIONS.filter(status => !['Pending Contact', 'Potential Client'].includes(status)))('saves %s directly without remarks', async status => {
     const { cell, lead, onOpenRemarksModal, onDirectStatusUpdate } = render('super_admin');
     await cell.props.onChange(status);
-    expect(onOpenRemarksModal).toHaveBeenCalledWith(lead, status);
-    expect(onDirectStatusUpdate).not.toHaveBeenCalled();
+    expect(onOpenRemarksModal).not.toHaveBeenCalled();
+    expect(onDirectStatusUpdate).toHaveBeenCalledWith(lead, status);
+  });
+  it.each(['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'])('updates a status directly for %s', async role => {
+    const { cell, lead, onOpenRemarksModal, onDirectStatusUpdate } = render(role);
+    await cell.props.onChange('Follow Up');
+    expect(onOpenRemarksModal).not.toHaveBeenCalled();
+    expect(onDirectStatusUpdate).toHaveBeenCalledWith(lead, 'Follow Up');
   });
   it('does not update when selecting the current value', async () => {
     const { cell, onOpenRemarksModal } = render('super_admin');

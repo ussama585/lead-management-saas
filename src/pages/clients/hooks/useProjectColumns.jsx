@@ -76,7 +76,7 @@ export function useProjectColumns({
         Cell: ({ row, cell }) => {
           return (
             <a
-              className="sop-brand-table-link"
+              className="sop-brand-table-link cursor-pointer"
               href={
                 userType === 'project_manager'
                   ? `/project-manager/project-listing-page/${row.original.id}`

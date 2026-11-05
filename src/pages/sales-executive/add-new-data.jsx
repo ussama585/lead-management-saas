@@ -384,7 +384,7 @@ export default function AddNewDataForExecutive() {
                       {({ field }) => (
                         <div className="form-item">
                           <label>Status<sup>*</sup></label>
-                          <Select
+                          <Select placeholder="Select status"
                             {...field}
                             value={field.value || "Select status"}
                             onChange={(value) => {
@@ -838,7 +838,7 @@ export default function AddNewDataForExecutive() {
                       {({ field }) => (
                         <div className="form-item">
                           <label>Status<sup>*</sup></label>
-                          <Select
+                          <Select placeholder="Select status"
                             {...field}
                             value={field.value || "Select status"}
                             onChange={(value) => {
@@ -922,7 +922,7 @@ export default function AddNewDataForExecutive() {
                       {({ field }) => (
                         <div className="form-item">
                           <label>Data Entry Date<sup>*</sup></label>
-                          <Input
+                          <Input placeholder="Enter data entry date"
                             {...field}
                             value={dayjs().format('DD-MM-YYYY')}
                             readOnly

@@ -166,12 +166,12 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {['name', 'email', 'phone', ...(!editing ? ['password', 'confirmPassword'] : [])].map(key => <div key={key}>
             <label htmlFor={`company-user-${key}`}>{({ name: 'Name', email: 'Email', phone: 'Phone', password: 'Password', confirmPassword: 'Confirm Password' })[key]} *</label>
-            <InputField id={`company-user-${key}`} name={key} type={key.toLowerCase().includes('password') ? 'password' : key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'}
+            <InputField placeholder={`Enter ${key === 'confirmPassword' ? 'password again' : key}`} id={`company-user-${key}`} name={key} type={key.toLowerCase().includes('password') ? 'password' : key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'}
               value={formik.values[key]} onChange={formik.handleChange} onBlur={formik.handleBlur} disabled={save.isLoading || (editing && key === 'email')} />
             {fieldError(key)}
           </div>)}
           <div><label htmlFor="company-user-role">User Type *</label>
-            <Select id="company-user-role" className="w-full" value={formik.values.user_type} disabled={editing || save.isLoading}
+            <Select placeholder="Select user type" id="company-user-role" className="w-full" value={formik.values.user_type} disabled={editing || save.isLoading}
               options={companyUserRoles.map(value => ({ value, label: value.replace(/_/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase()) }))}
               onChange={value => { formik.setFieldValue('user_type', value); formik.setFieldValue('manager', ''); }} onBlur={() => formik.setFieldTouched('user_type', true)} />{fieldError('user_type')}
           </div>

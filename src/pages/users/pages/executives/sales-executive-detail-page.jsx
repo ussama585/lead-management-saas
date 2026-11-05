@@ -412,7 +412,7 @@ export default function SalesExecutiveDetail() {
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
-            <div onClick={() => navigate(`/admin/project-detail/${row.id}/${row.job_slug}`)}>
+            <div className="cursor-pointer underline underline-offset-2" onClick={() => navigate(`/admin/project-detail/${row.id}/${row.job_slug}`)}>
               <span style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} className="link-style" >{row.title}</span>
             </div>
           );
@@ -515,7 +515,7 @@ export default function SalesExecutiveDetail() {
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
-            <div onClick={() => navigate(`/admin/project-detail/${row.id}/${row.job_slug}`)}>
+            <div className="cursor-pointer underline underline-offset-2" onClick={() => navigate(`/admin/project-detail/${row.id}/${row.job_slug}`)}>
               <span style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} className="link-style" >{row.title}</span>
             </div>
           );
@@ -740,7 +740,7 @@ export default function SalesExecutiveDetail() {
         Cell: ({ cell }) => {
           const row = cell.getValue();
           return (
-            <div onClick={() => navigate(`/admin/project-detail/${row.id}/${row.job_slug}`)}>
+            <div className="cursor-pointer underline underline-offset-2" onClick={() => navigate(`/admin/project-detail/${row.id}/${row.job_slug}`)}>
               <span style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} className="link-style" >{row.title}</span>
             </div>
           );
@@ -1234,7 +1234,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Company Name</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter company name" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1245,7 +1245,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Company Email</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter company email" {...field} readOnly />
 
                           </div>
                         )}
@@ -1257,7 +1257,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Company Phone</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter company phone" {...field} readOnly />
 
                           </div>
                         )}
@@ -1282,7 +1282,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Job Title</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter job title" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1294,7 +1294,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Number of Resources Required</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter number of resources required" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1306,7 +1306,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Job Posting Date</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter job posting date" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1318,7 +1318,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Hiring Deadline</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter hiring deadline" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1337,7 +1337,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Name</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter name" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1348,7 +1348,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Designation</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter designation" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1359,7 +1359,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Phone</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter phone" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1370,7 +1370,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Email</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter email" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1381,7 +1381,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Website URL</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter website url" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1392,7 +1392,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>LinkedIn Profile</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter linked in profile" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1403,7 +1403,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Facebook Profile</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter facebook profile" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1415,7 +1415,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Country</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter country" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1426,7 +1426,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>City</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter city" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1444,7 +1444,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Acquired Through</label>
-                            <Input {...field} readOnly />
+                            <Input placeholder="Enter acquired through" {...field} readOnly />
                           </div>
                         )}
                       </Field>
@@ -1455,7 +1455,7 @@ export default function SalesExecutiveDetail() {
                         {({ field }) => (
                           <div className="form-item">
                             <label>Remarks</label>
-                            <TextArea
+                            <TextArea placeholder="Enter remarks"
                               {...field}
                               rows={4}
                               readOnly

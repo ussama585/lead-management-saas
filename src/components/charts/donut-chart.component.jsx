@@ -131,7 +131,7 @@ const DonutChartWithFilters = ({ leadType = 'meta' }) => {
             triggerStyle={{ border: '1px solid #d9d9d9' }}
           />
           {leadType === 'meta' && (
-            <Select value={mode} onChange={setMode} style={{ minWidth: 200 }}>
+            <Select placeholder="Select grouping" value={mode} onChange={setMode} style={{ minWidth: 200 }}>
               <Option value="Status">Status</Option>
               <Option value="Project Size">Project Size</Option>
             </Select>

@@ -5,6 +5,7 @@ import { createMetaLeadFollowUp } from './metaLeads.js';
 import { createWebsiteLeadFollowUp } from './leads.js';
 
 vi.mock('./api.js', () => ({ default: { post: vi.fn() } }));
+vi.mock('../store/user-store.js', () => ({ default: { getState: () => ({ user: {} }) } }));
 beforeEach(() => vi.clearAllMocks());
 
 describe.each([
@@ -12,6 +13,12 @@ describe.each([
   ['Meta', createMetaLeadFollowUp, '/meta-leads/meta-follow-up/12'],
   ['Website', createWebsiteLeadFollowUp, '/lead-generation/follow-up/12'],
 ])('%s lead follow-up submission', (_name, submit, endpoint) => {
+  it('preserves the super admin company ID in the payload', async () => {
+    api.post.mockResolvedValue({ data: { success: true } });
+    const payload = { remarks: 'Called client', company_id: 8, is_next_followup_required: false };
+    await submit(12, payload);
+    expect(api.post).toHaveBeenCalledWith(endpoint, payload);
+  });
   it('posts remarks and scheduling fields to the lead follow-up endpoint', async () => {
     const payload = { current_followup_date: '2026-10-29T10:00:00', next_followup_date: null, is_next_followup_required: false, remarks: 'Called client' };
     api.post.mockResolvedValue({ data: { success: true } });

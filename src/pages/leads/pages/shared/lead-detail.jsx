@@ -8,10 +8,11 @@ import React, { useMemo, useState, useEffect } from 'react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import "../../../../assets/styles/legacy/leads.generated.css";
 import { Alert, Row, Col } from 'antd';
-import { Trash2 as DeleteOutlined } from 'lucide-react';
+import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
 import LeadCard from '../../../../components/lead-card.component.jsx';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
 import DeleteJobDialog from './delete-job-dialog.jsx';
+import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
@@ -207,7 +208,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             accessorKey: 'job_title',
             size: 0.5,
             enableEditing: false,
-            Cell: ({ cell, row }) => <span style={{ cursor: isReadOnlyLead ? 'default' : 'pointer' }}
+            Cell: ({ cell, row }) => <span className="cursor-pointer underline underline-offset-2" style={{ cursor: isReadOnlyLead ? 'default' : 'pointer' }}
                 onClick={() => {
                     if (isReadOnlyLead) return;
                     navigate(getRolePath(user?.user_type, `/leads/${id}/job/${row.original.id}`));
@@ -228,7 +229,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
     Edit: ({ cell, row, table }) => {
         const [value, setValue] = React.useState(cell.getValue() === '101' ? '100+' : cell.getValue());
         return (
-            <Select
+            <Select placeholder="Select number of vacancies"
                 className='antd-input dropdown'
                 value={value}
                 options={vacancyOptions}
@@ -259,7 +260,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
-                    <Select
+                    <Select placeholder="Select job type"
                         className='antd-input dropdown'
                         value={value}
                         options={jobTypeOptions}
@@ -290,7 +291,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(normalizeEmploymentType(cell.getValue()));
                 return (
-                    <Select
+                    <Select placeholder="Select employment type"
                         className='antd-input dropdown'
                         value={value}
                         options={employmentTypeOptions}
@@ -519,7 +520,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
-                    <Select
+                    <Select placeholder="Select currency"
                         className='antd-input dropdown'
                         value={value}
                         options={currencyOptions}
@@ -550,7 +551,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
-                    <Select
+                    <Select placeholder="Select payment terms"
                         className='antd-input dropdown'
                         value={value}
                         options={paymentTermOptions}
@@ -581,7 +582,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
-                    <Select
+                    <Select placeholder="Select gender preference"
                         className='antd-input dropdown'
                         value={value}
                         options={genderOptions}
@@ -632,15 +633,20 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
         ...(canDeleteJob
             ? [
                 {
-                    header: 'Action',
-                    id: 'delete',
+                    header: 'Actions',
+                    id: 'actions',
                     enableSorting: false,
                     enableEditing: false,
-                    size: 100,
+                    size: 120,
                     Cell: ({ row }) => (
+                      <div className="flex items-center gap-1">
+                        {['super_admin', 'company_admin'].includes(user?.user_type) && <Button type="text" aria-label={`Edit ${row.original.job_title || 'job'}`} title="Edit job" className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
+                          icon={<Pencil size={16} className="app-icon" />}
+                          onClick={event => { event.stopPropagation(); navigate(getRolePath(user?.user_type, `/leads/${id}/job/${row.original.id}`)); }} />}
                         <Button type="text" danger aria-label={`Delete ${row.original.job_title || 'job'}`} title="Delete job"
                             icon={<DeleteOutlined size={16} className="app-icon" />}
                             onClick={event => { event.stopPropagation(); handleDeleteJob(row.original); }} />
+                      </div>
                     ),
                 },
             ]
@@ -739,6 +745,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
                
                 <div className="row">
                     <div className="col-12 mt-2">
+                      <JobListingTabs>
                         {!isReadOnlyLead && (
                             <button onClick={() => {
                                 if (isReadOnlyLead) return;
@@ -747,6 +754,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
                         )}
                         {jobsError && <Alert type="error" showIcon message={jobsRequestError?.message || 'Could not load lead jobs.'} action={<Button onClick={() => refetchJobs()}>Retry</Button>} />}
                         <MaterialReactTable table={table} />
+                      </JobListingTabs>
                     </div>
                 </div>
             </div>
@@ -756,7 +764,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
                 onCancel={() => setDescModalOpen(false)}
                 footer={null}
             >
-                <Input.TextArea
+                <Input.TextArea placeholder="Enter job description"
                     rows={6}
                     value={descEditValue}
                     onChange={e => setDescEditValue(e.target.value)}

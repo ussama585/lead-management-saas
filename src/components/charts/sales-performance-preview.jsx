@@ -25,6 +25,7 @@ export default function SalesPerformancePreview() {
         <p className='sales-performance-preview-chart-subtitle'>Sample revenue over time <span className='ml-2 rounded bg-muted px-2 py-1 text-xs'>Demo data</span></p>
       </div>
       <select aria-label='Sales performance period' value={period} onChange={event => setPeriod(event.target.value)} className='rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm'>
+        <option value="" disabled>Select period</option>
         {Object.keys(samples).map(value => <option key={value}>{value}</option>)}
       </select>
     </div>

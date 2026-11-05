@@ -52,7 +52,7 @@ export const createProjectColumns = ({
       accessorKey: 'project_name',
       Cell: ({ row, cell }) => (
         <a
-          className="sop-brand-table-link"
+          className="sop-brand-table-link cursor-pointer"
           href={`/project-listing-page/${row.original.id}`}
           onClick={(e) => {
             e.preventDefault();

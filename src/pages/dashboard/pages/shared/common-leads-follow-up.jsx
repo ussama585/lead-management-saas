@@ -1,6 +1,7 @@
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Tooltip, Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useCallback, useMemo, useState } from 'react';
+import { leadModalCompanyPayload } from '../../../shared/utils/lead-modal-company.js';
 import { Alert, Tag } from 'antd';
 import { MessageCircle as CommentOutlined, Clock as ClockCircleOutlined, FileText as FilePdfOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -587,6 +588,7 @@ const CommonLeadsFollowUp = () => {
             leadId,
             leadType,
             payload: {
+              ...leadModalCompanyPayload(user, lead),
               current_followup_date: new Date().toISOString(),
               next_followup_date: isNextFollowupRequired && values?.followUpDate
                 ? new Date(values.followUpDate).toISOString()

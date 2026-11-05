@@ -102,7 +102,7 @@ export default function SalesExecutiveListing() {
                 alt="Profile"
                 style={{ width: 40, height: 40, flexShrink: 0, objectFit: 'cover', borderRadius: '50%', marginRight: '10px' }}
               />
-              <span className="link-style" onClick={() => navigate(`/admin/sales-executive-detail/${row.user}/${row.slug}`)} >{row.name}</span>
+              <span className="link-style cursor-pointer" onClick={() => navigate(`/admin/sales-executive-detail/${row.user}/${row.slug}`)} >{row.name}</span>
             </div>
           );
         },

@@ -31,7 +31,7 @@ const QuestionCard = ({
   const cardShell = (
     <div className={`gf-qcard-shell ${isDragged ? 'gf-qcard-shell--dragged' : ''}`}>
       <div
-        className={`gf-qcard ${isDragOver ? 'gf-qcard--dragover' : ''} ${isFocused ? 'gf-qcard--focused' : ''}`}
+        className={[`gf-qcard ${isDragOver ? 'gf-qcard--dragover' : ''} ${isFocused ? 'gf-qcard--focused' : ''}`, "cursor-pointer"].filter(Boolean).join(" ")}
         onClick={() => onQuestionClick(question.id)}
         onDragEnter={(e) => onDragEnter(e, index)}
         onDragOver={onDragOver}
@@ -56,7 +56,7 @@ const QuestionCard = ({
 
           <div className="gf-qcard-body">
             <div className="gf-qcard-title-row">
-              <div className="gf-qcard-title-grow" onClick={(e) => e.stopPropagation()}>
+              <div className="gf-qcard-title-grow cursor-pointer" onClick={(e) => e.stopPropagation()}>
                 <QuestionTextInput
                   variant="google"
                   value={values.questions?.[index]?.question_text || ''}
@@ -75,7 +75,7 @@ const QuestionCard = ({
                   }
                 />
               </div>
-              <div className="gf-qcard-type-slot" onClick={(e) => e.stopPropagation()}>
+              <div className="gf-qcard-type-slot cursor-pointer" onClick={(e) => e.stopPropagation()}>
                 <QuestionTypeSelect
                   value={question.question_type}
                   onChange={onQuestionTypeChange}
@@ -89,7 +89,7 @@ const QuestionCard = ({
               </div>
             </div>
 
-            <div className="gf-qcard-options-slot" onClick={(e) => e.stopPropagation()}>
+            <div className="gf-qcard-options-slot cursor-pointer" onClick={(e) => e.stopPropagation()}>
               <QuestionOptions
                 question={question}
                 index={index}
@@ -141,7 +141,7 @@ const QuestionCard = ({
               </Tooltip>
               <span className="gf-qcard-footer-divider" />
               <span className="gf-qcard-required-label">Required</span>
-              <div className="gf-qcard-switch-wrap" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation">
+              <div className="gf-qcard-switch-wrap cursor-pointer" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation">
                 <Switch
                   checked={values.questions?.[index]?.is_required}
                   onChange={(checked) => {

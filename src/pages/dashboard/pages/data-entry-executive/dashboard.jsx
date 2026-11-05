@@ -39,7 +39,7 @@ const DataEntryExecutiveDashboard = () => {
       <div style={{ padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2>Sales Data Executive Dashboard</h2>
-          <Select value={filter} onChange={setFilter} style={{ width: 150 }}>
+          <Select placeholder="Select time period" value={filter} onChange={setFilter} style={{ width: 150 }}>
             <Option value="week">Week</Option>
             <Option value="month">Month</Option>
             <Option value="year">Year</Option>

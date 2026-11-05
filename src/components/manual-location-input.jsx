@@ -23,7 +23,7 @@ export function ManualLocationListInput({ value = [], onChange, ...props }) {
   const [draft, setDraft] = useState(value.join(', '));
   useEffect(() => { setDraft(value.join(', ')); }, [value]);
   const commit = () => onChange([...new Set(draft.split(',').map(item => item.trim()).filter(Boolean))]);
-  return <Input {...props} value={draft} type="text" onChange={event => {
+  return <Input placeholder="Enter locations separated by commas" {...props} value={draft} type="text" onChange={event => {
     setDraft(event.target.value);
     if (!event.target.value) onChange([]);
   }} onBlur={commit} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); commit(); } }} />;

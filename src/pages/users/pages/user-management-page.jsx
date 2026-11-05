@@ -605,7 +605,7 @@ export default function UserManagement() {
       <Divider />
       {isSuperAdminViewer && <div className="mb-4 flex items-center gap-3">
         <label htmlFor="user-active-filter">Account status</label>
-        <Select id="user-active-filter" value={activeFilter} style={{ width: 180 }} options={[
+        <Select placeholder="Select account status" id="user-active-filter" value={activeFilter} style={{ width: 180 }} options={[
           { value: '', label: 'All statuses' }, { value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' },
         ]} onChange={value => { setActiveFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
       </div>}

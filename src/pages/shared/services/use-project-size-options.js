@@ -18,5 +18,6 @@ export default function useProjectSizeOptions({ enabled = true, companyId = null
       enabled: enabled && Boolean(user) && (!superAdmin || Boolean(selectedId)), refetchOnWindowFocus: false, staleTime: 60000, retry: 1,
     });
   const options = useMemo(() => projectSizeOptions(query.data), [query.data]);
-  return { ...query, options, disabled: superAdmin && !selectedId };
+  return { ...query, options, disabled: superAdmin && !selectedId,
+    scope: JSON.stringify([user?.id, user?.user_type, superAdmin ? selectedId : user?.company_id]) };
 }

@@ -286,7 +286,7 @@ const CampaignComparisonSplineChart = () => {
               }}
               triggerStyle={{ border: '1px solid #d9d9d9' }}
             />
-            <Select
+            <Select placeholder="Select status"
               value={statusFilter}
               style={{ minWidth: 200 }}
               onChange={(value) => setStatusFilter(value)}
@@ -302,7 +302,7 @@ const CampaignComparisonSplineChart = () => {
 
           {/* Primary selection */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-            <Select
+            <Select placeholder="Select campaign"
               value={selectedCampaign}
               style={{ minWidth: 160 }}
               onChange={(value) => {
@@ -317,7 +317,7 @@ const CampaignComparisonSplineChart = () => {
                 </Option>
               ))}
             </Select>
-            <Select
+            <Select placeholder="Select ad set"
               value={selectedAdset}
               style={{ minWidth: 160 }}
               onChange={(value) => {
@@ -331,7 +331,7 @@ const CampaignComparisonSplineChart = () => {
                 </Option>
               ))}
             </Select>
-            <Select
+            <Select placeholder="Select ad"
               value={selectedAd}
               style={{ minWidth: 160 }}
               onChange={(value) => setSelectedAd(value)}
@@ -346,7 +346,7 @@ const CampaignComparisonSplineChart = () => {
 
           {/* Comparison selection */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Select
+            <Select placeholder="Select comparison campaign"
               value={compareCampaign}
               style={{ minWidth: 160 }}
               onChange={(value) => {
@@ -361,7 +361,7 @@ const CampaignComparisonSplineChart = () => {
                 </Option>
               ))}
             </Select>
-            <Select
+            <Select placeholder="Select comparison ad set"
               value={compareAdset}
               style={{ minWidth: 160 }}
               onChange={(value) => {
@@ -375,7 +375,7 @@ const CampaignComparisonSplineChart = () => {
                 </Option>
               ))}
             </Select>
-            <Select
+            <Select placeholder="Select comparison ad"
               value={compareAd}
               style={{ minWidth: 160 }}
               onChange={(value) => setCompareAd(value)}

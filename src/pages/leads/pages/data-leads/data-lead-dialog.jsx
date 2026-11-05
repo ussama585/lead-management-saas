@@ -8,12 +8,12 @@ import { Alert, Descriptions, Switch } from 'antd';
 import { useFormik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../shared/services/api.js';
-import { industryNames } from '../../../shared/utils/countries.js';
+import { industryNames, currencyOptions } from '../../../shared/utils/countries.js';
 import useUserStore from '../../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../../auth/role-access.js';
 import { dataLeadSchema, dataLeadEditSchema, dataLeadEditFields } from '../../schemas/data-lead-schema.js';
 
-const emptyLead = { company: undefined, industry: '', company_name: '', contact_person_name: '', contact_person_designation: '', email: '', phone_number: '', project_size: '', assigned_to: null, contract_currency: 'PKR', contract_price: null };
+const emptyLead = { company: undefined, industry: '', company_name: '', contact_person_name: '', contact_person_designation: '', email: '', phone_number: '', project_size: '', assigned_to: null, contract_currency: 'Pakistani Rupee (PKR)', contract_price: null };
 const labels = { industry: 'Industry', company_name: 'Company name', contact_person_name: 'Contact name', contact_person_designation: 'Designation', email: 'Email', phone_number: 'Phone number', status: 'Status', project_size: 'Project size', assigned_to: 'Assigned user', contract_currency: 'Currency', contract_price: 'Contract price', followup_date: 'Follow-up date', remarks: 'Remarks' };
 
 export function dataLeadPayload(values, superAdmin) {
@@ -36,6 +36,12 @@ export async function getDataLeadDetails(id) {
   success(data);
   if (data?.data?.id == null) throw new Error('Could not read lead details.');
   return data.data;
+}
+export async function getLeadCreateAssignees(companyId = null) {
+  const { data } = await api.get('/accounts/users-for-assigning', { params: companyId ? { company_id: companyId } : {} });
+  success(data);
+  if (!Array.isArray(data)) throw new Error('Could not read the assignee list.');
+  return data;
 }
 export async function saveDataLead({ id, values, superAdmin }) {
   const payload = id == null ? dataLeadPayload(values, superAdmin) : Object.fromEntries(dataLeadEditFields.map(key => [key, String(values[key] ?? '').trim()]));
@@ -82,6 +88,13 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
   const validationSchema = mode === 'edit' ? dataLeadEditSchema() : dataLeadSchema(superAdmin);
   const requiredFields = new Set(Object.entries(validationSchema.describe().fields).filter(([, field]) => field.optional === false).map(([key]) => key));
   const formik = useFormik({ initialValues: initial, enableReinitialize: true, validationSchema, onSubmit: async values => { try { await save.mutateAsync({ id, values, superAdmin }); } catch { /* Formik displays API errors. */ } } });
+  const assignmentCompanyId = superAdmin ? formik.values.company : null;
+  const assigningUsers = useQuery(['leadCreateAssignees', user?.id, user?.user_type, assignmentCompanyId],
+    () => getLeadCreateAssignees(assignmentCompanyId), {
+      enabled: mode === 'create' && (!superAdmin || Boolean(assignmentCompanyId)),
+      refetchOnWindowFocus: false,
+    });
+  const assigneeOptions = mode === 'create' ? (superAdmin && !assignmentCompanyId ? [] : assigningUsers.data || []) : assignees;
   const pending = save.isLoading;
   function close() { if (!pending) onClose(); }
   const loading = id != null && detail.isFetching;
@@ -94,14 +107,20 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
       options={[...new Set([...industryNames.map(item => item.value), formik.values.industry].filter(Boolean))].map(value => ({ value, label: value }))}
       onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} />;
     if (key === 'contract_currency') return <Select {...common} className='w-full' placeholder='Select currency'
-      options={[{ value: 'PKR', label: 'Pakistani Rupee (PKR)' }, { value: 'USD', label: 'US Dollar (USD)' }, { value: 'CAD', label: 'Canadian Dollar (CAD)' }]}
+      options={currencyOptions}
       onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} />;
-    if (key === 'company') return <Select {...common} className='w-full' showSearch filterOption={false} onSearch={setCompanySearch} loading={companies.isFetching} options={companyOptions} onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} placeholder='Search for a company' />;
-    if (['assigned_to', 'contract_price'].includes(key)) return key === 'assigned_to' && assignees.length ? <Select {...common} className='w-full' allowClear showSearch optionFilterProp='label' options={assignees.map(item => ({ value: item.id, label: item.name }))} onChange={value => formik.setFieldValue(key, value ?? null)} onBlur={() => formik.setFieldTouched(key, true)} /> : <Input {...common} type='number' className='h-10 w-full' min={key === 'assigned_to' ? 1 : 0} step={key === 'contract_price' ? 'any' : 1} onChange={event => formik.setFieldValue(key, event.target.value === '' ? null : Number(event.target.value))} />;
+    if (key === 'company') return <Select {...common} className='w-full' showSearch filterOption={false} onSearch={setCompanySearch} loading={companies.isFetching} options={companyOptions} onChange={value => { formik.setFieldValue(key, value); formik.setFieldValue('assigned_to', null); }} onBlur={() => formik.setFieldTouched(key, true)} placeholder='Search for a company' />;
+    if (key === 'assigned_to') return <Select {...common} className='w-full' allowClear showSearch optionFilterProp='label'
+      disabled={pending || (superAdmin && !assignmentCompanyId) || assigningUsers.isLoading}
+      placeholder={superAdmin && !assignmentCompanyId ? 'Select a company first' : 'Select assigned user'}
+      loading={assigningUsers.isFetching}
+      options={assigneeOptions.map(item => ({ value: item.id, label: [item.name, item.user_type ? `(${item.user_type.replace(/_/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase())})` : ''].filter(Boolean).join(' ') }))}
+      onChange={value => formik.setFieldValue(key, value ?? null)} onBlur={() => formik.setFieldTouched(key, true)} />;
+    if (key === 'contract_price') return <Input placeholder="Enter contract price" {...common} type='number' className='h-10 w-full' min={0} step='any' onChange={event => formik.setFieldValue(key, event.target.value === '' ? null : Number(event.target.value))} />;
     if (key === 'is_accepting_response') return <Switch id={common.id} disabled={pending} checked={formik.values[key]} onChange={value => formik.setFieldValue(key, value)} />;
-    if (['status', 'project_size'].includes(key)) return <Select {...common} className='w-full' showSearch optionFilterProp='label' options={[...new Set((key === 'status' ? statuses : projectSizes).concat(formik.values[key] || []).filter(Boolean))].map(value => ({ value, label: value }))} onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} placeholder='Select a value' />;
-    if (key === 'remarks') return <Input.TextArea {...common} rows={3} onChange={formik.handleChange} />;
-    return <Input {...common} type={key === 'email' ? 'email' : key === 'followup_date' ? 'date' : 'text'} onChange={formik.handleChange} />;
+    if (['status', 'project_size'].includes(key)) return <Select {...common} className='w-full' showSearch optionFilterProp='label' options={[...new Set((key === 'status' ? statuses : projectSizes).concat(formik.values[key] || []).filter(Boolean))].map(value => ({ value, label: value }))} onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} placeholder={`Select ${labels[key].toLowerCase()}`} />;
+    if (key === 'remarks') return <Input.TextArea placeholder="Enter remarks" {...common} rows={3} onChange={formik.handleChange} />;
+    return <Input placeholder={`Enter ${labels[key]?.toLowerCase() || 'a value'}`} {...common} type={key === 'email' ? 'email' : key === 'followup_date' ? 'date' : 'text'} onChange={formik.handleChange} />;
   }
   return <Modal title={mode === 'view' ? 'Data lead details' : mode === 'edit' ? 'Edit data lead' : 'Create data lead'} open width={800} style={{ width: 'calc(100% - 32px)' }} onCancel={close}
     onOk={formik.submitForm} okText={mode === 'edit' ? 'Save changes' : 'Create lead'} confirmLoading={pending} okButtonProps={{ disabled: loading || detailError }}
@@ -114,6 +133,7 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
           {formik.touched[key] && formik.errors[key] && <p id={`data-lead-${key}-error`} role='alert' className='mt-1 text-sm text-destructive'>{formik.errors[key]}</p>}
         </div>)}
         {companies.isError && superAdmin && mode === 'create' && <Alert className='sm:col-span-2' type='error' message='Could not load companies.' action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}
+        {assigningUsers.isError && mode === 'create' && <Alert className='sm:col-span-2' type='error' message='Could not load assignees.' action={<Button onClick={() => assigningUsers.refetch()}>Retry</Button>} />}
         {formik.status && <Alert className='sm:col-span-2' type='error' showIcon message={formik.status} />}
         <button type='submit' hidden disabled={pending}>Save lead</button>
       </form>}

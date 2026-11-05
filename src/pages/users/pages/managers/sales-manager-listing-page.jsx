@@ -93,7 +93,7 @@ export default function SalesManagerListing() {
                 Cell: ({ cell }) => {
                     const row = cell.getValue();
                     return (
-                        <div style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} onClick={() => navigate(`/admin/sales-executive-detail/${row.user}/${row.slug}`)}>
+                        <div className="cursor-pointer underline underline-offset-2" style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }} onClick={() => navigate(`/admin/sales-executive-detail/${row.user}/${row.slug}`)}>
                             <span className="link-style" >{row.name}</span>
                         </div>
                     );

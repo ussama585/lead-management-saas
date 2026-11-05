@@ -587,7 +587,24 @@ export const countriesNames = [
 export const currencyOptions = [
   { label: "Pakistani Rupee (PKR)", value: "Pakistani Rupee (PKR)"},
   { label: "US Dollar (USD)", value: "US Dollar (USD)"},
+  { label: "Saudi Riyal (SAR)", value: "Saudi Riyal (SAR)" },
+  { label: "Australian Dollar (AUD)", value: "Australian Dollar (AUD)" },
+  { label: "Bangladeshi Taka (BDT)", value: "Bangladeshi Taka (BDT)" },
+  { label: "British Pound (GBP)", value: "British Pound (GBP)" },
   { label: "Canadian Dollar (CAD)", value: "Canadian Dollar (CAD)"},
+  { label: "Chinese Yuan (CNY)", value: "Chinese Yuan (CNY)" },
+  { label: "Egyptian Pound (EGP)", value: "Egyptian Pound (EGP)" },
+  { label: "Euro (EUR)", value: "Euro (EUR)" },
+  { label: "Indian Rupee (INR)", value: "Indian Rupee (INR)" },
+  { label: "Japanese Yen (JPY)", value: "Japanese Yen (JPY)" },
+  { label: "Malaysian Ringgit (MYR)", value: "Malaysian Ringgit (MYR)" },
+  { label: "Nigerian Naira (NGN)", value: "Nigerian Naira (NGN)" },
+  { label: "Russian Ruble (RUB)", value: "Russian Ruble (RUB)" },
+  { label: "Singapore Dollar (SGD)", value: "Singapore Dollar (SGD)" },
+  { label: "South African Rand (ZAR)", value: "South African Rand (ZAR)" },
+  { label: "Swiss Franc (CHF)", value: "Swiss Franc (CHF)" },
+  { label: "Turkish Lira (TRY)", value: "Turkish Lira (TRY)" },
+  { label: "UAE Dirham (AED)", value: "UAE Dirham (AED)" },
 
 ];
 

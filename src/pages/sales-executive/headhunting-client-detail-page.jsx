@@ -318,7 +318,7 @@ export default function HeadhuntingClientDetailForExecutive() {
           const status = row.original.status;
           return (
             <div className="select-box" style={{ width: "150px" }}>
-            <Select
+            <Select placeholder="Select status"
               value={status || ""}
               onChange={(value) => {
                 statusChangeMutation({ value, id: row.original.id });
@@ -530,7 +530,7 @@ export default function HeadhuntingClientDetailForExecutive() {
               {/* Status Change Dropdown */}
               <div className="select-box" style={{ width: "200px" }}>
                 <Text style={{ fontWeight: "bold", color: "#3E6A9F" }}>Select Status</Text>
-                <Select
+                <Select placeholder="Select status"
                   // placeholder="Select Status"
                   onChange={(status) => changeStatusHandler({id, status})}
                   defaultValue={userDetails?.status}

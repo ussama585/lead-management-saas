@@ -1,4 +1,5 @@
 import { leadOptionCompanyId } from '../pages/shared/utils/lead-option-company.js';
+import { leadModalCompanyPayload } from '../pages/shared/utils/lead-modal-company.js';
 import { message } from './ui/notifications.jsx';
 import { Select } from './ui/app-select.jsx';
 import React, { useEffect, useState, useMemo } from "react";
@@ -167,6 +168,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
       : '';
     const requestData = {
       status: payload.status,
+      ...(payload.company_id != null ? { company_id: payload.company_id } : {}),
       remarks: payload.remarks,
       ...(selectedJobIdsString ? { selected_job_ids: selectedJobIdsString } : {}),
       ...(payload.total_vacancies != null ? { total_vacancies: payload.total_vacancies } : {}),
@@ -352,23 +354,11 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     setShowModal(false);
   };
 
-  // Handle status change with remarks modal
+  // Save status changes directly for every role that can edit the lead.
   const handleStatusChange = async (value) => {
     if (value === status) return;
 
-    if (value === 'Potential Client') {
-      updateStatusMutation.mutate({ id: lead.id, status: value });
-      return;
-    }
-    const conversionData = null;
-
-    // Open remarks modal for status change
-    setRemarksModal({
-      visible: true,
-      lead: { ...lead, conversionData, proposalData: conversionData },
-      forStatusChange: true,
-      newStatus: value
-    });
+    updateStatusMutation.mutate({ id: lead.id, status: value });
   };
 
   // Handle remarks save
@@ -450,6 +440,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
       } else {
         const payload = {
               id: remarksModal.lead.id,
+              ...leadModalCompanyPayload(user, remarksModal.lead),
               status: remarksModal.lead.status,
               total_vacancies: contractData.total_vacancies ?? remarksModal.lead.total_vacancies,
               selected_job_ids: contractData.selected_job_ids || []

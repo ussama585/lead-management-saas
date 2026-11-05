@@ -328,7 +328,7 @@ export default function CreateUser() {
                       <label className="label">
                         Create User Type <span className="asterisk">*</span>
                       </label>
-                      <Select
+                      <Select placeholder="Select user type"
                         className="dropdown-select"
                         popupMatchSelectWidth={false}
                         value={values.user_type}
