@@ -30,7 +30,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
       <label htmlFor="overview-company-filter" className="text-sm font-medium">Company</label>
       <div className={leadListing ? 'lead-company-filter__control' : undefined} style={leadListing ? undefined : { display: 'contents' }}>
       {leadListing && <Building2 size={20} className="shrink-0" aria-hidden="true" />}
-      <Select id="overview-company-filter" aria-label="Company" placeholder="All companies"
+      <Select id="overview-company-filter" aria-label="Company" placeholder={/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname) ? 'Select company' : 'All companies'}
         style={{ width: 280, maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
         virtual={false} optionRender={option => <CompanySelectOption option={option} />}
         labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}

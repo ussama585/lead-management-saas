@@ -64,6 +64,7 @@ export async function editCompanyUser(id, values, initial) {
     if (value !== '' && value != null && String(value) !== String(initial[key] ?? '')) body.append(key === 'manager' ? 'manager_id' : key, key === 'password' ? values[key] : value);
   }
   if (values.profile_file) body.append('profile_pic', values.profile_file);
+  else if (values.remove_profile_pic) body.append('profile_pic', '');
   if (![...body.keys()].length) return { unchanged: true };
   const { data } = await api.patch(`/accounts/detail/${encodeURIComponent(id)}`, body);
   return assertUserSuccess(data);
@@ -94,7 +95,7 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
   });
   const initial = { name: details.data?.name || '', email: details.data?.email || '', phone: details.data?.phone || '',
     password: '', confirmPassword: '', company_id: Number(companyId), user_type: details.data?.user_type || 'sales_executive',
-    manager: managerIdFromOptions(managers.data, details.data), profile_file: null };
+    manager: managerIdFromOptions(managers.data, details.data), profile_file: null, remove_profile_pic: false };
   const save = useMutation(values => editing ? editCompanyUser(target.id, values, initial) : createCompanyUser(companyId, values), {
     onSuccess: result => {
       if (result.unchanged) { message.info('No changes were made'); return; }
@@ -121,19 +122,27 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
         <div className="mb-5 flex justify-center">
           <div className="relative inline-flex">
             <UserAvatar className="size-20">
-              <AvatarImage src={picturePreview || details.data?.profile_pic || undefined} alt="User profile" className="object-cover" />
+              <AvatarImage src={formik.values.remove_profile_pic ? undefined : picturePreview || details.data?.profile_pic || undefined} alt="User profile" className="object-cover" />
               <AvatarFallback className="bg-primary text-3xl text-primary-foreground">{Array.from(String(formik.values.name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
             </UserAvatar>
+            <div className="absolute bottom-0 left-full flex items-center gap-1">
             <Button type="default" shape="circle" size="small" aria-label="Edit profile picture" title="Edit profile picture"
               icon={<Pencil size={14} />} disabled={save.isLoading} onClick={() => pictureInput.current?.click()}
-              style={{ position: 'absolute', bottom: 0, right: 0 }} />
+              />
+            {editing && !formik.values.remove_profile_pic && (formik.values.profile_file || details.data?.profile_pic) && (
+              <Button danger shape="circle" size="small" aria-label="Remove profile picture" title="Remove profile picture"
+                icon={<Trash2 size={14} />} disabled={save.isLoading}
+                onClick={() => { formik.setFieldValue('profile_file', null); formik.setFieldValue('remove_profile_pic', true); }} />
+            )}
+            </div>
           </div>
           <input ref={pictureInput} id="company-user-picture" type="file" accept="image/*" hidden disabled={save.isLoading}
             onChange={event => {
               const file = event.target.files?.[0];
               event.target.value = '';
               if (file && !file.type.startsWith('image/')) { message.error('Select an image file.'); event.target.value = ''; return; }
-              if (file) formik.setFieldValue('profile_file', file);
+              if (file && file.size > 2 * 1024 * 1024) { message.error('Profile image must be 2 MB or smaller.'); return; }
+              if (file) { formik.setFieldValue('remove_profile_pic', false); formik.setFieldValue('profile_file', file); }
             }} />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -161,6 +161,7 @@ export default function CreateUser() {
               event.target.value = '';
               if (!file) return;
               if (!file.type.startsWith('image/')) { message.error('Select an image file.'); return; }
+              if (file.size > 2 * 1024 * 1024) { message.error('Profile image must be 2 MB or smaller.'); return; }
               setProfileFile(file);
             }} />
           <div className="form-container">

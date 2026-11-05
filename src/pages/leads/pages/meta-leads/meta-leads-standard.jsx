@@ -1,3 +1,4 @@
+import { formatSalaryBudget } from '../../../shared/utils/salary-budget.js';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
@@ -202,8 +203,10 @@ export default function MetaLeadsStandard() {
     return option ? option.label : value || '-';
   };
 
-  const formatExtraDataValue = (val) => {
-    if (!val || typeof val !== 'string') return val || '';
+  const formatExtraDataValue = (val, key) => {
+    if (String(key || '').includes('monthly_salary_budget')) return formatSalaryBudget(val);
+    if (val == null || (typeof val === 'string' && !val.trim())) return '-';
+    if (typeof val !== 'string') return String(val);
     let s = val
       .replace(/_\+/g, '+')
       .replace(/_-_/g, '-')
@@ -930,31 +933,7 @@ export default function MetaLeadsStandard() {
 
         if (!salaryData || !salaryData.value) return <span>-</span>;
 
-        // Format the salary value for better readability
-        let formattedValue = salaryData.value;
-
-        // Handle different formats
-        if (formattedValue.toLowerCase().includes('pkr')) {
-          // Format: "pkr_50,000_-_pkr_100,000" -> "PKR 50,000-PKR 100,000"
-          // Format: "under_pkr_50,000" or "underpkr_50,000" -> "under PKR 50,000"
-          formattedValue = formattedValue
-            .replace(/under_?pkr_?/gi, 'under PKR ') // Handle "under_pkr_", "underpkr_", "underpkr" formats
-            .replace(/pkr_/gi, 'PKR ')
-            .replace(/\bpkr\b/gi, 'PKR ') // Handle standalone "pkr" with word boundaries
-            .replace(/_-_/g, '-') // Handle dash in ranges first (before replacing other underscores)
-            .replace(/_\+/g, '+') // Handle plus sign
-            .replace(/_/g, '') // Remove remaining underscores (don't replace with commas, numbers already have commas)
-            .replace(/\s+/g, ' ')
-            .trim();
-        } else {
-          // General formatting
-          formattedValue = formattedValue
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, l => l.toUpperCase())
-            .trim();
-        }
-
-        return <span style={{ whiteSpace: 'nowrap' }}>{formattedValue}</span>;
+        return <span style={{ whiteSpace: 'nowrap' }}>{formatSalaryBudget(salaryData.value)}</span>;
       },
     },
     {
@@ -1032,6 +1011,7 @@ export default function MetaLeadsStandard() {
     {user?.user_type === 'super_admin' && (
       <Button
         icon={<UserAddOutlined size="1em" className="app-icon" />}
+        disabled={!selectedCompany(searchParams.toString())}
         onClick={() => setUserAssignmentModalVisible(true)}
         style={{ backgroundColor: '#3E6A9F', borderColor: '#3E6A9F', color: 'white' }}
       >Manage Assignees</Button>
@@ -1338,7 +1318,7 @@ export default function MetaLeadsStandard() {
                     {formatExtraDataKey(item.key)}
                   </div>
                   <div style={{ fontSize: 14, color: '#333' }}>
-                    {formatExtraDataValue(item.value)}
+                    {formatExtraDataValue(item.value, item.key)}
                   </div>
                 </div>
               ) : null

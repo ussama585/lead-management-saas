@@ -80,6 +80,11 @@ function getUserTypeLabel(userType) {
   return userType ? userType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '';
 }
 
+function getAssigneeLabel(assignee) {
+  const userType = getUserTypeLabel(assignee?.user_type);
+  return [assignee?.name, userType ? `(${userType})` : ''].filter(Boolean).join(' ');
+}
+
 const STATUSES_REQUIRING_REMARKS = new Set([
   "SaaS Client",
   "Follow Up",
@@ -656,8 +661,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                   ...(assignedTo && !executivesList.some(e => String(e.id) === String(assignedTo.id) || (e.email && e.email === assignedTo.id)) ? [assignedTo] : []),
                   ...executivesList,
                 ].map((executive) => (
-                  <Option key={String(executive.id)} value={executive.id} label={executive?.name}>
-                    {executive?.name} - {executive?.user_type === 'sales_manager' ? 'Manager' : 'Executive'}
+                  <Option key={String(executive.id)} value={executive.id} label={getAssigneeLabel(executive)}>
+                    {getAssigneeLabel(executive)}
                   </Option>
                 ))}
               </Select>

@@ -696,6 +696,7 @@ const DataEntryTable = () => {
         </div>
 
         <LeadListingFilters
+          requiresCompany={superAdmin && !companyId}
           executives={executivesList}
           selectedExecutive={selectedExecId}
           showExecutives={canViewUserTabs}

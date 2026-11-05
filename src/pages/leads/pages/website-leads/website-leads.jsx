@@ -1591,6 +1591,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             <div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right">
               <Button
                 icon={<UserAddOutlined size="1em" className="app-icon" />}
+                disabled={userType === 'super_admin' && !selectedCompany(searchParams.toString())}
                 onClick={() => setUserAssignmentModalVisible(true)}
                 style={{ backgroundColor: '#3e6a9f', borderColor: '#3e6a9f', color: '#fff' }}
               >Manage Assignees</Button>

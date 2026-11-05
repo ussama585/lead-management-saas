@@ -135,6 +135,10 @@ export default function EditUser() {
       message.error('Please select an image file.');
       return;
     }
+    if (selectedFile.size > 2 * 1024 * 1024) {
+      message.error('Profile image must be 2 MB or smaller.');
+      return;
+    }
     setSelectedImage(selectedFile);
   };
 
