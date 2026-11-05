@@ -64,7 +64,6 @@ export async function editCompanyUser(id, values, initial) {
     if (value !== '' && value != null && String(value) !== String(initial[key] ?? '')) body.append(key === 'manager' ? 'manager_id' : key, key === 'password' ? values[key] : value);
   }
   if (values.profile_file) body.append('profile_pic', values.profile_file);
-  else if (values.remove_profile_pic) body.append('profile_pic', '');
   if (![...body.keys()].length) return { unchanged: true };
   const { data } = await api.patch(`/accounts/detail/${encodeURIComponent(id)}`, body);
   return assertUserSuccess(data);
@@ -86,6 +85,7 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
   const queryClient = useQueryClient();
   const pictureInput = useRef(null);
   const [picturePreview, setPicturePreview] = useState(null);
+  const [pictureRemoved, setPictureRemoved] = useState(false);
   const editing = target.mode === 'edit';
   const details = useQuery(['companyUserEdit', companyId, target.id], () => getCompanyUserDetails(target.id), {
     enabled: editing, staleTime: 0, cacheTime: 0, refetchOnMount: 'always', refetchOnWindowFocus: false, refetchOnReconnect: false, retry: 1,
@@ -105,7 +105,22 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
     onError: error => { message.error(userFormError(error)); applyUserErrors(error, formik); },
   });
   const formik = useFormik({ initialValues: initial, enableReinitialize: true, validationSchema: editing ? companyUserEditSchema : companyUserCreateSchema,
-    onSubmit: async values => { try { await save.mutateAsync(values); } catch { /* Errors are displayed by the mutation. */ } } });
+    onSubmit: async values => { if (removePicture.isLoading) return; try { await save.mutateAsync(values); } catch { /* Errors are displayed by the mutation. */ } } });
+  const removePicture = useMutation(async () => {
+    const { data } = await api.delete(`/accounts/picture/delete/${encodeURIComponent(target.id)}`);
+    return assertUserSuccess(data);
+  }, {
+    onSuccess: () => {
+      formik.setFieldValue('profile_file', null);
+      setPictureRemoved(true);
+      queryClient.invalidateQueries(['companyUsers']);
+      queryClient.invalidateQueries(['usersList']);
+      queryClient.removeQueries(['userDetails', String(target.id)]);
+      message.success('Profile picture removed successfully');
+    },
+    onError: error => message.error(userFormError(error)),
+  });
+  const pictureBusy = save.isLoading || removePicture.isLoading;
   useEffect(() => {
     if (!formik.values.profile_file) { setPicturePreview(null); return; }
     const url = URL.createObjectURL(formik.values.profile_file);
@@ -115,28 +130,31 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
   const managerOptions = managers.data || [];
   const fieldError = key => formik.touched[key] && formik.errors[key] ? <div className="error text-sm" style={{ color: 'red' }} role="alert">{formik.errors[key]}</div> : null;
   return <Modal open title={editing ? 'Edit company user' : 'Create company user'} width={720} footer={null}
-    closable={!save.isLoading} maskClosable={!save.isLoading} keyboard={!save.isLoading} onCancel={() => { if (!save.isLoading) onClose(); }}>
+    closable={!pictureBusy} maskClosable={!pictureBusy} keyboard={!pictureBusy} onCancel={() => { if (!pictureBusy) onClose(); }}>
     {editing && details.isLoading ? <div className="py-6 text-center"><Spin /></div> : editing && details.isError
       ? <Alert type="error" message={userFormError(details.error)} action={<Button onClick={() => details.refetch()}>Retry</Button>} />
       : <form className="user-management-form" onSubmit={formik.handleSubmit} noValidate>
         <div className="mb-5 flex justify-center">
           <div className="relative inline-flex">
             <UserAvatar className="size-20">
-              <AvatarImage src={formik.values.remove_profile_pic ? undefined : picturePreview || details.data?.profile_pic || undefined} alt="User profile" className="object-cover" />
+              <AvatarImage src={picturePreview || (!pictureRemoved && details.data?.profile_pic) || undefined} alt="User profile" className="object-cover" />
               <AvatarFallback className="bg-primary text-3xl text-primary-foreground">{Array.from(String(formik.values.name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
             </UserAvatar>
             <div className="absolute bottom-0 left-full flex items-center gap-1">
             <Button type="default" shape="circle" size="small" aria-label="Edit profile picture" title="Edit profile picture"
-              icon={<Pencil size={14} />} disabled={save.isLoading} onClick={() => pictureInput.current?.click()}
+              icon={<Pencil size={14} />} disabled={pictureBusy} onClick={() => pictureInput.current?.click()}
               />
-            {editing && !formik.values.remove_profile_pic && (formik.values.profile_file || details.data?.profile_pic) && (
+            {(formik.values.profile_file || (!pictureRemoved && details.data?.profile_pic)) && (
               <Button danger shape="circle" size="small" aria-label="Remove profile picture" title="Remove profile picture"
-                icon={<Trash2 size={14} />} disabled={save.isLoading}
-                onClick={() => { formik.setFieldValue('profile_file', null); formik.setFieldValue('remove_profile_pic', true); }} />
+                icon={<Trash2 size={14} />} disabled={pictureBusy}
+                onClick={() => {
+                  if (editing && !pictureRemoved && details.data?.profile_pic) removePicture.mutate();
+                  else formik.setFieldValue('profile_file', null);
+                }} />
             )}
             </div>
           </div>
-          <input ref={pictureInput} id="company-user-picture" type="file" accept="image/*" hidden disabled={save.isLoading}
+          <input ref={pictureInput} id="company-user-picture" type="file" accept="image/*" hidden disabled={pictureBusy}
             onChange={event => {
               const file = event.target.files?.[0];
               event.target.value = '';
@@ -165,7 +183,7 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
             {managers.isError && <div role="alert">Could not load managers. <Button type="link" onClick={() => managers.refetch()}>Retry</Button></div>}
           </div>}
         </div>
-        <Space className="mt-5"><Button type="primary" htmlType="submit" loading={save.isLoading}>{editing ? 'Save changes' : 'Create user'}</Button><Button disabled={save.isLoading} onClick={onClose}>Cancel</Button></Space>
+        <Space className="mt-5"><Button type="primary" htmlType="submit" loading={save.isLoading} disabled={removePicture.isLoading}>{editing ? 'Save changes' : 'Create user'}</Button><Button disabled={pictureBusy} onClick={onClose}>Cancel</Button></Space>
       </form>}
   </Modal>;
 }

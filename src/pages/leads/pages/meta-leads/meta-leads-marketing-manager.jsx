@@ -14,6 +14,7 @@ import ManageAssigneesModal from '../../../../components/manage-assignees-modal.
 import { getMetaLeadsAssignedUsers, addMetaLeadsUserAssignments, removeMetaLeadsUserAssignments } from '../../../shared/services/leads.js'
 
 import { loadTableState } from '../../../shared/utils/persistTableState.js';
+import { syncLeadFilterParams } from '../../../shared/utils/lead-filter-query.js';
 
 import {
   getMetaLeadsListCount,
@@ -457,11 +458,12 @@ export default function MetaLeadsMarketingManager() {
         stateToSave.historyEndDate = historyEndDate.toISOString();
       }
 
+      syncLeadFilterParams(setSearchParams, stateToSave);
       sessionStorage.setItem('tableState_meta-leads-marketing-manager', JSON.stringify(stateToSave));
     } catch (e) {
       console.warn('Failed to save meta-leads marketing manager table state:', e);
     }
-  }, [globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange, projectSizeFilter, executiveFilter, duplicateCheck, formNamesFilter, excludeKeywords, selectedCampaign, selectedAdset, selectedAd, selectedHistoryStatuses, historyStartDate, historyEndDate]);
+  }, [globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange, projectSizeFilter, executiveFilter, duplicateCheck, formNamesFilter, excludeKeywords, selectedCampaign, selectedAdset, selectedAd, selectedHistoryStatuses, historyStartDate, historyEndDate, setSearchParams]);
 
   // Fetch executives/managers list for assignment (same as leads.jsx)
   const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
@@ -632,8 +634,7 @@ export default function MetaLeadsMarketingManager() {
   // Handle adset selection changes
   useEffect(() => {
     if (selectedAdset) {
-      // Clear previous ads when a new adset is selected
-      setSelectedAd(null);
+      // Selection handlers clear the previous ad; preserve restored selections on mount.
       // The React Query will automatically fetch new ads for the selected adset
     } else {
       // Clear ads when no adset is selected

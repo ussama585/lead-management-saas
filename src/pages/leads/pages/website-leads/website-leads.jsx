@@ -32,6 +32,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
   import MarketingManagerFilters from './components/marketing-manager-filters.jsx';
   import { useDuplicateLead } from '../../../../components/hooks/useDuplicateLead.js';
   import { saveTableState, loadTableState } from '../../../shared/utils/persistTableState.js';
+  import { syncLeadFilterParams } from '../../../shared/utils/lead-filter-query.js';
   import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
   import FollowUpModal from '../../../../components/follow-up-modal.component.jsx';
 
@@ -199,7 +200,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     const [updatingProjectSizeId, setUpdatingProjectSizeId] = useState(null);
     const [assignmentModal, setAssignmentModal] = useState({ visible: false, lead: null, newAssigneeId: null, newAssigneeName: null });
     const [columnVisibility, setColumnVisibility] = useState({});
-    const [projectSizeFilter, setProjectSizeFilter] = useState('');
+    const [projectSizeFilter, setProjectSizeFilter] = useState(initialState.projectSizeFilter || '');
     const [rowSelection, setRowSelection] = useState({});
     const [proposalModal, setProposalModal] = useState({ visible: false, data: null, loading: false });
     const [followUpModal, setFollowUpModal] = useState({ visible: false, lead: null });
@@ -283,6 +284,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           selectedExecutive: normalizedExecutive,
           hearAboutUs: normalizedHearAboutUs,
           duplicateCheck,
+          projectSizeFilter,
           search: globalFilter,
           pageIndex: pagination.pageIndex,
           pageSize: pagination.pageSize,
@@ -298,31 +300,13 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           ];
         }
 
+        syncLeadFilterParams(setSearchParams, stateToSave);
         sessionStorage.setItem('tableState_leads-page', JSON.stringify(stateToSave));
       } catch (e) {
         console.warn('Failed to save table state:', e);
       }
 
-      // Update URL params (only status and executive for backwards compatibility)
-      const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
-      // Normalize to single values (handle arrays by taking first value)
-      const normalizedStatus = Array.isArray(selectedStatus)
-        ? (selectedStatus.length > 0 ? selectedStatus[0] : '')
-        : selectedStatus;
-      const normalizedExecutive = Array.isArray(selectedExecutive)
-        ? (selectedExecutive.length > 0 ? selectedExecutive[0] : '')
-        : selectedExecutive;
-      const normalizedHearAboutUsForUrl = Array.isArray(hearAboutUs)
-        ? hearAboutUs
-        : (hearAboutUs ? [hearAboutUs] : []);
-
-      if (normalizedStatus) params.status = normalizedStatus;
-      if (normalizedExecutive) params.executive = normalizedExecutive;
-      if (normalizedHearAboutUsForUrl.length > 0) {
-        params.hear_about_us = normalizedHearAboutUsForUrl.join(',');
-      }
-      setSearchParams(params, { replace: true });
-    }, [selectedStatus, selectedExecutive, hearAboutUs, duplicateCheck, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange]);
+    }, [selectedStatus, selectedExecutive, hearAboutUs, duplicateCheck, projectSizeFilter, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange, setSearchParams]);
 
     // Helper function to reset all persistent filters (except the tab selection)
     const resetAllFilters = () => {
@@ -1263,21 +1247,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       setSorting([]);
       setGlobalFilter('');
 
-      // Update URL with status parameter
-      const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
-      const normalizedExecutive = Array.isArray(selectedExecutive)
-        ? (selectedExecutive.length > 0 ? selectedExecutive[0] : '')
-        : selectedExecutive;
-      const normalizedHearAboutUs = Array.isArray(hearAboutUs)
-        ? hearAboutUs
-        : (hearAboutUs ? [hearAboutUs] : []);
 
-      if (normalizedStatus) params.status = normalizedStatus;
-      if (normalizedExecutive) params.executive = normalizedExecutive;
-      if (normalizedHearAboutUs.length > 0) {
-        params.hear_about_us = normalizedHearAboutUs.join(',');
-      }
-      setSearchParams(params);
     };
 
     const handleExecutiveClick = (executiveId) => {
@@ -1294,21 +1264,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       setDateRange(null);
       setShowDateModal(false);
 
-      // Update URL with executive parameter (keep status if selected)
-      const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
-      const normalizedStatus = Array.isArray(selectedStatus)
-        ? (selectedStatus.length > 0 ? selectedStatus[0] : '')
-        : selectedStatus;
-      const normalizedHearAboutUs = Array.isArray(hearAboutUs)
-        ? hearAboutUs
-        : (hearAboutUs ? [hearAboutUs] : []);
 
-      if (normalizedExecutiveId) params.executive = normalizedExecutiveId;
-      if (normalizedStatus) params.status = normalizedStatus;
-      if (normalizedHearAboutUs.length > 0) {
-        params.hear_about_us = normalizedHearAboutUs.join(',');
-      }
-      setSearchParams(params);
 
       // React Query will automatically refetch due to query key changes
     };
@@ -1365,20 +1321,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               setSorting([]);
               setGlobalFilter('');
 
-              const params = searchParams.get('company_id') ? { company_id: searchParams.get('company_id') } : {};
-              const normalizedStatus = Array.isArray(selectedStatus)
-                ? (selectedStatus.length > 0 ? selectedStatus[0] : '')
-                : selectedStatus;
-              const normalizedExecutive = Array.isArray(selectedExecutive)
-                ? (selectedExecutive.length > 0 ? selectedExecutive[0] : '')
-                : selectedExecutive;
 
-              if (normalizedStatus) params.status = normalizedStatus;
-              if (normalizedExecutive) params.executive = normalizedExecutive;
-              if (normalizedValues.length > 0) {
-                params.hear_about_us = normalizedValues.join(',');
-              }
-              setSearchParams(params);
             }}
             getExecutiveCount={getExecutiveCount}
             getStatusCount={getStatusCount}

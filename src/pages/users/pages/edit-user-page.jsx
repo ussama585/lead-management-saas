@@ -57,13 +57,14 @@ export default function EditUser() {
   const imageInputRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
+  const [pictureRemoved, setPictureRemoved] = useState(false);
   useEffect(() => {
     if (!selectedImage) { setImagePreview(''); return; }
     const url = URL.createObjectURL(selectedImage);
     setImagePreview(url);
     return () => URL.revokeObjectURL(url);
   }, [selectedImage]);
-  useEffect(() => { setSelectedImage(null); }, [userId]);
+  useEffect(() => { setSelectedImage(null); setPictureRemoved(false); }, [userId]);
 
 
   const { data: userDetails, isLoading, error, refetch: refetchUserDetails } = useQuery({
@@ -75,6 +76,20 @@ export default function EditUser() {
   });
 
   const ManagerType = userDetails?.data?.user_type;
+
+  const removePictureMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await api.delete(`/accounts/picture/delete/${userId}`);
+      return assertUserSuccess(data);
+    },
+    onSuccess: () => {
+      setSelectedImage(null);
+      setPictureRemoved(true);
+      queryClient.invalidateQueries('usersList');
+      message.success('Profile picture removed successfully');
+    },
+    onError: error => message.error(userFormError(error)),
+  });
 
   const formatUserType = (userType) => {
     return userType
@@ -124,13 +139,13 @@ export default function EditUser() {
   };
 
   const handleImageEditClick = () => {
-    if (!isUpdating) imageInputRef.current?.click();
+    if (!isUpdating && !removePictureMutation.isLoading) imageInputRef.current?.click();
   };
 
   const handleImageUpload = (event) => {
     const selectedFile = event.target.files?.[0];
     event.target.value = '';
-    if (!selectedFile || isUpdating) return;
+    if (!selectedFile || isUpdating || removePictureMutation.isLoading) return;
     if (!selectedFile.type.startsWith('image/')) {
       message.error('Please select an image file.');
       return;
@@ -161,10 +176,19 @@ export default function EditUser() {
               type="user"
               name={previewValues.name || ''}
               isCreate={false}
-              profileImg={imagePreview || userDetails?.data?.profile_pic || undefined}
+              profileImg={imagePreview || (!pictureRemoved && userDetails?.data?.profile_pic) || undefined}
               phoneNumber={phoneNumber}
               email={email}
               onEditPicture={handleImageEditClick}
+              pictureBusy={isUpdating || removePictureMutation.isLoading}
+              onRemovePicture={['super_admin', 'company_admin'].includes(user?.user_type) ? () => {
+                if (isUpdating || removePictureMutation.isLoading) return;
+                if (pictureRemoved || !userDetails?.data?.profile_pic) {
+                  setSelectedImage(null);
+                  return;
+                }
+                removePictureMutation.mutate();
+              } : undefined}
               editPictureByAvatar
               details={[
                 { label: 'Name', value: previewValues.name }, { label: 'Email', value: previewValues.email },
@@ -324,7 +348,7 @@ export default function EditUser() {
                     </div>
 
                     <Form.Item>
-                      <Button type="primary" className="create-button" htmlType="submit" loading={isUpdating}>
+                      <Button type="primary" className="create-button" htmlType="submit" loading={isUpdating} disabled={removePictureMutation.isLoading}>
                         Update
                       </Button>
                     </Form.Item>

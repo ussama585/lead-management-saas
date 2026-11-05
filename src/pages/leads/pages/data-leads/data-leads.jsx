@@ -43,6 +43,7 @@ import useUserStore from "../../../shared/store/user-store.js";
 import { ConfirmationModal } from "../../../clients/components/LazyModals.jsx";
 import BootstrapDateRangeModal from "../../../../components/bootstrap-date-range-modal.component.jsx";
 import { loadTableState } from "../../../shared/utils/persistTableState.js";
+import { syncLeadFilterParams } from '../../../shared/utils/lead-filter-query.js';
 import StatusHistoryModal, { createStatusHistoryColumn } from "../../../../components/status-history-modal.jsx";
 import dayjs from "dayjs";
 import api from '../../../shared/services/api.js';
@@ -100,7 +101,6 @@ const DataLeads = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
   const [leadDialog, setLeadDialog] = useState(null);
-  const [projectSizeFilter, setProjectSizeFilter] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Load persisted state from sessionStorage
@@ -108,6 +108,7 @@ const DataLeads = () => {
     defaultStatus: '',
     status: '',
   });
+  const [projectSizeFilter, setProjectSizeFilter] = useState(initialState.projectSizeFilter || '');
   
   const [pagination, setPagination] = useState({ 
     pageIndex: initialState.pageIndex, 
@@ -195,6 +196,7 @@ const DataLeads = () => {
         statusFilter: selectedStatus,
         executiveFilter: selectedExecutive,
         duplicateCheck,
+        projectSizeFilter,
         search: globalFilter,
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -210,11 +212,12 @@ const DataLeads = () => {
         ];
       }
 
+      syncLeadFilterParams(setSearchParams, stateToSave);
       sessionStorage.setItem('tableState_data-leads-page', JSON.stringify(stateToSave));
     } catch (e) {
       console.warn('Failed to save data-leads table state:', e);
     }
-  }, [selectedStatus, selectedExecutive, duplicateCheck, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange]);
+  }, [selectedStatus, selectedExecutive, duplicateCheck, projectSizeFilter, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange, setSearchParams]);
 
 
 

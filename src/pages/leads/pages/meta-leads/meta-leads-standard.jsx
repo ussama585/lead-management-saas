@@ -27,6 +27,7 @@ import ManageAssigneesModal from '../../../../components/manage-assignees-modal.
 import { getMetaLeadsAssignedUsers, addMetaLeadsUserAssignments, removeMetaLeadsUserAssignments } from '../../../shared/services/leads.js';
 import { createAssignedToColumn } from '../../../shared/utils/assignedToColumn.jsx';
 import { loadTableState } from '../../../shared/utils/persistTableState.js';
+import { syncLeadFilterParams } from '../../../shared/utils/lead-filter-query.js';
 
 import {getMetaLeadsStats, getMetaLeadsListCount,updateMetaLeadProjectSize, createMetaLeadFollowUp, getMetaLeadHistory} from '../../../shared/services/metaLeads.js'
   // getMetaLeadsCampaignNameList, getMetaLeadsAdsetNameList, getMetaLeadsAdNameList, getMetaLeadsListWithHistory, getMetaLeadsAdsetListByCampaign, getMetaLeadsAdsListByAdset, 
@@ -160,8 +161,8 @@ export default function MetaLeadsStandard() {
   
   const [showDateModal, setShowDateModal] = useState(false);
   const [datePickerResetKey, setDatePickerResetKey] = useState(0);
-  const [selectedExecId, setSelectedExecId] = useState(null);
-  const [statusFilter, setStatusFilter] = useState(STATUS_OPTIONS.includes(initialState.statusFilter) ? initialState.statusFilter : 'All');
+  const [selectedExecId, setSelectedExecId] = useState(initialState.selectedExecId || null);
+  const [statusFilter, setStatusFilter] = useState(initialState.statusFilter || 'All');
   const [selectedProjectSize, setSelectedProjectSize] = useState(null);
   const [updatingProjectSizeId, setUpdatingProjectSizeId] = useState(null);
   const [projectSizeFilter, setProjectSizeFilter] = useState(initialState.projectSizeFilter || null);
@@ -374,6 +375,7 @@ export default function MetaLeadsStandard() {
         sorting: sorting,
         projectSizeFilter: projectSizeFilter,
         executiveFilter: executiveFilter,
+        selectedExecId,
         timestamp: Date.now(),
       };
 
@@ -385,11 +387,12 @@ export default function MetaLeadsStandard() {
         ];
       }
 
+      syncLeadFilterParams(setSearchParams, stateToSave);
       sessionStorage.setItem('tableState_meta-leads-page', JSON.stringify(stateToSave));
     } catch (e) {
       console.warn('Failed to save meta-leads table state:', e);
     }
-  }, [statusFilter, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange, projectSizeFilter, executiveFilter]);
+  }, [statusFilter, globalFilter, pagination.pageIndex, pagination.pageSize, sorting, dateRange, projectSizeFilter, executiveFilter, selectedExecId, setSearchParams]);
 
   // Fetch executives/managers list for assignment (same as leads.jsx)
   const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({

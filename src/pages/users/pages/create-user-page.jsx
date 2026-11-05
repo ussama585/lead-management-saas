@@ -18,7 +18,7 @@ import UserFormPreviewSync from '../../../components/user-form-preview-sync.jsx'
 import UserPlaceholderIcon from '../../../assets/images/user-card-icons/user-placeholder.svg';
 import InputField from '../../../components/input-field.component.jsx';
 import { Avatar, AvatarImage, AvatarFallback } from '../../../components/ui/avatar.jsx';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import '../../../assets/styles/legacy/create-user.css';
 import '../../../assets/styles/user-management-form.css';
 
@@ -140,7 +140,10 @@ export default function CreateUser() {
             phoneNumber={phone}
             email={email}
             isCreate={false}
-            showPencil={false}
+            editPictureByAvatar
+            onEditPicture={() => pictureInput.current?.click()}
+            onRemovePicture={() => setProfileFile(null)}
+            pictureBusy={isLoading}
             profileImg={picturePreview || undefined}
             avatar={UserPlaceholderIcon}
             details={[
@@ -198,9 +201,13 @@ export default function CreateUser() {
                         <AvatarImage src={picturePreview || undefined} alt="Selected profile picture" className="object-cover" />
                         <AvatarFallback className="bg-primary text-3xl text-primary-foreground">{values.name?.trim().charAt(0).toUpperCase() || '?'}</AvatarFallback>
                       </Avatar>
+                      <div className="absolute bottom-0 left-full flex items-center gap-1">
                       <Button shape="circle" size="small" aria-label="Upload profile picture" title="Upload profile picture"
                         icon={<Pencil size={14} />} disabled={isLoading} onClick={() => pictureInput.current?.click()}
-                        style={{ position: 'absolute', bottom: 0, right: 0 }} />
+                        />
+                      {profileFile && <Button danger shape="circle" size="small" aria-label="Remove profile picture" title="Remove profile picture"
+                        icon={<Trash2 size={14} />} disabled={isLoading} onClick={() => setProfileFile(null)} />}
+                      </div>
                     </div>
                   </div>
                   <div className="form-grid">

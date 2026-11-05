@@ -1,3 +1,5 @@
+import { readLeadFilterParams } from './lead-filter-query.js';
+
 /**
  * Utility to persist table state using URL params + sessionStorage
  * This ensures state persists on reload AND when navigating back to the page
@@ -89,6 +91,9 @@ export const loadTableState = (routeKey, searchParams, defaults = {}) => {
     sorting: [],
     dateRange: null,
   };
+
+  const isLeadPage = ['leads-page', 'data-leads-page', 'meta-leads-page', 'meta-leads-marketing-manager'].includes(routeKey);
+  if (isLeadPage && searchParams.get('filters') === '1') return readLeadFilterParams(searchParams, state);
 
   // Try to load from sessionStorage first
   try {
@@ -203,7 +208,7 @@ export const loadTableState = (routeKey, searchParams, defaults = {}) => {
     state.sorting = [{ id: sortBy, desc: sortOrder === 'desc' }];
   }
 
-  return state;
+  return isLeadPage ? readLeadFilterParams(searchParams, state) : state;
 };
 
 /**

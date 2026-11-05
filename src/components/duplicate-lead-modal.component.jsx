@@ -191,6 +191,14 @@ export default function DuplicateLeadModal({ visible, lead, onClose, leadType = 
       width={700}
     >
       <div style={{ padding: '8px 0' }}>
+        <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fffbe6', borderRadius: '4px', border: '1px solid #ffe58f' }}>
+          <Title level={5} style={{ margin: '0 0 8px 0', color: '#ad6800' }}>
+            Duplicate Information
+          </Title>
+          <p style={{ margin: 0, color: '#614700' }}>
+            This lead has been marked as a duplicate of the original lead shown below. Please review the information and take appropriate action.
+          </p>
+        </div>
         <LeadCard
           lead={lead}
           leadType={leadType}
@@ -247,14 +255,6 @@ export default function DuplicateLeadModal({ visible, lead, onClose, leadType = 
           })()
         ) : null}
 
-        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#fffbe6', borderRadius: '4px', border: '1px solid #ffe58f' }}>
-          <Title level={5} style={{ margin: '0 0 8px 0', color: '#ad6800' }}>
-            Duplicate Information
-          </Title>
-          <p style={{ margin: 0, color: '#614700' }}>
-            This lead has been marked as a duplicate of the original lead shown above. Please review the information and take appropriate action.
-          </p>
-        </div>
       </div>
     </Modal>
   );

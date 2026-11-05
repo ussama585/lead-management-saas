@@ -5,10 +5,10 @@ import CallIcon from '../assets/images/user-card-icons/call.svg';
 import MailIcon from '../assets/images/user-card-icons/mail.svg';
 import PencilIcon from '../assets/images/user-card-icons/pencil.svg';
 import Avatar from 'react-avatar';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import '../assets/styles/legacy/create-user.css';
 
-export default function UserDetailCard({ type, name, phoneNumber, email, onEditPicture, isCreate = false, showPencil = true, isClient = false, status = "-", location, details, profileImg, editPictureByAvatar = false, centerName = false }) {
+export default function UserDetailCard({ type, name, phoneNumber, email, onEditPicture, onRemovePicture, pictureBusy = false, isCreate = false, showPencil = true, isClient = false, status = "-", location, details, profileImg, editPictureByAvatar = false, centerName = false }) {
   return (
     <div className={details ? 'card user-detail-preview-card' : 'card'}>
       <div className="heading-section">
@@ -35,11 +35,14 @@ export default function UserDetailCard({ type, name, phoneNumber, email, onEditP
         <div className="avatar-outer-container">
           <div className="avatar-container [&_img]:object-cover" style={editPictureByAvatar ? { position: 'relative' } : undefined}>
             <Avatar name={name || '?'} src={profileImg} round={true} />
-            {editPictureByAvatar && showPencil && <button type="button" aria-label="Edit profile picture" title="Edit profile picture" onClick={onEditPicture}
+            {editPictureByAvatar && showPencil && <button type="button" aria-label="Edit profile picture" title="Edit profile picture" onClick={onEditPicture} disabled={pictureBusy}
               className="flex items-center justify-center rounded-full bg-background text-foreground"
               style={{ position: 'absolute', right: -4, bottom: -4, width: 30, height: 30, border: '1px solid #d2d2d2', cursor: 'pointer' }}>
               <Pencil size={16} />
             </button>}
+            {onRemovePicture && profileImg && <button type="button" aria-label="Remove profile picture" title="Remove profile picture" onClick={onRemovePicture} disabled={pictureBusy}
+              className="flex items-center justify-center rounded-full bg-background text-destructive disabled:opacity-50"
+              style={{ position: 'absolute', right: -40, bottom: -4, width: 30, height: 30, border: '1px solid #d2d2d2', cursor: 'pointer' }}><Trash2 size={16} /></button>}
           </div>
           {(
             <h3 className="general-name" style={{ color: '#3E6A9F', textAlign: !centerName && details && name && !editPictureByAvatar ? 'left' : 'center', ...(details ? { alignSelf: 'stretch' } : {}) }}>
