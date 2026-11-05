@@ -102,7 +102,7 @@ const MetaLead = () => {
     sorting?.[0]?.['id'],
     sorting?.[0]?.['desc'],
   ],
-  async () => await api.get(`/meta-leads/jobs/${leadId}?page=${pagination.pageIndex+1}&size=${pagination.pageSize}&search=${globalFilter}&sort_by=${sorting?.[0]?.['id'] ?? ''}&order=${sorting?.[0]?.['desc'] ? 'desc' : 'asc'}`),
+  async () => await api.get(`/meta-leads/jobs/${leadId}?is_active=true&page=${pagination.pageIndex+1}&size=${pagination.pageSize}&search=${globalFilter}&sort_by=${sorting?.[0]?.['id'] ?? ''}&order=${sorting?.[0]?.['desc'] ? 'desc' : 'asc'}`),
   {
     enabled: Boolean(leadId),
     staleTime: 5 * 60 * 1000, // 5 minutes - jobs data changes frequently
@@ -136,8 +136,9 @@ const MetaLead = () => {
   }, []);
 
   const handleConfirmDeleteJob = useCallback(() => {
-    deleteJobMutation.mutate({ jobId: deleteModal.job?.id });
-  }, [deleteModal.job, deleteJobMutation]);
+    if (!deleteReason.trim()) { message.error('Please add remarks before deleting this job.'); return; }
+    deleteJobMutation.mutate({ jobId: deleteModal.job?.id, reason: deleteReason.trim() });
+  }, [deleteModal.job, deleteJobMutation, deleteReason]);
 
  const { data: leadDetail, refetch: refetchLeadDetail } = useQuery(
   ["metaLeadDetail", leadId],
@@ -806,7 +807,7 @@ const getMetaLeadUrl = () => {
           </Button>
         </Stack>
 
-            <JobListingTabs><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs}><MaterialReactTable table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>
@@ -881,7 +882,7 @@ const getMetaLeadUrl = () => {
           }}
           mutation={deleteJobMutation}
           onConfirm={handleConfirmDeleteJob}
-          showReasonField={false}
+          showReasonField={true}
           reason={deleteReason}
           setReason={setDeleteReason}
           message={

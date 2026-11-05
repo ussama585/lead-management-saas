@@ -62,7 +62,7 @@ const durationError = error => error?.response?.data?.message || error?.response
 const AdminSettingsPage = () => {
   const { user } = useUserStore();
   const superAdmin = isSuperAdmin(user?.user_type);
-  const [companyId, setCompanyId] = useState(null);
+  const [selectedCompanyId, setCompanyId] = useState(undefined);
   // const canManageAppearance = isSuperAdmin(user?.user_type);
   const settingsSections = [
     // ...(canManageAppearance ? [{ key: 'appearance', label: 'Appearance', icon: Palette }] : []),
@@ -77,6 +77,7 @@ const AdminSettingsPage = () => {
   const companies = useQuery(['overviewCompanies', user?.id], getCompanies, {
     enabled: superAdmin && section === 'follow-up-duration', staleTime: 300000, refetchOnWindowFocus: false,
   });
+  const companyId = selectedCompanyId === undefined ? companies.data?.[0]?.value ?? null : selectedCompanyId;
   const queryClient = useQueryClient();
   const durationQueryKey = ['checkupDurationList', user?.id, user?.user_type, superAdmin ? companyId : null];
   const [editTarget, setEditTarget] = useState(null);

@@ -504,8 +504,11 @@ export default function JobsPage() {
             if (!visible) setDeleteReason('');
           }}
           mutation={deleteMutation}
-          onConfirm={() => deleteMutation.mutate({ jobId: deleteModal.job?.id })}
-          showReasonField={false}
+          onConfirm={() => {
+            if (!deleteReason.trim()) { message.error('Please add remarks before deleting this job.'); return; }
+            deleteMutation.mutate({ jobId: deleteModal.job?.id, reason: deleteReason.trim() });
+          }}
+          showReasonField={true}
           reason={deleteReason}
           setReason={setDeleteReason}
           message={

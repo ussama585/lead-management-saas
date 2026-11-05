@@ -34,6 +34,7 @@ export const updateLeadJob = async (jobId, jobData) => {
 // Delete a job for regular (website) lead
 export const deleteWebsiteLeadJob = async (jobId, reason) => {
   const deleteReason = typeof reason === 'string' ? reason.trim() : '';
+  if (!deleteReason) throw new Error('Please add remarks before deleting this job.');
   const endpoint = `/lead-generation/delete-job/${encodeURIComponent(jobId)}`;
   const { data } = await (deleteReason ? api.delete(endpoint, {
     data: { delete_reason: deleteReason },

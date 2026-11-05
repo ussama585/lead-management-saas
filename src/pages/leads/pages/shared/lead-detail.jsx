@@ -48,9 +48,9 @@ export async function getWebsiteLeadJobHistory(jobId) {
     return data;
 }
 
-export async function getWebsiteLeadJobs(leadId, { page = 1, size = 10, search = '', sortBy = '', order = 'asc' } = {}) {
+export async function getWebsiteLeadJobs(leadId, { page = 1, size = 10, search = '', sortBy = '', order = 'asc', is_active } = {}) {
     const { data } = await api.get(`/lead-generation/job-list/${encodeURIComponent(leadId)}`, {
-        params: { page, size, search, sort_by: sortBy, order },
+        params: { page, size, search, sort_by: sortBy, order, ...(is_active !== undefined ? { is_active } : {}) },
     });
     if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load lead jobs.');
     if (!Array.isArray(data?.results)) throw new Error('Could not read lead jobs.');
@@ -139,6 +139,7 @@ const LeadDetailPage = () => {
             sorting?.[0]?.['desc']
         ],
         () => getWebsiteLeadJobs(id, { page: pagination.pageIndex + 1, size: pagination.pageSize, search: globalFilter,
+            is_active: true,
             sortBy: sorting?.[0]?.id ?? '', order: sorting?.[0]?.desc ? 'desc' : 'asc' }),
         {
             staleTime: 5 * 60 * 1000, // 5 minutes - jobs data changes frequently
@@ -745,7 +746,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
                
                 <div className="row">
                     <div className="col-12 mt-2">
-                      <JobListingTabs>
+                      <JobListingTabs source="website" leadId={id} onRestored={refetchJobs}>
                         {!isReadOnlyLead && (
                             <button onClick={() => {
                                 if (isReadOnlyLead) return;

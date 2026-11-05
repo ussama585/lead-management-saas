@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
+import { deleteDataLeadJobWithRemarks } from '../../../shared/services/lead-job-lifecycle.js';
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
 import DeleteJobDialog from '../shared/delete-job-dialog.jsx';
@@ -40,10 +41,8 @@ async function updateDataLeadJob(jobId, payload) {
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not update job.');
   return data;
 }
-async function deleteDataLeadJob(jobId) {
-  const { data } = await api.delete(`/data-leads/update-job/${encodeURIComponent(jobId)}`);
-  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not delete job.');
-  return data;
+async function deleteDataLeadJob(jobId, reason) {
+  return deleteDataLeadJobWithRemarks(jobId, reason);
 }
 
 const DataLead = () => {
@@ -100,6 +99,7 @@ const DataLead = () => {
     ["dataLeadJobs", dataLeadId, pagination.pageIndex, pagination.pageSize, sortField, sortDirection, globalFilter],
     async () => {
       const params = {
+        is_active: true,
         page: pagination.pageIndex + 1,
         size: pagination.pageSize,
       };
@@ -796,7 +796,7 @@ const DataLead = () => {
           </Stack>
         )}
 
-            <JobListingTabs><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs}><MaterialReactTable table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>
