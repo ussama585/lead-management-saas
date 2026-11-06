@@ -49,7 +49,7 @@ const ManageAssigneesModal = ({
   const [searchParams] = useSearchParams();
   const companyId = isSuperAdmin(user?.user_type)
     ? selectedCompany(searchParams.toString())
-    : user?.company_id || user?.company?.id || (typeof user?.company === 'number' ? user.company : null);
+    : null;
   const canManage = isSuperAdmin(user?.user_type) || user?.user_type === 'company_admin';
 
   const isMetaLeads = leadType === 'meta-leads';
@@ -72,10 +72,12 @@ const ManageAssigneesModal = ({
   const { data: allExecutivesData, isLoading: loadingExecutives } = useQuery({
     queryKey: ['manageAssigneesUsers', user?.id, user?.user_type, companyId],
     queryFn: async () => {
-      const { data } = await api.get('/accounts/users-for-assigning', { params: { company_id: companyId } });
+      const { data } = await (isSuperAdmin(user?.user_type)
+        ? api.get('/accounts/users-for-assigning', { params: { user_type: 'sales_executive', company_id: companyId } })
+        : api.get('/accounts/users-for-assigning', { params: { user_type: 'sales_executive' } }));
       return data;
     },
-    enabled: visible && canManage && Boolean(companyId),
+    enabled: visible && canManage && (!isSuperAdmin(user?.user_type) || Boolean(companyId)),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,

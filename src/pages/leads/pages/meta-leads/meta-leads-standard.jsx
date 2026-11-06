@@ -247,7 +247,7 @@ export default function MetaLeadsStandard() {
   };
 
   // Check if user is admin or manager
-  const canAssign = user?.user_type === 'super_admin' || user?.user_type === 'sales_manager';
+  const canAssign = ['super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type);
 
   // Meta leads stats query
   const {
@@ -1016,13 +1016,13 @@ export default function MetaLeadsStandard() {
 </LeadDateRangeField></LeadDateFilter>
 
       {/* Tabs Section (replaces stats cards) */}
-        {canAssign && <div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right">
+        {canAssign && <div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right" style={{ flexBasis: '100%' }}>
   
   <Space>
-    {user?.user_type === 'super_admin' && (
+    {['super_admin', 'company_admin'].includes(user?.user_type) && (
       <Button
         icon={<UserAddOutlined size="1em" className="app-icon" />}
-        disabled={!selectedCompany(searchParams.toString())}
+        disabled={user?.user_type === 'super_admin' && !selectedCompany(searchParams.toString())}
         onClick={() => setUserAssignmentModalVisible(true)}
         style={{ backgroundColor: '#3E6A9F', borderColor: '#3E6A9F', color: 'white' }}
       >Manage Assignees</Button>
