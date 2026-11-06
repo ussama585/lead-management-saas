@@ -6,7 +6,7 @@ import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button as AntButton } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback, useEffect, Suspense } from "react";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
-import { useNavigate, useParams, useSearchParams, useLocation } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
@@ -246,15 +246,13 @@ const DataLead = () => {
         size: 0.5,
         enableEditing: false,
         Cell: ({ cell, row }) => (
-          <span
-            style={{ cursor: isReadOnlyLead ? "default" : "pointer", textDecoration: isReadOnlyLead ? "none" : "underline" }}
-            onClick={() => {
-              if (isReadOnlyLead) return;
-              navigate(getRolePath(user?.user_type, `/data-leads/${dataLeadId}/edit/${row.original.id}`));
-            }}
+          <Link
+            to={getRolePath(user?.user_type, `/data-leads/${dataLeadId}/edit/${row.original.id}`)}
+            className="cursor-pointer text-primary underline underline-offset-2"
+            onClick={event => event.stopPropagation()}
           >
             {cell.getValue() || "-"}
-          </span>
+          </Link>
         ),
       }] : []),
       {
