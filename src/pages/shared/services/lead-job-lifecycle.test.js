@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 import api from './api.js';
 import { restoreLeadJob, deleteDataLeadJobWithRemarks, listDeletedLeadJobs } from './lead-job-lifecycle.js';
-vi.mock('./api.js', () => ({ default: { patch: vi.fn(), delete: vi.fn(), get: vi.fn() } }));
+vi.mock('./api.js', () => ({ default: { post: vi.fn(), delete: vi.fn(), get: vi.fn() } }));
 beforeEach(() => vi.clearAllMocks());
 
 it.each([
@@ -23,13 +23,13 @@ it('accepts a nested results response', async () => {
 });
 
 it.each([
-  ['website', '/lead-generation/job/7'],
-  ['data', '/data-leads/update-job/7'],
-  ['meta', '/meta-leads/update-job/7'],
-])('restores %s jobs with only is_active', async (source, endpoint) => {
-  api.patch.mockResolvedValue({ data: { success: true } });
+  ['website', '/lead-generation/job-restore/7'],
+  ['data', '/data-leads/job-restore/7'],
+  ['meta', '/meta-leads/job-restore/7'],
+])('restores %s jobs with POST to the restore endpoint', async (source, endpoint) => {
+  api.post.mockResolvedValue({ data: { success: true } });
   await restoreLeadJob(source, 7);
-  expect(api.patch).toHaveBeenCalledWith(endpoint, { is_active: true });
+  expect(api.post).toHaveBeenCalledWith(endpoint);
 });
 it('uses the supplied data job deletion endpoint and form-data remarks', async () => {
   api.delete.mockResolvedValue({ data: { success: true } });
@@ -43,6 +43,6 @@ it('blocks empty deletion remarks', async () => {
   expect(api.delete).not.toHaveBeenCalled();
 });
 it('surfaces restore rejection', async () => {
-  api.patch.mockResolvedValue({ data: { status: false, message: 'Restore denied' } });
+  api.post.mockResolvedValue({ data: { status: false, message: 'Restore denied' } });
   await expect(restoreLeadJob('data', 7)).rejects.toThrow('Restore denied');
 });

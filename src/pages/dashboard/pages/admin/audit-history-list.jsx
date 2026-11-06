@@ -1,8 +1,12 @@
 import { Select } from '../../../../components/ui/app-select.jsx';
+import { Tabs, TabsList, TabsTrigger } from '../../../../components/ui/tabs.jsx';
+import { useSearchParams } from 'react-router-dom';
+import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback } from 'react';
 import { Alert } from 'antd';
-import { LoaderCircle as LoadingOutlined } from 'lucide-react';
+import { LoaderCircle as LoadingOutlined, Eye } from 'lucide-react';
+import ActivityDetailModal from '../../../../components/activity-detail-modal.jsx';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import BootstrapDateRangeModal from '../../../../components/bootstrap-date-range-modal.component.jsx';
@@ -13,13 +17,11 @@ import formatDateUniversal from '../../../shared/utils/formatDate.js';
 import { getAccountsAllUsers, getHistoryModelNames } from '../../../shared/services/admin-graphs.js';
 import api from '../../../shared/services/api.js';
 import useUserStore from '../../../shared/store/user-store.js';
-import { getRolePath } from '../../../auth/role-home.js';
 import '../../../../assets/styles/legacy/table-client-actions.css';
 
-const THEME_PRIMARY = '#3E6A9F';
 
-export async function getAuditHistoryList({ page = 1, size = 10, sortBy = 'changed_at', order = 'desc', search, modelName, changedBy, startDate, endDate } = {}) {
-  const params = { page, size };
+export async function getAuditHistoryList({ page = 1, size = 10, filterBy = 'system_activity', sortBy = 'changed_at', order = 'desc', search, modelName, changedBy, startDate, endDate } = {}) {
+  const params = { page, size, filter_by: filterBy };
   if (sortBy) params.sort_by = sortBy;
   if (order) params.order = order;
   if (search?.trim()) params.search = search.trim();
@@ -27,10 +29,28 @@ export async function getAuditHistoryList({ page = 1, size = 10, sortBy = 'chang
   if (changedBy?.length) params.changed_by = changedBy.join(',');
   if (startDate) params.start_date = startDate;
   if (endDate) params.end_date = endDate;
-  const { data } = await api.get('/activity/list', { params });
+  const { data } = await api.get('/activity/grouped-list', { params });
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load user activity.');
   if (!Array.isArray(data?.results)) throw new Error('Could not read the user activity list.');
   return data;
+}
+
+export function getActivityChanges(row) {
+  const changes = row?.fields ?? row?.changes ?? row?.change;
+  if (Array.isArray(changes)) return changes;
+  if (changes && typeof changes === 'object') {
+    if ('field' in changes || 'field_name' in changes) return [changes];
+    return Object.entries(changes).map(([field, values]) => ({ field, ...(values && typeof values === 'object' ? values : { new: values }) }));
+  }
+  return [{ field: row?.field_name, old: row?.old_value, new: row?.new_value }];
+}
+
+function ChangeValues({ row, type }) {
+  return <div className="grid gap-2">{getActivityChanges(row).map((change, index) => {
+    const value = type === 'field' ? change.field ?? change.field_name
+      : type === 'old' ? change.old ?? change.old_value : change.new ?? change.new_value;
+    return <div key={index}>{type === 'field' ? formatFieldName(value) : formatCellValue(value)}</div>;
+  })}</div>;
 }
 
 const formatCellValue = (value) => {
@@ -75,51 +95,6 @@ const formatDurationFromDate = (value) => {
   return makeLabel(Math.floor(absMs / dayMs), 'day');
 };
 
-const getActivityLinkPath = (row) => {
-  const objectId = row?.object_id ?? row?.id;
-  if (!objectId) return null;
-  const leadId =
-    row?.lead_id ??
-    row?.lead ??
-    row?.leadId ??
-    row?.parent_id ??
-    row?.parentId ??
-    row?.source_id ??
-    row?.sourceId ??
-    null;
-
-  const modelName = String(row?.model_name || '').toLowerCase();
-  const category = String(row?.category || '').toLowerCase();
-  const lookup = `${modelName} ${category}`;
-
-  switch (true) {
-    case /sales data|dataentry/.test(lookup):
-      return `/admin/sales-data-detail/${objectId}`;
-    case /website lead job|leadgenerationrequestjob/.test(lookup):
-      return `/admin/lead-job-detail/${objectId}?source=website${leadId ? `&leadId=${leadId}` : ''}`;
-    case /meta lead job|metaleadjob/.test(lookup):
-      return `/admin/lead-job-detail/${objectId}?source=meta${leadId ? `&leadId=${leadId}` : ''}`;
-    case /data lead job|dataleadjob/.test(lookup):
-      return `/admin/lead-job-detail/${objectId}?source=data${leadId ? `&leadId=${leadId}` : ''}`;
-    case /website lead|leadgenerationrequest/.test(lookup):
-      return `/admin/leads/${objectId}`;
-    case /meta lead|metalead/.test(lookup):
-      return `/admin/meta-leads/${objectId}`;
-    case /data lead|datalead/.test(lookup):
-      return `/data-lead/${objectId}`;
-    case /client job/.test(lookup):
-      return `/job-headhunting/${objectId}`;
-    case /project|headhuntingproject|client project/.test(lookup):
-      return `/project-listing-page/${objectId}`;
-    case /client|headhuntingclient/.test(lookup):
-      return `/client-head-hunting/${objectId}`;
-    case /job|headhuntingjob/.test(lookup):
-      return `/job-headhunting/${objectId}`;
-    default:
-      return null;
-  }
-};
-
 const SORT_FIELD_MAP = {
   id: 'id',
   name: 'changed_by_name',
@@ -142,6 +117,10 @@ const getCurrentMonthRange = () => [dayjs().startOf('month'), dayjs().endOf('mon
 
 export default function AuditHistoryListPage() {
   const { user } = useUserStore();
+  const [selectedChangeId, setSelectedChangeId] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activityTab = searchParams.get('activity_tab') === 'user_accounts_activity' ? 'user_accounts_activity' : 'system_activity';
+  const companyId = selectedCompany(searchParams.toString());
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([{ id: 'changed_at', desc: true }]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -159,7 +138,7 @@ export default function AuditHistoryListPage() {
   }, []);
 
   const { data: allUsers = [] } = useQuery(
-    ['accountsAllUsers'],
+    ['accountsAllUsers', user?.id, user?.user_type, companyId],
     () => getAccountsAllUsers(),
     {
       staleTime: 5 * 60 * 1000,
@@ -169,7 +148,7 @@ export default function AuditHistoryListPage() {
   );
 
   const { data: modelNames = [] } = useQuery(
-    ['historyModelNames'],
+    ['historyModelNames', user?.id, user?.user_type, companyId],
     () => getHistoryModelNames(),
     {
       staleTime: 5 * 60 * 1000,
@@ -183,6 +162,8 @@ export default function AuditHistoryListPage() {
       'auditHistoryList',
       user?.id,
       user?.user_type,
+      companyId,
+      activityTab,
       pagination.pageIndex,
       pagination.pageSize,
       sortBy,
@@ -197,6 +178,7 @@ export default function AuditHistoryListPage() {
       getAuditHistoryList({
         page: pagination.pageIndex + 1,
         size: pagination.pageSize,
+        filterBy: activityTab,
         sortBy,
         order: sortOrder,
         search: globalFilter,
@@ -206,7 +188,7 @@ export default function AuditHistoryListPage() {
         endDate: dateRangeFilter?.[1]?.format?.('YYYY-MM-DD'),
       }),
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       staleTime: 0,
       refetchOnWindowFocus: false,
     }
@@ -260,10 +242,10 @@ export default function AuditHistoryListPage() {
         header: 'ID',
         id: 'id',
         accessorKey: 'id',
+        enableSorting: false,
         size: 90,
         Cell: ({ row }) => {
-          const v = row.original?.id ?? row.original?.change_id ?? row.original?.object_id;
-          return <span>{formatCellValue(v)}</span>;
+          return <span>{pagination.pageIndex * pagination.pageSize + row.index + 1}</span>;
         },
       },
       {
@@ -290,25 +272,25 @@ export default function AuditHistoryListPage() {
         header: 'New Value',
         id: 'new_value',
         accessorKey: 'new_value',
+        enableSorting: false,
         size: 200,
-        Cell: ({ cell }) => <span>{formatCellValue(cell.getValue())}</span>,
+        Cell: ({ row }) => <ChangeValues row={row.original} type="new" />,
       },
       {
         header: 'Old Value',
         id: 'old_value',
         accessorKey: 'old_value',
+        enableSorting: false,
         size: 200,
-        Cell: ({ cell }) => <span>{formatCellValue(cell.getValue())}</span>,
+        Cell: ({ row }) => <ChangeValues row={row.original} type="old" />,
       },
       {
         header: 'Field',
         id: 'field_name',
         accessorKey: 'field_name',
+        enableSorting: false,
         size: 180,
-        Cell: ({ row }) => {
-          const v = row.original?.field_name;
-          return <span>{formatFieldName(v)}</span>;
-        },
+        Cell: ({ row }) => <ChangeValues row={row.original} type="field" />,
       },
       {
         header: 'Category',
@@ -317,21 +299,8 @@ export default function AuditHistoryListPage() {
         size: 180,
         Cell: ({ row }) => {
           const v = row.original?.category ?? row.original?.model_name;
-          const href = getRolePath(user?.user_type, getActivityLinkPath(row.original) || '');
           const label = formatFieldName(v);
-
-          if (!href) return <span>{label}</span>;
-
-          return (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: THEME_PRIMARY, textDecoration: 'underline' }}
-            >
-              {label}
-            </a>
-          );
+          return <span>{label}</span>;
         },
       },
       {
@@ -354,15 +323,33 @@ export default function AuditHistoryListPage() {
           return <span>{formatDurationFromDate(value)}</span>;
         },
       },
+      {
+        header: 'Actions', id: 'actions', size: 90, enableSorting: false, enableColumnFilter: false,
+        Cell: ({ row }) => <Button type="text" title="View activity details" aria-label="View activity details"
+          className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
+          icon={<Eye size={16} />} disabled={!row.original?.change_id}
+          onClick={() => setSelectedChangeId(row.original.change_id)} />,
+      },
     ],
-    [user?.user_type]
+    [pagination.pageIndex, pagination.pageSize]
   );
 
   return (
     <>
+      {selectedChangeId && <ActivityDetailModal key={selectedChangeId} changeId={selectedChangeId} onClose={() => setSelectedChangeId(null)} />}
       {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load user activity.'}
         action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
       <div className="container">
+        <Tabs value={activityTab} onValueChange={value => {
+          setPagination(previous => ({ ...previous, pageIndex: 0 }));
+          setModelNameFilter('');
+          setSearchParams(previous => { const next = new URLSearchParams(previous); next.set('activity_tab', value); return next; }, { replace: true });
+        }} className="mb-4">
+          <TabsList aria-label="Activity type">
+            <TabsTrigger value="system_activity">System Activity</TabsTrigger>
+            <TabsTrigger value="user_accounts_activity">User Accounts Activity</TabsTrigger>
+          </TabsList>
+        </Tabs>
         <div className="user-activity-filters mb-3 grid min-w-0 grid-cols-1 items-end gap-3 md:grid-cols-2">
           <div className="order-1 min-w-0">
           <Select
@@ -474,7 +461,7 @@ export default function AuditHistoryListPage() {
               enableRowSelection={false}
               columnVisibility={columnVisibility}
               onColumnVisibilityChange={setColumnVisibility}
-              heading={`User Activity (${totalCount})`}
+              heading={`${activityTab === 'system_activity' ? 'System Activity' : 'User Accounts Activity'} (${totalCount})`}
             />
           )}
         </div>

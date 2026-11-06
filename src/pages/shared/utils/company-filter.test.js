@@ -37,7 +37,7 @@ describe('Super Admin company filter', () => {
       expect(config.params).toEqual({ start_date: '2026-11-01', assigned_to: 8, company_id: '5' });
     }
   });
-  it.each(['/data-leads/list', '/data-leads/list-count', '/data-leads/stats', '/meta-leads/list', '/lead-generation/list?page=2', '/accounts/all-users', '/sales-executive/list', '/follow-up/user-list', '/activity/list'])(
+  it.each(['/data-leads/list', '/data-leads/list-count', '/data-leads/stats', '/meta-leads/list', '/lead-generation/list?page=2', '/accounts/all-users', '/sales-executive/list', '/follow-up/user-list', '/activity/list', '/activity/grouped-list'])(
     'adds company_id to %s preserving existing filters', (url) => {
       const config = { url, params: { search: 'test', assigned: true } };
       applyCompanyFilter(config, 'super_admin', location);

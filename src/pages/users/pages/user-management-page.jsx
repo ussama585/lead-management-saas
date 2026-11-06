@@ -28,7 +28,7 @@ import TargetIcon from '../../../assets/images/table-icons/target-icon.svg';
 import GreenPencilIcon from '../../../assets/images/table-icons/green-pencil.svg';
 import BlueHamburgerIcon from '../../../assets/images/table-icons/blue-hamburger.svg';
 
-import { getUsers, getAllUsers, getCompanyManagementUsers, getUserCount, getUserTabCounts, toggleUserActivation, validateDeleteUserOtp } from '../../shared/services/users-service.js';
+import { getUsers, getAllUsers, getCompanyManagementUsers, getUserCount, getUserTabCounts, toggleUserActivation, validateDeleteUserOtp, requestDeleteUserOtp } from '../../shared/services/users-service.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { getTargetForUser } from '../../shared/services/stats-service.js';
@@ -210,15 +210,17 @@ export default function UserManagement() {
     navigate('/admin/create-user');
   };
 
-  const handleDeleteUser = async (userId, userName) => {
-    console.log('[UserManagement] Requesting OTP for user deletion:', userId);
-
-    setUserToDelete({
-      userId: userId,
-      userName: userName
-    });
-    setOtpModalVisible(true);
-    console.log('[UserManagement] OTP modal shown for user:', userId);
+  const deleteOtpMutation = useMutation(({ userId }) => requestDeleteUserOtp(userId), {
+    onSuccess: (result, target) => {
+      setUserToDelete(target);
+      setOtpModalVisible(true);
+      message.success(result?.message || 'OTP sent to your registered email');
+    },
+    onError: error => message.error(error?.response?.data?.message || error?.message || 'Could not send deletion OTP.'),
+  });
+  const handleDeleteUser = (userId, userName) => {
+    if (deleteOtpMutation.isLoading || otpModalVisible) return;
+    deleteOtpMutation.mutate({ userId, userName });
   };
 
   const handleOtpSubmit = async (otp) => {
@@ -372,12 +374,13 @@ export default function UserManagement() {
           const row = cell.getValue();
           return (
             !isSuperAdmin(row.user_type) ? (
-              <img
+              <Button type="text" title="Delete user" aria-label={`Delete ${row.name || 'user'}`}
+                disabled={deleteOtpMutation.isLoading} loading={deleteOtpMutation.isLoading && deleteOtpMutation.variables?.userId === row.id}
+                onClick={() => handleDeleteUser(row.id, row.name)} icon={<img
                 src={DeleteUserIcon}
-                alt="Delete"
-                onClick={() => handleDeleteUser(row.id, row.name)}
+                alt=""
                 style={{ cursor: 'pointer', width: '20px', height: '20px' }}
-              />
+              />} />
             ) : (
               <span>-</span>
             )
@@ -438,7 +441,7 @@ export default function UserManagement() {
       // },
 
     ],
-    [navigate, pagination.pageIndex, pagination.pageSize]
+    [navigate, pagination.pageIndex, pagination.pageSize, deleteOtpMutation.isLoading, deleteOtpMutation.variables, otpModalVisible, currentUser?.user_type]
   );
 
 
@@ -642,7 +645,9 @@ export default function UserManagement() {
       <OtpModal
         openModal={otpModalVisible}
         setOpenModal={setOtpModalVisible}
-        email={userToDelete ? userToDelete.userName : ''}
+        title="Confirm user deletion"
+        description={<>Enter the six digit OTP sent to your registered email to delete {userToDelete?.userName || 'this user'}.</>}
+        submitText="Verify and delete user"
         onSubmit={handleOtpSubmit}
       />
 

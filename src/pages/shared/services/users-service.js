@@ -124,6 +124,12 @@ export const editUser = async (userId, userData) => {
  * @param {string|number} userId
  * @returns {Promise<object>} API response
  */
+export const requestDeleteUserOtp = async (userId) => {
+  const { data } = await api.delete(`/accounts/detail/${encodeURIComponent(userId)}`);
+  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not send deletion OTP.');
+  return data;
+};
+
 export const validateDeleteUserOtp = async (userId, otp) => {
   const body = new FormData();
   body.append('otp', String(otp).trim());

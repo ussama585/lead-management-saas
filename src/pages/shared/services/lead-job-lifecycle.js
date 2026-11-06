@@ -14,9 +14,9 @@ export async function listDeletedLeadJobs(source, { leadId, pagination, sorting 
 }
 
 export async function restoreLeadJob(source, jobId) {
-  const prefixes = { website: '/lead-generation/job', data: '/data-leads/update-job', meta: '/meta-leads/update-job' };
+  const prefixes = { website: '/lead-generation/job-restore', data: '/data-leads/job-restore', meta: '/meta-leads/job-restore' };
   if (!prefixes[source]) throw new Error('Unsupported job source.');
-  const { data } = await api.patch(`${prefixes[source]}/${encodeURIComponent(jobId)}`, { is_active: true });
+  const { data } = await api.post(`${prefixes[source]}/${encodeURIComponent(jobId)}`);
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not restore job.');
   return data;
 }
