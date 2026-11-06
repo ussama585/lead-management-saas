@@ -63,7 +63,7 @@ export async function updateCompany(id, values) {
 
 export async function deleteCompany(id, otp) {
   const endpoint = `/company/detail/${encodeURIComponent(id)}`;
-  const { data } = await (otp == null ? api.delete(endpoint) : api.delete(endpoint, { params: { otp: String(otp).trim() } }));
+  const { data } = await (otp == null ? api.delete(endpoint) : api.delete(endpoint, { data: { otp: String(otp).trim() } }));
   return assertCompanySuccess(data);
 }
 

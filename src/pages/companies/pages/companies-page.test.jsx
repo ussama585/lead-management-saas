@@ -77,10 +77,10 @@ describe('company details and mutations', () => {
     await deleteCompany(1);
     expect(api.delete).toHaveBeenCalledWith('/company/detail/1');
   });
-  it('confirms company deletion with OTP in query params on the same endpoint', async () => {
+  it('confirms company deletion with OTP in the body on the same endpoint', async () => {
     api.delete.mockResolvedValue({ data: { success: true } });
     await deleteCompany(1, ' 012345 ');
-    expect(api.delete).toHaveBeenLastCalledWith('/company/detail/1', { params: { otp: '012345' } });
+    expect(api.delete).toHaveBeenLastCalledWith('/company/detail/1', { data: { otp: '012345' } });
   });
   it('keeps unsuccessful edits and deletes as errors', async () => {
     api.patch.mockResolvedValue({ data: { success: false, message: 'Update denied' } });
