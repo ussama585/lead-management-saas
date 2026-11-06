@@ -4,7 +4,6 @@ import { Select } from '../../../components/ui/app-select.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getRolePath } from '../../auth/role-home.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { Formik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -18,6 +17,7 @@ import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import UserDetailCard from '../../../components/user-detail-card.component.jsx';
 import UserFormPreviewSync from '../../../components/user-form-preview-sync.jsx';
 import { managerIdFromOptions } from '../user-manager-options.js';
+import { userManagementReturnPath } from '../user-management-return.js';
 import UserPlaceholderIcon from '../../../assets/images/user-card-icons/user-placeholder.svg';
 import InputField from '../../../components/input-field.component.jsx';
 import '../../../assets/styles/legacy/create-user.css';
@@ -37,7 +37,7 @@ export async function getEditUserSalesManagers(companyId) {
 export default function EditUser() {
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const goBack = () => navigate(getRolePath(user?.user_type, '/user-management'));
+  const goBack = () => navigate(userManagementReturnPath(user?.user_type, userDetails?.data));
   const queryClient = useQueryClient();
   const { id: userId } = useParams();
 
@@ -229,7 +229,7 @@ export default function EditUser() {
                   if (formData.has('profile_pic') || formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('manager_id')) {
                     // If there are changes, make the API call
                     editUserMutate(formData, {
-                      onSuccess: () => navigate(getRolePath(user?.user_type, '/user-management'), { replace: true }),
+                      onSuccess: () => navigate(userManagementReturnPath(user?.user_type, userDetails?.data), { replace: true }),
                       onError: error => applyUserErrors(error, helpers),
                     });
                   } else {

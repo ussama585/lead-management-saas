@@ -5,9 +5,9 @@ import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert, Avatar, Card, Space, Switch, Table, Tag } from 'antd';
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import BreadCrumb from '../../../components/breadcrumb.component.jsx';
+import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import api from '../../shared/services/api.js';
@@ -34,8 +34,9 @@ function assertCompanySuccess(data) {
   return data;
 }
 
-export async function listCompanies({ page = 1, pageSize = 10, search = '', sortBy, order } = {}) {
+export async function listCompanies({ page = 1, pageSize = 10, search = '', sortBy, order, isActive } = {}) {
   const params = { page, size: pageSize };
+  if (typeof isActive === 'boolean') params.is_active = isActive;
   if (search.trim()) params.search = search.trim();
   if (sortBy) { params.sort_by = sortBy; params.order = order || 'asc'; }
   const { data } = await api.get('/company/list', { params });
@@ -64,6 +65,11 @@ export async function updateCompany(id, values) {
 export async function deleteCompany(id, otp) {
   const endpoint = `/company/detail/${encodeURIComponent(id)}`;
   const { data } = await (otp == null ? api.delete(endpoint) : api.delete(endpoint, { data: { otp: String(otp).trim() } }));
+  return assertCompanySuccess(data);
+}
+
+export async function restoreCompany(id) {
+  const { data } = await api.patch(`/company/detail/${encodeURIComponent(id)}`, { is_active: true });
   return assertCompanySuccess(data);
 }
 
@@ -181,12 +187,14 @@ export default function CompaniesPage() {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [search, setSearch] = useState('');
   const [sorting, setSorting] = useState({});
+  const [companyTab, setCompanyTab] = useState('active');
+  const [restoreTarget, setRestoreTarget] = useState(null);
   const [dialog, setDialog] = useState(null);
   const queryPrefix = ['companiesList', user?.id, user?.user_type];
   const detailPrefix = ['companyDetail', user?.id, user?.user_type];
-  const list = useQuery([...queryPrefix, pagination, search, sorting],
-    () => listCompanies({ page: pagination.current, pageSize: pagination.pageSize, search, ...sorting }),
-    { enabled: isSuperAdmin(user?.user_type), keepPreviousData: true, refetchOnWindowFocus: false, retry: 1 });
+  const list = useQuery([...queryPrefix, companyTab, pagination, search, sorting],
+    () => listCompanies({ page: pagination.current, pageSize: pagination.pageSize, search, ...sorting, isActive: companyTab === 'active' }),
+    { enabled: isSuperAdmin(user?.user_type), refetchOnWindowFocus: false, retry: 1 });
   const detail = useQuery([...detailPrefix, dialog?.id], () => getCompanyDetails(dialog.id), {
     enabled: isSuperAdmin(user?.user_type) && dialog?.id != null,
     refetchOnWindowFocus: false, refetchOnMount: 'always', retry: 1,
@@ -216,7 +224,16 @@ export default function CompaniesPage() {
       catch { /* Mutation errors are displayed through Formik. */ }
     },
   });
-  const busy = save.isLoading || remove.isLoading;
+  const restore = useMutation(id => restoreCompany(id), {
+    onSuccess: async result => {
+      message.success(result?.message || 'Company restored successfully.');
+      setRestoreTarget(null);
+      if (list.data?.results?.length === 1 && pagination.current > 1) setPagination(previous => ({ ...previous, current: previous.current - 1 }));
+      await Promise.all([queryClient.invalidateQueries(['companiesList']), queryClient.invalidateQueries(['companyDetail']), queryClient.invalidateQueries(['companies'])]);
+    },
+    onError: error => message.error(companyError(error)),
+  });
+  const busy = save.isLoading || remove.isLoading || restore.isLoading;
   function openDialog(mode, row) {
     save.reset();
     formik.resetForm({ values: emptyCompany });
@@ -227,7 +244,7 @@ export default function CompaniesPage() {
   const columns = [
     { title: 'Company', dataIndex: 'name', key: 'name', sorter: true, render: (name, row) => <Space>
       <Avatar size={40} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }} aria-hidden='true'>{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</Avatar>
-      <span><Link to={`/super-admin/companies/${row.id}`} className='text-primary underline underline-offset-2'>{name}</Link><span className='block text-xs text-muted-foreground'>ID: {row.id}</span></span>
+      <span>{companyTab === 'active' ? <Link to={`/super-admin/companies/${row.id}`} className='text-primary underline underline-offset-2'>{name}</Link> : name}<span className='block text-xs text-muted-foreground'>ID: {row.id}</span></span>
     </Space> },
     ...[['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['city', 'City'], ['country', 'Country']].map(([field, title]) => ({
       title, dataIndex: field, key: field, sorter: ['email', 'city', 'country'].includes(field), render: value => value || '?',
@@ -235,16 +252,22 @@ export default function CompaniesPage() {
     { title: 'Website', dataIndex: 'website', key: 'website', render: value => /^https?:\/\//i.test(value || '') ? <a href={value} target='_blank' rel='noopener noreferrer' className='text-primary underline'>{value}</a> : value || '?' },
     { title: 'Status', dataIndex: 'is_active', key: 'is_active', render: value => <Tag color={value ? 'green' : 'default'}>{value ? 'Active' : 'Inactive'}</Tag> },
     { title: 'Created', dataIndex: 'created_at', key: 'created_at', sorter: true, render: value => value ? formatDateUniversal(value, true) : '?' },
-    { title: 'Actions', key: 'actions', width: 250, render: (_, row) => <Space wrap size={8} style={{ maxWidth: '100%' }}>
+    { title: companyTab === 'deleted' ? 'Restore' : 'Actions', key: 'actions', width: companyTab === 'deleted' ? 100 : 250, render: (_, row) => companyTab === 'deleted' ?
+      <Button title='Restore company' aria-label={`Restore ${row.name}`} size='small' icon={<RotateCcw size={16} />} className='bg-green-100 text-green-700 hover:bg-green-200' disabled={busy} onClick={() => setRestoreTarget(row)} /> : <Space wrap size={8} style={{ maxWidth: '100%' }}>
       <Button title='View company' aria-label={`View ${row.name}`} size='small' icon={<Eye size={16} />} disabled={busy} onClick={() => navigate(`/super-admin/companies/${row.id}`)} />
       <Button title='Edit company' aria-label={`Edit ${row.name}`} size='small' icon={<Pencil size={16} />} disabled={busy} onClick={() => openDialog('edit', row)} />
-      <Button title='Delete company' aria-label={`Delete ${row.name}`} size='small' danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => remove.request(row)} />
+      {companyTab === 'active' && <Button title='Delete company' aria-label={`Delete ${row.name}`} size='small' danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => remove.request(row)} />}
     </Space> },
   ];
   const detailReady = dialog?.id == null || (!detail.isFetching && !detail.isError && detail.data);
   return <>
-    <BreadCrumb linkText='Companies' />
-    <Card title='Companies' extra={<Button type='primary' icon={<Plus size={16} />} disabled={busy} onClick={() => openDialog('create')}>Create company</Button>}>
+    <Tabs value={companyTab} onValueChange={value => { setCompanyTab(value); setPagination(previous => ({ ...previous, current: 1 })); }} className='mb-4'>
+      <TabsList>
+        <TabsTrigger value='active'>Active Companies</TabsTrigger>
+        <TabsTrigger value='deleted'>Deleted Companies</TabsTrigger>
+      </TabsList>
+    </Tabs>
+    <Card extra={<Button type='primary' icon={<Plus size={16} />} disabled={busy} onClick={() => openDialog('create')}>Create company</Button>}>
       <Input.Search aria-label='Search companies' placeholder='Search companies...' allowClear onSearch={value => { setSearch(value.trim()); setPagination(previous => ({ ...previous, current: 1 })); }} className='mb-4' style={{ maxWidth: 360 }} />
       {list.isError && <Alert type='error' showIcon message={companyError(list.error)} className='mb-4' action={<Button onClick={() => list.refetch()}>Retry</Button>} />}
       <Table rowKey='id' columns={columns} dataSource={list.data?.results || []} loading={list.isLoading || list.isFetching} scroll={{ x: 1550 }}
@@ -254,6 +277,11 @@ export default function CompaniesPage() {
           setSorting(sorter.order ? { sortBy: sorter.field, order: sorter.order === 'descend' ? 'desc' : 'asc' } : {});
         }} locale={{ emptyText: list.isError ? 'Companies could not be loaded.' : 'No companies found.' }} />
     </Card>
+    <Modal title='Restore company' open={Boolean(restoreTarget)} okText='Restore' confirmLoading={restore.isLoading}
+      onCancel={() => { if (!restore.isLoading) setRestoreTarget(null); }}
+      onOk={() => { if (restoreTarget && !restore.isLoading) restore.mutate(restoreTarget.id); }}>
+      <p>Are you sure you want to restore {restoreTarget?.name || 'this company'}?</p>
+    </Modal>
     <Modal title={dialog?.mode === 'edit' ? 'Edit company' : 'Create company'} open={dialog?.mode === 'create' || dialog?.mode === 'edit'} width={680}
       onOk={formik.submitForm} okText={dialog?.mode === 'edit' ? 'Save changes' : 'Create company'} confirmLoading={save.isLoading}
       okButtonProps={{ disabled: !detailReady || formik.isSubmitting }} onCancel={closeDialog} cancelButtonProps={{ disabled: save.isLoading }} closable={!save.isLoading} maskClosable={!save.isLoading} keyboard={!save.isLoading}>

@@ -1,5 +1,6 @@
 import { assignmentEndpoint } from './assignment-endpoint.js';
 import api from './api.js';
+import { otpErrorMessage } from '../utils/otp-error.js';
 
 export async function getAllUsers({ page = 1, pageSize = 10, userType = 'all', search = '', sorting = [], isActive = '' } = {}) {
   const params = { page, size: pageSize };
@@ -134,7 +135,7 @@ export const validateDeleteUserOtp = async (userId, otp) => {
   const body = new FormData();
   body.append('otp', String(otp).trim());
   const { data } = await api.delete(`/accounts/detail/${encodeURIComponent(userId)}`, { data: body });
-  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not delete user.');
+  if (data?.success === false || data?.status === false) throw new Error(otpErrorMessage({ response: { data } }));
   return data;
 };
 export const toggleUserActivation = async (userId, isActive) => {

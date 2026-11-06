@@ -36,6 +36,7 @@ import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { getTargetForUser } from '../../shared/services/stats-service.js';
 import OtpModal from '../../auth/pages/otp-modal.jsx';
+import { otpErrorMessage } from '../../shared/utils/otp-error.js';
 import ResetUserPasswordDialog from '../../../components/reset-user-password-dialog.jsx';
 
 export default function UserManagement() {
@@ -263,7 +264,7 @@ function UserManagementContent({ superAdminScope = 'company' }) {
         message.success('User deleted successfully ');
       } catch (error) {
         // Show OTP error message
-        message.error(error?.message || 'Could not delete user. Please try again.');
+        message.error(otpErrorMessage(error));
         throw error;
       }
     }

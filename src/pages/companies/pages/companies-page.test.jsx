@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import api from '../../shared/services/api.js';
-import { companyError, companyFieldErrors, createCompany, listCompanies, getCompanyDetails, updateCompany, deleteCompany } from './companies-page.jsx';
+import { companyError, companyFieldErrors, createCompany, listCompanies, getCompanyDetails, updateCompany, deleteCompany, restoreCompany } from './companies-page.jsx';
 import { companySchema } from '../schemas/company-schema.js';
 import { canAccessMenu, canAccessRoute } from '../../auth/role-access.js';
 
@@ -12,6 +12,21 @@ vi.mock('../../../components/settings-delete-modal.jsx', () => ({ default: () =>
 beforeEach(() => vi.clearAllMocks());
 
 describe('companies API', () => {
+  it('restores a company with only is_active in the payload', async () => {
+    api.patch.mockResolvedValue({ data: { success: true } });
+    await restoreCompany(16);
+    expect(api.patch).toHaveBeenCalledWith('/company/detail/16', { is_active: true });
+  });
+  it('preserves restore API failures', async () => {
+    api.patch.mockResolvedValue({ data: { success: false, message: 'Restore denied.' } });
+    await expect(restoreCompany(16)).rejects.toThrow('Restore denied.');
+  });
+  it.each([true, false])('filters the company listing by is_active=%s', async isActive => {
+    const payload = { results: [{ id: 16, name: 'Company', is_active: isActive }], count: 1 };
+    api.get.mockResolvedValue({ data: payload });
+    expect(await listCompanies({ isActive, page: 2, search: 'sample' })).toEqual(payload);
+    expect(api.get).toHaveBeenCalledWith('/company/list', { params: { page: 2, size: 10, search: 'sample', is_active: isActive } });
+  });
   it('reads the paginated company list', async () => {
     const payload = { status: true, count: 3, next: null, previous: null, results: [{ id: 3, name: 'Company', is_active: true }] };
     api.get.mockResolvedValue({ data: payload });

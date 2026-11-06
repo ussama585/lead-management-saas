@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API_URL } from '../utils/api.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { getRoleHome } from '../../auth/role-home.js';
+import { otpErrorMessage } from '../utils/otp-error.js';
 
 export const loginSuperAdmin = async ({ email, password }) => {
     try {
@@ -26,7 +27,7 @@ export const loginUser = async ({ email, otp, superAdminOnly = false }) => {
     formData.append('otp', String(otp).trim());
     try {
         const { data: payload } = await axios.post(`${API_URL.replace(/\/$/, '')}/accounts/validate-otp`, formData);
-        if (payload?.success === false || payload?.status === false) throw new Error(payload.message || 'OTP verification failed.');
+        if (payload?.success === false || payload?.status === false) throw new Error(otpErrorMessage({ response: { data: payload } }));
         const session = payload?.data ?? payload;
         const account = session?.user ?? session;
         if (!getRoleHome(account?.user_type)) throw new Error('The login response did not include a supported user role.');
@@ -44,7 +45,7 @@ export const loginUser = async ({ email, otp, superAdminOnly = false }) => {
             ...(account.company != null ? { company: account.company } : {}),
         };
     } catch (error) {
-        throw new Error(error.response?.data?.message || error.message || 'Verification failed. Check your code and try again.');
+        throw new Error(otpErrorMessage(error));
     }
 };
 
