@@ -55,6 +55,6 @@ export default function SuperAdminStats({ userId, userType = 'super_admin' }) {
   return <>
     <StatsSection title="HR Management" endpoint={dashboardEndpoint('stats', userType)} queryKey={`${userType}UserStats`} labels={hrLabels} userId={userId} />
     <StatsSection title="Leads" endpoint={dashboardEndpoint('lead-stats', userType)} queryKey={`${userType}LeadStats`} labels={leadLabels} userId={userId} />
-    <StatsSection title="Demo Requests" endpoint="/demo/stats" queryKey={`${userType}DemoRequestStats`} labels={demoRequestLabels} userId={userId} />
+    {userType !== 'company_admin' && <StatsSection title="Demo Requests" endpoint="/demo/stats" queryKey={`${userType}DemoRequestStats`} labels={demoRequestLabels} userId={userId} />}
   </>;
 }
