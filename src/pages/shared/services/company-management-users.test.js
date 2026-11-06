@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+vi.mock('../store/user-store.js', () => ({ default: { getState: () => ({ user: {} }) } }));
 import api from './api.js';
 import { getCompanyManagementUsers, getUserTabCounts } from './users-service.js';
 vi.mock('./api.js', () => ({ default: { get: vi.fn() } }));

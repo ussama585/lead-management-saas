@@ -796,7 +796,7 @@ const DataLead = () => {
           </Stack>
         )}
 
-            <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs}><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs} activeColumns={columns}><MaterialReactTable table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>

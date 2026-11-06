@@ -1,5 +1,7 @@
 import React, { lazy, Suspense, useState, useMemo } from 'react';
 import { Outlet, useSearchParams } from 'react-router-dom';
+import { Tabs, TabsList, TabsTrigger } from '../../../../components/ui/tabs.jsx';
+import CompanyFilteredPage from '../../../../components/company-filtered-page.jsx';
 import dayjs from 'dayjs';
 
 //components
@@ -109,6 +111,29 @@ const DEMO_SYSTEM_STATS = {
 // Tabbed section with its own state so that the rest of the
 // dashboard does not re-render when switching tabs.
 export function DashboardTabsSection() {
+  const currentUser = useUserStore(state => state.user);
+  const [searchParams, setSearchParams] = useSearchParams();
+  if (!isSuperAdmin(currentUser?.user_type)) return <DashboardCompanyTabsSection />;
+  const scope = searchParams.get('stats_scope') === 'company' ? 'company'
+    : searchParams.get('stats_scope') === 'system' ? 'system'
+      : searchParams.has('company_id') || ['salesExecutives', 'systemLeads'].includes(searchParams.get('tab') || searchParams.get('selected')) ? 'company' : 'system';
+  return <div className="min-w-0">
+    <Tabs value={scope} onValueChange={value => {
+      const next = new URLSearchParams(searchParams);
+      next.set('stats_scope', value);
+      setSearchParams(next, { replace: true });
+    }} className="mb-5">
+      <TabsList aria-label="Dashboard statistics">
+        <TabsTrigger value="system">System Stats</TabsTrigger>
+        <TabsTrigger value="company">Company Stats</TabsTrigger>
+      </TabsList>
+    </Tabs>
+    {scope === 'system' ? <SuperAdminStats userId={currentUser?.id} userType={currentUser?.user_type} />
+      : <CompanyFilteredPage dashboardCompanyScope><DashboardCompanyTabsSection /></CompanyFilteredPage>}
+  </div>;
+}
+
+function DashboardCompanyTabsSection() {
   const currentUser = useUserStore(state => state.user);
   const superAdmin = isSuperAdmin(currentUser?.user_type);
   const [showDemoStats, setShowDemoStats] = useState(() => !new URLSearchParams(window.location.search).has('company_id'));
@@ -1302,9 +1327,10 @@ export function DashboardTabsSection() {
 // Query configuration is now handled by useQueryApi hook by default
 
 export default function AdminDashboard() {
+  const currentUser = useUserStore(state => state.user);
   return (
     <>
-      <BreadCrumb linkText="Dashboard" />
+      {!isSuperAdmin(currentUser?.user_type) && <BreadCrumb linkText="Dashboard" />}
       <Suspense fallback={<SkeletonLoader type="chart" />}>
         <div className="dashboard-container admin-dashboard-page">
           <Outlet />

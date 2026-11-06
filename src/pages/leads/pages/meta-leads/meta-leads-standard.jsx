@@ -615,6 +615,9 @@ export default function MetaLeadsStandard() {
     {
       header: 'ID',
       accessorKey: 'id',
+      size: 64,
+      minSize: 48,
+      maxSize: 80,
       enableSorting: false,
       Cell: ({ row, cell }) => {
         const leadId = row.original?.id;
@@ -859,6 +862,13 @@ export default function MetaLeadsStandard() {
       Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
     },
     {
+      header: 'Job Count',
+      accessorKey: 'job_count',
+      size: 100,
+      enableSorting: false,
+      Cell: ({ cell }) => <span>{cell.getValue() ?? 0}</span>,
+    },
+    {
       header: 'City',
       id: 'city', // Explicit id for sorting
       accessorKey: 'city',
@@ -973,7 +983,7 @@ export default function MetaLeadsStandard() {
     ];
     if (['super_admin', 'company_admin'].includes(user?.user_type)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
       Cell: ({ row }) => <LeadListingActions lead={row.original} source="meta" /> });
-    const leadingKeys = ['id', 'full_name', 'job_title', 'company_name', 'phone_number'];
+    const leadingKeys = ['id', 'full_name', 'job_title', 'company_name', 'job_count', 'phone_number'];
     return dateBeforeStatusHistory([
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'work_email'),

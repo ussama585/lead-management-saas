@@ -17,6 +17,7 @@ import formatDateUniversal from '../../../shared/utils/formatDate.js';
 import { getAccountsAllUsers, getHistoryModelNames } from '../../../shared/services/admin-graphs.js';
 import api from '../../../shared/services/api.js';
 import useUserStore from '../../../shared/store/user-store.js';
+import { isSuperAdmin } from '../../../auth/role-access.js';
 import '../../../../assets/styles/legacy/table-client-actions.css';
 
 
@@ -45,14 +46,6 @@ export function getActivityChanges(row) {
   return [{ field: row?.field_name, old: row?.old_value, new: row?.new_value }];
 }
 
-function ChangeValues({ row, type }) {
-  return <div className="grid gap-2">{getActivityChanges(row).map((change, index) => {
-    const value = type === 'field' ? change.field ?? change.field_name
-      : type === 'old' ? change.old ?? change.old_value : change.new ?? change.new_value;
-    return <div key={index}>{type === 'field' ? formatFieldName(value) : formatCellValue(value)}</div>;
-  })}</div>;
-}
-
 const formatCellValue = (value) => {
   if (value === null || value === undefined || value === '') return '-';
   if (typeof value === 'object') {
@@ -72,27 +65,6 @@ const formatFieldName = (value) => {
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/\b\w/g, (char) => char.toUpperCase());
-};
-
-const formatDurationFromDate = (value) => {
-  if (!value) return '-';
-  const ts = new Date(value).getTime();
-  if (Number.isNaN(ts)) return '-';
-
-  const diffMs = Date.now() - ts;
-  const absMs = Math.abs(diffMs);
-
-  const minuteMs = 60 * 1000;
-  const hourMs = 60 * minuteMs;
-  const dayMs = 24 * hourMs;
-
-  if (absMs < minuteMs) return 'just now';
-
-  const makeLabel = (count, unit) => `${count} ${unit}${count === 1 ? '' : 's'} ago`;
-
-  if (absMs < hourMs) return makeLabel(Math.floor(absMs / minuteMs), 'min');
-  if (absMs < dayMs) return makeLabel(Math.floor(absMs / hourMs), 'hour');
-  return makeLabel(Math.floor(absMs / dayMs), 'day');
 };
 
 const SORT_FIELD_MAP = {
@@ -139,7 +111,7 @@ export default function AuditHistoryListPage() {
 
   const { data: allUsers = [] } = useQuery(
     ['accountsAllUsers', user?.id, user?.user_type, companyId],
-    () => getAccountsAllUsers(),
+    () => getAccountsAllUsers(isSuperAdmin(user?.user_type) ? companyId : null),
     {
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
@@ -268,30 +240,12 @@ export default function AuditHistoryListPage() {
           return <span>{formatCellValue(v)}</span>;
         },
       },
-      {
-        header: 'New Value',
-        id: 'new_value',
-        accessorKey: 'new_value',
-        enableSorting: false,
-        size: 200,
-        Cell: ({ row }) => <ChangeValues row={row.original} type="new" />,
-      },
-      {
-        header: 'Old Value',
-        id: 'old_value',
-        accessorKey: 'old_value',
-        enableSorting: false,
-        size: 200,
-        Cell: ({ row }) => <ChangeValues row={row.original} type="old" />,
-      },
-      {
-        header: 'Field',
-        id: 'field_name',
-        accessorKey: 'field_name',
-        enableSorting: false,
-        size: 180,
-        Cell: ({ row }) => <ChangeValues row={row.original} type="field" />,
-      },
+      ...[
+        { header: 'Fields Changed', accessorKey: 'field_count', size: 120, enableSorting: false,
+          Cell: ({ cell }) => <span>{formatCellValue(cell.getValue())}</span> },
+        { header: 'Summary', accessorKey: 'summary', size: 420, enableSorting: false,
+          Cell: ({ cell }) => <span className="whitespace-pre-wrap break-words leading-6">{formatCellValue(cell.getValue())}</span> },
+      ],
       {
         header: 'Category',
         id: 'category',
@@ -313,16 +267,7 @@ export default function AuditHistoryListPage() {
           return <span>{value ? formatDateUniversal(value, true) : '-'}</span>;
         },
       },
-      {
-        header: 'Duration',
-        id: 'duration',
-        accessorKey: 'duration',
-        size: 120,
-        Cell: ({ row }) => {
-          const value = row.original?.date ?? row.original?.changed_at;
-          return <span>{formatDurationFromDate(value)}</span>;
-        },
-      },
+
       {
         header: 'Actions', id: 'actions', size: 90, enableSorting: false, enableColumnFilter: false,
         Cell: ({ row }) => <Button type="text" title="View activity details" aria-label="View activity details"

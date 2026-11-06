@@ -6,7 +6,10 @@ import { Spin, Button, Tooltip } from '../../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Row, Col, Form, DatePicker, Divider, Alert } from 'antd';
 import { Formik, Form as FormikForm, Field, ErrorMessage, useField } from "formik";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
+import CompanyFilteredPage from '../../../components/company-filtered-page.jsx';
+import { selectedCompany } from '../../shared/utils/company-filter.js';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { Table } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
@@ -36,12 +39,36 @@ import OtpModal from '../../auth/pages/otp-modal.jsx';
 import ResetUserPasswordDialog from '../../../components/reset-user-password-dialog.jsx';
 
 export default function UserManagement() {
+  const { user } = useUserStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  if (!isSuperAdmin(user?.user_type)) return <UserManagementContent />;
+  const scope = searchParams.get('users_scope') === 'super_admin' ? 'super_admin'
+    : searchParams.get('users_scope') === 'company' || searchParams.has('company_id') ? 'company' : 'super_admin';
+  return <>
+    <Tabs value={scope} onValueChange={value => {
+      const next = new URLSearchParams(searchParams);
+      next.set('users_scope', value);
+      setSearchParams(next, { replace: true });
+    }} className="mb-5">
+      <TabsList aria-label="User management sections">
+        <TabsTrigger value="super_admin">Super Admin</TabsTrigger>
+        <TabsTrigger value="company">Company Users</TabsTrigger>
+      </TabsList>
+    </Tabs>
+    {scope === 'super_admin' ? <UserManagementContent key="super_admin" superAdminScope="super_admin" />
+      : <CompanyFilteredPage userManagementCompanyScope><UserManagementContent key="company" superAdminScope="company" /></CompanyFilteredPage>}
+  </>;
+}
+
+function UserManagementContent({ superAdminScope = 'company' }) {
   const { user: currentUser } = useUserStore();
   console.log(currentUser, "useruseruser")
   const isSuperAdminViewer = isSuperAdmin(currentUser?.user_type);
   const isCompany = currentUser?.user_type === 'company_admin';
   const [passwordResetUser, setPasswordResetUser] = useState(null);
-  const companyId = isCompany ? currentUser?.company_id : undefined;
+  const [searchParams] = useSearchParams();
+  const superAdminOnly = isSuperAdminViewer && superAdminScope === 'super_admin';
+  const companyId = isCompany ? currentUser?.company_id : superAdminOnly ? null : selectedCompany(searchParams.toString());
   const [activeFilter, setActiveFilter] = useState('');
 
   const [userForTarget, setUserForTarget] = useState({
@@ -49,7 +76,7 @@ export default function UserManagement() {
     name: undefined,
   })
 
-  const [selectedTab, setSelectedTab] = useState('all');
+  const [selectedTab, setSelectedTab] = useState(superAdminOnly ? 'super_admin' : 'all');
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -101,12 +128,13 @@ export default function UserManagement() {
   const usersQueryKey = ['usersList', currentUser?.id, currentUser?.user_type, companyId, pagination.pageIndex, pagination.pageSize, selectedTab, search, sorting, activeFilter];
   const { data: usersList = {}, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: usersQueryKey,
-    queryFn: () => isSuperAdminViewer
+    queryFn: () => superAdminOnly
       ? getAllUsers({ page: pagination.pageIndex + 1, pageSize: pagination.pageSize, userType: selectedTab, search, sorting, isActive: activeFilter })
-      : currentUser?.user_type === 'company_admin'
+      : isCompany || isSuperAdminViewer
         ? getCompanyManagementUsers(companyId, { page: pagination.pageIndex + 1, pageSize: pagination.pageSize, userType: selectedTab, search, sorting, isActive: activeFilter })
         : getUsers(pagination.pageIndex + 1, pagination.pageSize, selectedTab, search, sorting),
     keepPreviousData: true,
+    enabled: Boolean(currentUser?.id) && (superAdminOnly || !isSuperAdminViewer || Boolean(companyId)),
     staleTime: 1000 * 60 * 5, // 5 minutes (adjust as needed)
     cacheTime: 1000 * 60 * 30,
   });
@@ -522,13 +550,13 @@ export default function UserManagement() {
 
   return (
     <>
-      <BreadCrumb linkText="All Users" />
+      {!isSuperAdminViewer && <BreadCrumb linkText="All Users" />}
 
       <div className="client-tabs-container">
 
-        <div className="client-tabs">
+        {!superAdminOnly && <div className="client-tabs">
           {isSuperAdminViewer || currentUser?.user_type === 'company_admin' ? [
-            ['all', 'All Users'], ...(isSuperAdminViewer ? [['super_admin', 'Super Admins']] : []), ['company_admin', 'Company Admins'],
+            ['all', 'All Users'], ['company_admin', 'Company Admins'],
             ['sales_manager', 'Sales Managers'], ['sales_executive', 'Sales Executives'], ['data_entry_executive', 'Data Entry Executives'],
           ].map(([value, label]) => <button key={value} type="button" className={`tab ${selectedTab === value ? 'active' : ''}`} onClick={() => handleTabClick(value)}>
             {label} ({userCount[value] ?? 0})
@@ -597,7 +625,7 @@ export default function UserManagement() {
             </button>
           </>}
 
-        </div>
+        </div>}
 
         <button className="createUserBtn" onClick={handleCreateUser}>
           Create New User

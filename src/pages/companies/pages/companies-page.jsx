@@ -13,7 +13,7 @@ import { isSuperAdmin } from '../../auth/role-access.js';
 import api from '../../shared/services/api.js';
 import { useFormik } from 'formik';
 import { companySchema } from '../schemas/company-schema.js';
-import SettingsDeleteModal from '../../../components/settings-delete-modal.jsx';
+import OtpModal from '../../auth/pages/otp-modal.jsx';
 import formatDateUniversal from '../../shared/utils/formatDate.js';
 
 const emptyCompany = { name: '', email: '', phone: '', website: '', address: '', country: '', city: '', is_active: true };
@@ -61,9 +61,38 @@ export async function updateCompany(id, values) {
   return assertCompanySuccess(data);
 }
 
-export async function deleteCompany(id) {
-  const { data } = await api.delete(`/company/detail/${encodeURIComponent(id)}`);
+export async function deleteCompany(id, otp) {
+  const endpoint = `/company/detail/${encodeURIComponent(id)}`;
+  const { data } = await (otp == null ? api.delete(endpoint) : api.delete(endpoint, { params: { otp: String(otp).trim() } }));
   return assertCompanySuccess(data);
+}
+
+function useCompanyDeleteOtp(onDeleted) {
+  const [target, setTarget] = useState(null);
+  const queryClient = useQueryClient();
+  const request = useMutation(company => deleteCompany(company.id), {
+    onSuccess: (result, company) => { setTarget(company); message.success(result?.message || 'OTP sent to your registered email.'); },
+    onError: error => message.error(companyError(error)),
+  });
+  const confirm = useMutation(({ company, otp }) => deleteCompany(company.id, otp), {
+    onSuccess: async (result, { company }) => {
+      message.success(result?.message || 'Company deleted successfully.');
+      setTarget(null);
+      await Promise.all([queryClient.invalidateQueries(['companiesList']), queryClient.invalidateQueries(['companyDetail'])]);
+      onDeleted(company);
+    },
+    onError: error => message.error(companyError(error)),
+  });
+  return { target, isLoading: request.isLoading || confirm.isLoading,
+    request: company => { if (!request.isLoading && !confirm.isLoading && !target) request.mutate(company); },
+    close: () => { if (!confirm.isLoading) setTarget(null); },
+    confirm: otp => confirm.mutateAsync({ company: target, otp }) };
+}
+
+function CompanyDeleteOtpModal({ deletion }) {
+  return <OtpModal openModal={Boolean(deletion.target)} setOpenModal={open => { if (!open) deletion.close(); }}
+    title="Confirm company deletion" description={`Enter the six digit OTP sent to your registered email to delete ${deletion.target?.name || 'this company'}.`}
+    submitText="Verify and delete company" onSubmit={deletion.confirm} />;
 }
 
 export function companyFieldErrors(error) {
@@ -96,7 +125,6 @@ export function companyError(error) {
 
 export function CompanyCardActions({ company, onSaved, onDeleted }) {
   const [editing, setEditing] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const queryClient = useQueryClient();
   const save = useMutation(values => updateCompany(company.id, values), {
     onSuccess: async result => {
@@ -112,20 +140,14 @@ export function CompanyCardActions({ company, onSaved, onDeleted }) {
       formik.setStatus(Object.keys(errors).length ? null : companyError(error));
     },
   });
-  const remove = useMutation(() => deleteCompany(company.id), {
-    onSuccess: async result => {
-      message.success(result?.message || 'Company deleted successfully.');
-      await queryClient.invalidateQueries(['companiesList']);
-      onDeleted();
-    },
-  });
+  const remove = useCompanyDeleteOtp(onDeleted);
   const formik = useFormik({ initialValues: companyPayload(company), enableReinitialize: true, validationSchema: companySchema,
     onSubmit: async values => { try { await save.mutateAsync(values); } catch { /* Display mutation errors in the form. */ } },
   });
   return <>
     <Space wrap>
       <Button size="small" icon={<Pencil size={16} />} disabled={save.isLoading || remove.isLoading} onClick={() => { formik.resetForm(); save.reset(); setEditing(true); }}>Edit</Button>
-      <Button size="small" danger icon={<Trash2 size={16} />} disabled={save.isLoading || remove.isLoading} onClick={() => { remove.reset(); setDeleting(true); }} />
+      <Button size="small" danger title="Delete company" aria-label="Delete company" icon={<Trash2 size={16} />} disabled={save.isLoading || remove.isLoading} loading={remove.isLoading} onClick={() => remove.request(company)} />
     </Space>
     <Modal title="Edit company" open={editing} width={680} onOk={formik.submitForm} okText="Save changes" confirmLoading={save.isLoading}
       onCancel={() => { if (!save.isLoading) setEditing(false); }} closable={!save.isLoading} maskClosable={!save.isLoading} keyboard={!save.isLoading} cancelButtonProps={{ disabled: save.isLoading }}>
@@ -148,8 +170,7 @@ export function CompanyCardActions({ company, onSaved, onDeleted }) {
         <button type="submit" hidden disabled={save.isLoading}>Save changes</button>
       </form>
     </Modal>
-    <SettingsDeleteModal title="Delete company" itemName={company.name} open={deleting} loading={remove.isLoading}
-      error={remove.isError ? companyError(remove.error) : null} onCancel={() => setDeleting(false)} onConfirm={() => { if (!remove.isLoading) remove.mutate(); }} />
+    <CompanyDeleteOtpModal deletion={remove} />
   </>;
 }
 
@@ -161,7 +182,6 @@ export default function CompaniesPage() {
   const [search, setSearch] = useState('');
   const [sorting, setSorting] = useState({});
   const [dialog, setDialog] = useState(null);
-  const [deleteTarget, setDeleteTarget] = useState(null);
   const queryPrefix = ['companiesList', user?.id, user?.user_type];
   const detailPrefix = ['companyDetail', user?.id, user?.user_type];
   const list = useQuery([...queryPrefix, pagination, search, sorting],
@@ -185,13 +205,8 @@ export default function CompaniesPage() {
       formik.setStatus(Object.keys(errors).length ? null : companyError(error));
     },
   });
-  const remove = useMutation(deleteCompany, {
-    onSuccess: async result => {
-      message.success(result?.message || 'Company deleted successfully.');
-      setDeleteTarget(null);
-      if (list.data?.results?.length === 1 && pagination.current > 1) setPagination(previous => ({ ...previous, current: previous.current - 1 }));
-      await Promise.all([queryClient.invalidateQueries(queryPrefix), queryClient.invalidateQueries(detailPrefix)]);
-    },
+  const remove = useCompanyDeleteOtp(() => {
+    if (list.data?.results?.length === 1 && pagination.current > 1) setPagination(previous => ({ ...previous, current: previous.current - 1 }));
   });
   const initialValues = dialog?.mode === 'edit' && detail.data ? companyPayload(detail.data) : emptyCompany;
   const formik = useFormik({
@@ -223,7 +238,7 @@ export default function CompaniesPage() {
     { title: 'Actions', key: 'actions', width: 250, render: (_, row) => <Space wrap size={8} style={{ maxWidth: '100%' }}>
       <Button title='View company' aria-label={`View ${row.name}`} size='small' icon={<Eye size={16} />} disabled={busy} onClick={() => navigate(`/super-admin/companies/${row.id}`)} />
       <Button title='Edit company' aria-label={`Edit ${row.name}`} size='small' icon={<Pencil size={16} />} disabled={busy} onClick={() => openDialog('edit', row)} />
-      <Button title='Delete company' aria-label={`Delete ${row.name}`} size='small' danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} />
+      <Button title='Delete company' aria-label={`Delete ${row.name}`} size='small' danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => remove.request(row)} />
     </Space> },
   ];
   const detailReady = dialog?.id == null || (!detail.isFetching && !detail.isError && detail.data);
@@ -269,8 +284,6 @@ export default function CompaniesPage() {
           <button type='submit' hidden disabled={save.isLoading}>Save company</button>
         </form>}
     </Modal>
-    <SettingsDeleteModal title='Delete company' itemName={deleteTarget?.name} open={deleteTarget != null} loading={remove.isLoading}
-      error={remove.isError ? companyError(remove.error) : null} onCancel={() => setDeleteTarget(null)}
-      onConfirm={() => { if (deleteTarget && !remove.isLoading) remove.mutate(deleteTarget.id); }} />
+    <CompanyDeleteOtpModal deletion={remove} />
   </>;
 }

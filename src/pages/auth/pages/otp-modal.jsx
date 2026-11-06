@@ -29,7 +29,7 @@ export default function OtpModal({ openModal, setOpenModal, email, onSubmit, tit
   return <Dialog open={openModal} onOpenChange={value => !mutation.isLoading && setOpenModal(value)}><DialogContent>
     <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description || <>Enter the six digit verification code sent to {email}.</>}</DialogDescription></DialogHeader>
     <form onSubmit={event => { event.preventDefault(); if (/^\d{6}$/.test(otp)) mutation.mutate(); }} className='grid gap-6'>
-      <OTPInput value={otp} onChange={setOtp} numInputs={6} inputType='tel' shouldAutoFocus containerStyle={{ display: 'flex', justifyContent: 'center', gap: 8 }} skipDefaultStyles renderInput={props => <Input placeholder="Enter verification code digit" {...props} aria-label={`Verification code digit ${props['aria-label'] || ''}`} className='h-12 w-10 px-2 text-center text-lg' disabled={mutation.isLoading} />} />
+      <OTPInput value={otp} onChange={setOtp} numInputs={6} inputType='tel' shouldAutoFocus containerStyle={{ display: 'flex', justifyContent: 'center', gap: 8 }} skipDefaultStyles renderInput={props => <Input {...props} placeholder="0" aria-label={`Verification code digit ${props['aria-label'] || ''}`} className='h-12 w-10 px-2 text-center text-lg' disabled={mutation.isLoading} />} />
       {mutation.isError && <p role='alert' className='sop-field-error'>Verification failed. Check your code and try again.</p>}
       <Button type='submit' disabled={mutation.isLoading || !/^\d{6}$/.test(otp)}>{mutation.isLoading && <Loader2 className='size-4 animate-spin' />}{mutation.isLoading ? 'Verifying...' : submitText}</Button>
     </form>

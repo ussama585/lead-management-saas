@@ -72,10 +72,15 @@ describe('company details and mutations', () => {
     await updateCompany(1, { name: ' Updated ', email: 'info@example.test', is_active: false });
     expect(api.patch).toHaveBeenCalledWith('/company/detail/1', expect.objectContaining({ name: 'Updated', email: 'info@example.test', is_active: false }));
   });
-  it('deletes using the same detail endpoint and accepts an empty response', async () => {
+  it('requests deletion OTP using the detail endpoint and accepts an empty response', async () => {
     api.delete.mockResolvedValue({ data: '' });
     await deleteCompany(1);
     expect(api.delete).toHaveBeenCalledWith('/company/detail/1');
+  });
+  it('confirms company deletion with OTP in query params on the same endpoint', async () => {
+    api.delete.mockResolvedValue({ data: { success: true } });
+    await deleteCompany(1, ' 012345 ');
+    expect(api.delete).toHaveBeenLastCalledWith('/company/detail/1', { params: { otp: '012345' } });
   });
   it('keeps unsuccessful edits and deletes as errors', async () => {
     api.patch.mockResolvedValue({ data: { success: false, message: 'Update denied' } });

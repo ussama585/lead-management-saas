@@ -746,7 +746,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
                
                 <div className="row">
                     <div className="col-12 mt-2">
-                      <JobListingTabs source="website" leadId={id} onRestored={refetchJobs}>
+                      <JobListingTabs source="website" leadId={id} onRestored={refetchJobs} activeColumns={columns}>
                         {!isReadOnlyLead && (
                             <button onClick={() => {
                                 if (isReadOnlyLead) return;

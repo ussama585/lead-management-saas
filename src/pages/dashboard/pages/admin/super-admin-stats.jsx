@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from 'react-query';
-import { Building2, Users, UserCog, UserPlus, UserStar, Database, Globe, Webhook } from 'lucide-react';
+import { Building2, Users, UserCog, UserPlus, UserStar, Database, Globe, Webhook, MonitorPlay, Clock, CircleCheck, CircleX } from 'lucide-react';
 import api from '../../../shared/services/api.js';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import { Button } from '../../../../components/ui/button.jsx';
@@ -23,6 +23,12 @@ const hrLabels = {
   data_entry_executive: ['Data Entry Executives', Database],
 };
 const leadLabels = { data_leads: ['Data Leads', Database], meta_leads: ['Meta Leads', Webhook], web_leads: ['Website Leads', Globe] };
+export const demoRequestLabels = {
+  demo_requests: ['Total Demo Requests', MonitorPlay],
+  pending: ['Pending Demo Requests', Clock],
+  approved: ['Approved Demo Requests', CircleCheck],
+  rejected: ['Rejected Demo Requests', CircleX],
+};
 
 export function dashboardStatCards(data, labels) {
   return Object.entries(data || {}).filter(([, value]) => value && typeof value === 'object' && Number.isFinite(Number(value.count)) && value.count != null)
@@ -49,5 +55,6 @@ export default function SuperAdminStats({ userId, userType = 'super_admin' }) {
   return <>
     <StatsSection title="HR Management" endpoint={dashboardEndpoint('stats', userType)} queryKey={`${userType}UserStats`} labels={hrLabels} userId={userId} />
     <StatsSection title="Leads" endpoint={dashboardEndpoint('lead-stats', userType)} queryKey={`${userType}LeadStats`} labels={leadLabels} userId={userId} />
+    <StatsSection title="Demo Requests" endpoint="/demo/stats" queryKey={`${userType}DemoRequestStats`} labels={demoRequestLabels} userId={userId} />
   </>;
 }

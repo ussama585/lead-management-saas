@@ -2,6 +2,26 @@ import { describe, expect, it } from 'vitest';
 import { applyCompanyFilter, companyFilterSection, selectedCompany } from './company-filter.js';
 
 describe('Super Admin company filter', () => {
+  it('keeps the Super Admin users tab independent of the company selection', () => {
+    const config = { url: '/accounts/all-users', params: { user_type: 'super_admin' } };
+    applyCompanyFilter(config, 'super_admin', { pathname: '/super-admin/user-management', search: '?users_scope=super_admin&company_id=9' });
+    expect(config.params).toEqual({ user_type: 'super_admin' });
+  });
+  it('scopes Company Users to the selected company', () => {
+    const config = { url: '/accounts/users-count' };
+    applyCompanyFilter(config, 'super_admin', { pathname: '/super-admin/user-management', search: '?users_scope=company&company_id=9' });
+    expect(config.params).toEqual({ company_id: '9' });
+  });
+  it.each(['/accounts/stats', '/accounts/lead-stats', '/admin-stats'])('keeps System Stats unscoped for %s', url => {
+    const config = { url };
+    applyCompanyFilter(config, 'super_admin', { pathname: '/super-admin', search: '?stats_scope=system&company_id=9' });
+    expect(config.params).toBeUndefined();
+  });
+  it.each(['/accounts/stats', '/accounts/lead-stats', '/admin-stats'])('scopes Company Stats for %s', url => {
+    const config = { url };
+    applyCompanyFilter(config, 'super_admin', { pathname: '/super-admin', search: '?stats_scope=company&company_id=9' });
+    expect(config.params).toEqual({ company_id: '9' });
+  });
   it.each(['', 'user-management', 'sales-manager-listing', 'sales-executive-listing', 'leads', 'data-leads', 'meta-leads', 'follow-up', 'audit-history-list'])(
     'enables the %s overview for Super Admin only', (slug) => {
       expect(companyFilterSection('super_admin', `/super-admin/${slug}`)).toBeTruthy();

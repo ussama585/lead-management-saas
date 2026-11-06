@@ -1,10 +1,23 @@
 import { describe, it, expect, vi } from 'vitest';
 import api from '../../../shared/services/api.js';
-import { getSuperAdminStats, dashboardStatCards } from './super-admin-stats.jsx';
+import { getSuperAdminStats, dashboardStatCards, demoRequestLabels } from './super-admin-stats.jsx';
 
 vi.mock('../../../shared/services/api.js', () => ({ default: { get: vi.fn() } }));
 
 describe('Super Admin dashboard stats', () => {
+  it('loads demo request counts and trends including zero values', async () => {
+    const stats = { demo_requests: { count: 2, trend: -100 }, pending: { count: 2, trend: -100 },
+      approved: { count: 0, trend: 0 }, rejected: { count: 0, trend: 0 } };
+    api.get.mockResolvedValue({ data: stats });
+    const result = await getSuperAdminStats('/demo/stats');
+    expect(api.get).toHaveBeenLastCalledWith('/demo/stats');
+    expect(dashboardStatCards(result, demoRequestLabels)).toMatchObject([
+      { title: 'Total Demo Requests', count: 2, trend: -100 },
+      { title: 'Pending Demo Requests', count: 2, trend: -100 },
+      { title: 'Approved Demo Requests', count: 0, trend: 0 },
+      { title: 'Rejected Demo Requests', count: 0, trend: 0 },
+    ]);
+  });
   it('loads manager lead counts with the selected stats scope', async () => {
     const stats = { website_leads_stats: { count: 0, trend: 0 }, data_leads_stats: { count: 2, trend: -10 }, meta_leads_stats: { count: 1, trend: 5 } };
     api.get.mockResolvedValue({ data: { status: true, data: stats } });

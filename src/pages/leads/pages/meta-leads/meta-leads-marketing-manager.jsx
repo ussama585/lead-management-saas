@@ -893,7 +893,9 @@ export default function MetaLeadsMarketingManager() {
       {
         header: '#',
         accessorKey: 'row_number',
-        size: 60,
+        size: 48,
+        minSize: 40,
+        maxSize: 64,
         enableSorting: false,
         Cell: ({ row }) => {
           const rowIndex = row.index;
@@ -1098,6 +1100,13 @@ export default function MetaLeadsMarketingManager() {
         sortUndefined: 'last', // Handle undefined/null values
         sortDescFirst: false, // Start with ascending order (A to Z)
         Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
+      },
+      {
+        header: 'Job Count',
+        accessorKey: 'job_count',
+        size: 100,
+        enableSorting: false,
+        Cell: ({ cell }) => <span>{cell.getValue() ?? 0}</span>,
       },
       {
         header: 'How Many Hires',

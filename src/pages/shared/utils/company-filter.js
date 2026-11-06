@@ -15,6 +15,8 @@ export function selectedCompany(search) {
 
 export function applyCompanyFilter(config, role, location) {
   const section = companyFilterSection(role, location.pathname);
+  if (section === 'user-management' && new URLSearchParams(location.search).get('users_scope') === 'super_admin') return config;
+  if (section === 'dashboard' && new URLSearchParams(location.search).get('stats_scope') === 'system') return config;
   const companyId = selectedCompany(location.search);
   if (!section || !companyId || config.skipAuth || (config.method ?? 'get').toLowerCase() !== 'get') return config;
   // Never send tenant parameters to external systems, auth, mutations, or company options.
@@ -29,7 +31,8 @@ export function applyCompanyFilter(config, role, location) {
   const overview = /^\/(?:lead-generation|data-leads|meta-leads)\/[^/]+$/.test(path)
     && !/\/(?:create|update|conversion|bulk-)/.test(path);
   const people = /^\/(?:accounts\/(?:all-users|user-listing|user-count|users-count|users-for-assigning)|sales-(?:manager|executive)\/list|sales-(?:manager|executive)-stats|overall-users)$/.test(path);
-  const dashboard = section === 'dashboard' && (path === '/admin-stats' || path.startsWith('/headhunting/') || /^\/[\w-]+$/.test(path));
+  const dashboard = section === 'dashboard' && (path === '/admin-stats' || path.startsWith('/headhunting/') || /^\/[\w-]+$/.test(path)
+    || ['/accounts/stats', '/accounts/lead-stats'].includes(path));
   if (!overview && !people && !dashboard && !['/admin-stats', '/follow-up/user-list', '/activity/list', '/activity/grouped-list'].includes(path)) return config;
   // URLSearchParams and object params are both used by existing services.
   if (config.params instanceof URLSearchParams) {

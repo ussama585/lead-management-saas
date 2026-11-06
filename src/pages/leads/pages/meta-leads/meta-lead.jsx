@@ -807,7 +807,7 @@ const getMetaLeadUrl = () => {
           </Button>
         </Stack>
 
-            <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs}><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs} activeColumns={columns}><MaterialReactTable table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>

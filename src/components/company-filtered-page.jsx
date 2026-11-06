@@ -30,7 +30,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
       <label htmlFor="overview-company-filter" className="text-sm font-medium">Company</label>
       <div className={leadListing ? 'lead-company-filter__control' : undefined} style={leadListing ? undefined : { display: 'contents' }}>
       {leadListing && <Building2 size={20} className="shrink-0" aria-hidden="true" />}
-      <Select id="overview-company-filter" aria-label="Company" placeholder={/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname) ? 'Select company' : 'All companies'}
+      <Select id="overview-company-filter" aria-label="Company" placeholder="Select Company"
         style={{ width: 280, maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
         virtual={false} optionRender={option => <CompanySelectOption option={option} />}
         labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}
@@ -57,7 +57,7 @@ function ScopedPage({ children, section, user }) {
       else if (search.has('company_id')) sessionStorage.removeItem('assignmentCompanyId');
     } catch { /* Storage may be unavailable. */ }
   }, [companyId, search]);
-  const defaultToFirstCompany = ['leads', 'meta-leads', 'data-leads', 'follow-up', 'audit-history-list'].includes(section);
+  const defaultToFirstCompany = ['dashboard', 'user-management', 'leads', 'meta-leads', 'data-leads', 'follow-up', 'audit-history-list'].includes(section);
   const [companyDefaultReady, setCompanyDefaultReady] = useState(!defaultToFirstCompany || Boolean(companyId));
   const parentClient = useQueryClient();
   const { data: options = [], isFetching, isError, refetch } = useQuery(
@@ -102,9 +102,12 @@ function ScopedPage({ children, section, user }) {
   </QueryClientProvider>;
 }
 
-export default function CompanyFilteredPage({ children }) {
+export default function CompanyFilteredPage({ children, dashboardCompanyScope = false, userManagementCompanyScope = false }) {
   const { user } = useUserStore();
   const { pathname } = useLocation();
   const section = companyFilterSection(user?.user_type, pathname);
+  // Dashboard company filtering lives below the top-level statistics tabs.
+  if (section === 'dashboard' && !dashboardCompanyScope) return children;
+  if (section === 'user-management' && !userManagementCompanyScope) return children;
   return section ? <ScopedPage key={`${user.id}:${section}`} section={section} user={user}>{children}</ScopedPage> : children;
 }

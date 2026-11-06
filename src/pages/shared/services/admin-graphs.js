@@ -512,9 +512,11 @@ export const getAccountsNewUserGraph = async ({
   }
 };
 
-export const getAccountsAllUsers = async () => {
+export const getAccountsAllUsers = async (companyId = null) => {
   try {
-    const response = await api.get('/accounts/simple-users-list');
+    const response = await (companyId
+      ? api.get('/accounts/simple-users-list', { params: { company_id: companyId } })
+      : api.get('/accounts/simple-users-list'));
     const raw = response?.data;
     if (Array.isArray(raw?.data)) return raw.data;
     return Array.isArray(raw) ? raw : [];

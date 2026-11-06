@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs.jsx';
 import NewTableComponent from './tables/new-table.jsx';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Eye } from 'lucide-react';
 import { Button } from './ui/app-controls.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Alert } from 'antd';
@@ -17,12 +17,20 @@ const deletedColumns = [
 ];
 const emptyJobs = [];
 
-export default function JobListingTabs({ children, source, leadId, fetchDeletedJobs, onRestored }) {
+export function deletedJobDataColumns(activeColumns) {
+  return activeColumns.filter(column => !['actions', 'delete', 'delete_reason', 'restore'].includes(column.id || column.accessorKey))
+    .map(({ Edit, ...column }) => ({ ...column, enableEditing: false,
+      ...(column.accessorKey === 'job_title' ? { Cell: ({ cell }) => <span>{cell.getValue() || '—'}</span> } : {}),
+    }));
+}
+
+export default function JobListingTabs({ children, source, leadId, fetchDeletedJobs, onRestored, activeColumns }) {
   const [tab, setTab] = useState('active');
   const [deletedSorting, setDeletedSorting] = useState([]);
   const [restoreTarget, setRestoreTarget] = useState(null);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [search, setSearch] = useState('');
+  const [textDetail, setTextDetail] = useState(null);
   const { user } = useUserStore();
   const queryClient = useQueryClient();
   const canLoad = Boolean(fetchDeletedJobs || (source && leadId));
@@ -42,7 +50,16 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
     },
   });
   const rows = Array.isArray(deletedJobs.data) ? deletedJobs.data : deletedJobs.data?.results || emptyJobs;
-  const columns = [...deletedColumns, { header: 'Delete Reason', accessorKey: 'delete_reason' },
+  const jobColumns = activeColumns ? deletedJobDataColumns(activeColumns).map(column => column.accessorKey === 'job_description'
+    ? { ...column, Cell: ({ row }) => <Button type="text" title="View job description" aria-label="View job description"
+      className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
+      icon={<Eye size={16} />} onClick={() => setTextDetail({ title: 'Job description', job: row.original.job_title, text: row.original.job_description })} /> }
+    : column) : deletedColumns;
+  const columns = [...jobColumns, { header: 'Delete Reason', accessorKey: 'delete_reason', enableSorting: false,
+    Cell: ({ row }) => <Button type="text" title="View delete reason" aria-label={`View delete reason for ${row.original.job_title || 'job'}`}
+      className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800" icon={<Eye size={16} />}
+      onClick={() => setTextDetail({ title: 'Delete reason', job: row.original.job_title, text: row.original.delete_reason })} />,
+  },
     ...(source ? [{ header: 'Restore', id: 'restore', enableSorting: false,
       Cell: ({ row }) => <Button type="text" title="Restore job" aria-label={`Restore ${row.original.job_title || 'job'}`}
         className="bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800"
@@ -65,6 +82,11 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
         globalFilter={search} onGlobalFilterChange={value => { setSearch(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
         enableRowSelection={false} enableGlobalFilter={canLoad} enablePagination={canLoad} />
     </TabsContent>
+    <Modal title={textDetail?.title || 'Delete reason'} open={Boolean(textDetail)} onCancel={() => setTextDetail(null)}
+      footer={<Button onClick={() => setTextDetail(null)}>Close</Button>}>
+      {textDetail?.job && <p className="mb-3 font-semibold">{textDetail.job}</p>}
+      <p className="whitespace-pre-wrap break-words rounded-lg border bg-muted/30 p-4 text-sm leading-6">{textDetail?.text || 'No information recorded.'}</p>
+    </Modal>
     <Modal title="Restore job" open={Boolean(restoreTarget)} okText="Restore" cancelText="Cancel"
       confirmLoading={restore.isLoading} cancelButtonProps={{ disabled: restore.isLoading }}
       closable={!restore.isLoading} maskClosable={!restore.isLoading} keyboard={!restore.isLoading}

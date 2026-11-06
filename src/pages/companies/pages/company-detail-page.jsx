@@ -14,6 +14,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import api from '../../shared/services/api.js';
+import { requestDeleteUserOtp } from '../../shared/services/users-service.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { companyError, getCompanyDetails, CompanyCardActions } from './companies-page.jsx';
@@ -209,6 +210,14 @@ function CompanyDetail({ companyId }) {
   const [passwordResetUser, setPasswordResetUser] = useState(null);
 
   const [otpTarget, setOtpTarget] = useState(null);
+  const requestDeleteOtp = useMutation(target => requestDeleteUserOtp(target.id), {
+    onSuccess: (result, target) => {
+      deleteUser.reset();
+      setOtpTarget(target);
+      message.success(result?.message || 'OTP sent to your registered email');
+    },
+    onError: error => message.error(userFormError(error)),
+  });
   const refreshUsers = () => {
     queryClient.invalidateQueries(['companyUsers']); queryClient.invalidateQueries(['usersList']); queryClient.invalidateQueries(['userCount']);
   };
@@ -238,7 +247,10 @@ function CompanyDetail({ companyId }) {
     { title: 'Reset Password', key: 'reset_password', render: (_, row) => <Button size="small" onClick={() => setPasswordResetUser(row)}>Reset Password</Button> },
     { title: 'Actions', key: 'actions', render: (_, row) => <Space>
       <Button aria-label={`Edit ${row.name}`} title="Edit user" icon={<Pencil size={16} />} onClick={() => setUserDialog({ mode: 'edit', id: row.id })} />
-      <Button danger aria-label={`Delete ${row.name}`} title="Delete user" icon={<Trash2 size={16} />} onClick={() => { deleteUser.reset(); setOtpTarget(row); }} />
+      <Button danger aria-label={`Delete ${row.name}`} title="Delete user" icon={<Trash2 size={16} />}
+        disabled={requestDeleteOtp.isLoading || deleteUser.isLoading || Boolean(otpTarget)}
+        loading={requestDeleteOtp.isLoading && requestDeleteOtp.variables?.id === row.id}
+        onClick={() => { if (!requestDeleteOtp.isLoading && !otpTarget) requestDeleteOtp.mutate(row); }} />
     </Space> },
   ];
   return <div className="min-w-0 max-w-full space-y-4">
@@ -284,7 +296,7 @@ function CompanyDetail({ companyId }) {
       refreshUsers();
     }} />}
     <OtpModal openModal={otpTarget != null} setOpenModal={open => { if (!open) setOtpTarget(null); }}
-      title="Verify user deletion" description={`Enter the six digit OTP to delete ${otpTarget?.name || 'this user'}.`}
+      title="Verify user deletion" description={`Enter the six digit OTP sent to your registered email to delete ${otpTarget?.name || 'this user'}.`}
       submitText="Verify and delete" onSubmit={otp => deleteUser.mutateAsync(otp)} />
   </div>;
 }
