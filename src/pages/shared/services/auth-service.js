@@ -11,26 +11,16 @@ export const loginSuperAdmin = async ({ email, password }) => {
         formData.append('password', password);
         const response = await axios.post(`${API_URL.replace(/\/$/, '')}/accounts/superuser/login`, formData);
         const payload = response.data;
-        const account = payload?.data;
+        const challenge = payload?.data ?? payload;
         if (payload?.success !== true) throw new Error(payload?.message || 'Super admin sign-in failed.');
-        if (!isSuperAdmin(account?.user_type)) throw new Error('This account does not have super admin access.');
-        if (typeof account?.access !== 'string' || !account.access.trim() ||
-            typeof account?.refresh !== 'string' || !account.refresh.trim()) {
-            throw new Error('The login response did not include valid session tokens.');
-        }
-        localStorage.setItem('access_token', account.access);
-        localStorage.setItem('refresh_token', account.refresh);
-        const { id, name, email: address, phone, user_type, slug, is_superuser } = account;
-        return { id, name, email: address, phone, user_type, slug, is_superuser,
-            ...(account.company_id != null ? { company_id: account.company_id } : {}),
-            ...(account.company != null ? { company: account.company } : {}),
-        };
+        if (challenge?.otp_required !== true) throw new Error('The super admin login API did not request OTP verification.');
+        return { email: challenge.email || email.trim(), otp_required: true };
     } catch (error) {
         throw new Error(error.response?.data?.message || error.message || 'Unable to sign in. Please try again.');
     }
 };
 
-export const loginUser = async ({ email, otp }) => {
+export const loginUser = async ({ email, otp, superAdminOnly = false }) => {
     const formData = new FormData();
     formData.append('email', email.trim());
     formData.append('otp', String(otp).trim());
@@ -40,6 +30,7 @@ export const loginUser = async ({ email, otp }) => {
         const session = payload?.data ?? payload;
         const account = session?.user ?? session;
         if (!getRoleHome(account?.user_type)) throw new Error('The login response did not include a supported user role.');
+        if (superAdminOnly && !isSuperAdmin(account.user_type)) throw new Error('This account does not have super admin access.');
         const access = session?.access ?? payload?.access;
         const refresh = session?.refresh ?? payload?.refresh;
         if (typeof access !== 'string' || !access.trim() || typeof refresh !== 'string' || !refresh.trim()) {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import { useFormik } from 'formik';
@@ -6,7 +6,8 @@ import { Command, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { Label } from '@/components/ui/label.jsx';
 import InputField from '@/components/input-field.component.jsx';
-import { loginSuperAdmin } from '@/pages/shared/services/auth-service.js';
+import { loginSuperAdmin, loginUser } from '@/pages/shared/services/auth-service.js';
+import OtpModal from './otp-modal.jsx';
 import { loginValidationSchema } from '@/pages/shared/schemas/schema.js';
 import useUserStore from '@/pages/shared/store/user-store.js';
 import { getRoleHome } from '../role-home.js';
@@ -15,16 +16,17 @@ export default function SuperAdminLoginPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, setUser } = useUserStore();
+  const [otpEmail, setOtpEmail] = useState(null);
   useEffect(() => {
     if (localStorage.getItem('access_token') && getRoleHome(user?.user_type)) {
       navigate(getRoleHome(user.user_type), { replace: true });
     }
   }, [navigate, user]);
   const mutation = useMutation(loginSuperAdmin, {
-    onSuccess: account => {
-      queryClient.clear();
-      setUser(account);
-      navigate(getRoleHome(account.user_type), { replace: true });
+    onSuccess: challenge => {
+      setOtpEmail(challenge.email);
+      formik.setFieldValue('password', '', false);
+      mutation.reset();
     },
   });
   const formik = useFormik({
@@ -32,6 +34,15 @@ export default function SuperAdminLoginPage() {
     onSubmit: values => mutation.mutate(values),
   });
   return <div className='sop-auth'>
+    <OtpModal openModal={Boolean(otpEmail)} email={otpEmail || ''} title="Verify super admin sign in"
+      description={`Enter the six digit verification code sent to ${otpEmail || 'your email'}.`}
+      submitText="Verify and sign in" setOpenModal={open => { if (!open) setOtpEmail(null); }}
+      onSubmit={async otp => {
+        const account = await loginUser({ email: otpEmail, otp, superAdminOnly: true });
+        queryClient.clear();
+        setUser(account);
+        navigate(getRoleHome(account.user_type), { replace: true });
+      }} />
     <aside className='sop-auth-brand'>
       <div className='flex items-center gap-3 text-lg font-semibold'><Command />Search O Pal</div>
       <div><h2>Super admin workspace</h2><p>Manage your application, users, and settings.</p></div>
