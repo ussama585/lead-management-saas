@@ -1,4 +1,4 @@
-export const DEFAULT_PRIMARY_COLOR = '#3E6A9F';
+export const DEFAULT_PRIMARY_COLOR = '#4F46E5';
 export const THEME_COLOR_STORAGE_KEY = 'app_primary_color';
 
 export function normalizeThemeColor(value) {

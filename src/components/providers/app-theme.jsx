@@ -20,7 +20,7 @@ export default function AppThemeProvider({ children }) {
   return <AppThemeContext.Provider value={{ preference: 'light', mode, setTheme: () => {} }}>
     <ThemeProvider theme={muiTheme}>
       <ConfigProvider theme={{ algorithm: antTheme.defaultAlgorithm,
-        token: { colorPrimary: primaryColor, colorTextLightSolid: primaryTextColor(primaryColor), borderRadius: 8, fontFamily: 'Inter, sans-serif' } }}>
+        token: { colorPrimary: primaryColor, colorTextLightSolid: primaryTextColor(primaryColor), colorSuccess: '#059669', colorWarning: '#D97706', colorError: '#DC3545', colorInfo: primaryColor, colorBgLayout: '#F6F7FC', colorBorder: '#DFE3F0', borderRadius: 12, fontFamily: 'Inter, sans-serif' } }}>
         {children}
       </ConfigProvider>
     </ThemeProvider>

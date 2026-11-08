@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import OrbitalScene from '@/components/visuals/orbital-scene.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import { useFormik } from 'formik';
@@ -44,6 +45,7 @@ export default function SuperAdminLoginPage() {
         navigate(getRoleHome(account.user_type), { replace: true });
       }} />
     <aside className='sop-auth-brand'>
+      <OrbitalScene />
       <div className='flex items-center gap-3 text-lg font-semibold'><Command />Search O Pal</div>
       <div><h2>Super admin workspace</h2><p>Manage your application, users, and settings.</p></div>
       <span className='text-sm'>Search O Pal management system</span>

@@ -15,6 +15,13 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
   const { user, clearUser } = useUserStore();
   const [passwordOpen, setPasswordOpen] = useState(false);
   const location = useLocation();
+  useEffect(() => {
+    if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+    const page = document.getElementById('main-content');
+    // Animate the existing page; never remount forms or reset route state.
+    const entrance = page?.animate?.([{ opacity: 0.65 }, { opacity: 1 }], { duration: 240, easing: 'ease-out' });
+    return () => entrance?.cancel();
+  }, [location.pathname]);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isMobile, setOpenMobile } = useSidebar();

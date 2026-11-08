@@ -11,6 +11,7 @@ import OtpModal from './otp-modal.jsx';
 import { loginValidationSchema } from '@/pages/shared/schemas/schema.js';
 import useUserStore from '@/pages/shared/store/user-store.js';
 import { getRoleHome } from '../role-home.js';
+import OrbitalScene from '@/components/visuals/orbital-scene.jsx';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function LoginPage() {
         navigate(getRoleHome(account.user_type), { replace: true });
       }} />
     <aside className='sop-auth-brand'>
+      <OrbitalScene />
       <div className='flex items-center gap-3 text-lg font-semibold'><Command />Search O Pal</div>
       <div><h2>Your team. Your work.<br />One workspace.</h2><p>Manage your leads, clients, projects, and people with a clear view of what matters.</p></div>
       <span className='text-sm'>Search O Pal management system</span>

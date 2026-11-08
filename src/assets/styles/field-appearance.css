@@ -1,5 +1,5 @@
 :root {
-  --field-border-color: #d2d2d2;
+  --field-border-color: #d9deed;
 }
 
 /* Apply the same field border in every module and interaction state. */
@@ -15,11 +15,6 @@ html body :is(
 html body :is(.ant-select, .ant-picker, .ant-input-number, .ant-input-affix-wrapper, .MuiOutlinedInput-root)[class]
   :is(.ant-select-selector, .MuiOutlinedInput-notchedOutline) {
   border-color: var(--field-border-color) !important;
-}
-
-/* Remove field, button, card, dropdown and modal shadows throughout the app. */
-*, *::before, *::after {
-  box-shadow: none !important;
 }
 
 /* User form previews retain their original elevated card appearance. */
