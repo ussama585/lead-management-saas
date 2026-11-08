@@ -3,9 +3,18 @@ import api from './api.js';
 import { getAllUsers } from './users-service.js';
 
 vi.mock('./api.js', () => ({ default: { get: vi.fn() } }));
+vi.mock('../store/user-store.js', () => ({ default: { getState: () => ({ user: { user_type: 'company_admin' } }) } }));
 beforeEach(() => vi.clearAllMocks());
 
-describe('super admin all-users listing', () => {
+describe('authenticated all-users listing', () => {
+  it('loads company-admin users without a company ID and keeps table filters', async () => {
+    const payload = { count: 1, results: [{ id: 12, name: 'Ali', user_type: 'sales_executive' }] };
+    api.get.mockResolvedValue({ data: payload });
+    expect(await getAllUsers({ page: 2, pageSize: 25, userType: 'sales_executive', search: ' Ali ', isActive: false, sorting: [{ id: 'name', desc: true }] })).toEqual(payload);
+    expect(api.get).toHaveBeenCalledWith('/accounts/all-users', { params: {
+      page: 2, size: 25, user_type: 'sales_executive', search: 'Ali', is_active: false, sort_by: 'name', order: 'desc',
+    } });
+  });
   it('uses the all-users endpoint and preserves the paginated response', async () => {
     const payload = { status: true, count: 1, next: null, previous: null, results: [{ id: 11, name: 'Company Admin', user_type: 'company_admin', profile_pic: null, is_active: true }] };
     api.get.mockResolvedValue({ data: payload });

@@ -1,6 +1,16 @@
 import { assignmentEndpoint } from './assignment-endpoint.js';
 import api from './api.js';
 import { otpErrorMessage } from '../utils/otp-error.js';
+import { companyIdFromUser } from '../../users/stored-company-id.js';
+
+export async function getAccountCompanyId(userId) {
+  if (!/^[1-9]\d*$/.test(String(userId ?? ''))) throw new Error('A signed-in account is required.');
+  const { data } = await api.get(`/accounts/detail/${encodeURIComponent(userId)}`);
+  if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load your company.');
+  const companyId = companyIdFromUser(data?.data ?? data);
+  if (!companyId) throw new Error('Your account details do not include a company ID.');
+  return companyId;
+}
 
 export async function getAllUsers({ page = 1, pageSize = 10, userType = 'all', search = '', sorting = [], isActive = '' } = {}) {
   const params = { page, size: pageSize };
@@ -19,7 +29,7 @@ export async function getAllUsers({ page = 1, pageSize = 10, userType = 'all', s
 
 export async function getCompanyManagementUsers(companyId, { page = 1, pageSize = 10, userType = 'all', search = '', sorting = [], isActive = '' } = {}) {
   if (!/^[1-9]\d*$/.test(String(companyId ?? ''))) throw new Error('Your account is missing a company ID. Please sign in again.');
-  const params = { page, size: pageSize };
+  const params = { page, size: pageSize, company_id: companyId };
   if (userType !== 'all') params.user_type = userType;
   if (search.trim()) params.search = search.trim();
   if (isActive !== '') params.is_active = isActive;

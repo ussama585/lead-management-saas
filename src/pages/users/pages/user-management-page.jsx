@@ -31,13 +31,14 @@ import TargetIcon from '../../../assets/images/table-icons/target-icon.svg';
 import GreenPencilIcon from '../../../assets/images/table-icons/green-pencil.svg';
 import BlueHamburgerIcon from '../../../assets/images/table-icons/blue-hamburger.svg';
 
-import { getUsers, getAllUsers, getCompanyManagementUsers, getUserCount, getUserTabCounts, toggleUserActivation, validateDeleteUserOtp, requestDeleteUserOtp } from '../../shared/services/users-service.js';
+import { getUsers, getAllUsers, getCompanyManagementUsers, getAccountCompanyId, getUserCount, getUserTabCounts, toggleUserActivation, validateDeleteUserOtp, requestDeleteUserOtp } from '../../shared/services/users-service.js';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import { getTargetForUser } from '../../shared/services/stats-service.js';
 import OtpModal from '../../auth/pages/otp-modal.jsx';
 import { otpErrorMessage } from '../../shared/utils/otp-error.js';
 import ResetUserPasswordDialog from '../../../components/reset-user-password-dialog.jsx';
+import { storedCompanyId } from '../stored-company-id.js';
 
 export default function UserManagement() {
   const { user } = useUserStore();
@@ -62,14 +63,23 @@ export default function UserManagement() {
 }
 
 function UserManagementContent({ superAdminScope = 'company' }) {
-  const { user: currentUser } = useUserStore();
+  const { user: currentUser, setUser } = useUserStore();
   console.log(currentUser, "useruseruser")
   const isSuperAdminViewer = isSuperAdmin(currentUser?.user_type);
   const isCompany = currentUser?.user_type === 'company_admin';
   const [passwordResetUser, setPasswordResetUser] = useState(null);
   const [searchParams] = useSearchParams();
   const superAdminOnly = isSuperAdminViewer && superAdminScope === 'super_admin';
-  const companyId = isCompany ? currentUser?.company_id : superAdminOnly ? null : selectedCompany(searchParams.toString());
+  const savedCompanyId = isCompany ? storedCompanyId(currentUser) : null;
+  const accountCompany = useQuery(['userManagementAccountCompany', currentUser?.id], () => getAccountCompanyId(currentUser.id), {
+    enabled: isCompany && Boolean(currentUser?.id) && !savedCompanyId,
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+  const companyId = isCompany ? savedCompanyId ?? accountCompany.data : isSuperAdminViewer && !superAdminOnly ? selectedCompany(searchParams.toString()) : null;
+  useEffect(() => {
+    if (isCompany && !savedCompanyId && accountCompany.data) setUser({ ...currentUser, company_id: accountCompany.data });
+  }, [isCompany, savedCompanyId, accountCompany.data, currentUser, setUser]);
   const [activeFilter, setActiveFilter] = useState('');
 
   const [userForTarget, setUserForTarget] = useState({
@@ -135,7 +145,7 @@ function UserManagementContent({ superAdminScope = 'company' }) {
         ? getCompanyManagementUsers(companyId, { page: pagination.pageIndex + 1, pageSize: pagination.pageSize, userType: selectedTab, search, sorting, isActive: activeFilter })
         : getUsers(pagination.pageIndex + 1, pagination.pageSize, selectedTab, search, sorting),
     keepPreviousData: true,
-    enabled: Boolean(currentUser?.id) && (superAdminOnly || !isSuperAdminViewer || Boolean(companyId)),
+    enabled: Boolean(currentUser?.id) && (superAdminOnly || (!isSuperAdminViewer && !isCompany) || Boolean(companyId)),
     staleTime: 1000 * 60 * 5, // 5 minutes (adjust as needed)
     cacheTime: 1000 * 60 * 30,
   });
@@ -641,7 +651,7 @@ function UserManagementContent({ superAdminScope = 'company' }) {
           { value: '', label: 'All statuses' }, { value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' },
         ]} onChange={value => { setActiveFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
       </div>}
-      {isError && <Alert className="mb-4" type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load users.'} action={<Button onClick={() => refetch()}>Retry</Button>} />}
+      {(isError || accountCompany.isError) && <Alert className="mb-4" type="error" showIcon message={(error || accountCompany.error)?.response?.data?.message || (error || accountCompany.error)?.message || 'Could not load users.'} action={<Button onClick={() => accountCompany.isError ? accountCompany.refetch() : refetch()}>Retry</Button>} />}
 
       <div>
         <TableComponent
@@ -656,8 +666,8 @@ function UserManagementContent({ superAdminScope = 'company' }) {
             id: 'reset_password', header: 'Reset Password', enableSorting: false, enableColumnFilter: false,
             Cell: ({ row }) => <Button size="small" onClick={() => setPasswordResetUser(row.original)}>Reset Password</Button>,
           }] : isSuperAdminViewer ? columns.filter(column => column.accessorKey !== 'manager') : columns}
-          isLoading={isLoading}
-          isFetching={isFetching}
+          isLoading={isLoading || (isCompany && !companyId && accountCompany.isLoading)}
+          isFetching={isFetching || accountCompany.isFetching}
           enableGlobalFilter={true}
           data={usersList.results || []}
           totalCount={usersList.count || 0}
