@@ -64,7 +64,7 @@ export default function UserManagement() {
 
 function UserManagementContent({ superAdminScope = 'company' }) {
   const { user: currentUser, setUser } = useUserStore();
-  console.log(currentUser, "useruseruser")
+  
   const isSuperAdminViewer = isSuperAdmin(currentUser?.user_type);
   const isCompany = currentUser?.user_type === 'company_admin';
   const [passwordResetUser, setPasswordResetUser] = useState(null);
