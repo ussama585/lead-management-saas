@@ -21,7 +21,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Space } from 'antd';
 import { MessageCircle as CommentOutlined, Pencil as EditOutlined, Calendar as CalendarOutlined, Upload as UploadOutlined, History as HistoryOutlined, Download as DownloadOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import StatusFilterTabs from '../../../../components/status-filter-tabs.jsx'
 import ImportLeadsButton from '../../../../components/import-leads-button.jsx'
 import { createStatusColumn } from '../../../shared/utils/statusColumn.jsx';
@@ -136,6 +136,7 @@ export default function MetaLeadsStandard() {
   const statusList = useLeadStatusOptions();
   const apiStatusOptions = statusList.options;
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   
   // Load persisted state from sessionStorage
   const initialState = loadTableState('meta-leads-page', searchParams, {
@@ -398,8 +399,8 @@ export default function MetaLeadsStandard() {
 
   // Fetch executives/managers list for assignment (same as leads.jsx)
   const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
-    queryKey: ['executiveList', user?.id, user?.user_type, selectedCompany(searchParams.toString())],
-    queryFn: () => getManangersExecutives(user?.user_type, selectedCompany(searchParams.toString())),
+    queryKey: ['leadListingAssignees', user?.id, user?.user_type, selectedCompany(searchParams.toString())],
+    queryFn: () => getManangersExecutives(user?.user_type, selectedCompany(searchParams.toString()), { omitUserType: true }),
     enabled: ['sales_manager', 'super_admin', 'company_admin'].includes(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
@@ -613,45 +614,11 @@ export default function MetaLeadsStandard() {
   const columns = useMemo(() => {
     const tableColumns = [
     {
-      header: 'ID',
-      accessorKey: 'id',
+      header: 'No.',
+      accessorKey: 'row_number',
       size: 64,
-      minSize: 48,
-      maxSize: 80,
       enableSorting: false,
-      Cell: ({ row, cell }) => {
-        const leadId = row.original?.id;
-        const value = cell.getValue() || '-';
-        const lead = row.original;
-        const isDuplicateLead = isDuplicate(lead);
-        
-        if (!leadId) return <span>{value}</span>;
-        return (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <a className="cursor-pointer"
-              style={{ color: '#3E6A9F', fontWeight: 600, textDecoration: 'underline' }}
-              href={`${metaLeadDetailBasePath}/meta-leads/${leadId}`}
-              onClick={(e) => { e.preventDefault(); navigate(`${metaLeadDetailBasePath}/meta-leads/${leadId}`); }}
-            >
-              {value}
-            </a>
-            {isDuplicateLead && (
-              <InfoCircleOutlined size="1em" className="app-icon"
-                style={{
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openDuplicateModal(lead);
-                }}
-                title="View duplicate information"
-              />
-            )}
-          </span>
-        );
-      },
+      Cell: ({ row }) => pagination.pageIndex * pagination.pageSize + row.index + 1,
     },
     ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
       header: 'Follow Ups and Remarks',
@@ -830,7 +797,16 @@ export default function MetaLeadsStandard() {
               <AvatarFallback className="bg-primary text-primary-foreground">{String(name).trim().charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5"><span>{name}</span>{delayedInfoIcon}{duplicateIcon}</div>
+              <div className="flex items-center gap-1.5">
+                <a className="flex flex-col text-[#3E6A9F] underline" href={`${metaLeadDetailBasePath}/meta-leads/${lead.id}`}
+                  onClick={event => {
+                    event.preventDefault();
+                    navigate(`${metaLeadDetailBasePath}/meta-leads/${lead.id}`, { state: { leadListingReturnTo: `${location.pathname}${location.search}` } });
+                  }}>
+                  <span>{name}</span>
+                </a>
+                {delayedInfoIcon}{duplicateIcon}
+              </div>
               <div data-table-secondary className="text-xs text-muted-foreground">{lead.work_email || lead.email || '-'}</div>
             </div>
           </div>
@@ -983,12 +959,12 @@ export default function MetaLeadsStandard() {
     ];
     if (['super_admin', 'company_admin'].includes(user?.user_type)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
       Cell: ({ row }) => <LeadListingActions lead={row.original} source="meta" /> });
-    const leadingKeys = ['id', 'full_name', 'job_title', 'company_name', 'job_count', 'phone_number'];
+    const leadingKeys = ['row_number', 'full_name', 'job_title', 'company_name', 'job_count', 'phone_number'];
     return dateBeforeStatusHistory([
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'work_email'),
     ]);
-  }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading]);
+  }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading, location.pathname, location.search]);
 
   const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, metaLeadsData?.results || [], projectSizeFilter);
   return (

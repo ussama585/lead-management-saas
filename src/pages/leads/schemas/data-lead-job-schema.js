@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import dayjs from 'dayjs';
 import { timezoneOptions } from '../../shared/utils/job-form-options.js';
 import { currencyOptions } from '../../shared/utils/countries.js';
 
@@ -17,6 +18,8 @@ export const dataLeadJobChoices = {
 const number = () => Yup.number().transform((value, raw) => raw === '' || raw == null ? null : value).nullable().typeError('Enter a valid number');
 const experience = () => number().integer().min(0).max(11).required('Select experience');
 const date = () => Yup.string().test('datetime', 'Enter a valid date and time', value => !value || !Number.isNaN(Date.parse(value)));
+export const requiresDegreeName = level => ["Bachelor's", "Bachelor's In Progress", "Master's", "Master's In Progress", 'Doctorate', 'Doctorate In Progress'].includes(level);
+export const earliestCvDeadline = () => dayjs().format('YYYY-MM-DD') + 'T00:00';
 
 export const dataLeadJobSchema = Yup.object({
   ...Object.fromEntries(Object.entries(dataLeadJobChoices).filter(([key]) => !key.includes('experience')).map(([key, choices]) => [key, Yup.string().oneOf(['', ...choices], 'Select a valid option')])),
@@ -35,8 +38,12 @@ export const dataLeadJobSchema = Yup.object({
   hours_per_week: Yup.string().nullable().when('job_type', { is: 'Part-Time', then: schema => schema.trim().required('Enter hours per week') }),
   contract_length: Yup.string().nullable().when('job_type', { is: 'Contract', then: schema => schema.trim().required('Enter contract length') }),
   contract_period: Yup.string().nullable().oneOf(['', ...dataLeadJobChoices.contract_period]).when('job_type', { is: 'Contract', then: schema => schema.required('Select contract period') }),
-  cv_submission_deadline: date(), expected_joining_date: date(),
-  degrees: Yup.array().of(Yup.object({ degree_name: Yup.string().trim().required('Enter the degree name') })),
+  cv_submission_deadline: date().test('not-past-date', 'CV submission deadline cannot be in the past', value =>
+    !value || value.slice(0, 10) >= earliestCvDeadline().slice(0, 10)),
+  expected_joining_date: date().test('not-past-date', 'Expected joining date cannot be in the past', value =>
+    !value || value.slice(0, 10) >= earliestCvDeadline().slice(0, 10)),
+  degrees: Yup.array().of(Yup.object({ degree_name: Yup.string().trim().required('Enter the degree name') }))
+    .when('degree_level', { is: requiresDegreeName, then: schema => schema.min(1, "Enter at least one degree name for Bachelor's level or higher").required('Enter a degree name') }),
   skills: Yup.array().of(Yup.object({ skill_name: Yup.string().trim().required('Enter the skill name'), experience: experience(),
     last_used: number().integer().min(0).max(5).required('Select last used') })).min(4, 'Add at least 4 skills'),
 });

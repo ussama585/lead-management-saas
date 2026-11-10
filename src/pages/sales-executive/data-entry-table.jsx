@@ -671,6 +671,8 @@ const DataEntryTable = () => {
                 options={(companies.data || []).map(company => ({ value: company.id, label: company.name }))}
                 onChange={value => {
                   setCompanyId(value ?? null);
+                  setStatusFilter('');
+                  setSelectedTab('all');
                   setPagination(previous => ({ ...previous, pageIndex: 0 }));
                   setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null);
                 }} />

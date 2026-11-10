@@ -101,6 +101,15 @@ export default function AuditHistoryListPage() {
   const [dateRangeFilter, setDateRangeFilter] = useState(() => ['super_admin', 'company_admin'].includes(user?.user_type) ? null : getCurrentMonthRange());
   const [showDateRangeModal, setShowDateRangeModal] = useState(false);
   const [columnVisibility, setColumnVisibility] = useState({});
+  const [filterCompanyId, setFilterCompanyId] = useState(companyId);
+  if (filterCompanyId !== companyId) {
+    setFilterCompanyId(companyId);
+    if (isSuperAdmin(user?.user_type)) {
+      setModelNameFilter('');
+      setChangedByFilter([]);
+      setPagination(previous => ({ ...previous, pageIndex: 0 }));
+    }
+  }
   const sortBy = resolveSortField(sorting);
   const sortOrder = sorting?.[0]?.desc ? 'desc' : 'asc';
 

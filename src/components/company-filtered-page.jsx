@@ -87,11 +87,20 @@ function ScopedPage({ children, section, user }) {
     if (storageKey) {
       try {
         const key = `tableState_${storageKey}`;
-        const saved = JSON.parse(sessionStorage.getItem(key) || '{}');
-        sessionStorage.setItem(key, JSON.stringify({ ...saved, pageIndex: 0 }));
+        sessionStorage.removeItem(key);
       } catch { /* A blocked session store must not prevent filtering. */ }
     }
-    const next = new URLSearchParams(search);
+    // Lead filters belong to the selected company. Start with a complete
+    // empty snapshot so neither URL filters nor saved table state carry across.
+    const next = new URLSearchParams(storageKey ? undefined : search);
+    if (storageKey) {
+      next.set('filters', '1');
+      // Explicitly clear both assignee representations and the status selection
+      // when the lead pages initialize their role-specific filter state.
+      next.set('status', '');
+      next.set('executive', '');
+      next.set('execId', '');
+    }
     if (id) next.set('company_id', id); else next.delete('company_id');
     next.set('page', '0');
     setSearch(next, { replace: true });

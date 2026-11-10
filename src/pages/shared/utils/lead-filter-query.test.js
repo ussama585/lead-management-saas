@@ -4,6 +4,23 @@ import { loadTableState } from './persistTableState.js';
 
 afterEach(() => vi.unstubAllGlobals());
 
+it.each(['leads-page', 'data-leads-page', 'meta-leads-page', 'meta-leads-marketing-manager'])('resets project size on fresh navigation and restores it from a return URL for %s', route => {
+  vi.stubGlobal('sessionStorage', { getItem: () => JSON.stringify({ projectSizeFilter: 'Large', timestamp: Date.now() }) });
+  expect(loadTableState(route, new URLSearchParams()).projectSizeFilter).toBeNull();
+  const returnParams = leadFilterParams('company_id=2', { projectSizeFilter: 'Large' });
+  expect(loadTableState(route, returnParams).projectSizeFilter).toBe('Large');
+});
+
+it.each(['leads-page', 'data-leads-page', 'meta-leads-page'])('clears status and assignee selections after switching company for %s', route => {
+  vi.stubGlobal('sessionStorage', { getItem: () => JSON.stringify({
+    status: 'Follow Up', statusFilter: 'Follow Up', selectedExecutive: '17',
+    executiveFilter: '17', selectedExecId: 17, timestamp: Date.now(),
+  }) });
+  const params = new URLSearchParams('company_id=2&filters=1&status=&executive=&execId=&page=0');
+  const state = loadTableState(route, params, { status: 'All' });
+  expect(state).toMatchObject({ status: '', statusFilter: '', selectedExecutive: '', executiveFilter: '', selectedExecId: '', pageIndex: 0 });
+});
+
 it('restores all website and data lead filters from the URL', () => {
   const state = { status: 'Company Profile Sent Email', selectedExecutive: '17', projectSizeFilter: 'Large',
     duplicateCheck: 'duplicate', search: 'Acme & Co', pageIndex: 3, pageSize: 25,

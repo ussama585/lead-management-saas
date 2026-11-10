@@ -15,7 +15,7 @@ import formatDate from "../pages/shared/utils/formatDate.js";
 import { formatDateTime } from "../pages/shared/utils/formatDate.js";
 import api from "../pages/shared/services/api.js";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { getManangersExecutives, getAssigningUsersListing } from "../pages/shared/services/users-service.js";
+import { getManangersExecutives } from "../pages/shared/services/users-service.js";
 import useUserStore from "../pages/shared/store/user-store.js";
 import ConfirmationModal from "./confirmation-modal.component.jsx";
 import { updateLeadAcceptingResponse, updateLeadById } from '../pages/shared/services/manager-service.js';
@@ -264,10 +264,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   // Fetch executives or managers/executives based on user type (do not call for sales_executive)
   const { data } = useQuery({
-    queryKey: ['executiveList', user?.id, user?.user_type, optionCompanyId],
-    queryFn: () => user?.user_type === 'super_admin'
-        ? getManangersExecutives(user.user_type, optionCompanyId)
-        : getAssigningUsersListing('sales_executive'),
+    queryKey: ['leadProfileAssignees', user?.id, user?.user_type, optionCompanyId],
+    queryFn: () => getManangersExecutives(user?.user_type, optionCompanyId, { omitUserType: true }),
     enabled: Boolean(user) && user.user_type !== 'sales_executive' && (user.user_type !== 'super_admin' || Boolean(optionCompanyId)),
     staleTime: 60000,
     cacheTime: 300000,

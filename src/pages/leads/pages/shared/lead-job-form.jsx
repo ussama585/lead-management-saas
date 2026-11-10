@@ -13,7 +13,8 @@ import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import api from '../../../shared/services/api.js';
 import useUserStore from '../../../shared/store/user-store.js';
 import { getRolePath } from '../../../auth/role-home.js';
-import { dataLeadJobSchema, dataLeadJobChoices } from '../../schemas/data-lead-job-schema.js';
+import { dataLeadJobSchema, dataLeadJobChoices, earliestCvDeadline, requiresDegreeName } from '../../schemas/data-lead-job-schema.js';
+import { systemJobTimezone } from '../../../shared/utils/system-job-timezone.js';
 import { languageOptions, nationalityOptions, departmentOptions, workingDaysOptions, degreeNameOptions } from '../../../shared/utils/job-form-options.js';
 import '../../../../assets/styles/data-lead-job-form.css';
 import '../../../../assets/styles/job-form-appearance.css';
@@ -92,7 +93,7 @@ export async function deleteDataLeadJob(jobId) {
   return data;
 }
 export function dataLeadJobFormValues(job, leadId) {
-  const values = { ...emptyDataLeadJob };
+  const values = { ...emptyDataLeadJob, timezone: systemJobTimezone() };
   for (const key of Object.keys(values)) if (job?.[key] != null) values[key] = job[key];
   values.data_lead = Number(leadId);
   ['department', 'languages_required', 'nationality_preference'].forEach(key => {
@@ -197,6 +198,7 @@ export default function LeadJobForm() {
     const value = getIn(formik.values, key);
     const error = fieldError(key);
     const props = { id: key, name: key, disabled: save.isLoading, onBlur: () => formik.setFieldTouched(key, true),
+      ...(dates.includes(key) ? { min: earliestCvDeadline() } : {}),
       status: typeof error === 'string' ? 'error' : undefined, 'aria-describedby': `${key}-error` };
     let control;
     if (tagChoices[key]) control = <Select {...props} className="data-job-multiselect" mode="tags" style={{ width: '100%' }} value={splitTags(value)} options={tagChoices[key]}
@@ -248,9 +250,11 @@ export default function LeadJobForm() {
       <div className="data-job-paired-sections">
         {section('Education', <div className="data-job-stack">
           {field('degree_level')}
-          <div className="data-job-field"><label htmlFor="degree-names">Degree Name(s)</label>
+          <div className="data-job-field"><label htmlFor="degree-names">Degree Name(s){requiresDegreeName(formik.values.degree_level) ? '*' : ''}</label>
             <Select id="degree-names" mode="tags" showSearch optionFilterProp="label" options={degreeNameOptions} placeholder="Select or type degree names" disabled={save.isLoading}
               style={{ width: '100%' }} value={formik.values.degrees.map(degree => degree.degree_name)}
+              aria-required={requiresDegreeName(formik.values.degree_level)}
+              onBlur={() => formik.setFieldTouched('degrees', true)}
               onChange={names => formik.setFieldValue('degrees', names.map(degree_name => ({ degree_name })))} />
             <p className="data-job-help">Please type/select one degree name at a time</p>
             {typeof fieldError('degrees') === 'string' && <p role="alert" className="text-destructive">{fieldError('degrees')}</p>}

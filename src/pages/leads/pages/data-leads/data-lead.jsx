@@ -766,7 +766,10 @@ const DataLead = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Data Lead Jobs" goBack={() => navigationState?.followUpReturnTo ? navigate(navigationState.followUpReturnTo) : navigate(-1)} />
+      <BreadCrumb linkText="Data Lead Jobs" goBack={() => {
+        const returnTo = navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo;
+        returnTo ? navigate(returnTo) : navigate(-1);
+      }} />
       <div className="leads">
         <div className="container">
       <Box

@@ -242,7 +242,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
     // Fetch executives/managers list for assignment (same as lead-card)
     // Marketing managers use leadStatsData instead, so they don't need this API
     const { data: assigningUsersData, isLoading: loadingAssigningUsers } = useQuery({
-      queryKey: ['executiveList', user?.id, user?.user_type, selectedCompany(searchParams.toString())],
+      queryKey: ['leadListingAssignees', user?.id, user?.user_type, selectedCompany(searchParams.toString())],
       queryFn: () => getManangersExecutives(userType, selectedCompany(searchParams.toString()), { omitUserType: true }),
       enabled: ['sales_manager', 'admin', 'super_admin', 'company_admin'].includes(userType),
       staleTime: 10 * 60 * 1000,
@@ -948,9 +948,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           Cell: ({ cell, row }) => {
             const name = cell.getValue();
             const lead = row.original;
-            const avatar = <Avatar className="size-10 shrink-0" aria-hidden="true">
-              <AvatarFallback className="bg-primary text-primary-foreground">{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
-            </Avatar>;
             const isDuplicateLead = isDuplicate(lead);
             const isFollowupDelayed =
               lead?.is_followup_delayed === true || lead?.is_followed_delayed === true;
@@ -982,6 +979,9 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
                 </button>
               </Tooltip>
             );
+            const avatar = <Avatar className="size-10 shrink-0" aria-hidden="true">
+              <AvatarFallback className="bg-primary text-primary-foreground">{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
+            </Avatar>;
             const delayedInfoIcon = isFollowupDelayed && (
               <Tooltip title="This follow up is delayed" color="#ff4d4f">
                 <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#ff4d4f', fontSize: '14px' }} />
@@ -1013,7 +1013,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
                 <a className="cursor-pointer"
                   style={{ textDecoration: 'underline', color: '#3E6A9F', display: 'flex', alignItems: 'center', gap: '6px' }}
                   href={leadHref}
-                  onClick={(e) => { e.preventDefault(); navigate(leadHref); }}
+                  onClick={(e) => { e.preventDefault(); navigate(leadHref, { state: { leadListingReturnTo: `${location.pathname}${location.search}` } }); }}
                 >
                   {name}
                 </a>
@@ -1221,7 +1221,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       const statusIndex = ordered.findIndex(column => column.accessorKey === 'status');
       ordered.splice(statusIndex + 1, 0, ...adjacentKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean));
       return dateBeforeStatusHistory(ordered);
-    }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination]);
+    }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination, location.pathname, location.search]);
 
 
 

@@ -11,6 +11,8 @@ import dayjs from "dayjs";
 import useUserStore from "../../../shared/store/user-store.js";
 import { isSuperAdmin } from '../../../auth/role-access.js';
 import { formatSalaryNum } from "../../../shared/utils/formatters.js";
+import { getLeadJobDetail } from '../../../shared/services/leads.js';
+import { getMetaLeadJobById } from '../../../shared/services/metaLeads.js';
 
 export async function getJobDetails(jobId, leadId) {
   if (leadId != null && leadId !== '') {
@@ -80,7 +82,7 @@ const SkillCard = ({ skill }) => (
   </div>
 );
 
-const DataLeadJobDetail = () => {
+const DataLeadJobDetail = ({ jobSource = 'data' }) => {
   const navigate = useNavigate();
   const { jobId, leadId: routeLeadId } = useParams();
   const [searchParams] = useSearchParams();
@@ -89,8 +91,9 @@ const DataLeadJobDetail = () => {
   const isAdmin = isSuperAdmin(user?.user_type);
 
   const { data: job, isLoading, isError, error, refetch } = useQuery(
-    ["dataLeadJobDetail", user?.id, user?.user_type, leadId, jobId],
-    () => getJobDetails(jobId, leadId),
+    ["dataLeadJobDetail", jobSource, user?.id, user?.user_type, leadId, jobId],
+    () => jobSource === 'website' ? getLeadJobDetail(jobId)
+      : jobSource === 'meta' ? getMetaLeadJobById(jobId) : getJobDetails(jobId, leadId),
     { enabled: Boolean(jobId), refetchOnWindowFocus: false }
   );
 

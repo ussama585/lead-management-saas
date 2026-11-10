@@ -127,7 +127,9 @@ export const loadTableState = (routeKey, searchParams, defaults = {}) => {
           dateRange: dateRange,
           selectedExecutive: parsed.selectedExecutive || null,
           statusFilter: parsed.statusFilter !== undefined ? parsed.statusFilter : state.statusFilter,
-          projectSizeFilter: parsed.projectSizeFilter || null,
+          // Lead routes restore project size from their URL, including detail
+          // return links. Fresh route navigation should start without it.
+          projectSizeFilter: isLeadPage ? null : parsed.projectSizeFilter || null,
           executiveFilter: parsed.executiveFilter || null,
           selectedCampaign: parsed.selectedCampaign || null,
           selectedAdset: parsed.selectedAdset || null,

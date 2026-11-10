@@ -858,7 +858,7 @@ function DashboardCompanyTabsSection() {
 
       {/* SYSTEM STATS SECTION (cards) */}
       {activeSection === 'systemStats' && (
-        (superAdmin || currentUser?.user_type === 'company_admin') ? <SuperAdminStats userId={currentUser?.id} userType={currentUser?.user_type} /> :
+        (superAdmin || currentUser?.user_type === 'company_admin') ? <SuperAdminStats userId={currentUser?.id} userType={currentUser?.user_type} showDemoRequests={false} /> :
         <>
           <SalesPerformancePreview />
           <div className="my-4 flex flex-wrap items-center justify-between gap-3">

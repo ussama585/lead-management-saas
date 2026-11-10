@@ -221,8 +221,7 @@ export const assignClient = async (clientId, userId) => {
 
 export const getManangersExecutives = async (userType = null, companyId = null, { omitUserType = false } = {}) => {
   try {
-    // Assignment dropdowns consistently request sales executives for every role.
-    const endpoint = assignmentEndpoint(companyId);
+    const endpoint = assignmentEndpoint(companyId, { omitUserType });
     console.log("endpoint: ", endpoint);
 
     const response = await api.get(endpoint);

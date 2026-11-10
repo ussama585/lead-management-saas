@@ -27,7 +27,7 @@ import { File as InsertDriveFileOutlinedIcon, Ruler } from 'lucide-react';
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { alpha } from "@mui/material/styles";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { useNavigate, Link as RouterLink, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, Link as RouterLink, useSearchParams } from "react-router-dom";
 import { Avatar as AntAvatar, Alert as AntAlert, Space } from 'antd';
 import { Info as InfoCircleOutlined, MessageCircle as CommentOutlined, Upload as UploadOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
 import DuplicateLeadModal from '../../../../components/duplicate-lead-modal.component.jsx';
@@ -104,6 +104,7 @@ const DataLeads = () => {
   const { user } = useUserStore();
   const [leadDialog, setLeadDialog] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   
   // Load persisted state from sessionStorage
   const initialState = loadTableState('data-leads-page', searchParams, {
@@ -183,8 +184,8 @@ const DataLeads = () => {
     data: assigningUsersData,
     isLoading: loadingAssigningUsers,
   } = useQuery({
-    queryKey: ["executiveList", user?.id, user?.user_type, selectedCompany(searchParams.toString())],
-    queryFn: () => getManangersExecutives(user?.user_type, selectedCompany(searchParams.toString())),
+    queryKey: ['leadListingAssignees', user?.id, user?.user_type, selectedCompany(searchParams.toString())],
+    queryFn: () => getManangersExecutives(user?.user_type, selectedCompany(searchParams.toString()), { omitUserType: true }),
     enabled: ['admin', 'super_admin', 'company_admin', 'sales_manager'].includes(user?.user_type),
     staleTime: 10 * 60 * 1000,
     cacheTime: 15 * 60 * 1000,
@@ -748,6 +749,7 @@ const DataLeads = () => {
             <Link
               component={RouterLink}
               to={`/data-lead/${row.original.id}`}
+              state={{ leadListingReturnTo: `${location.pathname}${location.search}` }}
               underline="always"
               sx={{
                 fontWeight: 600,
@@ -1042,6 +1044,7 @@ const DataLeads = () => {
   },
     [
       PROJECT_SIZE_OPTIONS,
+      location.pathname, location.search,
       apiStatusOptions, statusList.isLoading, statusList.isError,
       executivesList,
       assigneeOptions,

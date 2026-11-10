@@ -233,7 +233,7 @@ function App() {
             <Route path="/admin/leads/:id" element={<ProtectedRoute element={<LeadDetailPage />} allowedRoles={['admin']} />} />
             <Route path="/admin/leads/:id/job/:jobId" element={<ProtectedRoute element={<LeadJobPage />} allowedRoles={['admin']} />} />
             <Route path="/admin/meta-leads/:id/job/:jobId" element={<ProtectedRoute element={<LeadJobPage/>} allowedRoles={['admin']} />} />
-            <Route path="/admin/lead-job-detail/:jobId" element={<ProtectedRoute element={<LeadJobDetailPage />} allowedRoles={['admin']} />} />
+            <Route path="/admin/lead-job-detail/:jobId" element={<ProtectedRoute element={<LeadJobDetailPage />} allowedRoles={['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive']} />} />
             <Route path="/admin/leads/:id/new-job" element={<ProtectedRoute element={<NewLeadJobPage />} allowedRoles={['admin']} />} />
             <Route path="/admin/meta-leads/:id/new-job" element={<ProtectedRoute element={<NewLeadJobPage />} allowedRoles={['admin']} />} />
             <Route path="/admin/add-new-lead" element={<ProtectedRoute element={<AddNewLead />} allowedRoles={['admin']} />} />

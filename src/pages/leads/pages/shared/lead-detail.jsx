@@ -175,7 +175,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
 
     const { state: navigationState } = useLocation();
     const goBack = () => {
-        navigate(navigationState?.followUpReturnTo || getRolePath(user?.user_type, '/leads'));
+        navigate(navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo || getRolePath(user?.user_type, '/leads'));
     };
 
     // Options for dropdowns
@@ -629,6 +629,13 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
                     >Edit</Button>
                 </>
             ),
+        },
+        {
+            header: 'View Details', id: 'view_details', enableSorting: false, enableEditing: false,
+            Cell: ({ row }) => <Button size="small" onClick={event => {
+                event.stopPropagation();
+                navigate(getRolePath(user?.user_type, `/lead-job-detail/${row.original.id}?source=website`));
+            }}>View Details</Button>,
         },
         // Job actions use the existing delete confirmation and API.
         ...(canDeleteJob

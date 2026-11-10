@@ -649,6 +649,13 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
           </>
       ),
     },
+    {
+      header: 'View Details', id: 'view_details', enableSorting: false, enableEditing: false,
+      Cell: ({ row }) => <Button size="small" onClick={event => {
+        event.stopPropagation();
+        navigate(`${routePrefix}/lead-job-detail/${row.original.id}?source=meta`);
+      }}>View Details</Button>,
+    },
     // Delete column - only for admin and sales_manager
     ...(canDeleteJob
       ? [
@@ -776,7 +783,7 @@ const getMetaLeadUrl = () => {
     <>
      <BreadCrumb 
   linkText="Meta Lead Jobs" 
-  goBack={() => navigate(navigationState?.followUpReturnTo || getMetaLeadUrl())}
+  goBack={() => navigate(navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo || getMetaLeadUrl())}
 />
       <div className="leads">
         <div className="container">
