@@ -17,7 +17,7 @@ function Result({ query, children }) {
   return query.isError ? <div role="alert" className="p-4"><p>{query.error.message}</p><Button variant="outline" onClick={() => query.refetch()}>Retry</Button></div> : children;
 }
 
-export default function RoleLeadDashboard({ statsOnly = false }) {
+export default function RoleLeadDashboard({ statsOnly = false, additionalStats = null }) {
   const { user } = useUserStore();
   const initialDates = () => [dayjs().startOf('month'), dayjs().endOf('month')];
   const [totalDates, setTotalDates] = useState(initialDates);
@@ -46,9 +46,10 @@ export default function RoleLeadDashboard({ statsOnly = false }) {
     {isManager && <div className="flex items-center gap-3"><label htmlFor="manager-lead-stats-scope">Lead statistics</label>
       <Select placeholder="Select lead statistics" id="manager-lead-stats-scope" value={statsScope} onChange={setStatsScope} options={['My Stats', 'Executive Stats'].map(value => ({ value, label: value }))} />
     </div>}
-    <Result query={stats}><div className="admin-stat-cards-grid">
-      {stats.isLoading ? <p role="status">Loading lead statistics...</p> : dashboardStatCards(stats.data, { data_leads: ['Data Leads'], meta_leads: ['Meta Leads'], web_leads: ['Website Leads'], website_leads_stats: ['Website Leads'], data_leads_stats: ['Data Leads'], meta_leads_stats: ['Meta Leads'] }).map(card => <StatsCard key={card.key} title={card.title} value={card.count} percentage={card.trend} />)}
-    </div></Result>
+    <div className="admin-stat-cards-grid">
+      {additionalStats}
+      <Result query={stats}>{stats.isLoading ? <p role="status">Loading lead statistics...</p> : dashboardStatCards(stats.data, { data_leads: ['Data Leads'], meta_leads: ['Meta Leads'], web_leads: ['Website Leads'], website_leads_stats: ['Website Leads'], data_leads_stats: ['Data Leads'], meta_leads_stats: ['Meta Leads'] }).map(card => <StatsCard key={card.key} title={card.title} value={card.count} percentage={card.trend} />)}</Result>
+    </div>
     {!statsOnly && <>
       <Result query={total}><TotalLeadsReceivedChart totalCount={total.data?.totalCount || 0} timeSeriesData={total.data?.timeSeriesData || []} selectedPeriod={period} onPeriodChange={setPeriod} showSourceFilter={false} dateRange={totalDates} onDateRangeChange={setTotalDates} isLoading={total.isLoading} /></Result>
       <Result query={distribution}><LeadStatusDistributionChart data={distribution.data || []} selectedSource={source} onSourceChange={setSource} dateRange={distributionDates} onDateRangeChange={setDistributionDates} isLoading={distribution.isLoading} /></Result>
