@@ -259,7 +259,7 @@ export default function LeadJobForm() {
               onBlur={() => formik.setFieldTouched('degrees', true)}
               onChange={names => formik.setFieldValue('degrees', names.map(degree_name => ({ degree_name })))} />
             <p className="data-job-help">Please type/select one degree name at a time</p>
-            {typeof fieldError('degrees') === 'string' && <p role="alert" className="text-destructive">{fieldError('degrees')}</p>}
+            {typeof fieldError('degrees') === 'string' && <p role="alert" className="mt-1 text-sm text-destructive">{fieldError('degrees')}</p>}
           </div>
           {field('educational_qualification')}
         </div>)}

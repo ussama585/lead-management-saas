@@ -1153,6 +1153,7 @@ function DashboardCompanyTabsSection() {
               <span>{totalLeadsReceivedError.message || 'Could not load total leads received.'}</span>
               <Button variant="outline" onClick={() => refetchTotalLeadsReceived()}>Retry</Button>
             </div> : <TotalLeadsReceivedChart
+              showPeriodFilter={!superAdmin && currentUser?.user_type !== 'company_admin'}
               showSourceFilter={!superAdmin && currentUser?.user_type !== 'company_admin'}
               title="Total Leads Received"
               totalCount={totalLeadsReceivedTotalCount}

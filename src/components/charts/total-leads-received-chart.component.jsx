@@ -28,6 +28,7 @@ const TotalLeadsReceivedChart = ({
   selectedSource = 'Meta',
   onSourceChange,
   showSourceFilter = true,
+  showPeriodFilter = true,
   isLoading = false,
   emptyMessage = 'No data to display',
   dateRange,
@@ -99,12 +100,12 @@ const TotalLeadsReceivedChart = ({
             setShowModal={setShowDateRangeModal}
             onDone={handleDateRangeDone}
           />
-          <Select placeholder="Select time period"
+          {showPeriodFilter && <Select placeholder="Select time period"
             value={selectedPeriod}
             style={{ width: 120 }}
             onChange={onPeriodChange}
             options={PERIOD_OPTIONS}
-          />
+          />}
           {showSourceFilter && <Select placeholder="Select lead source"
             value={selectedSource}
             style={{ width: 140 }}
