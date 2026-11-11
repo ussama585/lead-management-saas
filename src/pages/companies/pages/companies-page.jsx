@@ -247,11 +247,11 @@ export default function CompaniesPage() {
       <span>{companyTab === 'active' ? <Link to={`/super-admin/companies/${row.id}`} className='text-primary underline underline-offset-2'>{name}</Link> : name}<span className='block text-xs text-muted-foreground'>ID: {row.id}</span></span>
     </Space> },
     ...[['email', 'Email'], ['phone', 'Phone'], ['address', 'Address'], ['city', 'City'], ['country', 'Country']].map(([field, title]) => ({
-      title, dataIndex: field, key: field, sorter: ['email', 'city', 'country'].includes(field), render: value => value || '?',
+      title, dataIndex: field, key: field, sorter: ['email', 'city', 'country'].includes(field), render: value => value ?? '',
     })),
-    { title: 'Website', dataIndex: 'website', key: 'website', render: value => /^https?:\/\//i.test(value || '') ? <a href={value} target='_blank' rel='noopener noreferrer' className='text-primary underline'>{value}</a> : value || '?' },
+    { title: 'Website', dataIndex: 'website', key: 'website', render: value => /^https?:\/\//i.test(value || '') ? <a href={value} target='_blank' rel='noopener noreferrer' className='text-primary underline'>{value}</a> : value ?? '' },
     { title: 'Status', dataIndex: 'is_active', key: 'is_active', render: value => <Tag color={value ? 'green' : 'default'}>{value ? 'Active' : 'Inactive'}</Tag> },
-    { title: 'Created', dataIndex: 'created_at', key: 'created_at', sorter: true, render: value => value ? formatDateUniversal(value, true) : '?' },
+    { title: 'Created', dataIndex: 'created_at', key: 'created_at', sorter: true, render: value => value ? formatDateUniversal(value, true) : '' },
     { title: companyTab === 'deleted' ? 'Restore' : 'Actions', key: 'actions', width: companyTab === 'deleted' ? 100 : 250, render: (_, row) => companyTab === 'deleted' ?
       <Button title='Restore company' aria-label={`Restore ${row.name}`} size='small' icon={<RotateCcw size={16} />} className='bg-green-100 text-green-700 hover:bg-green-200' disabled={busy} onClick={() => setRestoreTarget(row)} /> : <Space wrap size={8} style={{ maxWidth: '100%' }}>
       <Button title='View company' aria-label={`View ${row.name}`} size='small' icon={<Eye size={16} />} disabled={busy} onClick={() => navigate(`/super-admin/companies/${row.id}`)} />

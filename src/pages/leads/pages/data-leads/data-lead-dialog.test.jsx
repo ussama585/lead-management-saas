@@ -14,12 +14,12 @@ describe('data lead API contract', () => {
     const users = [{ id: 8, name: 'Ali', user_type: 'sales_manager' }];
     api.get.mockResolvedValue({ data: users });
     expect(await getLeadCreateAssignees('3')).toEqual(users);
-    expect(api.get).toHaveBeenCalledWith('/accounts/users-for-assigning', { params: { user_type: 'sales_executive', company_id: '3' } });
+    expect(api.get).toHaveBeenCalledWith('/accounts/users-for-assigning', { params: { company_id: '3' } });
   });
   it('uses the authenticated company for company admins', async () => {
     api.get.mockResolvedValue({ data: [] });
     await getLeadCreateAssignees();
-    expect(api.get).toHaveBeenCalledWith('/accounts/users-for-assigning', { params: { user_type: 'sales_executive' } });
+    expect(api.get).toHaveBeenCalledWith('/accounts/users-for-assigning', { params: {} });
   });
   it('creates a JSON lead with all documented fields for super admins', async () => {
     api.post.mockResolvedValue({ data: { success: true, message: 'Lead created successfully.' } });

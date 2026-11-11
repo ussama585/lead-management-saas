@@ -39,7 +39,7 @@ export async function getDataLeadDetails(id) {
   return data.data;
 }
 export async function getLeadCreateAssignees(companyId = null) {
-  const { data } = await api.get('/accounts/users-for-assigning', { params: { user_type: 'sales_executive', ...(companyId ? { company_id: companyId } : {}) } });
+  const { data } = await api.get('/accounts/users-for-assigning', { params: companyId ? { company_id: companyId } : {} });
   success(data);
   if (!Array.isArray(data)) throw new Error('Could not read the assignee list.');
   return data;
