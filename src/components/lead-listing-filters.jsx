@@ -27,9 +27,9 @@ function FilterCards({ statusFirst, children }) {
 export default function LeadListingFilters({ executives = [], selectedExecutive, onExecutiveChange, getExecutiveCount,
   statusFilter, setStatusFilter, statusChoices, getTotalCount, getStatusCount, showExecutives = true, requiresCompany = false, statusFirst = false }) {
   if (requiresCompany) return <FilterCards statusFirst={statusFirst}>
-    <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound}>
+    {showExecutives && <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound}>
       <p className="py-3 text-sm text-muted-foreground">Select company first</p>
-    </FilterCard>
+    </FilterCard>}
     <FilterCard title="Status Filters" subtitle="Filter leads by current status" Icon={ListFilter}>
       <p className="py-3 text-sm text-muted-foreground">Select company first</p>
     </FilterCard>

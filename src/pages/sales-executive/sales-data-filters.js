@@ -4,10 +4,9 @@ export function changeSalesDataStatus(currentStatus, valueOrUpdater) {
   return { status, tab: ['assigned', 'unassigned'].includes(status) ? status : 'all' };
 }
 
-export function salesDataFilterParams(status, assigneeId, tab) {
+export function salesDataFilterParams(status, tab) {
   return {
     ...(status && !['assigned', 'unassigned'].includes(status) ? { status } : {}),
-    ...(assigneeId != null && assigneeId !== '' ? { assigned_to: assigneeId } : {}),
-    ...(tab === 'unassigned' ? { assigned: false } : {}),
+    ...(['assigned', 'unassigned'].includes(tab) ? { assigned: tab === 'assigned' } : {}),
   };
 }

@@ -1,3 +1,4 @@
+import CompanySelectOption from './company-select-option.jsx';
 import { ProjectSizeManager } from './project-size-settings.jsx';
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
@@ -18,6 +19,7 @@ export default function CompanyLeadSettingsList({ type }) {
     <div className="mb-4">
       <label htmlFor={`settings-company-${type}`} className="mb-2 block text-sm font-medium">Company</label>
       <Select id={`settings-company-${type}`} style={{ width: 280, maxWidth: '100%' }} showSearch allowClear
+        optionRender={option => <CompanySelectOption option={option} />}
         placeholder="Select company" options={companies.data || []} value={companyId ?? undefined} loading={companies.isFetching}
         onChange={value => setCompanyId(value || null)} />
     </div>

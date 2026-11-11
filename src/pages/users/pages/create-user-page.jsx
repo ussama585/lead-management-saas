@@ -1,3 +1,4 @@
+import CompanySelectOption from '../../../components/company-select-option.jsx';
 import { message } from '../../../components/ui/notifications.jsx';
 import { Select } from '../../../components/ui/app-select.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
@@ -218,7 +219,7 @@ export default function CreateUser() {
                         onBlur={() => setFieldTouched('company_id', true)}
                         loading={loadingCompanies} showSearch filterOption={false} onSearch={setCompanySearch}
                         onChange={value => { setFieldValue('company_id', value); setFieldValue('manager', ''); }}
-                        options={companies.map(company => ({ value: company.id, label: company.name }))} />
+                        options={companies.map(company => ({ value: company.id, label: company.name, email: company.email }))} optionRender={option => <CompanySelectOption option={option} />} />
                       {touched.company_id && errors.company_id && (
                         <div className="error" style={{ color: 'red' }}>{errors.company_id}</div>
                       )}

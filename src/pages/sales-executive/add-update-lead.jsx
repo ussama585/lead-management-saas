@@ -1,3 +1,4 @@
+import CompanySelectOption from '../../components/company-select-option.jsx';
 import ManualLocationInput from '../../components/manual-location-input.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import { Modal } from '../../components/ui/app-modal.jsx';
@@ -541,7 +542,7 @@ const AddUpdateLead = () => {
                     value={field.value ?? undefined} onChange={value => form.setFieldValue('company', value ?? null)}
                     onBlur={() => form.setFieldTouched('company', true)} loading={loadingCompanies}
                     showSearch allowClear optionFilterProp="label" placeholder="Select company"
-                    options={companies.map(company => ({ value: company.id, label: company.name }))}
+                    options={companies.map(company => ({ value: company.id, label: company.name, email: company.email }))} optionRender={option => <CompanySelectOption option={option} />}
                     notFoundContent={loadingCompanies ? <Spin size="small" /> : 'No companies found'}
                     style={{ width: '100%' }} />}</Field>
                   {companiesError && <div role="alert">{companyError?.response?.data?.message || companyError?.message || 'Could not load companies.'} <Button type="link" onClick={() => refetchCompanies()}>Retry</Button></div>}

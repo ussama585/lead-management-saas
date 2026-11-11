@@ -1,3 +1,4 @@
+import CompanySelectOption from '../../components/company-select-option.jsx';
 import React, { useState, useEffect, useCallback } from "react";
 
 import NewTableComponent from "../../components/tables/new-table.jsx";
@@ -27,7 +28,6 @@ import { getAssigningUserList } from "../shared/services/headhunting.js";
 import "../../assets/styles/legacy/create-user.css";
 import "../../assets/styles/legacy/client-listing-page.css";
 import {
-  getExecutives,
 } from "../shared/services/users-service.js";
 import useUserStore from "../shared/store/user-store.js";
 import { isSuperAdmin } from '../auth/role-access.js';
@@ -132,7 +132,6 @@ const DataEntryTable = () => {
   const rawTab = searchParams.get("tab") || (superAdmin ? 'all' : 'assigned');
   const initialTabFromUrl = ["assigned", "unassigned", "all"].includes(rawTab) ? rawTab : "assigned";
   const initialStatusFromUrl = searchParams.get("status") || "";
-  const initialExecIdFromUrl = searchParams.get("execId") ? Number(searchParams.get("execId")) : null;
   const initialSearchFromUrl = searchParams.get("search") || "";
   const initialPageIndexFromUrl = parseInt(searchParams.get("page")) || 0;
   const initialPageSizeFromUrl = parseInt(searchParams.get("pageSize")) || 10;
@@ -159,10 +158,8 @@ const DataEntryTable = () => {
   const [columnVisibility, setColumnVisibility] = useState({});
   const [statusFilter, setStatusFilter] = useState(initialStatusFromUrl);
   const [selectedTab, setSelectedTab] = useState(initialTabFromUrl);
-  const [selectedExecId, setSelectedExecId] = useState(initialExecIdFromUrl);
   const [rowSelection, setRowSelection] = useState({});
   const [selectedAssignee, setSelectedAssignee] = useState(null);
-  const [executivesList, setExecutivesList] = useState([]); // for tabs
   const [assignableUsers, setAssignableUsers] = useState([]); // for dropdown
   const [isSaving, setIsSaving] = useState(false);
 
@@ -179,9 +176,6 @@ const DataEntryTable = () => {
     }
     
     // Executive filter
-    if (selectedExecId) {
-      newParams.execId = selectedExecId.toString();
-    }
     
     // Search
     if (globalFilter && globalFilter.trim()) {
@@ -204,11 +198,11 @@ const DataEntryTable = () => {
     
     setSearchParams(newParams, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, selectedTab, selectedExecId, globalFilter, pagination.pageIndex, pagination.pageSize, sorting]);
+  }, [statusFilter, selectedTab, globalFilter, pagination.pageIndex, pagination.pageSize, sorting]);
   const countParams = {
     ...companyParams,
     search: globalFilter,
-    ...salesDataFilterParams('', selectedExecId, selectedTab),
+    ...salesDataFilterParams('', selectedTab),
   };
   const listingParams = {
     ...companyParams,
@@ -217,7 +211,7 @@ const DataEntryTable = () => {
     search: globalFilter,
     sort_by: sorting?.[0]?.id ?? '',
     order: sorting?.[0]?.desc ? 'desc' : 'asc',
-    ...salesDataFilterParams(statusFilter, selectedExecId, selectedTab),
+    ...salesDataFilterParams(statusFilter, selectedTab),
   };
   const queryOptions = {
     enabled: Boolean(user?.id) && (!superAdmin || !companies.isLoading),
@@ -377,43 +371,33 @@ const DataEntryTable = () => {
     [user, navigate, selectedTab, pagination]
   );
 
-  // Fetch executives/managers for tabs (executive/manager filter buttons)
-  React.useEffect(() => {
-    let active = true;
-    async function fetchExecutivesForTabs() {
-      try {
-        let data = [];
-        if (canViewUserTabs) {
-          data = await getExecutives(companyParams);
-        }
-        if (active) setExecutivesList(Array.isArray(data) ? data : []);
-      } catch (err) {
-        if (active) setExecutivesList([]);
-      }
-    }
-    if (canViewUserTabs) {
-      fetchExecutivesForTabs();
-    }
-    return () => { active = false; };
-  }, [user.id, user.user_type, canViewUserTabs, companyId, dateRange]);
-
   // Fetch assignable users for dropdowns (Assign to)
  React.useEffect(() => {
+  let active = true;
+  setAssignableUsers([]);
   async function fetchAssignableUsers() {
     try {
       let data = [];
       if (superAdmin || ['company_admin', 'sales_manager'].includes(user.user_type)) {
-        data = await getAssigningUserList(); // NEW unified endpoint
+        if (superAdmin || user.user_type === 'company_admin') {
+          const response = await api.get('/accounts/users-for-assigning', {
+            params: superAdmin ? { company_id: companyId } : {},
+          });
+          data = response.data;
+        } else {
+          data = await getAssigningUserList();
+        }
       }
-      setAssignableUsers(Array.isArray(data) ? data : []);
+      if (active) setAssignableUsers(Array.isArray(data) ? data : []);
     } catch (err) {
-      setAssignableUsers([]);
+      if (active) setAssignableUsers([]);
     }
   }
-  if (superAdmin || ['company_admin', 'sales_manager'].includes(user.user_type)) {
+  if ((superAdmin && companyId != null) || ['company_admin', 'sales_manager'].includes(user.user_type)) {
     fetchAssignableUsers();
   }
-}, [user.user_type]);
+  return () => { active = false; };
+}, [user.id, user.user_type, superAdmin, companyId]);
   const tabCounts = {
     ...statusCount,
     all: statusCount?.all_count ?? statusCount?.all ?? statusCount?.total_count ?? statusCount?.count ?? 0,
@@ -574,7 +558,6 @@ const DataEntryTable = () => {
     const next = changeSalesDataStatus(statusFilter, valueOrUpdater);
     setStatusFilter(next.status);
     setSelectedTab(next.tab);
-    if (next.tab === 'unassigned') setSelectedExecId(null);
     setPagination({ pageIndex: 0, pageSize: 10 });
   }, [statusFilter]);
 
@@ -669,13 +652,13 @@ const DataEntryTable = () => {
               <Building2 size={20} className="shrink-0" aria-hidden="true" />
               <FilterSelect id="sales-data-company-filter" showSearch allowClear placeholder="All companies"
                 value={companyId ?? undefined} loading={companies.isFetching} style={{ width: '100%' }}
-                options={(companies.data || []).map(company => ({ value: company.id, label: company.name }))}
+                options={(companies.data || []).map(company => ({ value: company.id, label: company.name, email: company.email }))} optionRender={option => <CompanySelectOption option={option} />}
                 onChange={value => {
                   setCompanyId(value ?? null);
                   setStatusFilter('');
                   setSelectedTab('all');
                   setPagination(previous => ({ ...previous, pageIndex: 0 }));
-                  setRowSelection({}); setSelectedExecId(null); setSelectedAssignee(null);
+                  setRowSelection({}); setSelectedAssignee(null);
                 }} />
             </div>
             {companies.isError && <div role="alert">Could not load companies. <Button onClick={() => companies.refetch()}>Retry</Button></div>}
@@ -690,18 +673,7 @@ const DataEntryTable = () => {
         <LeadListingFilters
           statusFirst
           requiresCompany={superAdmin && !companyId}
-          executives={executivesList}
-          selectedExecutive={selectedExecId}
-          showExecutives={canViewUserTabs && selectedTab !== 'unassigned'}
-          getExecutiveCount={id => executivesList.find(exec => String(exec.id) === String(id))?.count}
-          onExecutiveChange={id => {
-            if (id == null) {
-              setSelectedExecId(null);
-            } else {
-              setSelectedExecId(selectedExecId === id ? null : id);
-            }
-            setPagination({ pageIndex: 0, pageSize: 10 });
-          }}
+          showExecutives={false}
           statusFilter={statusFilter}
           setStatusFilter={handleScopeTabFilter}
           statusChoices={statusChoices}

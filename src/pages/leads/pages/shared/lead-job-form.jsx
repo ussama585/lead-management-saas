@@ -280,7 +280,7 @@ export default function LeadJobForm() {
               formik.setFieldValue('key_skills_required', names.join(', '));
             }} />
           <p className="data-job-help">Search existing skills or type a custom skill, then press Enter</p>
-          {typeof fieldError('skills') === 'string' && <p role="alert" className="text-destructive">{fieldError('skills')}</p>}
+          {typeof fieldError('skills') === 'string' && <p role="alert" className="mt-1 text-sm text-destructive" style={{ fontSize: '14px', marginTop: '4px' }}>{fieldError('skills')}</p>}
         </div>
         {formik.values.skills.map((skill, index) => skill.skill_name && <div key={index} className="data-job-skill-row">
           {field(`skills.${index}.skill_name`, 'Skill Name')}

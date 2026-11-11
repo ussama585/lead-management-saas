@@ -1,3 +1,4 @@
+import CompanySelectOption from '../../../../components/company-select-option.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -99,7 +100,7 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
   function close() { if (!pending) onClose(); }
   const loading = id != null && detail.isFetching;
   const detailError = id != null && detail.isError;
-  const companyOptions = (companies.data || []).map(company => ({ value: company.id, label: `${company.name} (ID: ${company.id})` }));
+  const companyOptions = (companies.data || []).map(company => ({ value: company.id, label: `${company.name} (ID: ${company.id})`, email: company.email }));
   if (detail.data?.company != null && !companyOptions.some(option => option.value === detail.data.company)) companyOptions.push({ value: detail.data.company, label: `Company ID: ${detail.data.company}` });
   function control(key) {
     const common = { id: `data-lead-${key}`, name: key, disabled: pending, value: formik.values[key], onBlur: formik.handleBlur, 'aria-required': requiredFields.has(key), 'aria-invalid': Boolean(formik.touched[key] && formik.errors[key]), 'aria-describedby': formik.touched[key] && formik.errors[key] ? `data-lead-${key}-error` : undefined };
@@ -109,7 +110,7 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
     if (key === 'contract_currency') return <Select {...common} className='w-full' placeholder='Select currency'
       options={currencyOptions}
       onChange={value => formik.setFieldValue(key, value)} onBlur={() => formik.setFieldTouched(key, true)} />;
-    if (key === 'company') return <Select {...common} className='w-full' showSearch filterOption={false} onSearch={setCompanySearch} loading={companies.isFetching} options={companyOptions} onChange={value => { formik.setFieldValue(key, value); formik.setFieldValue('assigned_to', null); }} onBlur={() => formik.setFieldTouched(key, true)} placeholder='Search for a company' />;
+    if (key === 'company') return <Select {...common} className='w-full' showSearch filterOption={false} onSearch={setCompanySearch} loading={companies.isFetching} options={companyOptions} optionRender={option => <CompanySelectOption option={option} />} onChange={value => { formik.setFieldValue(key, value); formik.setFieldValue('assigned_to', null); }} onBlur={() => formik.setFieldTouched(key, true)} placeholder='Search for a company' />;
     if (key === 'assigned_to') return <Select {...common} className='w-full' allowClear showSearch optionFilterProp='label'
       disabled={pending || (superAdmin && !assignmentCompanyId) || assigningUsers.isLoading}
       placeholder={superAdmin && !assignmentCompanyId ? 'Select a company first' : 'Select assigned user'}

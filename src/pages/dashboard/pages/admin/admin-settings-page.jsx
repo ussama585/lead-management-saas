@@ -1,3 +1,4 @@
+import CompanySelectOption from '../../../../components/company-select-option.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Button } from '../../../../components/ui/app-controls.jsx';
@@ -170,7 +171,7 @@ const AdminSettingsPage = () => {
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {superAdmin && <div>
               <label htmlFor="duration-company" className="mb-2 block text-sm font-medium">Company</label>
-              <Select id="duration-company" placeholder="Select company" showSearch allowClear
+              <Select id="duration-company" optionRender={option => <CompanySelectOption option={option} />} placeholder="Select company" showSearch allowClear
                 style={{ width: 280, maxWidth: '100%' }} options={companies.data || []}
                 value={companyId ?? undefined} loading={companies.isFetching}
                 disabled={createMutation.isLoading || updateMutation.isLoading || deleteMutation.isLoading}
