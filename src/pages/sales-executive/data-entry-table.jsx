@@ -574,6 +574,7 @@ const DataEntryTable = () => {
     const next = changeSalesDataStatus(statusFilter, valueOrUpdater);
     setStatusFilter(next.status);
     setSelectedTab(next.tab);
+    if (next.tab === 'unassigned') setSelectedExecId(null);
     setPagination({ pageIndex: 0, pageSize: 10 });
   }, [statusFilter]);
 
@@ -691,7 +692,7 @@ const DataEntryTable = () => {
           requiresCompany={superAdmin && !companyId}
           executives={executivesList}
           selectedExecutive={selectedExecId}
-          showExecutives={canViewUserTabs}
+          showExecutives={canViewUserTabs && selectedTab !== 'unassigned'}
           getExecutiveCount={id => executivesList.find(exec => String(exec.id) === String(id))?.count}
           onExecutiveChange={id => {
             if (id == null) {
