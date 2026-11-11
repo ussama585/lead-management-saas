@@ -6,7 +6,7 @@ import { Select } from '../../../components/ui/app-select.jsx';
 import { Input } from '../../../components/ui/app-controls.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Avatar, Card, Descriptions, Space, Table, Tag } from 'antd';
+import { Alert, Avatar, Card, Descriptions, Space, Switch, Table, Tag } from 'antd';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { Avatar as UserAvatar, AvatarImage, AvatarFallback } from '../../../components/ui/avatar.jsx';
 import { useFormik } from 'formik';
@@ -30,6 +30,7 @@ export async function createCompanyUser(companyId, values) {
   if (!/^[1-9]\d*$/.test(String(companyId))) throw new Error('A valid company is required.');
   if (!companyUserRoles.includes(values.user_type)) throw new Error('Select a valid user type.');
   const payload = { company_id: Number(companyId), name: values.name.trim(), email: values.email.trim(), phone: values.phone.trim(), password: values.password, user_type: values.user_type };
+  payload.is_active = values.is_active ?? true;
   if (values.user_type === 'sales_executive' && values.manager) payload.manager_id = Number(values.manager);
   let body = payload;
   if (values.profile_file) {
@@ -50,7 +51,7 @@ export async function getCompanyUserDetails(id) {
 
 export async function editCompanyUser(id, values, initial) {
   const body = new FormData();
-  for (const key of ['name', 'phone', 'password', 'manager']) {
+  for (const key of ['name', 'phone', 'password', 'manager', 'is_active']) {
     const value = typeof values[key] === 'string' ? values[key].trim() : values[key];
     if (key === 'manager' && (value === '' || value == null) && initial.manager) {
       body.append('manager_id', '');
@@ -90,6 +91,7 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
   });
   const initial = { name: details.data?.name || '', email: details.data?.email || '', phone: details.data?.phone || '',
     password: '', confirmPassword: '', company_id: Number(companyId), user_type: details.data?.user_type || 'sales_executive',
+    is_active: ![false, 'false', 0, '0'].includes(details.data?.is_active ?? true),
     manager: managerIdFromOptions(managers.data, details.data), profile_file: null, remove_profile_pic: false };
   const save = useMutation(values => editing ? editCompanyUser(target.id, values, initial) : createCompanyUser(companyId, values), {
     onSuccess: result => {
@@ -177,6 +179,11 @@ function CompanyUserForm({ companyId, target, onClose, onSaved }) {
               onChange={value => formik.setFieldValue('manager', value ? Number(value) : '')} onBlur={() => formik.setFieldTouched('manager', true)} />{fieldError('manager')}
             {managers.isError && <div role="alert">Could not load managers. <Button type="link" onClick={() => managers.refetch()}>Retry</Button></div>}
           </div>}
+        </div>
+        <div className="mt-4 flex items-center gap-3">
+          <label className="label" htmlFor="company-user-active">Account status</label>
+          <Switch id="company-user-active" checked={formik.values.is_active} checkedChildren="Active" unCheckedChildren="Inactive"
+            disabled={save.isLoading} onChange={checked => formik.setFieldValue('is_active', checked)} />
         </div>
         <Space className="mt-5"><Button type="primary" htmlType="submit" loading={save.isLoading} disabled={removePicture.isLoading}>{editing ? 'Save changes' : 'Create user'}</Button><Button disabled={pictureBusy} onClick={onClose}>Cancel</Button></Space>
       </form>}

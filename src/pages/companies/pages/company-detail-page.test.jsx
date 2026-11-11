@@ -45,6 +45,7 @@ describe('company detail users', () => {
     await createCompanyUser(3, { ...values, user_type });
     expect(api.post).toHaveBeenLastCalledWith('/accounts/signup', {
       name: values.name, email: values.email, phone: values.phone, password: values.password, user_type, company_id: 3,
+      is_active: true,
       ...(user_type === 'sales_executive' ? { manager_id: 2 } : {}),
     });
   });
