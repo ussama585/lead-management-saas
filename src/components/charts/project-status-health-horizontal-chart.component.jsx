@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Select } from '../ui/app-select.jsx';
 import Chart from './apex-chart.jsx';
 import dayjs from 'dayjs';
 import BootstrapDateRangeModal from '../bootstrap-date-range-modal.component.jsx';
@@ -18,8 +17,6 @@ const ProjectStatusHealthHorizontalChart = ({
   emptyMessage = 'No data to display',
   dateRange,
   onDateRangeChange,
-  selectedSource = 'Meta',
-  onSourceChange,
 }) => {
   const [showDateRangeModal, setShowDateRangeModal] = useState(false);
   const [internalDateRange, setInternalDateRange] = useState(dateRange ?? [dayjs().startOf('month'), dayjs().endOf('month')]);
@@ -145,8 +142,6 @@ const ProjectStatusHealthHorizontalChart = ({
           )}
         </div>
         <div className="project-status-health-chart-dropdowns">
-          {onSourceChange && <Select placeholder="Select lead source" value={selectedSource} onChange={onSourceChange}
-            style={{ width: 140 }} options={['Meta', 'Data', 'Website'].map(value => ({ value, label: value }))} />}
           <BootstrapDateRangeModal
             value={activeDateRange}
             onChange={onDateRangeChange}

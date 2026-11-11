@@ -321,10 +321,9 @@ export const getSystemLeadFunnel = async ({
   }
 };
 
-export const getSuperAdminLeadsStatusHealth = async ({ startDate, endDate, companyId, leadType } = {}) => {
+export const getSuperAdminLeadsStatusHealth = async ({ startDate, endDate, companyId } = {}) => {
   const { data } = await api.get('/accounts/leads-status-health', {
     params: {
-      ...(leadType ? { lead_type: leadType } : {}),
       ...(companyId ? { company_id: companyId } : {}),
       ...(startDate ? { start_date: startDate } : {}),
       ...(endDate ? { end_date: endDate } : {}),
@@ -414,12 +413,11 @@ export const getLeadsStatusHealth = async ({
   startDate,
   endDate,
   userType,
-  leadType,
 } = {}) => {
   const rolePaths = { company_admin: 'company-admin', sales_manager: 'sales-manager', sales_executive: 'sales-executive' };
   if (rolePaths[userType]) {
     const { data } = await api.get(dashboardEndpoint('leads-status-health', userType), {
-      params: { ...(startDate ? { start_date: startDate } : {}), ...(endDate ? { end_date: endDate } : {}), ...(leadType ? { lead_type: leadType } : {}) },
+      params: { ...(startDate ? { start_date: startDate } : {}), ...(endDate ? { end_date: endDate } : {}) },
     });
     if (data?.status === false || data?.success === false || !Array.isArray(data?.data)) throw new Error(data?.message || 'Could not load lead status health.');
     return data.data;

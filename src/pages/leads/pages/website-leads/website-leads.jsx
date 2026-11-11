@@ -1337,7 +1337,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             showExecutives={userType !== 'sales_executive'}
             onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
             statusFilter={selectedStatus} setStatusFilter={handleTabClick}
-            statusChoices={statusTabs.filter(tab => tab.value !== 'Unassigned' || ['super_admin', 'sales_manager', 'marketing_manager'].includes(userType))}
+            statusChoices={statusTabs.filter(tab => tab.value !== 'Unassigned' || ['super_admin', 'company_admin', 'sales_manager', 'marketing_manager'].includes(userType))}
             getTotalCount={() => getStatusCount(leadCounts, 'total_count')} getStatusCount={key => getStatusCount(leadCounts, key)} />        )}
         {/* Export selected button */}
         {Object.keys(rowSelection).filter((key) => rowSelection[key]).length > 0 && (

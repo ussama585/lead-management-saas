@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Select } from '../ui/app-select.jsx';
 import Chart from './apex-chart.jsx';
 import dayjs from 'dayjs';
 import BootstrapDateRangeModal from '../bootstrap-date-range-modal.component.jsx';
@@ -11,13 +12,16 @@ import '../../assets/styles/legacy/executive-mobilisation-amounts-chart.componen
  */
 const ExecutiveMobilisationAmountsChart = ({
   title = 'Mobilisation Amounts per Executive',
-  data = [], 
+  data: fallbackData = [],
+  dataBySource,
   isLoading = false,
   emptyMessage = 'No data to display',
   dateRange,
   onDateRangeChange,
 }) => {
   const [showDateRangeModal, setShowDateRangeModal] = useState(false);
+  const [selectedSource, setSelectedSource] = useState('Website');
+  const data = dataBySource ? (Array.isArray(dataBySource[selectedSource]) ? dataBySource[selectedSource] : []) : fallbackData;
   const [internalDateRange, setInternalDateRange] = useState(dateRange ?? [dayjs().startOf('month'), dayjs().endOf('month')]);
   const activeDateRange = dateRange ?? internalDateRange;
   const handleDateRangeDone = (range) => {
@@ -111,6 +115,8 @@ const ExecutiveMobilisationAmountsChart = ({
           </p>
         </div>
         <div className="executive-mobilisation-amounts-chart-dropdown">
+          {dataBySource && <Select placeholder="Select lead type" value={selectedSource} onChange={setSelectedSource}
+            style={{ width: 140 }} options={['Website', 'Meta', 'Data'].map(value => ({ value, label: value }))} />}
           <BootstrapDateRangeModal
             value={activeDateRange}
             onChange={onDateRangeChange}

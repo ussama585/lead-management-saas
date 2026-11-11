@@ -175,7 +175,6 @@ function DashboardCompanyTabsSection() {
   const [overallConversionDateRange, setOverallConversionDateRange] = useState([dayjs().startOf('month'), dayjs().endOf('month')]);
   const [projectStatusHealthDateRange, setProjectStatusHealthDateRange] = useState([dayjs().startOf('month'), dayjs().endOf('month')]);
   const [leadsStatusHealthDateRange, setLeadsStatusHealthDateRange] = useState([dayjs().startOf('month'), dayjs().endOf('month')]);
-  const [leadsStatusHealthLeadType, setLeadsStatusHealthLeadType] = useState('meta');
   const [executiveMobilisationDateRange, setExecutiveMobilisationDateRange] = useState([dayjs().startOf('month'), dayjs().endOf('month')]);
   const [leadConversionToPotentialDateRange, setLeadConversionToPotentialDateRange] = useState([dayjs().startOf('month'), dayjs().endOf('month')]);
   const [jobResumeHiredStatsDateRange, setJobResumeHiredStatsDateRange] = useState([dayjs().startOf('month'), dayjs().endOf('month')]);
@@ -301,7 +300,7 @@ function DashboardCompanyTabsSection() {
     error: totalLeadsReceivedError,
     refetch: refetchTotalLeadsReceived,
   } = useQuery({
-    queryKey: ['totalLeadsReceived', currentUser?.id, superAdmin, mobilisationCompanyId, totalLeadsReceivedDateRange, selectedTotalLeadsPeriod, totalLeadsReceivedLeadType],
+    queryKey: ['totalLeadsReceived', currentUser?.id, superAdmin, mobilisationCompanyId, totalLeadsReceivedDateRange, selectedTotalLeadsPeriod, superAdmin ? null : totalLeadsReceivedLeadType],
     queryFn: () => {
       const [start, end] = totalLeadsReceivedDateRange || [];
       if (superAdmin || currentUser?.user_type === 'company_admin') return getSuperAdminTotalLeadsReceived({
@@ -310,7 +309,6 @@ function DashboardCompanyTabsSection() {
         endDate: end?.format?.('YYYY-MM-DDTHH:mm:ss'),
         period: selectedTotalLeadsPeriod,
         companyId: mobilisationCompanyId,
-        leadType: toLeadTypeLabel(totalLeadsReceivedLeadType),
       });
       return getTotalLeadsReceived({
         startDate: toDateString(start),
@@ -418,12 +416,11 @@ function DashboardCompanyTabsSection() {
     error: leadsStatusHealthError,
     refetch: refetchLeadsStatusHealth,
   } = useQuery({
-    queryKey: ['leadsStatusHealth', currentUser?.id, superAdmin, mobilisationCompanyId, leadsStatusHealthDateRange, (superAdmin || currentUser?.user_type === 'company_admin') ? leadsStatusHealthLeadType : null],
+    queryKey: ['leadsStatusHealth', currentUser?.id, superAdmin, mobilisationCompanyId, leadsStatusHealthDateRange],
     queryFn: () => {
       const [start, end] = leadsStatusHealthDateRange || [];
       const fetchHealth = superAdmin ? getSuperAdminLeadsStatusHealth : getLeadsStatusHealth;
       return fetchHealth({
-        ...((superAdmin || currentUser?.user_type === 'company_admin') ? { leadType: toLeadTypeLabel(leadsStatusHealthLeadType) } : {}),
         userType: currentUser?.user_type,
         startDate: superAdmin ? start?.format('YYYY-MM-DDTHH:mm:ss') : toDateString(start),
         endDate: superAdmin ? end?.format('YYYY-MM-DDTHH:mm:ss') : toDateString(end),
@@ -1022,6 +1019,7 @@ function DashboardCompanyTabsSection() {
             </div> : <ExecutiveMobilisationAmountsChart
               title="Mobilisation Amounts per Executive"
               data={executiveMobilisationData}
+              dataBySource={executiveMobilisationRaw}
               isLoading={loadingExecutiveMobilisation}
               dateRange={executiveMobilisationDateRange}
               onDateRangeChange={setExecutiveMobilisationDateRange}
@@ -1155,7 +1153,7 @@ function DashboardCompanyTabsSection() {
               <span>{totalLeadsReceivedError.message || 'Could not load total leads received.'}</span>
               <Button variant="outline" onClick={() => refetchTotalLeadsReceived()}>Retry</Button>
             </div> : <TotalLeadsReceivedChart
-              showSourceFilter
+              showSourceFilter={!superAdmin && currentUser?.user_type !== 'company_admin'}
               title="Total Leads Received"
               totalCount={totalLeadsReceivedTotalCount}
               timeSeriesData={totalLeadsReceivedTimeSeries}
@@ -1278,9 +1276,7 @@ function DashboardCompanyTabsSection() {
               <Button variant="outline" onClick={() => refetchLeadsStatusHealth()}>Retry</Button>
             </div> : <ProjectStatusHealthHorizontalChart
               title="Leads Status Health"
-              subtitle={(superAdmin || currentUser?.user_type === 'company_admin') ? `${toLeadTypeLabel(leadsStatusHealthLeadType)} leads` : 'Sum of all system leads (Meta, Data and Website)'}
-              selectedSource={toLeadTypeLabel(leadsStatusHealthLeadType)}
-              onSourceChange={(superAdmin || currentUser?.user_type === 'company_admin') ? value => setLeadsStatusHealthLeadType(fromLeadTypeLabel(value)) : undefined}
+              subtitle="Sum of all system leads (Meta, Data and Website)"
               data={leadsStatusHealthData}
               isLoading={loadingLeadsStatusHealth}
               dateRange={leadsStatusHealthDateRange}
