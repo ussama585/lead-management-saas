@@ -12,6 +12,16 @@ import { formatDateUniversal } from '../shared/utils/formatDate.js';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../components/ui/dialog.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import DemoRequestEditDialog from './demo-request-edit-dialog.jsx';
+import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs.jsx';
+
+export async function getDemoRequestCounts() {
+  const { data } = await api.get('/demo/list-count');
+  assertDemoSuccess(data);
+  if (!['total', 'pending', 'approved', 'rejected'].every(key => Number.isFinite(data?.[key]))) {
+    throw new Error('Could not read demo request counts.');
+  }
+  return data;
+}
 
 function assertDemoSuccess(data) {
   if (data?.success === false || data?.status === false) {
@@ -59,6 +69,7 @@ const fields = [
 export default function DemoRequestsPage() {
   const user = useUserStore(state => state.user);
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
   const [sorting, setSorting] = useState([{ id: 'created_at', desc: true }]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -66,12 +77,16 @@ export default function DemoRequestsPage() {
   const [deleteRequest, setDeleteRequest] = useState(null);
   const queryClient = useQueryClient();
 
-  const listing = useQuery(['demoRequests', user?.id, user?.user_type, search, sorting, pagination],
-    () => getDemoRequests({ search, sortBy: sorting[0]?.id || 'created_at',
+  const counts = useQuery(['demoRequestCounts', user?.id, user?.user_type], getDemoRequestCounts,
+    { enabled: isSuperAdmin(user?.user_type), refetchOnWindowFocus: false });
+  const listing = useQuery(['demoRequests', user?.id, user?.user_type, status, search, sorting, pagination],
+    () => getDemoRequests({ search, status, sortBy: sorting[0]?.id || 'created_at',
       order: sorting[0]?.desc === false ? 'asc' : 'desc', page: pagination.pageIndex + 1, size: pagination.pageSize }),
     { enabled: isSuperAdmin(user?.user_type), keepPreviousData: true, refetchOnWindowFocus: false });
   const data = listing.data;
-  const refresh = () => queryClient.invalidateQueries(['demoRequests']);
+  const refresh = () => Promise.all([
+    queryClient.invalidateQueries(['demoRequests']), queryClient.invalidateQueries(['demoRequestCounts']),
+  ]);
   const removal = useMutation(deleteDemoRequest, {
     onSuccess: async result => {
       message.success(result?.message || 'Demo request deleted successfully.');
@@ -116,6 +131,16 @@ export default function DemoRequestsPage() {
 
   return <>
     <div className="listing-page-content">
+      <Tabs value={status || 'all'} onValueChange={value => { setStatus(value === 'all' ? '' : value); resetPage(); }} className="mb-4">
+        <TabsList aria-label="Demo request status" className="h-auto flex-wrap">
+          {[['all', 'All', 'total'], ['pending', 'Pending', 'pending'], ['approved', 'Approved', 'approved'], ['rejected', 'Rejected', 'rejected']].map(([value, label, key]) =>
+            <TabsTrigger key={value} value={value}>{label} ({counts.data?.[key] ?? '…'})</TabsTrigger>)}
+        </TabsList>
+      </Tabs>
+      {counts.isError && <div role="alert" className="mb-4 flex items-center gap-3 text-destructive">
+        <span>{counts.error?.message || 'Could not load demo request counts.'}</span>
+        <Button variant="outline" onClick={() => counts.refetch()}>Retry</Button>
+      </div>}
       {listing.isError && <div role="alert" className="mb-4 flex items-center gap-3 rounded-md border border-destructive p-4 text-destructive">
         <span>{listing.error?.message || 'Could not load demo requests.'}</span>
         <Button variant="outline" onClick={() => listing.refetch()}>Retry</Button>

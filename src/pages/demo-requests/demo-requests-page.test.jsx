@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import api from '../shared/services/api.js';
-import { getDemoRequests, getDemoRequestDetail, updateDemoRequest, deleteDemoRequest } from './demo-requests-page.jsx';
+import { getDemoRequestCounts, getDemoRequests, getDemoRequestDetail, updateDemoRequest, deleteDemoRequest } from './demo-requests-page.jsx';
 import { demoRequestSchema } from './demo-request-schema.js';
 import { canAccessRoute, canAccessMenu } from '../auth/role-access.js';
 
@@ -10,6 +10,16 @@ vi.mock('../../components/breadcrumb.component.jsx', () => ({ default: () => nul
 vi.mock('../../components/tables/new-table.jsx', () => ({ default: () => null }));
 
 describe('Demo Request listing', () => {
+  it('loads status tab counts from demo/list-count', async () => {
+    const counts = { total: 3, pending: 1, approved: 1, rejected: 1 };
+    api.get.mockResolvedValue({ data: counts });
+    expect(await getDemoRequestCounts()).toEqual(counts);
+    expect(api.get).toHaveBeenLastCalledWith('/demo/list-count');
+  });
+  it('rejects unreadable tab counts', async () => {
+    api.get.mockResolvedValue({ data: { total: 3 } });
+    await expect(getDemoRequestCounts()).rejects.toThrow('Could not read');
+  });
   it('unwraps the detail endpoint response', async () => {
     const detail = { id: 1, name: 'John Smith', status: 'Pending' };
     api.get.mockResolvedValue({ data: { success: true, data: detail } });
