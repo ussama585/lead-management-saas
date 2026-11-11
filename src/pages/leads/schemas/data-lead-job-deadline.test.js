@@ -2,6 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { dataLeadJobSchema, earliestCvDeadline } from './data-lead-job-schema.js';
 
 afterEach(() => vi.useRealTimers());
+
 it('rejects past dates and permits today and future deadlines', async () => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date(2026, 10, 10, 15));

@@ -11,7 +11,7 @@ import useUserStore from '../pages/shared/store/user-store.js';
 
 export async function changePassword({ old_password, new_password, confirm_password }, userType) {
   const payload = { old_password, new_password };
-  if (userType === 'super_admin') payload.confirm_password = confirm_password;
+  if (['super_admin', 'company_admin'].includes(userType)) payload.confirm_password = confirm_password;
   const { data } = await api.post('/accounts/change-password', payload);
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not change password.');
   return data;

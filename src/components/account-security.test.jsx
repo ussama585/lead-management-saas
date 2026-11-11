@@ -15,10 +15,10 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('password reset for signed-in users', () => {
-  it('sends all three password fields for super admin', async () => {
+  it.each(['super_admin', 'company_admin'])('sends all three password fields for %s', async role => {
     api.post.mockResolvedValue({ data: { status: true } });
     const payload = { old_password: 'old-secret', new_password: 'new-secret', confirm_password: 'new-secret' };
-    await changePassword(payload, 'super_admin');
+    await changePassword(payload, role);
     expect(api.post).toHaveBeenCalledWith('/accounts/change-password', payload);
   });
   it('sends only the old and new passwords as JSON', async () => {

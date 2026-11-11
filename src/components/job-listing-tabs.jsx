@@ -55,7 +55,9 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
       className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
       icon={<Eye size={16} />} onClick={() => setTextDetail({ title: 'Job description', job: row.original.job_title, text: row.original.job_description })} /> }
     : column) : deletedColumns;
-  const columns = [...jobColumns, { header: 'Delete Reason', accessorKey: 'delete_reason', enableSorting: false,
+  const columns = [{ header: '#', id: 'row_number', size: 64, enableSorting: false,
+    Cell: ({ row }) => pagination.pageIndex * pagination.pageSize + row.index + 1,
+  }, ...jobColumns, { header: 'Delete Reason', accessorKey: 'delete_reason', enableSorting: false,
     Cell: ({ row }) => <Button type="text" title="View delete reason" aria-label={`View delete reason for ${row.original.job_title || 'job'}`}
       className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800" icon={<Eye size={16} />}
       onClick={() => setTextDetail({ title: 'Delete reason', job: row.original.job_title, text: row.original.delete_reason })} />,

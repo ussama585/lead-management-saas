@@ -1,7 +1,7 @@
 import { message } from './ui/notifications.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Select } from './ui/app-select.jsx';
-import { Button } from './ui/app-controls.jsx';
+import { Button, Input } from './ui/app-controls.jsx';
 import React, { useState, useMemo } from 'react';
 import { Space } from 'antd';
 import { Trash2 as DeleteOutlined, Plus as PlusOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
@@ -42,7 +42,6 @@ const ManageAssigneesModal = ({
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedUsersSkipRounds, setSelectedUsersSkipRounds] = useState({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-  const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [removingUserId, setRemovingUserId] = useState(null);
   const user = useUserStore((state) => state.user);
@@ -118,12 +117,12 @@ const ManageAssigneesModal = ({
 
   const filteredAssignedUsers = useMemo(() => {
     if (!globalFilter) return assignedUsers;
-    const lower = globalFilter.toLowerCase();
+    const lower = globalFilter.trim().toLowerCase();
     return assignedUsers.filter(
       (u) =>
         userLabel(u).toLowerCase().includes(lower) ||
         (u.email || '').toLowerCase().includes(lower) ||
-        u.id.toString().includes(lower)
+        String(u.id ?? '').includes(lower)
     );
   }, [assignedUsers, globalFilter]);
 
@@ -156,19 +155,19 @@ const ManageAssigneesModal = ({
 
   const columns = useMemo(
     () => [
-      { header: 'ID', accessorKey: 'id', size: 80, enableSorting: true },
+      { header: 'ID', accessorKey: 'id', size: 80, enableSorting: false },
       {
         header: 'Name',
         accessorKey: 'name',
-        enableSorting: true,
+        enableSorting: false,
         Cell: ({ row }) => <span className="manage-assignees-modal__cell-name">{userLabel({ ...row.original, user_type: allExecutivesData?.find(user => String(user.id) === String(row.original.id))?.user_type || row.original.user_type })}</span>,
       },
-      { header: 'Email', accessorKey: 'email', enableSorting: true },
+      { header: 'Email', accessorKey: 'email', enableSorting: false },
       {
         header: 'Skip Round',
         accessorKey: 'skip_round',
         size: 110,
-        enableSorting: true,
+        enableSorting: false,
         Cell: ({ cell }) => <span>{cell.getValue() ?? 0}</span>,
       },
       {
@@ -303,17 +302,20 @@ const ManageAssigneesModal = ({
           Assigned Users ({assignedUsersData?.total_users || 0})
         </h4>
 
+        <Input className="mb-3" placeholder="Search assigned users by name, email or ID"
+          aria-label="Search assigned users" value={globalFilter}
+          onChange={event => {
+            setGlobalFilter(event.target.value);
+            setPagination(previous => ({ ...previous, pageIndex: 0 }));
+          }} />
         <NewTableComponent
           totalCount={filteredAssignedUsers.length}
           columns={columns}
-          data={filteredAssignedUsers}
+          data={filteredAssignedUsers.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize)}
           initialState={{}}
           pagination={pagination}
           onPaginationChange={setPagination}
-          sorting={sorting}
-          onSortingChange={setSorting}
-          globalFilter={globalFilter}
-          onGlobalFilterChange={setGlobalFilter}
+          enableGlobalFilter={false}
           isLoading={loadingAssignedUsers}
           enableRowSelection={false}
           heading="Assigned Users"

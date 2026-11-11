@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { getRolePath } from '../../auth/role-home.js';
 import { Formik } from 'formik';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { Form } from 'antd';
+import { Form, Switch } from 'antd';
 import { assertUserSuccess, userFormError, applyUserErrors } from '../user-form-errors.js';
 import { createUserSchema } from '../schemas/create-user-schema.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
@@ -27,7 +27,7 @@ const { Option } = Select;
 export async function createUser(values) {
   const payload = {
     name: values.name.trim(), email: values.email.trim(), phone: values.phone.trim(),
-    password: values.password, user_type: values.user_type,
+    password: values.password, user_type: values.user_type, is_active: values.is_active ?? true,
   };
   if (values.company_id) payload.company_id = Number(values.company_id);
   if (values.user_type === 'sales_executive' && values.manager) payload.manager_id = Number(values.manager);
@@ -175,6 +175,7 @@ export default function CreateUser() {
                 phone: '',
                 password: '',
                 confirmPassword: '',
+                is_active: true,
                 user_type: 'sales_executive', // Ensure this matches the initialValues
                 manager: '',
                 company_id: superAdmin ? '' : (user?.company_id || user?.company?.id || (typeof user?.company === 'number' ? user.company : '')),
@@ -422,6 +423,13 @@ export default function CreateUser() {
                         )}
                       </Form.Item>
                     ) : null}
+                    <Form.Item className="form-item">
+                    <div className="flex items-center gap-3">
+                      <label className="label" htmlFor="create-user-active">Account status</label>
+                      <Switch id="create-user-active" checked={values.is_active} checkedChildren="Active" unCheckedChildren="Inactive"
+                        disabled={isLoading} onChange={checked => setFieldValue('is_active', checked)} />
+                    </div>
+                    </Form.Item>
                   </div>
 
                   <Form.Item>

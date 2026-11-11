@@ -686,18 +686,8 @@ const DataEntryTable = () => {
             </LeadDateRangeField>
           </div>
         </div>}
-        <div className="listing-toolbar-flex">
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-            {user.user_type === "admin" && (
-              <button type="button" className="listing-btn-primary" onClick={handleExportAll}>
-                <DownloadOutlined size="1em" className="app-icon" style={{ marginRight: 8 }} />
-                Export All to CSV
-              </button>
-            )}
-          </div>
-        </div>
-
         <LeadListingFilters
+          statusFirst
           requiresCompany={superAdmin && !companyId}
           executives={executivesList}
           selectedExecutive={selectedExecId}
@@ -749,6 +739,14 @@ const DataEntryTable = () => {
             </div>
           )}
 
+        {(superAdmin || user?.user_type === 'company_admin') && (
+          <div className="mb-3 flex w-full justify-end">
+            <button type="button" className="listing-btn-primary" onClick={handleExportAll}>
+              <DownloadOutlined size="1em" className="app-icon" style={{ marginRight: 8 }} />
+              Export All to CSV
+            </button>
+          </div>
+        )}
         <div className="table-container">
           <NewTableComponent
             totalCount={data?.count || 0}

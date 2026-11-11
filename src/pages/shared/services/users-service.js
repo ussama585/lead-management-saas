@@ -102,8 +102,11 @@ export const getUserCount = async () => {
   }
 };
 
-export async function getUserTabCounts() {
-  const { data } = await api.get('/accounts/users-count');
+export async function getUserTabCounts({ isActive = '', companyId = null } = {}) {
+  const params = {};
+  if (isActive !== '') params.is_active = isActive;
+  if (companyId != null) params.company_id = companyId;
+  const { data } = await (Object.keys(params).length ? api.get('/accounts/users-count', { params }) : api.get('/accounts/users-count'));
   if (data?.success === false || data?.status === false) throw new Error(data.message || 'Could not load user counts.');
   if (!data?.data || typeof data.data.total !== 'number') throw new Error('Could not read user counts.');
   return { ...data.data, all: data.data.total };

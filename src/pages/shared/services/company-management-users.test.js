@@ -4,6 +4,16 @@ import api from './api.js';
 import { getCompanyManagementUsers, getUserTabCounts, getAccountCompanyId } from './users-service.js';
 vi.mock('./api.js', () => ({ default: { get: vi.fn() } }));
 describe('company User Management listing', () => {
+  it.each(['true', 'false'])('passes account status %s and company scope to tab counts', async isActive => {
+    api.get.mockResolvedValue({ data: { success: true, data: { total: 3 } } });
+    await getUserTabCounts({ isActive, companyId: 9 });
+    expect(api.get).toHaveBeenLastCalledWith('/accounts/users-count', { params: { is_active: isActive, company_id: 9 } });
+  });
+  it('omits account status when all statuses are selected', async () => {
+    api.get.mockResolvedValue({ data: { success: true, data: { total: 3 } } });
+    await getUserTabCounts({ isActive: '', companyId: 9 });
+    expect(api.get).toHaveBeenLastCalledWith('/accounts/users-count', { params: { company_id: 9 } });
+  });
   it('recovers the company from the signed-in account detail when OTP login omits it', async () => {
     api.get.mockResolvedValue({ data: { success: true, data: { id: 42, user_type: 'company_admin', company_id: 10 } } });
     expect(await getAccountCompanyId(42)).toBe(10);

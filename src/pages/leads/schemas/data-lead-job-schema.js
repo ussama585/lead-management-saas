@@ -34,6 +34,7 @@ export const dataLeadJobSchema = Yup.object({
   min_experience: experience(),
   max_experience: experience().test('experience-range', 'Maximum experience must be at least minimum experience', function(value) { return value == null || this.parent.min_experience == null || value >= this.parent.min_experience; }),
   min_salary: number().min(0),
+  working_hours: Yup.string().nullable().test('no-letters', 'Working hours cannot contain letters', value => !value || !/\p{L}/u.test(value)),
   max_salary: number().min(0).test('salary-range', 'Maximum salary must be at least minimum salary', function(value) { return value == null || this.parent.min_salary == null || value >= this.parent.min_salary; }),
   hours_per_week: Yup.string().nullable().when('job_type', { is: 'Part-Time', then: schema => schema.trim().required('Enter hours per week') }),
   contract_length: Yup.string().nullable().when('job_type', { is: 'Contract', then: schema => schema.trim().required('Enter contract length') }),

@@ -47,12 +47,6 @@ export async function getCompanyUserDetails(id) {
   if (user?.id == null) throw new Error('Could not read user details.');
   return user;
 }
-export async function resetCompanyUserPassword(id, values) {
-  const body = new FormData();
-  body.append('password', values.new_password);
-  const { data } = await api.patch(`/accounts/detail/${encodeURIComponent(id)}`, body);
-  return assertUserSuccess(data);
-}
 
 export async function editCompanyUser(id, values, initial) {
   const body = new FormData();
@@ -290,7 +284,7 @@ function CompanyDetail({ companyId }) {
         </section>
       </>}
     {passwordResetUser && <ResetUserPasswordDialog key={passwordResetUser.id} user={passwordResetUser}
-      onReset={resetCompanyUserPassword} onClose={() => setPasswordResetUser(null)} />}
+      onClose={() => setPasswordResetUser(null)} />}
     {userDialog && <CompanyUserForm key={`${companyId}:${userDialog.mode}:${userDialog.id ?? 'new'}`} companyId={companyId} target={userDialog} onClose={() => setUserDialog(null)} onSaved={() => {
       if (userDialog.mode === 'create') setPagination(previous => ({ ...previous, current: 1 }));
       refreshUsers();

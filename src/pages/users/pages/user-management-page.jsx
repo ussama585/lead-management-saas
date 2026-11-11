@@ -152,8 +152,8 @@ function UserManagementContent({ superAdminScope = 'company' }) {
 
   // Fetch user counts 
   const { data: countData } = useQuery({
-    queryKey: ['userCount', currentUser?.id, currentUser?.user_type, companyId],
-    queryFn: isSuperAdminViewer || currentUser?.user_type === 'company_admin' ? getUserTabCounts : getUserCount,
+    queryKey: ['userCount', currentUser?.id, currentUser?.user_type, companyId, activeFilter],
+    queryFn: () => isSuperAdminViewer || isCompany ? getUserTabCounts({ isActive: activeFilter, companyId }) : getUserCount(),
     enabled: Boolean(currentUser?.id),
     staleTime: 1000 * 60 * 5, // 5 minutes (adjust as needed)
     cacheTime: 1000 * 60 * 30,
@@ -645,7 +645,7 @@ function UserManagementContent({ superAdminScope = 'company' }) {
       </div>
 
       <Divider />
-      {isSuperAdminViewer && <div className="mb-4 flex items-center gap-3">
+      {(isSuperAdminViewer || isCompany) && <div className="mb-4 flex items-center gap-3">
         <label htmlFor="user-active-filter">Account status</label>
         <Select placeholder="Select account status" id="user-active-filter" value={activeFilter} style={{ width: 180 }} options={[
           { value: '', label: 'All statuses' }, { value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' },
@@ -680,7 +680,7 @@ function UserManagementContent({ superAdminScope = 'company' }) {
 
       {['super_admin', 'company_admin'].includes(currentUser?.user_type) && passwordResetUser && <ResetUserPasswordDialog
         key={passwordResetUser.user_slug ?? passwordResetUser.slug ?? passwordResetUser.id}
-        user={passwordResetUser} onClose={() => setPasswordResetUser(null)} />}
+        user={passwordResetUser} requireOldPassword={superAdminOnly} onClose={() => setPasswordResetUser(null)} />}
       <OtpModal
         openModal={otpModalVisible}
         setOpenModal={setOtpModalVisible}

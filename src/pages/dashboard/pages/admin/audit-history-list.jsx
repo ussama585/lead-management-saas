@@ -200,15 +200,6 @@ export default function AuditHistoryListPage() {
         })),
     [modelNames]
   );
-  const selectedUserPills = useMemo(() => {
-    if (!Array.isArray(changedByFilter) || changedByFilter.length === 0) return [];
-    const byId = new Map(usersDropdownOptions.map((opt) => [String(opt.value), opt.label]));
-    return changedByFilter.map((id) => ({
-      id: String(id),
-      label: byId.get(String(id)) || `User ${id}`,
-    }));
-  }, [changedByFilter, usersDropdownOptions]);
-
   const clearFilters = () => {
     setGlobalFilter('');
     setModelNameFilter('');
@@ -325,17 +316,14 @@ export default function AuditHistoryListPage() {
           <Select
             className="user-activity-filter-select"
             placeholder="Filter by changed by user"
-            mode="multiple"
-            value={changedByFilter}
+            value={changedByFilter[0] ?? ''}
             onChange={(value) => {
-              setChangedByFilter(Array.isArray(value) ? value.map((v) => String(v)) : []);
+              setChangedByFilter(value == null || value === '' ? [] : [String(value)]);
               setPagination((prev) => ({ ...prev, pageIndex: 0 }));
             }}
             options={usersDropdownOptions}
             showSearch
             optionFilterProp="label"
-            maxTagCount={0}
-            maxTagPlaceholder={() => null}
             dropdownMatchSelectWidth
             dropdownStyle={{ maxWidth: 'calc(100vw - 32px)' }}
             style={{ width: 520, minWidth: 0, maxWidth: '100%' }}
@@ -363,32 +351,6 @@ export default function AuditHistoryListPage() {
             <Button className="user-activity-clear-filters" onClick={clearFilters}>Clear Filters</Button>
           </div>
         </div>
-        {selectedUserPills.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-            {selectedUserPills.map((pill) => (
-              <button
-                key={pill.id}
-                type="button"
-                onClick={() => {
-                  setChangedByFilter((prev) => prev.filter((id) => String(id) !== pill.id));
-                  setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                }}
-                style={{
-                  border: '1px solid #d9d9d9',
-                  background: '#f5f5f5',
-                  borderRadius: 999,
-                  padding: '2px 8px',
-                  fontSize: 12,
-                  lineHeight: '18px',
-                  cursor: 'pointer',
-                }}
-                title="Remove filter"
-              >
-                {pill.label} x
-              </button>
-            ))}
-          </div>
-        )}
         <div className="table-container">
           {isLoading ? (
             <div className="sop-branded-spin-wrap">

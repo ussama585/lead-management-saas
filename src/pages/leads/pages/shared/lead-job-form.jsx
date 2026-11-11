@@ -201,7 +201,9 @@ export default function LeadJobForm() {
       ...(dates.includes(key) ? { min: earliestCvDeadline() } : {}),
       status: typeof error === 'string' ? 'error' : undefined, 'aria-describedby': `${key}-error` };
     let control;
-    if (tagChoices[key]) control = <Select {...props} className="data-job-multiselect" mode="tags" style={{ width: '100%' }} value={splitTags(value)} options={tagChoices[key]}
+    if (key === 'working_hours') control = <Input {...props} type="text" placeholder={label} value={value ?? ''}
+      onChange={event => formik.setFieldValue(key, event.target.value.replace(/\p{L}/gu, ''))} />;
+    else if (tagChoices[key]) control = <Select {...props} className="data-job-multiselect" mode="tags" style={{ width: '100%' }} value={splitTags(value)} options={tagChoices[key]}
       placeholder={`Select or enter ${key === 'department' ? 'departments' : key === 'languages_required' ? 'languages' : 'nationalities'}`} tokenSeparators={[',']}
       onChange={values => formik.setFieldValue(key, values.join(', '))} />;
     else if (choices) control = <Select {...props} allowClear={key === 'job_type' || key === 'contract_period'} showSearch optionFilterProp="label" style={{ width: '100%' }} value={value === '' ? undefined : value}

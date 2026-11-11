@@ -7,15 +7,14 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import api from '../../../shared/services/api.js';
 import { followUpDurationSchema } from '../schemas/follow-up-duration-schema.js';
-import { Alert, Card, Typography, InputNumber, Space, Table } from 'antd';
+import { Alert, Card, Typography, InputNumber, Space } from 'antd';
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
-import { Clock, ListFilter, Ruler } from 'lucide-react';
+import { Clock, ListFilter, Ruler, Pencil, Trash2 } from 'lucide-react';
 // import { Palette, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { Button as SettingsNavButton } from '../../../../components/ui/button.jsx';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 // import AppearanceSettings from '../../../../components/appearance-settings.jsx';
 import LeadStatusSettings from '../../../../components/lead-status-settings.jsx';
 import ProjectSizeSettings from '../../../../components/project-size-settings.jsx';
@@ -85,6 +84,8 @@ const AdminSettingsPage = () => {
   const { data: durations, isLoading, isFetching, isError, error, refetch } = useQuery(durationQueryKey, () => listCheckupDurations(superAdmin ? companyId : null), {
     enabled: section === 'follow-up-duration' && (!superAdmin || Boolean(companyId)), refetchOnWindowFocus: false,
   });
+  const canCreateDuration = Boolean(durations) && !isLoading && !isFetching && !isError
+    && durations.results.length === 0 && (!superAdmin || Boolean(companyId));
 
   const createMutation = useMutation((durationMinutes) => createCheckupDuration(durationMinutes, superAdmin ? companyId : null), {
     onSuccess: (res) => {
@@ -101,7 +102,7 @@ const AdminSettingsPage = () => {
     validationSchema: followUpDurationSchema,
     onSubmit: async (values, helpers) => {
       if (superAdmin && !companyId) { helpers.setStatus('Select a company first.'); return; }
-      if (createMutation.isLoading) return;
+      if (createMutation.isLoading || !canCreateDuration) return;
       try {
         await createMutation.mutateAsync(values.duration_minutes);
         helpers.resetForm();
@@ -145,7 +146,6 @@ const AdminSettingsPage = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Settings" />
       <div className="dashboard-container settings-page">
         <div className="settings-layout">
           <nav aria-label="Settings sections" className="settings-navigation">
@@ -180,20 +180,31 @@ const AdminSettingsPage = () => {
             </div>}
             {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load durations.'}
               action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
-            <Table rowKey="id" dataSource={durations?.results || []} loading={isLoading || isFetching}
-              scroll={{ x: 580 }} pagination={(durations?.results?.length || 0) > 10 ? { pageSize: 10 } : false}
-              locale={{ emptyText: isError ? 'Duration list unavailable.' : 'No follow-up duration configured yet.' }}
-              columns={[
-                { title: 'ID', dataIndex: 'id', width: 80 },
-                { title: 'Duration (minutes)', dataIndex: 'duration_minutes' },
-                { title: 'Created', dataIndex: 'created_at', render: value => value ? formatDateUniversal(value, true) : '-' },
-                { title: 'Updated', dataIndex: 'updated_at', render: value => value ? formatDateUniversal(value, true) : '-' },
-                { title: 'Actions', key: 'actions', width: 160, render: (_, record) => <Space wrap>
-                  <Button size="small" onClick={() => { updateMutation.reset(); editForm.resetForm(); setEditTarget(record); }}>Edit</Button>
-                  <Button size="small" danger onClick={() => { deleteMutation.reset(); setDeleteTarget(record); }}>Delete</Button>
-                </Space> },
-              ]} />
-                <form onSubmit={createForm.handleSubmit} style={{ borderTop: 'none', paddingTop: 0 }}>
+            {isLoading || isFetching ? <p role="status" className="text-sm text-muted-foreground">Loading follow-up duration...</p> :
+              durations?.results?.length ? <div className="grid gap-3">
+                {durations.results.map(record => <div key={record.id} className="flex flex-wrap items-start justify-between gap-4 rounded-xl border bg-background p-5">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-lg bg-blue-100 p-2 text-blue-700"><Clock size={22} /></span>
+                      <div><p className="text-sm text-muted-foreground" style={{ margin: 0 }}>Follow-up duration</p>
+                        <p className="text-xl font-semibold" style={{ margin: 0 }}>{record.duration_minutes} minutes</p></div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      <p>Created: {record.created_at ? formatDateUniversal(record.created_at, true) : '-'}</p>
+                      <p>Updated: {record.updated_at ? formatDateUniversal(record.updated_at, true) : '-'}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="text" title="Edit follow-up duration" aria-label="Edit follow-up duration"
+                      className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
+                      icon={<Pencil size={16} />} onClick={() => { updateMutation.reset(); editForm.resetForm(); setEditTarget(record); }} />
+                    <Button type="text" title="Delete follow-up duration" aria-label="Delete follow-up duration"
+                      className="bg-red-100 text-red-700 hover:bg-red-200 hover:text-red-800"
+                      icon={<Trash2 size={16} />} onClick={() => { deleteMutation.reset(); setDeleteTarget(record); }} />
+                  </div>
+                </div>)}
+              </div> : !isError && <p className="text-sm text-muted-foreground">No follow-up duration configured yet.</p>}
+                {canCreateDuration && <form onSubmit={createForm.handleSubmit} style={{ borderTop: 'none', paddingTop: 0 }}>
                   <label htmlFor="create-duration-minutes">
                     Create duration (minutes)
                   </label>
@@ -226,7 +237,7 @@ const AdminSettingsPage = () => {
                   {createForm.touched.duration_minutes && createForm.errors.duration_minutes &&
                     <div id="duration-create-error" role="alert" className="text-sm text-destructive">{createForm.errors.duration_minutes}</div>}
                   {createForm.status && <div role="alert" className="text-sm text-destructive">{createForm.status}</div>}
-                </form>
+                </form>}
           </Space>
         </Card>}
         <Modal title="Edit follow-up duration" open={editTarget != null} onOk={() => editForm.handleSubmit()}

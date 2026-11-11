@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useUserStore from '../../shared/store/user-store.js';
 import { Formik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { Form } from 'antd';
+import { Form, Switch } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { editUserSchema } from '../schemas/edit-user-schema.js';
 import { userFormError, applyUserErrors, assertUserSuccess } from '../user-form-errors.js';
@@ -47,6 +47,7 @@ export default function EditUser() {
     phone: '',
     profile_pic: '',
     manager: '',
+    is_active: true,
   });
 
   const [isUpdating, setIsUpdating] = useState(false);
@@ -113,6 +114,7 @@ export default function EditUser() {
         phone: userDetails.data.phone || '',
         profile_pic: userDetails.data.profile_pic || '',
         manager: managerIdFromOptions(managerList, userDetails?.data),
+        is_active: ![false, 'false', 0, '0'].includes(userDetails.data.is_active ?? true),
 
       });
       setPhoneNumber(userDetails.data.phone || '');
@@ -226,7 +228,7 @@ export default function EditUser() {
 
 
                   if (selectedImage) formData.append('profile_pic', selectedImage);
-                  if (formData.has('profile_pic') || formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('manager_id')) {
+                  if (formData.has('profile_pic') || formData.has('name') || formData.has('email') || formData.has('phone') || formData.has('manager_id') || formData.has('is_active')) {
                     // If there are changes, make the API call
                     editUserMutate(formData, {
                       onSuccess: () => navigate(userManagementReturnPath(user?.user_type, userDetails?.data), { replace: true }),
@@ -241,6 +243,11 @@ export default function EditUser() {
                 {({ handleSubmit, handleBlur, values, setFieldValue, setFieldTouched, errors, touched }) => (
                   <form className="user-management-form" onSubmit={handleSubmit} onBlur={handleBlur} noValidate>
                     <UserFormPreviewSync onChange={setPreviewValues} />
+                    <div className="mb-4 flex items-center gap-3">
+                      <label className="label" htmlFor="edit-user-active">Account status</label>
+                      <Switch id="edit-user-active" checked={values.is_active} checkedChildren="Active" unCheckedChildren="Inactive"
+                        disabled={isUpdating} onChange={checked => setFieldValue('is_active', checked)} />
+                    </div>
                     <div className="form-grid">
                       <Form.Item className="form-item">
                         <label className="label">

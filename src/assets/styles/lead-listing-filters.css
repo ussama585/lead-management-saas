@@ -58,6 +58,13 @@
 .user-activity-filters .user-activity-filter-select > button .text-muted-foreground {
   color: #334155 !important;
 }
+.user-activity-filters .user-activity-filter-select [data-slot='select-trigger'] > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 html body .user-activity-filters .user-activity-filter-select {
   --field-border-color: #94a3b8;
 }

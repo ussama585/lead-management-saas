@@ -1,8 +1,22 @@
 import { expect, it, vi } from 'vitest';
 import api from '../pages/shared/services/api.js';
 import { resetUserPassword } from './reset-user-password-dialog.jsx';
-import { resetUserPasswordSchema } from '../pages/users/schemas/reset-user-password-schema.js';
+import { resetUserPasswordSchema, resetSuperAdminPasswordSchema } from '../pages/users/schemas/reset-user-password-schema.js';
 vi.mock('../pages/shared/services/api.js', () => ({ default: { post: vi.fn() } }));
+
+it('sends the current password instead of a slug for the Super Admin tab', async () => {
+  api.post.mockResolvedValue({ data: { status: true } });
+  const values = { old_password: 'OldPassword@123', new_password: 'NewPassword@123', confirm_password: 'NewPassword@123' };
+  await resetUserPassword(undefined, values, true);
+  expect(api.post).toHaveBeenLastCalledWith('/accounts/change-password', values);
+});
+
+it('requires the current password only for Super Admin resets', async () => {
+  const values = { new_password: 'NewPassword@123', confirm_password: 'NewPassword@123' };
+  await expect(resetSuperAdminPasswordSchema.validate(values)).rejects.toThrow('current password');
+  await expect(resetSuperAdminPasswordSchema.validate({ ...values, old_password: 'OldPassword@123' })).resolves.toBeTruthy();
+  await expect(resetUserPasswordSchema.validate(values)).resolves.toBeTruthy();
+});
 
 it('resets the selected user by slug without sending an old password', async () => {
   api.post.mockResolvedValue({ data: { status: true } });

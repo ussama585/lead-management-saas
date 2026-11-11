@@ -19,16 +19,21 @@ function FilterCard({ title, subtitle, Icon, selectedLabel, children }) {
   </section>;
 }
 
+function FilterCards({ statusFirst, children }) {
+  const cards = React.Children.toArray(children);
+  return <div className="lead-listing-filters">{statusFirst ? cards.reverse() : cards}</div>;
+}
+
 export default function LeadListingFilters({ executives = [], selectedExecutive, onExecutiveChange, getExecutiveCount,
-  statusFilter, setStatusFilter, statusChoices, getTotalCount, getStatusCount, showExecutives = true, requiresCompany = false }) {
-  if (requiresCompany) return <div className="lead-listing-filters">
+  statusFilter, setStatusFilter, statusChoices, getTotalCount, getStatusCount, showExecutives = true, requiresCompany = false, statusFirst = false }) {
+  if (requiresCompany) return <FilterCards statusFirst={statusFirst}>
     <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound}>
       <p className="py-3 text-sm text-muted-foreground">Select company first</p>
     </FilterCard>
     <FilterCard title="Status Filters" subtitle="Filter leads by current status" Icon={ListFilter}>
       <p className="py-3 text-sm text-muted-foreground">Select company first</p>
     </FilterCard>
-  </div>;
+  </FilterCards>;
   const isAll = selectedExecutive == null || selectedExecutive === '';
   const selectedAssignee = executives.find(executive => String(executive.id) === String(selectedExecutive));
   const assigneeLabel = isAll ? 'All' : selectedAssignee
@@ -37,7 +42,7 @@ export default function LeadListingFilters({ executives = [], selectedExecutive,
   const statusLabel = !statusFilter || statusFilter === 'All' ? 'All'
     : statusChoices.find(choice => choice.value === statusFilter)?.label || statusFilter;
   const buttonClass = 'h-auto min-h-8 max-w-full whitespace-normal text-left';
-  return <div className="lead-listing-filters">
+  return <FilterCards statusFirst={statusFirst}>
     {showExecutives && <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound} selectedLabel={assigneeLabel}>
     <div className="flex flex-wrap items-center gap-2 py-2" role="group" aria-label="Filter by assigned user">
       <Button type="button" size="sm" className={buttonClass} variant={isAll ? 'default' : 'outline'} aria-pressed={isAll} onClick={() => onExecutiveChange(null)}>All ({getTotalCount()})</Button>
@@ -53,5 +58,5 @@ export default function LeadListingFilters({ executives = [], selectedExecutive,
       <StatusFilterTabs statusFilter={statusFilter} setStatusFilter={setStatusFilter} statusChoices={statusChoices}
         getTotalCount={getTotalCount} getStatusCount={getStatusCount} />
     </FilterCard>
-  </div>;
+  </FilterCards>;
 }
