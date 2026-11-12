@@ -6,6 +6,16 @@ vi.mock('./api.js', () => ({ default: { get: vi.fn() } }));
 beforeEach(() => vi.clearAllMocks());
 
 describe('Sales Data assignee filters', () => {
+  it.each([true, false])('passes assigned=%s without dropping false', async assigned => {
+    api.get.mockResolvedValue({ data: [] });
+    await getSalesDataAssigneeFilters({ assigned });
+    expect(api.get).toHaveBeenCalledWith('/data-leads/stats', { params: { assigned } });
+  });
+  it('passes a selected lead status', async () => {
+    api.get.mockResolvedValue({ data: [] });
+    await getSalesDataAssigneeFilters({ status: 'Activated' });
+    expect(api.get).toHaveBeenCalledWith('/data-leads/stats', { params: { status: 'Activated' } });
+  });
   it.each([true, false])('scopes the company parameter for Super Admin=%s', async superAdmin => {
     const rows = [{ id: 8, name: 'Executive', data_leads_assigned: 2 }];
     api.get.mockResolvedValue({ data: rows });

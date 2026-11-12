@@ -21,11 +21,10 @@ import {
   Button,
   Stack,
   Link,
-  IconButton,
 } from "@mui/material";
 import { getDataLeadsStats, getDataLeadsListCount as fetchDataLeadsListCount } from "../../../shared/services/data-leads-service.js";
 import StatusFilterTabs from "../../../../components/status-filter-tabs.jsx";
-import { File as InsertDriveFileOutlinedIcon, Ruler, Plus } from 'lucide-react';
+import { Ruler, Plus } from 'lucide-react';
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { alpha } from "@mui/material/styles";
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -917,6 +916,12 @@ const DataLeads = () => {
         },
       },
       {
+        header: "Follow Up Date",
+        accessorKey: "followup_date",
+        size: 160,
+        Cell: ({ cell }) => <span style={{ whiteSpace: 'nowrap' }}>{cell.getValue() ? formatDateUniversal(cell.getValue(), false) : '-'}</span>,
+      },
+      {
         header: "Date",
         accessorKey: "created_at",
         size: 160,
@@ -927,75 +932,6 @@ const DataLeads = () => {
               : "-"}
           </span>
         ),
-      },
-      {
-        header: "Proposal",
-        id: "proposal", // Explicit id for sorting
-        accessorKey: "proposal",
-        size: 160,
-        sortUndefined: "last", // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ cell, row }) => {
-          const proposalUrl = cell.getValue() || row.original.proposal_url;
-          if (!proposalUrl) {
-            return <span>-</span>;
-          }
-          const fileLabel = '';
-          const handleOpen = () => {
-            const href = proposalUrl?.startsWith("http")
-              ? proposalUrl
-              : `${proposalUrl}`;
-            window.open(href, "_blank", "noopener,noreferrer");
-          };
-          return (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <IconButton
-                size="small"
-                onClick={handleOpen}
-                sx={{
-                  color: "#3e6a9f",
-                  border: "1px solid #3e6a9f30",
-                }}
-              >
-                <InsertDriveFileOutlinedIcon size="1em" className="app-icon"  style={{ fontSize: 20 }} />
-              </IconButton>
-              <Link
-                component="button"
-                type="button"
-                onClick={handleOpen}
-                underline="always"
-                sx={{
-                  color: "#1f3a61",
-                  fontWeight: 500,
-                }}
-              >
-                {fileLabel}
-              </Link>
-            </Stack>
-          );
-        },
-      },
-      {
-        header: "Contract Currency",
-        id: "contract_currency", // Explicit id for sorting
-        accessorKey: "contract_currency",
-        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
-        size: 160,
-        sortUndefined: "last", // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ cell }) => <span>{cell.getValue() || "-"}</span>,
-      },
-      {
-        header: "Contract Price",
-        id: "contract_price", // Explicit id for sorting
-        accessorKey: "contract_price",
-        size: 160,
-        sortUndefined: "last", // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ cell }) =>
-          cell.getValue()
-            ? Number(cell.getValue()).toLocaleString()
-            : "-",
       },
       {
         header: "Industry",

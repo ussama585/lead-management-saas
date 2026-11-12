@@ -904,6 +904,7 @@ export default function MetaLeadsMarketingManager() {
           return <span>{pageIndex * pageSize + rowIndex + 1}</span>;
         },
       },
+
       {
         header: 'Created Date',
         id: 'created_time', // Explicit id for sorting
@@ -1044,6 +1045,11 @@ export default function MetaLeadsMarketingManager() {
         );
       },
     },
+      {
+        header: 'Follow Up Date',
+        accessorKey: 'followup_date',
+        Cell: ({ cell }) => <span style={{ whiteSpace: 'nowrap' }}>{cell.getValue() ? formatDateUniversal(cell.getValue(), false) : '-'}</span>,
+      },
 
       {
         header: 'Name',
@@ -1194,52 +1200,6 @@ export default function MetaLeadsMarketingManager() {
        createStatusHistoryColumn({
          onOpenHistory: (lead) => setStatusHistoryModal({ visible: true, lead }),
        }),
-      {
-        header: 'Advance Payment Terms',
-        id: 'advance_payment', // Explicit id for sorting
-        accessorKey: 'advance_payment',
-        sortUndefined: 'last', // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ row }) => {
-          const extraData = row.original.extra_data;
-          if (!extraData || !Array.isArray(extraData)) return <span>-</span>;
-
-          const paymentData = extraData.find(item =>
-            item && item.key === 'are_you_prepared_to_pay_a_portion_of_the_fee_(advance)_to_initiate_the_specialized_headhunting_search?'
-          );
-
-          if (!paymentData || !paymentData.value) return <span>-</span>;
-
-          // Format the value to be more readable
-          const formattedValue = paymentData.value
-            .replace(/,/g, ', ')
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, l => l.toUpperCase())
-            .replace(/\s+/g, ' ')
-            .trim();
-
-          return <span>{formattedValue}</span>;
-        },
-      },
-      {
-        header: 'Monthly Salary Budget',
-        id: 'salary_budget', // Explicit id for sorting
-        accessorKey: 'salary_budget',
-        sortUndefined: 'last', // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ row }) => {
-          const extraData = row.original.extra_data;
-          if (!extraData || !Array.isArray(extraData)) return <span>-</span>;
-
-          const salaryData = extraData.find(item =>
-            item && item.key === 'what_is_the_approximate_monthly_salary_budget_for_this_role?'
-          );
-
-          if (!salaryData || !salaryData.value) return <span>-</span>;
-
-          return <span style={{ whiteSpace: 'nowrap' }}>{formatSalaryBudget(salaryData.value)}</span>;
-        },
-      },
       {
         header: 'Extra Fields',
         accessorKey: 'extra_data',

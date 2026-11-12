@@ -230,6 +230,7 @@ const DataEntryTable = () => {
   const assigneeFilterParams = {
     superAdmin,
     companyId,
+    ...salesDataFilterParams(statusFilter, selectedTab),
     startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
     endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
   };
