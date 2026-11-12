@@ -5,6 +5,7 @@ import { useQuery } from 'react-query';
 
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
+import useUserStore from '../../../shared/store/user-store.js';
 import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import LineChart from '../../../../components/charts/line-chart.component.jsx';
@@ -18,6 +19,8 @@ import '../../../../assets/styles/legacy/table-client-actions.css';
 export default function SalesExecutiveListing() {
 
   const navigate = useNavigate();
+  const { user } = useUserStore();
+  const isManager = user?.user_type === 'sales_manager';
 
   const [pagination, setPagination] = useState({
     pageIndex: 0, // Start at page 0
@@ -62,7 +65,7 @@ export default function SalesExecutiveListing() {
 
   // Fetch Executive listing with pagination
   const { data: executivesList = {}, isLoading: loadingExecutiveList } = useQuery({
-    queryKey: ['ExecutivesList', pagination.pageIndex, pagination.pageSize, sorting, globalFilter],
+    queryKey: ['ExecutivesList', user?.id, user?.user_type, pagination.pageIndex, pagination.pageSize, sorting, globalFilter],
     queryFn: () => getExecutivesList(undefined, pagination.pageIndex + 1, pagination.pageSize, sorting, globalFilter),
     staleTime: 0,
     cacheTime: 0,
@@ -84,7 +87,14 @@ export default function SalesExecutiveListing() {
     : [];
 
   const columns = useMemo(
-    () => [
+    () => isManager ? [
+      { header: '#', accessorKey: 'id', Cell: ({ row }) => <span>{row.index + 1 + pagination.pageIndex * pagination.pageSize}</span> },
+      { header: 'Name', accessorKey: 'name' },
+      { header: 'Email', accessorKey: 'email' },
+      { header: 'Phone', accessorKey: 'phone' },
+      { header: 'Company', accessorKey: 'company_name' },
+      { header: 'Status', accessorKey: 'is_active', Cell: ({ cell }) => <span>{cell.getValue() ? 'Active' : 'Inactive'}</span> },
+    ] : [
       {
         header: '#',
         accessorKey: 'id',
@@ -143,7 +153,7 @@ export default function SalesExecutiveListing() {
         Cell: ({ cell }) => <span>{cell.getValue()}</span>,
       },
     ],
-    [navigate]
+    [navigate, isManager, pagination.pageIndex, pagination.pageSize]
   );
 
 
@@ -154,6 +164,7 @@ export default function SalesExecutiveListing() {
 
   const transformedData = executivesList?.results
     ? executivesList.results.map((executive) => ({
+      ...executive,
       id: executive?.id ?? "-",
       user: executive?.user ?? "-",
       slug: executive?.slug ?? "-",
@@ -185,7 +196,7 @@ export default function SalesExecutiveListing() {
 
   return (
     <>
-      <BreadCrumb linkText="Sales Executives" />
+      {!isManager && <BreadCrumb linkText="Sales Executives" />}
       <div className="container">
 
 

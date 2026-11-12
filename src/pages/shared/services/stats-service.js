@@ -45,20 +45,21 @@ export const getManagersList = async (page = 1, pageSize = 10, sorting = [], sea
 };
 
 export const getExecutivesList = async (userId, page, pageSize, sorting = [], search = '') => {
+  const isManager = useUserStore.getState().user?.user_type === 'sales_manager';
   const sortBy = sorting?.[0]?.id || '';
   const sortOrder = sorting?.[0]?.desc ? 'desc' : 'asc';
   const params = new URLSearchParams({
     page,
     size: pageSize,
     sort_by: sortBy,
-    sort_order: sortOrder,
+    [isManager ? 'order' : 'sort_order']: sortOrder,
     search: search ?? '',
   });
   if (userId != null && userId !== '') {
     params.append('user_id', userId);
   }
 
-  const endpoint = `/sales-executive/list?${params.toString()}`;
+  const endpoint = `${isManager ? '/sales-manager/executive-list' : '/sales-executive/list'}?${params.toString()}`;
 
   try {
     const response = await api.get(endpoint);
