@@ -67,7 +67,7 @@ const ProjectStatusHealthHorizontalChart = ({
     plotOptions: {
       bar: {
         horizontal: true,
-        barHeight: '70%',
+        barHeight: '45%',
         borderRadius: 4,
         distributed: true,
         dataLabels: {
@@ -160,7 +160,7 @@ const ProjectStatusHealthHorizontalChart = ({
           options={options}
           series={series}
           type="bar"
-          height={1000}
+          height={Math.max(200, normalizedData.length * 48 + 80)}
         />
       )}
     </div>
