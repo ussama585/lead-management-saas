@@ -1,0 +1,165 @@
+[
+  {
+    "route": "user-management",
+    "tableCount": 1,
+    "headers": [
+      "#",
+      "Name0",
+      "Company0",
+      "User Type0",
+      "Phone0",
+      "Email0",
+      "Edit User",
+      "Delete User",
+      "Active/Deactive User",
+      "Reset Password"
+    ],
+    "interactions": [
+      {
+        "mobileTableVisible": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "route": "companies",
+    "tableCount": 1,
+    "headers": [
+      "Company0",
+      "Email0",
+      "Phone",
+      "Address",
+      "City0",
+      "Country0",
+      "Website",
+      "Status",
+      "Created0",
+      "Actions"
+    ],
+    "interactions": [
+      {
+        "sortingRequests": []
+      },
+      {
+        "searchRequests": []
+      },
+      {
+        "mobileTableVisible": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "route": "leads",
+    "tableCount": 1,
+    "headers": [
+      "",
+      "#",
+      "Name0",
+      "Designation0",
+      "Company0",
+      "Phone0",
+      "Follow Ups and Remarks",
+      "Status0",
+      "Project Size0",
+      "Assigned To0",
+      "Client Contact Date0",
+      "Follow Up Date0",
+      "Job0",
+      "No. of Resources0",
+      "Proposal0",
+      "Contract Currency0",
+      "Contract Amount0",
+      "Industry0",
+      "Hear About Us0",
+      "Date0",
+      "Status History",
+      "Action"
+    ],
+    "interactions": [
+      {
+        "mobileTableVisible": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "route": "data-leads",
+    "tableCount": 1,
+    "headers": [
+      "#",
+      "Name0",
+      "Designation0",
+      "Company0",
+      "Phone0",
+      "Follow Ups and Remarks",
+      "Status0",
+      "Project Size0",
+      "Assigned To0",
+      "Jobs0",
+      "No. of Resources0",
+      "Proposal0",
+      "Contract Currency0",
+      "Contract Price0",
+      "Industry0",
+      "Added By0",
+      "Date0",
+      "History",
+      "Actions"
+    ],
+    "interactions": [
+      {
+        "mobileTableVisible": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "route": "meta-leads",
+    "tableCount": 1,
+    "headers": [
+      "No.",
+      "Full Name0",
+      "Job Title0",
+      "Company Name0",
+      "Job Count",
+      "Phone Number0",
+      "Follow Ups and Remarks",
+      "Status0",
+      "Project Size0",
+      "Assigned To0",
+      "Who Are You0",
+      "Role Hiring For0",
+      "City0",
+      "Preferred Contact Method0",
+      "How Many Hires0",
+      "Advance Payment Terms0",
+      "Monthly Salary Budget0",
+      "Extra Fields",
+      "Created At0",
+      "Status History",
+      "Action"
+    ],
+    "interactions": [
+      {
+        "mobileTableVisible": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "route": "settings",
+    "tableCount": 1,
+    "headers": [
+      "ID",
+      "Status name",
+      "Actions"
+    ],
+    "interactions": [
+      {
+        "mobileTableVisible": true
+      }
+    ],
+    "errors": []
+  }
+]
