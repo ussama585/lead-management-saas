@@ -1,15 +1,16 @@
 import { dashboardEndpoint } from './dashboard-endpoint.js';
 import api from './api.js';
 
-export const getSuperAdminTotalLeadsReceived = async ({ startDate, endDate, period = 'month', companyId, userType } = {}) => {
-  const { data } = await api.get(dashboardEndpoint('total-lead-received', userType), {
+export const getSuperAdminTotalLeadsReceived = async ({ startDate, endDate, companyId, userType } = {}) => {
+  const { data } = await (userType === 'company_admin'
+    ? api.get('/accounts/total-lead-received')
+    : api.get(dashboardEndpoint('total-lead-received', userType), {
     params: {
       ...(companyId ? { company_id: companyId } : {}),
       ...(startDate ? { start_date: startDate } : {}),
       ...(endDate ? { end_date: endDate } : {}),
-      period,
     },
-  });
+  }));
   if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load total leads received.');
   if (!Number.isFinite(data?.totalCount) || !Array.isArray(data?.timeSeriesData)) throw new Error('Could not read total leads received.');
   return data;

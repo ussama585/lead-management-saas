@@ -1,7 +1,7 @@
 import api from './api.js';
 
 export const getSalesDataAssigneeFilters = async ({ companyId, startDate, endDate, superAdmin = false } = {}) => {
-  const { data } = await api.get('/accounts/lead-status-distribute', {
+  const { data } = await api.get('/data-leads/stats', {
     params: {
       ...(superAdmin && companyId != null ? { company_id: companyId } : {}),
       ...(startDate ? { start_date: startDate } : {}),
