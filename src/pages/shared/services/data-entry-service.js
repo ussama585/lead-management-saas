@@ -1,5 +1,19 @@
 import api from './api.js';
 
+export const getSalesDataAssigneeFilters = async ({ companyId, startDate, endDate, superAdmin = false } = {}) => {
+  const { data } = await api.get('/accounts/lead-status-distribute', {
+    params: {
+      ...(superAdmin && companyId != null ? { company_id: companyId } : {}),
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+    },
+  });
+  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not load assignee filters.');
+  const rows = Array.isArray(data) ? data : data?.data;
+  if (!Array.isArray(rows)) throw new Error('Could not read assignee filters.');
+  return rows;
+};
+
 
 // Create a single data entry
 export const createDataEntry = async (values) => {

@@ -23,8 +23,8 @@ import { leadCountTabs, normalizeLeadCounts } from "../shared/services/lead-filt
 import {
   listDataEntry,
   bulkAssignDataEntry,
+  getSalesDataAssigneeFilters,
 } from "../shared/services/data-entry-service.js";
-import { getAssigningUserList } from "../shared/services/headhunting.js";
 import "../../assets/styles/legacy/create-user.css";
 import "../../assets/styles/legacy/client-listing-page.css";
 import {
@@ -157,10 +157,10 @@ const DataEntryTable = () => {
   const [globalFilter, setGlobalFilter] = useState(initialSearchFromUrl);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [statusFilter, setStatusFilter] = useState(initialStatusFromUrl);
+  const [selectedExecutive, setSelectedExecutive] = useState(searchParams.get('assigned_to') || null);
   const [selectedTab, setSelectedTab] = useState(initialTabFromUrl);
   const [rowSelection, setRowSelection] = useState({});
   const [selectedAssignee, setSelectedAssignee] = useState(null);
-  const [assignableUsers, setAssignableUsers] = useState([]); // for dropdown
   const [isSaving, setIsSaving] = useState(false);
 
  // Sync all state to URL params
@@ -175,7 +175,7 @@ const DataEntryTable = () => {
       newParams.status = statusFilter;
     }
     
-    // Executive filter
+    if (selectedExecutive) newParams.assigned_to = String(selectedExecutive);
     
     // Search
     if (globalFilter && globalFilter.trim()) {
@@ -198,11 +198,17 @@ const DataEntryTable = () => {
     
     setSearchParams(newParams, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, selectedTab, globalFilter, pagination.pageIndex, pagination.pageSize, sorting]);
+  }, [statusFilter, selectedTab, selectedExecutive, globalFilter, pagination.pageIndex, pagination.pageSize, sorting]);
+  const assigneeSelectionParams = selectedExecutive
+    ? String(selectedExecutive).startsWith('status:')
+      ? { status: String(selectedExecutive).slice(7) }
+      : { assigned_to: selectedExecutive }
+    : {};
   const countParams = {
     ...companyParams,
     search: globalFilter,
     ...salesDataFilterParams('', selectedTab),
+    ...assigneeSelectionParams,
   };
   const listingParams = {
     ...companyParams,
@@ -212,6 +218,7 @@ const DataEntryTable = () => {
     sort_by: sorting?.[0]?.id ?? '',
     order: sorting?.[0]?.desc ? 'desc' : 'asc',
     ...salesDataFilterParams(statusFilter, selectedTab),
+    ...assigneeSelectionParams,
   };
   const queryOptions = {
     enabled: Boolean(user?.id) && (!superAdmin || !companies.isLoading),
@@ -220,6 +227,20 @@ const DataEntryTable = () => {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   };
+  const assigneeFilterParams = {
+    superAdmin,
+    companyId,
+    startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
+    endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
+  };
+  const { data: assigneeFilters = [] } = useQuery(
+    ['sales-data-assignee-filters', user?.id, user?.user_type, assigneeFilterParams],
+    () => getSalesDataAssigneeFilters(assigneeFilterParams),
+    { ...queryOptions, keepPreviousData: false, enabled: canViewUserTabs && Boolean(user?.id) && (!superAdmin || companyId != null) },
+  );
+  const assigneeFilterOptions = assigneeFilters.map(row => typeof row.status === 'string'
+    ? { id: `status:${row.status}`, name: row.status, filterCount: Number(row.count) || 0 }
+    : { ...row, filterCount: Number(row.data_leads_assigned) || 0 });
   const { data: statusCount, refetch: refetchStatusCount } = useQuery(
     ['status-count', user?.id, user?.user_type, countParams],
     async () => normalizeLeadCounts(await listDataEntryCount(countParams)),
@@ -371,33 +392,6 @@ const DataEntryTable = () => {
     [user, navigate, selectedTab, pagination]
   );
 
-  // Fetch assignable users for dropdowns (Assign to)
- React.useEffect(() => {
-  let active = true;
-  setAssignableUsers([]);
-  async function fetchAssignableUsers() {
-    try {
-      let data = [];
-      if (superAdmin || ['company_admin', 'sales_manager'].includes(user.user_type)) {
-        if (superAdmin || user.user_type === 'company_admin') {
-          const response = await api.get('/accounts/users-for-assigning', {
-            params: superAdmin ? { company_id: companyId } : {},
-          });
-          data = response.data;
-        } else {
-          data = await getAssigningUserList();
-        }
-      }
-      if (active) setAssignableUsers(Array.isArray(data) ? data : []);
-    } catch (err) {
-      if (active) setAssignableUsers([]);
-    }
-  }
-  if ((superAdmin && companyId != null) || ['company_admin', 'sales_manager'].includes(user.user_type)) {
-    fetchAssignableUsers();
-  }
-  return () => { active = false; };
-}, [user.id, user.user_type, superAdmin, companyId]);
   const tabCounts = {
     ...statusCount,
     all: statusCount?.all_count ?? statusCount?.all ?? statusCount?.total_count ?? statusCount?.count ?? 0,
@@ -558,6 +552,7 @@ const DataEntryTable = () => {
     const next = changeSalesDataStatus(statusFilter, valueOrUpdater);
     setStatusFilter(next.status);
     setSelectedTab(next.tab);
+    if (next.tab === 'unassigned') setSelectedExecutive(null);
     setPagination({ pageIndex: 0, pageSize: 10 });
   }, [statusFilter]);
 
@@ -656,6 +651,7 @@ const DataEntryTable = () => {
                 onChange={value => {
                   setCompanyId(value ?? null);
                   setStatusFilter('');
+                  setSelectedExecutive(null);
                   setSelectedTab('all');
                   setPagination(previous => ({ ...previous, pageIndex: 0 }));
                   setRowSelection({}); setSelectedAssignee(null);
@@ -673,7 +669,20 @@ const DataEntryTable = () => {
         <LeadListingFilters
           statusFirst
           requiresCompany={superAdmin && !companyId}
-          showExecutives={false}
+          showExecutives={canViewUserTabs && (!statusFilter || statusFilter === 'All' || statusFilter === 'assigned')}
+          executives={assigneeFilterOptions}
+          getExecutiveCount={id => assigneeFilterOptions.find(option => String(option.id) === String(id))?.filterCount ?? 0}
+          getAssigneeTotalCount={() => assigneeFilterOptions.reduce((total, option) => total + option.filterCount, 0)}
+          selectedExecutive={selectedExecutive}
+          onExecutiveChange={value => {
+            setSelectedExecutive(value);
+            if (value && selectedTab === 'unassigned') {
+              setStatusFilter('');
+              setSelectedTab('all');
+            }
+            setPagination(previous => ({ ...previous, pageIndex: 0 }));
+            setRowSelection({});
+          }}
           statusFilter={statusFilter}
           setStatusFilter={handleScopeTabFilter}
           statusChoices={statusChoices}
@@ -704,7 +713,7 @@ const DataEntryTable = () => {
                   <SelectValue placeholder="Select Executive/Manager" />
                 </SelectTrigger>
                 <SelectContent>
-                  {assignableUsers.map(exec => <SelectItem key={exec.id} value={String(exec.id)}>
+                  {assigneeFilters.filter(exec => exec.id != null).map(exec => <SelectItem key={exec.id} value={String(exec.id)}>
                     {exec.name} - {exec.user_type === 'sales_manager' ? 'Manager' : 'Executive'}
                   </SelectItem>)}
                 </SelectContent>
@@ -799,7 +808,7 @@ const DataEntryTable = () => {
 
             // Find the assignee name
             const assigneeName =
-              assignableUsers.find((user) => user.id === pendingAssignee)
+              assigneeFilters.find((user) => String(user.id) === String(pendingAssignee))
                 ?.name || "Unknown User";
 
             if (!selectedRows.length)
