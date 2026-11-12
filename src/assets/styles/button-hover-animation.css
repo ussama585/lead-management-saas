@@ -1,0 +1,61 @@
+/* Shared text-action buttons: gradient surface and expanding icon panel. */
+button[data-slot='button'].button-flight {
+  --action-icon-size: 30px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  min-height: 40px;
+  height: 40px;
+  padding: 5px 12px 5px 16px !important;
+  overflow: hidden;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(110deg, #3e6a9f 0%, #205da5 100%) !important;
+  color: #fff !important;
+  box-shadow: inset 0 0 20px -10px rgb(20 53 94 / 35%);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .015em;
+  cursor: pointer;
+}
+.button-flight .button-flight-label {
+  display: inline-block;
+  flex-shrink: 0;
+  margin-right: 40px;
+  color: inherit;
+  white-space: nowrap;
+}
+.button-flight .button-flight-icon {
+  position: absolute;
+  z-index: 1;
+  top: 5px;
+  right: 5px;
+  bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--action-icon-size);
+  border-radius: 8px;
+  background: #fff;
+  color: #205da5;
+  box-shadow: 1px 1px 7px 1px rgb(17 59 111 / 18%);
+  transition: width .3s ease, transform .15s ease;
+}
+.button-flight .svg-wrapper { display: flex; align-items: center; justify-content: center; }
+.button-flight .svg-wrapper > svg,
+.button-flight .svg-wrapper > img { display: block; width: 17px; height: 17px; color: #205da5; transition: transform .3s ease; }
+@media (prefers-reduced-motion: no-preference) {
+  .button-flight:hover .button-flight-icon,
+  .button-flight:focus-visible .button-flight-icon { width: calc(100% - 10px); }
+  .button-flight:hover .svg-wrapper > svg,
+  .button-flight:focus-visible .svg-wrapper > svg { transform: translateX(2px); }
+  .button-flight:active .button-flight-icon { transform: scale(.95); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button-flight .button-flight-icon,
+  .button-flight .svg-wrapper > svg,
+  .button-flight .svg-wrapper > img { transition: none; }
+}

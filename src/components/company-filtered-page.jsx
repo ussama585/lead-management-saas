@@ -1,3 +1,4 @@
+import LeadTopFiltersAccordion from './lead-top-filters-accordion.jsx';
 import { Select } from './ui/app-select.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LeadDateFilterSlot, LeadProjectFilterSlot } from './lead-date-filter-slot.jsx';
@@ -18,19 +19,24 @@ export async function getCompanies() {
 
 function FilterContents({ children, options, loading, error, retry, companyId, onChange }) {
   const mutating = useIsMutating();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const filterParams = new URLSearchParams(search);
   const leadListing = /\/(?:leads|data-leads|meta-leads|follow-up)\/?$/.test(pathname);
   const [dateSlot, setDateSlot] = useState(null);
   const [projectSlot, setProjectSlot] = useState(null);
   return <LeadDateFilterSlot.Provider value={leadListing ? dateSlot : null}>
     <LeadProjectFilterSlot.Provider value={leadListing ? projectSlot : null}>
-    <div className={leadListing ? 'lead-company-date-toolbar lead-company-date-toolbar--compact' : undefined}>
+<LeadTopFiltersAccordion enabled={/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname)}
+      company={options.find(option => String(option.value) === String(companyId))?.label}
+      projectSize={filterParams.get('project_size')}
+      dateRange={[filterParams.get('date_start'), filterParams.get('date_end')]}>
+    <div className={leadListing ? `lead-company-date-toolbar lead-company-date-toolbar--compact${/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname) ? ' data-leads-ui data-leads-topbar' : ''}` : undefined}>
     <div className={leadListing ? 'lead-company-date-toolbar__left' : undefined} style={leadListing ? undefined : { display: 'contents' }}>
     <div className={leadListing ? 'lead-company-filter' : 'mb-4 flex flex-wrap items-center gap-2'}>
       <label htmlFor="overview-company-filter" className="text-sm font-medium">Company</label>
       <div className={leadListing ? 'lead-company-filter__control' : undefined} style={leadListing ? undefined : { display: 'contents' }}>
       {leadListing && <Building2 size={20} className="shrink-0" aria-hidden="true" />}
-      <Select id="overview-company-filter" aria-label="Company" placeholder="Select Company"
+      <Select id="overview-company-filter" aria-label="Company" placeholder={/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname) ? 'Filter by company' : 'Select Company'}
         style={{ width: 280, maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
         virtual={false} optionRender={option => <CompanySelectOption option={option} />}
         labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}
@@ -42,7 +48,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
     {leadListing && <div ref={setProjectSlot} className="lead-company-project-slot" />}
     </div>
     {leadListing && <div ref={setDateSlot} className="lead-filter-toolbar lead-company-date-toolbar__date" />}
-    </div>
+    </div></LeadTopFiltersAccordion>
     {children}
     </LeadProjectFilterSlot.Provider>
   </LeadDateFilterSlot.Provider>;

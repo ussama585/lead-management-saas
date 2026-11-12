@@ -1,3 +1,5 @@
+import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
+import '../../../../assets/styles/data-leads-page.css';
 import { formatSalaryBudget } from '../../../shared/utils/salary-budget.js';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
@@ -969,15 +971,15 @@ export default function MetaLeadsStandard() {
   const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, metaLeadsData?.results || [], projectSizeFilter);
   return (
     <>
-      <div className="leads">
+      <div className="leads data-leads-ui">
         <>
             {/* Date Range Filter */}
-          <div className="lead-filter-toolbar">
+<LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>          <div className="lead-filter-toolbar data-leads-local-toolbar">
             <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
               options={projectSizeFilterOptions}
               onChange={value => { setProjectSizeFilter(value || null); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
             <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
-<BootstrapDateRangeModal
+<BootstrapDateRangeModal placeholder="Filter by date range"
                   key={datePickerResetKey}
                   value={dateRange}
                   onChange={handleDateRangeChange}
@@ -1013,11 +1015,12 @@ export default function MetaLeadsStandard() {
   </Space>
 </div> }
 
-            </div>
+            </div></LeadTopFiltersAccordion>
 
 
 
-      <LeadListingFilters requiresCompany={statusList.disabled} executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []} selectedExecutive={selectedExecId}
+      <LeadListingFilters hideAllSummary requiresCompany={statusList.disabled} executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []} selectedExecutive={selectedExecId}
+        getAssigneeTotalCount={() => (Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []).reduce((total, executive) => total + (Number(executive.meta_leads_assigned) || 0), 0)}
         showExecutives={user?.user_type !== 'sales_executive' && Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0}
         onExecutiveChange={id => { setSelectedExecId(previous => id == null || previous === id ? null : id); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
         getExecutiveCount={id => metaLeadsStatsData?.find(item => item.id === id)?.meta_leads_assigned || 0}

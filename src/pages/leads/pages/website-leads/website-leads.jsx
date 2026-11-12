@@ -1,3 +1,5 @@
+import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
+import '../../../../assets/styles/data-leads-page.css';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import dayjs from 'dayjs';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
@@ -1333,7 +1335,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             userType={userType}
           />
         ) : (
-          <LeadListingFilters requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
+          <LeadListingFilters hideAllSummary requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
+            getAssigneeTotalCount={() => executivesList.reduce((total, executive) => total + (Number(executive.website_leads_assigned) || 0), 0)}
             showExecutives={userType !== 'sales_executive'}
             onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
             statusFilter={selectedStatus} setStatusFilter={handleTabClick}
@@ -1519,12 +1522,12 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       <>
 
         {/* Date Range Filter and Manage Assignees Button */}
-        <div className={`lead-filter-toolbar${userType === 'company_admin' ? ' website-company-filter-toolbar' : ''}`}>
+<LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>        <div className={`lead-filter-toolbar data-leads-ui data-leads-local-toolbar${userType === 'company_admin' ? ' website-company-filter-toolbar' : ''}`}>
           <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
             options={projectSizeFilterOptions}
             onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
           <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
-<BootstrapDateRangeModal
+<BootstrapDateRangeModal placeholder="Filter by date range"
               value={dateRange}
               showModal={showDateModal}
               setShowModal={setShowDateModal}
@@ -1536,18 +1539,18 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             />
 </LeadDateRangeField></LeadDateFilter>
           {['super_admin', 'company_admin'].includes(userType) && (
-            <div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right">
+            <LeadDateFilter><div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right">
               <Button
                 icon={<UserAddOutlined size="1em" className="app-icon" />}
                 disabled={userType === 'super_admin' && !selectedCompany(searchParams.toString())}
                 onClick={() => setUserAssignmentModalVisible(true)}
                 style={{ backgroundColor: '#3e6a9f', borderColor: '#3e6a9f', color: '#fff' }}
               >Manage Assignees</Button>
-            </div>
+            </div></LeadDateFilter>
           )}
-        </div>
+        </div></LeadTopFiltersAccordion>
 
-        <div className="leads">
+        <div className="leads data-leads-ui">
           <>
             {tableContent}
 

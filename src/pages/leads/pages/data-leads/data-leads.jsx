@@ -1,5 +1,7 @@
+import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
+import '../../../../assets/styles/data-leads-page.css';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
@@ -23,7 +25,7 @@ import {
 } from "@mui/material";
 import { getDataLeadsStats, getDataLeadsListCount as fetchDataLeadsListCount } from "../../../shared/services/data-leads-service.js";
 import StatusFilterTabs from "../../../../components/status-filter-tabs.jsx";
-import { File as InsertDriveFileOutlinedIcon, Ruler } from 'lucide-react';
+import { File as InsertDriveFileOutlinedIcon, Ruler, Plus } from 'lucide-react';
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { alpha } from "@mui/material/styles";
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -1117,7 +1119,7 @@ const DataLeads = () => {
         <label htmlFor='data-leads-project-size'>Project size</label>
         <div className='lead-project-size-filter__control lead-company-filter__control'>
         <Ruler size={20} aria-hidden='true' className='shrink-0' />
-        <AntSelect id='data-leads-project-size' style={{ width: '100%' }} allowClear placeholder='All project sizes' value={projectSizeFilter || undefined}
+        <AntSelect id='data-leads-project-size' style={{ width: '100%' }} allowClear placeholder='Filter by project size' value={projectSizeFilter || undefined}
           options={projectSizeFilterOptions}
           onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
         </div>
@@ -1140,7 +1142,7 @@ const DataLeads = () => {
         projectSizes={[...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean)}
         assignees={Array.isArray(assigningUsersData) ? assigningUsersData : Array.isArray(assigningUsersData?.results) ? assigningUsersData.results : []} />}
       {!useInlineFilterToolbar && projectSizeFilterControl}
-      <div className="leads">
+      <div className="leads data-leads-ui">
         <div className="min-w-0">
       <Box
         sx={{
@@ -1164,10 +1166,10 @@ const DataLeads = () => {
         </Box>
 
         {/* Date Range Filter and Add New Lead button */}
-        <div className={`lead-filter-toolbar${useInlineFilterToolbar ? ' data-leads-executive-toolbar' : ''}`}>
+<LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>        <div className={`lead-filter-toolbar data-leads-local-toolbar${useInlineFilterToolbar ? ' data-leads-executive-toolbar' : ''}`}>
           {useInlineFilterToolbar && projectSizeFilterControl}
-          <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
-<BootstrapDateRangeModal
+          <LeadDateFilter><LeadDateRangeField label="Date Range" hasValue={Boolean(dateRange)} onClear={clearDateRange}>
+<BootstrapDateRangeModal placeholder="Filter by date range"
               key={datePickerResetKey}
               value={dateRange}
               onChange={handleDateRangeChange}
@@ -1183,9 +1185,10 @@ const DataLeads = () => {
           
           {/* Add New Lead button */}
           {user?.user_type !== 'marketing_manager' && (
-            <AntButton
-              className={useInlineFilterToolbar ? 'data-leads-executive-add' : undefined}
+            <LeadDateFilter><AntButton
+              className="data-leads-add-button"
               type="primary"
+              icon={<Plus size={20} />}
               onClick={() => setLeadDialog({ mode: 'create' })}
               style={{
                 cursor: 'pointer',
@@ -1197,9 +1200,9 @@ const DataLeads = () => {
               }}
             >
               Add New Lead
-            </AntButton>
+            </AntButton></LeadDateFilter>
           )}
-        </div>
+        </div></LeadTopFiltersAccordion>
 
         <Stack
           direction="column"
@@ -1226,7 +1229,8 @@ const DataLeads = () => {
             />
           ) : (
             <>
-              <LeadListingFilters requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
+              <LeadListingFilters hideAllSummary requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
+                getAssigneeTotalCount={() => executivesList.reduce((total, executive) => total + (Number(executive.data_leads_assigned) || 0), 0)}
                 showExecutives={user?.user_type !== 'sales_executive'}
                 onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
                 statusFilter={selectedStatus} setStatusFilter={handleStatusChange} statusChoices={statusTabs}

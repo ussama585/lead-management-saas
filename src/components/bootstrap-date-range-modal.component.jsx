@@ -17,7 +17,7 @@ const MOBILE_BREAKPOINT = 1050;
 const MIN_WIDTH_BREAKPOINT = 450;
 const DEBOUNCE_DELAY = 150;
 
-const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onDone, triggerStyle }) => {
+const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onDone, triggerStyle, placeholder = 'Select Date Range' }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isBelowMinWidth, setIsBelowMinWidth] = useState(false);
 
@@ -127,7 +127,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
       const end = format(currentSelection.endDate, 'do MMM, yyyy');
       return `${start} - ${end}`;
     }
-    return 'Select Date Range';
+    return placeholder;
   }, [selection]);
 
   return (

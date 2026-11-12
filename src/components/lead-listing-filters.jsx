@@ -1,5 +1,5 @@
 import React, { useId, useState } from 'react';
-import { UsersRound, ListFilter, ChevronUp, ChevronDown } from 'lucide-react';
+import { UsersRound, UserRound, ListFilter, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button.jsx';
 import StatusFilterTabs from './status-filter-tabs.jsx';
 import '../assets/styles/lead-listing-filters.css';
@@ -19,14 +19,15 @@ function FilterCard({ title, subtitle, Icon, selectedLabel, children }) {
   </section>;
 }
 
-function FilterCards({ statusFirst, children }) {
+function FilterCards({ statusFirst, children, accordion }) {
   const cards = React.Children.toArray(children);
-  return <div className="lead-listing-filters">{statusFirst ? cards.reverse() : cards}</div>;
+  const content = <div className="lead-listing-filters">{statusFirst ? cards.reverse() : cards}</div>;
+  return accordion ? <details open className="leads-filters-accordion"><summary>Filters<ChevronDown size={16} aria-hidden="true" /></summary>{content}</details> : content;
 }
 
-export default function LeadListingFilters({ executives = [], selectedExecutive, onExecutiveChange, getExecutiveCount,
-  statusFilter, setStatusFilter, statusChoices, getTotalCount, getStatusCount, showExecutives = true, requiresCompany = false, statusFirst = false }) {
-  if (requiresCompany) return <FilterCards statusFirst={statusFirst}>
+export default function LeadListingFilters({ executives = [], selectedExecutive, onExecutiveChange, getExecutiveCount, getAssigneeTotalCount,
+  statusFilter, setStatusFilter, statusChoices, getTotalCount, getStatusCount, showExecutives = true, requiresCompany = false, statusFirst = false, hideAllSummary = false, accordion = false }) {
+  if (requiresCompany) return <FilterCards statusFirst={statusFirst} accordion={accordion}>
     {showExecutives && <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound}>
       <p className="py-3 text-sm text-muted-foreground">Select company first</p>
     </FilterCard>}
@@ -42,19 +43,19 @@ export default function LeadListingFilters({ executives = [], selectedExecutive,
   const statusLabel = !statusFilter || statusFilter === 'All' ? 'All'
     : statusChoices.find(choice => choice.value === statusFilter)?.label || statusFilter;
   const buttonClass = 'h-auto min-h-8 max-w-full whitespace-normal text-left';
-  return <FilterCards statusFirst={statusFirst}>
-    {showExecutives && <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound} selectedLabel={assigneeLabel}>
+  return <FilterCards statusFirst={statusFirst} accordion={accordion}>
+    {showExecutives && <FilterCard title="Assignee Filters" subtitle="Filter leads by assignee and role" Icon={UsersRound} selectedLabel={hideAllSummary && isAll ? null : assigneeLabel}>
     <div className="flex flex-wrap items-center gap-2 py-2" role="group" aria-label="Filter by assigned user">
-      <Button type="button" size="sm" className={buttonClass} variant={isAll ? 'default' : 'outline'} aria-pressed={isAll} onClick={() => onExecutiveChange(null)}>All ({getTotalCount()})</Button>
+      <Button type="button" size="sm" className={buttonClass} variant={isAll ? 'default' : 'outline'} aria-pressed={isAll} onClick={() => onExecutiveChange(null)}>All ({(getAssigneeTotalCount || getTotalCount)()})</Button>
       {executives.map(executive => {
         const selected = !isAll && String(selectedExecutive) === String(executive.id);
         const role = executive.user_type ? ` - ${executive.user_type === 'sales_manager' ? 'Manager' : 'Executive'}` : '';
         const count = getExecutiveCount?.(executive.id);
         return <Button key={executive.id} type="button" size="sm" className={buttonClass} variant={selected ? 'default' : 'outline'} aria-pressed={selected}
-          onClick={() => onExecutiveChange(executive.id)}>{executive.name}{role}{typeof count === 'number' ? ` (${count})` : ''}</Button>;
+          onClick={() => onExecutiveChange(executive.id)}>{hideAllSummary && <UserRound className="size-4 shrink-0 text-blue-600" aria-hidden="true" />}{executive.name}{role}{typeof count === 'number' ? ` (${count})` : ''}</Button>;
       })}
     </div></FilterCard>}
-    <FilterCard title="Status Filters" subtitle="Filter leads by current status" Icon={ListFilter} selectedLabel={statusLabel}>
+    <FilterCard title="Status Filters" subtitle="Filter leads by current status" Icon={ListFilter} selectedLabel={hideAllSummary && statusLabel === 'All' ? null : statusLabel}>
       <StatusFilterTabs statusFilter={statusFilter} setStatusFilter={setStatusFilter} statusChoices={statusChoices}
         getTotalCount={getTotalCount} getStatusCount={getStatusCount} />
     </FilterCard>

@@ -1,0 +1,159 @@
+/* Data Leads presentation only. No shared lead-page styles are changed. */
+.data-leads-ui .lead-company-filter > label,
+.data-leads-ui .lead-date-range-field__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.leads-top-filters-accordion { margin-bottom: 20px; border: 1px solid #e1e8f3; border-radius: 12px; background: #fff; }
+.leads-top-filters-accordion > summary { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; cursor: pointer; list-style: none; font-size: 14px; font-weight: 600; color: #17243c; }
+.leads-top-filters-accordion > summary::-webkit-details-marker { display: none; }
+.leads-top-filters-accordion[open] > summary { border-bottom: 1px solid #edf1f7; }
+.leads-top-filters-accordion[open] > summary svg { transform: rotate(180deg); }
+.leads-top-filters-summary { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-left: auto; min-width: 0; }
+.leads-top-filters-summary > svg { flex-shrink: 0; margin-left: 4px; }
+.leads-top-filters-summary__value { display: block; max-width: 240px; padding: 4px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 6px; background: #edf3fb; color: #315d92; font-size: 12px; font-weight: 500; }
+.leads-top-filters-accordion > summary { gap: 16px; }
+@media (max-width: 600px) {
+  .leads-top-filters-summary__value { max-width: 150px; }
+}
+.leads-top-filters-accordion > .data-leads-topbar,
+.data-leads-ui.leads-top-filters-accordion > .data-leads-local-toolbar { padding: 16px 20px; margin: 0; }
+.data-leads-page-header {
+  display: flex; align-items: center; gap: 20px; margin: 0 0 32px;
+  padding: 8px 8px 0; color: #0f1e36;
+}
+.data-leads-page-header__icon {
+  display: grid; place-items: center; width: 56px; height: 56px; flex-shrink: 0;
+  background: #eaf1fb; border-radius: 14px; color: #205b9c;
+  box-shadow: 0 3px 8px rgb(34 76 130 / 5%);
+}
+.data-leads-page-header h1 { margin: 0; font-size: 28px; font-weight: 700; line-height: 36px; letter-spacing: -.7px; }
+.data-leads-page-header p { margin: 2px 0 0; color: #607089; font-size: 15px; line-height: 24px; }
+.data-leads-topbar,
+.data-leads-ui .data-leads-local-toolbar {
+  padding: 16px 8px 28px; margin: 0 0 24px; border: 0; background: transparent;
+  box-shadow: none; gap: 24px;
+}
+.data-leads-topbar .lead-company-date-toolbar__left {
+  flex: 1 1 420px; display: flex; align-items: flex-end; gap: 24px; min-width: 0;
+}
+.data-leads-topbar .lead-company-filter,
+.data-leads-topbar .lead-company-project-slot { flex: 1 1 190px; min-width: 0; }
+.data-leads-topbar .lead-company-project-slot .lead-company-filter { width: 100%; }
+.data-leads-topbar .lead-company-date-toolbar__date {
+  display: flex; flex: 1 1 440px; flex-wrap: nowrap; gap: 24px;
+  align-items: flex-end; justify-content: flex-end;
+}
+.data-leads-ui .lead-company-filter { margin-bottom: 0; gap: 8px; }
+.data-leads-ui .lead-company-filter label,
+.data-leads-ui .lead-date-range-field__label {
+  font-size: 14px; font-weight: 500; line-height: 20px; color: #17243c;
+}
+.data-leads-ui .lead-company-filter__control {
+  width: 100%; max-width: 100%; height: 40px; border: 1px solid #dbe3ef;
+  border-radius: 12px; background: #fff; padding-left: 16px; gap: 12px;
+  box-shadow: 0 2px 5px rgb(30 58 98 / 5%);
+}
+.data-leads-ui .lead-company-filter__control > svg { width: 20px; height: 20px; color: #64748b; }
+.data-leads-ui .lead-company-filter__control [data-slot='select-trigger'] {
+  height: 38px !important; min-height: 38px !important; background: transparent;
+  font-size: 14px; font-weight: 400; padding-right: 14px;
+}
+.data-leads-ui [data-slot='select-trigger'] > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.data-leads-ui .lead-date-range-field { min-width: 0; flex: 1 1 240px; }
+.data-leads-ui .date-range-trigger {
+  width: 100%; max-width: 100%; min-height: 40px; height: 40px;
+  border: 1px solid #dbe3ef !important; border-radius: 12px !important;
+  background: #fff !important; font-size: 14px; color: #53647f !important;
+  box-shadow: 0 2px 5px rgb(30 58 98 / 5%);
+}
+.data-leads-ui .lead-date-range-field__picker { min-width: 0; width: 100%; }
+.data-leads-ui .data-leads-add-button {
+  min-height: 40px; border-radius: 12px; padding: 0 24px; flex-shrink: 0;
+  font-size: 14px; font-weight: 600; background: #205da5 !important;
+  border-color: #205da5 !important; color: #fff;
+  box-shadow: 0 4px 10px rgb(25 76 141 / 14%); transition: background .15s, box-shadow .15s;
+}
+.data-leads-ui .data-leads-add-button:hover { background: #174c8b !important; }
+.data-leads-ui .lead-listing-filters { gap: 12px; margin-bottom: 12px; }
+.data-leads-ui .lead-listing-filters .lead-filter-card {
+  padding: 16px 20px; border: 1px solid #e1e8f3; border-radius: 14px;
+  background: #fff; box-shadow: 0 4px 12px rgb(31 58 99 / 6%) !important;
+}
+.data-leads-ui .lead-listing-filters .lead-filter-card__header { margin-bottom: 12px; gap: 12px; }
+.data-leads-ui .lead-listing-filters .lead-filter-card__icon {
+  flex-basis: 36px; height: 36px; border-radius: 12px; background: #e8f0fc; color: #205b9c;
+}
+.data-leads-ui .lead-filter-card__icon svg { width: 20px; height: 20px; }
+.data-leads-ui .lead-listing-filters .lead-filter-card__heading h2 {
+  font-size: 16px; font-weight: 650; color: #12213b; line-height: 26px; letter-spacing: -.3px;
+}
+.data-leads-ui .lead-listing-filters .lead-filter-card__heading p { font-size: 14px; margin-top: 4px; color: #61718a; }
+.data-leads-ui .lead-listing-filters [role='group'] { gap: 12px; padding: 0; }
+.data-leads-ui .lead-listing-filters [role='group'] > button {
+  min-height: 36px; max-height: 40px; padding: 6px 14px; border-radius: 14px; font-size: 14px;
+  font-weight: 400; line-height: 22px; color: #17243c; background: #fff;
+  border: 1px solid #e0e7f1; box-shadow: 0 2px 4px rgb(25 49 87 / 4%);
+  transition: background .15s, border-color .15s, color .15s;
+}
+.data-leads-ui .lead-listing-filters [role='group'] > button[aria-pressed='true'] {
+  background: #205da5; border-color: #205da5; color: #fff; font-weight: 600;
+  box-shadow: 0 3px 7px rgb(32 93 165 / 16%) !important;
+}
+.data-leads-ui .lead-listing-filters [role='group'] > button:not([aria-pressed='true']):hover { background: #f4f8fd; border-color: #acc3df; }
+.data-leads-ui .lead-listing-filters .lead-filter-card__selected { padding: 4px 10px; background: #edf3fc; color: #315d92; font-size: 12px; border-radius: 8px; }
+.data-leads-ui .data-leads-local-toolbar:empty { display: none; }
+.data-leads-ui .data-leads-executive-toolbar::after { display: none; }
+.data-leads-ui.website-company-filter-toolbar::after { display: none; }
+@media (min-width: 768px) {
+  .data-leads-ui .data-leads-local-toolbar,
+  .data-leads-ui.data-leads-local-toolbar { flex-wrap: nowrap; gap: 16px; }
+  .data-leads-ui .data-leads-local-toolbar > .lead-project-size-filter,
+  .data-leads-ui.data-leads-local-toolbar > .lead-project-size-filter { flex: 1 1 200px; min-width: 0; width: auto; }
+  .data-leads-ui .data-leads-local-toolbar > .lead-date-range-field,
+  .data-leads-ui.data-leads-local-toolbar > .lead-date-range-field { flex: 1 1 240px; min-width: 0; margin-left: 0; }
+  .data-leads-ui .data-leads-local-toolbar > .lead-filter-toolbar__actions,
+  .data-leads-ui.data-leads-local-toolbar > .lead-filter-toolbar__actions { flex: 0 0 auto; margin-left: 0; order: initial; }
+}
+.data-leads-ui .data-leads-executive-toolbar .lead-project-size-filter { flex: 1 1 220px; }
+.data-leads-ui button:focus-visible { outline: 2px solid #2868b2; outline-offset: 3px; }
+@media (max-width: 1100px) {
+  .data-leads-topbar { flex-direction: column; align-items: stretch; }
+  .data-leads-topbar .lead-company-date-toolbar__left,
+  .data-leads-topbar .lead-company-date-toolbar__date { flex-basis: auto; width: 100%; }
+  .data-leads-topbar .lead-company-date-toolbar__date { justify-content: space-between; }
+}
+@media (max-width: 600px) {
+  .data-leads-page-header { gap: 12px; margin-bottom: 20px; }
+  .data-leads-page-header h1 { font-size: 24px; }
+  .data-leads-page-header p { font-size: 13px; }
+  .data-leads-topbar, .data-leads-ui .data-leads-local-toolbar { padding: 8px 0 16px; }
+  .data-leads-topbar .lead-company-date-toolbar__left { flex-direction: column; align-items: stretch; gap: 16px; }
+  .data-leads-topbar .lead-company-filter, .data-leads-topbar .lead-company-project-slot { flex-basis: auto; width: 100%; }
+  .data-leads-ui .data-leads-local-toolbar { flex-direction: column; align-items: stretch; }
+  .data-leads-ui .data-leads-executive-toolbar .lead-project-size-filter,
+  .data-leads-ui .lead-date-range-field { flex-basis: auto; width: 100%; }
+  .data-leads-ui .date-range-trigger, .data-leads-ui .data-leads-add-button { width: 100%; }
+  .data-leads-topbar .lead-company-date-toolbar__date { flex-direction: column; align-items: stretch; gap: 16px; }
+  .data-leads-ui .lead-listing-filters .lead-filter-card { padding: 20px 16px; }
+}
+
+.data-leads-ui .leads-filters-accordion { margin-bottom: 20px; border: 1px solid #e1e8f3; border-radius: 12px; background: #fff; overflow: hidden; }
+.data-leads-ui .leads-filters-accordion > summary { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; color: #17243c; font-size: 14px; font-weight: 600; cursor: pointer; list-style: none; }
+.data-leads-ui .leads-filters-accordion > summary::-webkit-details-marker { display: none; }
+.data-leads-ui .leads-filters-accordion[open] > summary { border-bottom: 1px solid #edf1f7; }
+.data-leads-ui .leads-filters-accordion[open] > summary svg { transform: rotate(180deg); }
+.data-leads-ui .leads-filters-accordion > .lead-listing-filters { padding: 12px; margin: 0; }
+.data-leads-ui .lead-filter-card__collapse { width: 32px; height: 32px; }
+.data-leads-ui .lead-listing-filters [role='group'] > button { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.data-leads-ui .lead-filter-toolbar__actions { flex-basis: auto !important; }
+.data-leads-ui .lead-filter-toolbar__actions button,
+.data-leads-ui.data-leads-local-toolbar > button,
+.data-leads-ui .data-leads-local-toolbar > button { height: 40px; min-height: 40px; }
