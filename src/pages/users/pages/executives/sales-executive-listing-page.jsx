@@ -6,12 +6,12 @@ import { useQuery } from 'react-query';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import useUserStore from '../../../shared/store/user-store.js';
-import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';
-import StatsCard from '../../../../components/stats-card.component.jsx';
-import LineChart from '../../../../components/charts/line-chart.component.jsx';
-import { getStats, getExecutivesList, getExecutiveStats } from '../../../shared/services/stats-service.js';
+// import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';
+// import StatsCard from '../../../../components/stats-card.component.jsx';
+// import LineChart from '../../../../components/charts/line-chart.component.jsx';
+import { getExecutivesList } from '../../../shared/services/stats-service.js';
 import TableComponent from '../../../../components/tables/table.component.jsx';
-import SalesExecutivesIcon from '../../../../assets/images/stat-card-icons/sales-executives.svg';
+// import SalesExecutivesIcon from '../../../../assets/images/stat-card-icons/sales-executives.svg';
 import ProfileImagePlaceholder from '../../../../assets/images/user-card-icons/user-placeholder.svg';
 import '../../../../assets/styles/legacy/sales-executive-listing-page.css';
 import '../../../../assets/styles/legacy/table-client-actions.css';
@@ -37,6 +37,7 @@ export default function SalesExecutiveListing() {
 
   const [sorting, setSorting] = useState([]);
 
+  /* Card and graph API queries temporarily disabled.
   const [selectedTimeFrameForExecutivesData, setSelectedTimeFrameForExecutivesData] = useState('week');
 
   const { data: metricsData, isLoading: loadingStats } = useQuery({
@@ -63,6 +64,8 @@ export default function SalesExecutiveListing() {
 
 
 
+  */
+
   // Fetch Executive listing with pagination
   const { data: executivesList = {}, isLoading: loadingExecutiveList } = useQuery({
     queryKey: ['ExecutivesList', user?.id, user?.user_type, pagination.pageIndex, pagination.pageSize, sorting, globalFilter],
@@ -74,6 +77,7 @@ export default function SalesExecutiveListing() {
   });
 
 
+  /*
   const metrics = metricsData
     ? [
       {
@@ -85,6 +89,8 @@ export default function SalesExecutiveListing() {
       },
     ]
     : [];
+
+  */
 
   const columns = useMemo(
     () => isManager ? [
@@ -157,10 +163,13 @@ export default function SalesExecutiveListing() {
   );
 
 
+  /*
   const handleTimeFrameFromExecutivesStats = (value) => {
     setSelectedTimeFrameForExecutivesData(value);
   };
 
+
+  */
 
   const transformedData = executivesList?.results
     ? executivesList.results.map((executive) => ({
@@ -181,10 +190,13 @@ export default function SalesExecutiveListing() {
     }))
     : [];
 
+  /*
   // Structure the data to match LineChart requirements
   const chartData = {
     executives: executiveStats?.executives || [] // Here we directly map the Executives array
   };
+
+  */
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -200,6 +212,7 @@ export default function SalesExecutiveListing() {
       <div className="container">
 
 
+        {/* Sales executive card and graph temporarily disabled.
         {loadingStats ? (
           <div className="sop-branded-spin-wrap" style={{ minHeight: 140, padding: '32px 24px' }}>
             <Spin
@@ -243,6 +256,8 @@ export default function SalesExecutiveListing() {
             />
           )}
         </div>
+
+        */}
 
         <div className="table-container">
           {loadingExecutiveList ? (
