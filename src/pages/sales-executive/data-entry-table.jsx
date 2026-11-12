@@ -241,7 +241,7 @@ const DataEntryTable = () => {
   );
   const assigneeFilterOptions = assigneeFilters.map(row => typeof row.status === 'string'
     ? { id: `status:${row.status}`, name: row.status, filterCount: Number(row.count) || 0 }
-    : { ...row, filterCount: Number(row.data_leads_assigned) || 0 });
+    : { ...row, filterCount: Number(superAdmin ? row.count : row.data_leads_assigned) || 0 });
   const { data: statusCount, refetch: refetchStatusCount } = useQuery(
     ['status-count', user?.id, user?.user_type, countParams],
     async () => normalizeLeadCounts(await listDataEntryCount(countParams)),

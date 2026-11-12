@@ -20,7 +20,7 @@ describe('Sales Data assignee filters', () => {
     const rows = [{ id: 8, name: 'Executive', data_leads_assigned: 2 }];
     api.get.mockResolvedValue({ data: rows });
     expect(await getSalesDataAssigneeFilters({ superAdmin, companyId: 1, startDate: '2026-10-01', endDate: '2026-11-03' })).toEqual(rows);
-    expect(api.get).toHaveBeenCalledWith('/data-leads/stats', {
+    expect(api.get).toHaveBeenCalledWith(superAdmin ? '/data-entry/stats' : '/data-leads/stats', {
       params: { ...(superAdmin ? { company_id: 1 } : {}), start_date: '2026-10-01', end_date: '2026-11-03' },
     });
   });
