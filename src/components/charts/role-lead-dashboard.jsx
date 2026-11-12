@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { useQuery } from 'react-query';
 import useUserStore from '../../pages/shared/store/user-store.js';
-import { getSuperAdminLeadStatusDistribution, getSuperAdminMobilisationAmounts } from '../../pages/shared/services/admin-graphs.js';
+import { getSuperAdminLeadStatusDistribution } from '../../pages/shared/services/admin-graphs.js';
 import { getSuperAdminTotalLeadsReceived } from '../../pages/shared/services/admin-total-leads.js';
 import { getSuperAdminStats, dashboardStatCards } from '../../pages/dashboard/pages/admin/super-admin-stats.jsx';
 import StatsCard from '../stats-card.component.jsx';
 import LeadStatusDistributionChart from './lead-status-distribution-chart.component.jsx';
 import TotalLeadsReceivedChart from './total-leads-received-chart.component.jsx';
-import ExecutiveMobilisationAmountsChart from './executive-mobilisation-amounts-chart.component.jsx';
+// import ExecutiveMobilisationAmountsChart from './executive-mobilisation-amounts-chart.component.jsx';
 import { Button } from '../ui/button.jsx';
 import { Select } from '../ui/app-select.jsx';
 
@@ -22,7 +22,8 @@ export default function RoleLeadDashboard({ statsOnly = false, additionalStats =
   const initialDates = () => [dayjs().startOf('month'), dayjs().endOf('month')];
   const [totalDates, setTotalDates] = useState(initialDates);
   const [distributionDates, setDistributionDates] = useState(initialDates);
-  const [amountDates, setAmountDates] = useState(initialDates);
+  // Lead mobilisation is temporarily disabled, including its API request.
+  // const [amountDates, setAmountDates] = useState(initialDates);
   const [period, setPeriod] = useState('month');
   const [source, setSource] = useState('Meta');
   const [statsScope, setStatsScope] = useState('My Stats');
@@ -35,13 +36,6 @@ export default function RoleLeadDashboard({ statsOnly = false, additionalStats =
   ), { enabled });
   const total = useQuery(['roleAccountTotalLeads', ...key, totalDates, period], () => getSuperAdminTotalLeadsReceived({ ...dates(totalDates), period, userType: user?.user_type }), { enabled: enabled && !statsOnly });
   const distribution = useQuery(['roleAccountLeadDistribution', ...key, distributionDates, source], () => getSuperAdminLeadStatusDistribution({ ...dates(distributionDates), leadType: source, userType: user?.user_type }), { enabled: enabled && !statsOnly });
-  const amounts = useQuery(['roleAccountMobilisation', ...key, amountDates], () => getSuperAdminMobilisationAmounts({ ...dates(amountDates), userType: user?.user_type }), { enabled: enabled && !statsOnly });
-  const aggregated = new Map();
-  ['Meta', 'Data', 'Website'].forEach(type => (amounts.data?.[type] || []).forEach(row => {
-    const id = row.assigned_to_id ?? row.assigned_to_name;
-    const previous = aggregated.get(id);
-    aggregated.set(id, { ...row, mobilisation_amount: (previous?.mobilisation_amount || 0) + (Number(row.mobilisation_amount) || 0) });
-  }));
   return <section className="space-y-4">
     {isManager && <div className="flex items-center gap-3"><label htmlFor="manager-lead-stats-scope">Lead statistics</label>
       <Select placeholder="Select lead statistics" id="manager-lead-stats-scope" value={statsScope} onChange={setStatsScope} options={['My Stats', 'Executive Stats'].map(value => ({ value, label: value }))} />
@@ -53,7 +47,9 @@ export default function RoleLeadDashboard({ statsOnly = false, additionalStats =
     {!statsOnly && <>
       <Result query={total}><TotalLeadsReceivedChart totalCount={total.data?.totalCount || 0} timeSeriesData={total.data?.timeSeriesData || []} selectedPeriod={period} onPeriodChange={setPeriod} showSourceFilter={false} dateRange={totalDates} onDateRangeChange={setTotalDates} isLoading={total.isLoading} /></Result>
       <Result query={distribution}><LeadStatusDistributionChart data={distribution.data || []} selectedSource={source} onSourceChange={setSource} dateRange={distributionDates} onDateRangeChange={setDistributionDates} isLoading={distribution.isLoading} /></Result>
+      {/* Lead mobilisation section temporarily disabled.
       <Result query={amounts}><ExecutiveMobilisationAmountsChart data={[...aggregated.values()]} dateRange={amountDates} onDateRangeChange={setAmountDates} isLoading={amounts.isLoading} /></Result>
+      */}
     </>}
   </section>;
 }

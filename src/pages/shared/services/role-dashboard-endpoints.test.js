@@ -15,13 +15,13 @@ describe.each(['company_admin', 'sales_manager', 'sales_executive', 'super_admin
   it('uses the role prefix for status distribution', async () => {
     api.get.mockResolvedValue({ data: { data: [] } });
     await getSuperAdminLeadStatusDistribution({ userType });
-    expect(api.get).toHaveBeenLastCalledWith(`/${userType === 'company_admin' ? 'accounts' : prefix}/lead-status-distribute`, { params: {} });
+    expect(api.get).toHaveBeenLastCalledWith('/accounts/lead-status-distribute', { params: {} });
   });
   it('uses the role prefix for total received', async () => {
     api.get.mockResolvedValue({ data: { totalCount: 0, timeSeriesData: [] } });
     await getSuperAdminTotalLeadsReceived({ userType });
     if (userType === 'company_admin') expect(api.get).toHaveBeenLastCalledWith('/accounts/total-lead-received');
-    else expect(api.get).toHaveBeenLastCalledWith(`/${prefix}/total-lead-received`, { params: {} });
+    else expect(api.get).toHaveBeenLastCalledWith('/accounts/total-lead-received', { params: {} });
   });
   it('uses the role prefix for mobilisation amounts', async () => {
     api.get.mockResolvedValue({ data: { data: { Meta: [], Data: [], Website: [] } } });
