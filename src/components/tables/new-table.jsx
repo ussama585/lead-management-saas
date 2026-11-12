@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import '../../assets/styles/legacy/table/table-component.css';
+import '../../assets/styles/shared-table.css';
 
 const DEFAULT_GLOBAL_FILTER_DEBOUNCE_MS = 300;
 
@@ -43,7 +44,21 @@ const theme = createTheme({
   },
 });
 
-export default function NewTableComponent({
+function TableRenderer(props) {
+  return <ThemeProvider theme={theme}>
+    <div className="table-wrapper app-data-table"><MaterialReactTable {...props} /></div>
+  </ThemeProvider>;
+}
+
+// Pages with editing or custom client-side behavior can retain their MRT
+// options/instance while sharing the same renderer and visual surface.
+export default function NewTableComponent({ table, mrtOptions, ...props }) {
+  if (table) return <TableRenderer table={table} />;
+  if (mrtOptions) return <TableRenderer {...mrtOptions} />;
+  return <ConfiguredTable {...props} />;
+}
+
+function ConfiguredTable({
   totalCount,
   columns,
   data,
@@ -175,9 +190,7 @@ export default function NewTableComponent({
   ];
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className="table-wrapper">
-        <MaterialReactTable
+        <TableRenderer
           size="small"
           enableRowNumbers={false}
           columns={columns}
@@ -304,8 +317,6 @@ export default function NewTableComponent({
                 </Box>
               )}
         />
-      </div>
-    </ThemeProvider>
   );
 }
 

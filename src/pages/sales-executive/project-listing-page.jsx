@@ -4,7 +4,9 @@ import { Spin, Button } from '../../components/ui/app-controls.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
-import { Form, Row, Col, Table, Avatar, DatePicker } from 'antd';
+import { Form, Row, Col, Avatar, DatePicker } from 'antd';
+import NewTableComponent from '../../components/tables/new-table.jsx';
+import { listingColumns } from '../../components/tables/listing-table-options.js';
 import { LoaderCircle as LoadingOutlined, User as UserOutlined, CircleHelp as QuestionCircleOutlined, DollarSign as DollarOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import StatsCard from '../../components/stats-card.component.jsx';
@@ -840,13 +842,14 @@ export default function ProjectListing() {
         width={850}
       >
 
-        <Table
-          dataSource={dataSource}
-          columns={recordColumns}
-          pagination={false}
-          rowKey={(record, index) => index}
-          showHeader={false}
-        />
+        <NewTableComponent mrtOptions={{
+          columns: listingColumns(recordColumns), data: dataSource,
+          getRowId: (_record, index) => String(index),
+          enableTableHead: false, enablePagination: false, enableBottomToolbar: false,
+          enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+          enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+          enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+        }} />
       </Modal>
 
 

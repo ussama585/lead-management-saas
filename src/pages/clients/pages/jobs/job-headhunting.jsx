@@ -5,7 +5,9 @@ import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button, Tooltip, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef, Suspense } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, Typography, Table, Upload, Row, Col, DatePicker, Tabs, Divider, Popconfirm, Pagination, Switch } from 'antd';
+import { Card, Typography, Upload, Row, Col, DatePicker, Tabs, Divider, Popconfirm, Pagination, Switch } from 'antd';
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
+import { listingColumns, listingPagination, nextListingPagination } from '../../../../components/tables/listing-table-options.js';
 import dayjs from 'dayjs';
 import { MessageSquare as MessageOutlined, MessageCircle as CommentOutlined, MessageCircle as WhatsAppOutlined, Link as LinkOutlined, Share2 as ShareAltOutlined, FileText as FilePdfOutlined, Clock as ClockCircleOutlined, History as HistoryOutlined, User as UserOutlined } from 'lucide-react';
 import ProfileImagePlaceholder from '../../../../assets/images/user-card-icons/user-placeholder.svg';
@@ -3240,21 +3242,22 @@ export default function JobHeadhunting() {
                           Created At: {formatDateUniversal(batch.created_at, true)}
                         </Text>
                         <div style={{ overflowX: 'auto' }}>
-                          <Table
-                            columns={resumeColumns(batch.id)}
-                            dataSource={batch.resumes.map((r) => ({ ...r, key: r.id }))}
-                            pagination={{
-                              pageSize: 10,
-                              showSizeChanger: false,
-                              showQuickJumper: false,
-                              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} CVs`,
-                            }}
-                            locale={{ emptyText: 'No CVs in this batch.' }}
-                            style={{ marginTop: 12, minWidth: 600 }}
-                            size="small"
-                            className="resume-table"
-                            scroll={{ x: 600 }}
-                          />
+                          <NewTableComponent mrtOptions={{
+                            columns: listingColumns(resumeColumns(batch.id)),
+                            data: batch.resumes.map((r) => ({ ...r, key: r.id })),
+                            getRowId: row => String(row.id),
+                            initialState: { pagination: { pageIndex: 0, pageSize: 10 }, density: 'compact' },
+                            autoResetPageIndex: false,
+                            enableRowSelection: false,
+                            enableTopToolbar: false,
+                            enableColumnActions: false,
+                            enableColumnFilters: false,
+                            enableGlobalFilter: false,
+                            enableHiding: false,
+                            muiPaginationProps: { rowsPerPageOptions: [10] },
+                            muiTableContainerProps: { sx: { minWidth: 600, overflowX: 'auto' } },
+                            renderEmptyRowsFallback: () => <div className="p-4 text-center text-sm text-muted-foreground">No CVs in this batch.</div>,
+                          }} />
                         </div>
                       </Card>
                     ))}
@@ -3336,33 +3339,38 @@ export default function JobHeadhunting() {
                         Public CVs submitted for this job position
                       </Text>
                       <div style={{ overflowX: 'auto' }}>
-                        <Table
-                          columns={publicResumeColumns}
-                          dataSource={publicResumeData?.results?.map((r) => ({ ...r, key: r.id })) || []}
-                          pagination={{
-                            current: publicResumeData?.current_page ?? publicResumePage,
-                            total: publicResumeData?.count ?? 0,
-                            pageSize: publicResumeData?.size ?? publicResumePageSize,
-                            showSizeChanger: true,
-                            pageSizeOptions: ['10', '20', '50'],
-                            showQuickJumper: false,
-                            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} CVs`,
-                          }}
-                          onChange={(pagination) => {
-                            if (pagination?.current !== undefined && pagination.current !== publicResumePage) {
-                              setPublicResumePage(pagination.current);
-                            }
-                            if (pagination?.pageSize !== undefined && pagination.pageSize !== publicResumePageSize) {
+                        <NewTableComponent mrtOptions={{
+                          columns: listingColumns(publicResumeColumns),
+                          data: publicResumeData?.results?.map((r) => ({ ...r, key: r.id })) || [],
+                          getRowId: row => String(row.id),
+                          manualPagination: true,
+                          rowCount: publicResumeData?.count ?? 0,
+                          state: {
+                            pagination: listingPagination({ current: publicResumeData?.current_page ?? publicResumePage, pageSize: publicResumeData?.size ?? publicResumePageSize }),
+                            isLoading: publicResumeLoading,
+                          },
+                          onPaginationChange: updater => {
+                            const pagination = nextListingPagination(updater, {
+                              current: publicResumeData?.current_page ?? publicResumePage,
+                              pageSize: publicResumeData?.size ?? publicResumePageSize,
+                            });
+                            if (pagination.current !== publicResumePage) setPublicResumePage(pagination.current);
+                            if (pagination.pageSize !== publicResumePageSize) {
                               setPublicResumePageSize(pagination.pageSize);
                               setPublicResumePage(1);
                             }
-                          }}
-                          locale={{ emptyText: 'No public CVs found for this job.' }}
-                          style={{ marginTop: 12, minWidth: 600 }}
-                          size="small"
-                          className="resume-table"
-                          scroll={{ x: 600 }}
-                        />
+                          },
+                          initialState: { density: 'compact' },
+                          enableRowSelection: false,
+                          enableTopToolbar: false,
+                          enableColumnActions: false,
+                          enableColumnFilters: false,
+                          enableGlobalFilter: false,
+                          enableHiding: false,
+                          muiPaginationProps: { rowsPerPageOptions: [10, 20, 50] },
+                          muiTableContainerProps: { sx: { minWidth: 600, overflowX: 'auto' } },
+                          renderEmptyRowsFallback: () => <div className="p-4 text-center text-sm text-muted-foreground">No public CVs found for this job.</div>,
+                        }} />
                       </div>
                     </Card>
                   </Spin>
@@ -3415,25 +3423,45 @@ export default function JobHeadhunting() {
                     >
                       
                       <div style={{ overflowX: 'auto' }}>
-                        <Table
-                          columns={saasApplicationsColumns}
-                          dataSource={saasApplicationsRows.map((r, index) => ({ ...r, key: r.id ?? index }))}
-                          pagination={{
-                            current: saasApplicationsPage,
-                            total: saasApplicationsData?.count ?? 0,
-                            pageSize: saasApplicationsPageSize,
-                            showSizeChanger: true,
-                            pageSizeOptions: ['10', '20', '50'],
-                            showQuickJumper: false,
-                            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} applications`,
-                          }}
-                          onChange={handleSaasApplicationsTableChange}
-                          locale={{ emptyText: 'No Job Portal applications found for this job.' }}
-                          style={{ marginTop: 12, minWidth: 600 }}
-                          size="small"
-                          className="resume-table"
-                          scroll={{ x: 1200 }}
-                        />
+                        <NewTableComponent mrtOptions={{
+                          columns: listingColumns(saasApplicationsColumns),
+                          data: saasApplicationsRows.map((r, index) => ({ ...r, key: r.id ?? index })),
+                          getRowId: row => String(row.key),
+                          manualPagination: true,
+                          manualSorting: true,
+                          rowCount: saasApplicationsData?.count ?? 0,
+                          state: {
+                            pagination: listingPagination({ current: saasApplicationsPage, pageSize: saasApplicationsPageSize }),
+                            sorting: saasApplicationsSorting,
+                            isLoading: saasApplicationsLoading,
+                            showProgressBars: saasApplicationsFetching,
+                          },
+                          onPaginationChange: updater => {
+                            const pagination = nextListingPagination(updater, { current: saasApplicationsPage, pageSize: saasApplicationsPageSize });
+                            const currentSort = saasApplicationsSorting[0];
+                            handleSaasApplicationsTableChange(pagination, {}, currentSort
+                              ? { field: currentSort.id, order: currentSort.desc ? 'descend' : 'ascend' } : {});
+                          },
+                          onSortingChange: updater => {
+                            const next = typeof updater === 'function' ? updater(saasApplicationsSorting) : updater;
+                            const sort = next[0];
+                            handleSaasApplicationsTableChange({ current: saasApplicationsPage, pageSize: saasApplicationsPageSize }, {}, sort
+                              ? { field: sort.id, order: sort.desc ? 'descend' : 'ascend' } : {});
+                          },
+                          initialState: { density: 'compact' },
+                          enableMultiSort: false,
+                          sortDescFirst: false,
+                          enableSortingRemoval: true,
+                          enableRowSelection: false,
+                          enableTopToolbar: false,
+                          enableColumnActions: false,
+                          enableColumnFilters: false,
+                          enableGlobalFilter: false,
+                          enableHiding: false,
+                          muiPaginationProps: { rowsPerPageOptions: [10, 20, 50] },
+                          muiTableContainerProps: { sx: { minWidth: 1200, overflowX: 'auto' } },
+                          renderEmptyRowsFallback: () => <div className="p-4 text-center text-sm text-muted-foreground">No Job Portal applications found for this job.</div>,
+                        }} />
                       </div>
                     </Card>
                   </Spin>

@@ -1,3 +1,4 @@
+import { Button as JobActionButton } from '../../../../components/ui/app-controls.jsx';
 import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
@@ -10,7 +11,8 @@ import { useNavigate, useParams, useSearchParams, useLocation } from "react-rout
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import { useMaterialReactTable } from "material-react-table";
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
@@ -625,30 +627,6 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         enableEditing: false,
         Cell: ({ cell }) => <span>{cell.getValue() || "—"}</span>,
       },
-      {
-        header: "Job Description",
-        id: "job_description", // Explicit id for sorting
-        accessorKey: "job_description",
-        size: 1,
-        Cell: ({ cell, row }) => (
-          <>
-            
-            <Button
-              size="small"
-              style={{ marginLeft: 8 }}
-              disabled={isReadOnlyLead}
-              onClick={() => {
-                if (isReadOnlyLead) return;
-                setDescEditValue(cell.getValue() || "");
-                setDescEditRow(row.original);
-                setDescModalOpen(true);
-              }}
-            >
-              Edit
-            </Button>
-          </>
-      ),
-    },
     {
       header: 'View Details', id: 'view_details', enableSorting: false, enableEditing: false,
       Cell: ({ row }) => <Button size="small" onClick={event => {
@@ -794,27 +772,7 @@ const getMetaLeadUrl = () => {
         }}
       >
         {leadForCard && <LeadCard lead={leadForCard} leadType="Meta Lead" refetchLeadDetail={refetchLeadDetail} />}
-        <Stack direction="row" spacing={1} sx={{ mb: 2, mt: 2 }}>
-          <Button
-            className="custom-button"
-            onClick={handleCreateJob}
-            disabled={!leadId || isReadOnlyLead}
-            size="large"
-            style={{
-              backgroundColor: "#3e6a9f",
-              borderColor: "#3e6a9f",
-              color: "white",
-              height: 40,
-              borderRadius: 8,
-              fontWeight: 600,
-              padding: "0 24px",
-            }}
-          >
-            Add New Job
-          </Button>
-        </Stack>
-
-            <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs} activeColumns={columns}><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs} activeColumns={columns} actions={true && <JobActionButton type="primary" onClick={handleCreateJob} disabled={!leadId || isReadOnlyLead}>Add New Job</JobActionButton>}><NewTableComponent table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>

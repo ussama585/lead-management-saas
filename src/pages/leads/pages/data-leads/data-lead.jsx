@@ -10,7 +10,8 @@ import { Link, useNavigate, useParams, useSearchParams, useLocation } from "reac
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import { useMaterialReactTable } from "material-react-table";
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import { deleteDataLeadJobWithRemarks } from '../../../shared/services/lead-job-lifecycle.js';
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
@@ -611,28 +612,6 @@ const DataLead = () => {
         },
       },
       {
-        header: "Job Description",
-        accessorKey: "job_description",
-        size: 1,
-        Cell: ({ cell, row }) => (
-          <>
-           
-            <AntButton
-              size="small"
-              style={{ marginLeft: 8 }}
-              disabled={isReadOnlyLead}
-              onClick={() => {
-                setDescEditValue(cell.getValue() || "");
-                setDescEditRow(row.original);
-                setDescModalOpen(true);
-              }}
-          >
-            Edit
-            </AntButton>
-          </>
-        ),
-      },
-      {
         header: 'View Details', id: 'view_details', enableSorting: false, enableEditing: false,
         Cell: ({ row }) => <AntButton size="small" onClick={() => navigate(getRolePath(user?.user_type, `/data-leads/${dataLeadId}/jobs/${row.original.id}`))}>View Details</AntButton>,
       },
@@ -779,25 +758,7 @@ const DataLead = () => {
         }}
       >
         {leadForCard && <LeadCard lead={leadForCard} leadType="Data Lead" refetchLeadDetail={refetchLeadDetail} />}
-        {(!isReadOnlyLead || isSuperAdmin(user?.user_type)) && (
-          <Stack direction="row" spacing={1} sx={{ mb: 2, mt: 2 }}>
-            <Button
-              className="custom-button"
-              onClick={handleCreateJob}
-              disabled={!dataLeadId}
-              sx={{
-                backgroundColor: "#3e6a9f",
-                "&:hover": { backgroundColor: "#2d5a8a" },
-                textTransform: "none",
-                fontWeight: 600,
-              }}
-            >
-              Add New Job
-            </Button>
-          </Stack>
-        )}
-
-            <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs} activeColumns={columns}><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs} activeColumns={columns} actions={(!isReadOnlyLead || isSuperAdmin(user?.user_type)) && <AntButton type="primary" onClick={handleCreateJob} disabled={!dataLeadId}>Add New Job</AntButton>}><NewTableComponent table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>

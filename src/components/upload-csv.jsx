@@ -1,3 +1,4 @@
+import NewTableComponent from './tables/new-table.jsx';
 import { message } from './ui/notifications.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Button, Spin } from './ui/app-controls.jsx';
@@ -200,37 +201,21 @@ function UploadCSV() {
           </div>
 
           <div className="upload-csv__table-wrap">
-            <table className="upload-csv__table">
-            <thead>
-              <tr>
-                {data[0].map((header, idx) => (
-                  <th key={idx}>
-                    {formatHeader(header)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.slice(1).map((row, rowIndex) => {
-                const paddedRow = [...row];
-                const cellErrors = errors[rowIndex] || {};
-                const hasRowError = Object.keys(cellErrors).length > 0;
-                return (
-                  <tr key={rowIndex} className={hasRowError ? 'upload-csv__row--error' : ''}>
-                    {paddedRow.map((cell, colIndex) => {
-                      const header = data[0][colIndex];
-                      const errorMsg = cellErrors[header];
-                      return (
-                        <td key={colIndex} className={errorMsg ? 'upload-csv__cell--error' : ''}>
-                          {errorMsg ? errorMsg : cell}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-            </table>
+            <NewTableComponent mrtOptions={{
+              columns: data[0].map((header, index) => ({
+                id: `csv-column-${index}`, header: formatHeader(header), accessorFn: row => row[index],
+                enableSorting: false, enableColumnFilter: false,
+                Cell: ({ cell, row }) => errors[row.index]?.[header] || cell.getValue(),
+                muiTableBodyCellProps: ({ row }) => ({ className: errors[row.index]?.[header] ? 'upload-csv__cell--error' : '' }),
+              })),
+              data: data.slice(1), getRowId: (_row, index) => String(index),
+              enablePagination: false, enableBottomToolbar: false,
+              enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+              enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+              enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+              initialState: { density: 'compact' },
+              muiTableBodyRowProps: ({ row }) => ({ className: Object.keys(errors[row.index] || {}).length ? 'upload-csv__row--error' : '' }),
+            }} />
           </div>
           </>
         )}

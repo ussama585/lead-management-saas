@@ -2,7 +2,8 @@ import { message } from '../../../components/ui/notifications.jsx';
 import { Modal } from '../../../components/ui/app-modal.jsx';
 import { Button } from '../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback } from 'react';
-import { ConfigProvider, Space, Table, Tag, Typography } from 'antd';
+import { ConfigProvider, Space, Tag, Typography } from 'antd';
+import { listingColumns } from '../../../components/tables/listing-table-options.js';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import useUserStore from '../../shared/store/user-store.js';
@@ -395,19 +396,23 @@ const AvailableQuestionnairesPage = () => {
           width={760}
           destroyOnClose
         >
-          <Table
-            columns={[
+          <NewTableComponent mrtOptions={{
+            columns: listingColumns([
               { title: 'Job ID', dataIndex: 'job_id', key: 'job_id', width: 110 },
               { title: 'Title', dataIndex: 'title', key: 'title' },
               { title: 'Status', dataIndex: 'status', key: 'status', width: 140 },
               { title: 'Created At', dataIndex: 'created_at', key: 'created_at', width: 160 },
-            ]}
-            dataSource={jobsModalRows}
-            pagination={false}
-            size="small"
-            scroll={{ y: 360 }}
-            locale={{ emptyText: 'No jobs found' }}
-          />
+            ]),
+            data: jobsModalRows,
+            getRowId: (row, index) => String(row.key ?? index),
+            enablePagination: false, enableBottomToolbar: false,
+            enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+            enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+            enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+            initialState: { density: 'compact' },
+            muiTableContainerProps: { sx: { maxHeight: 360 } },
+            localization: { noRecordsToDisplay: 'No jobs found' },
+          }} />
         </Modal>
         <div className="table-container">
           <ConfigProvider

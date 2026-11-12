@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Avatar, Table } from 'antd';
+import { Avatar } from 'antd';
+import NewTableComponent from '../tables/new-table.jsx';
+import { listingColumns } from '../tables/listing-table-options.js';
 import { User as UserOutlined, Crown as CrownOutlined, Star as StarOutlined } from 'lucide-react';
 import dayjs from 'dayjs';
 import BootstrapDateRangeModal from '../bootstrap-date-range-modal.component.jsx';
@@ -165,18 +167,21 @@ const ExecutivePerformanceLeaderboardChart = ({
       ) : (
         <>
           <div className="executive-performance-leaderboard-table-wrapper">
-            <Table
-              columns={columns}
-              dataSource={data.map((item, idx) => ({
+            <NewTableComponent mrtOptions={{
+              columns: listingColumns(columns),
+              data: data.map((item, idx) => ({
                 ...item,
                 key: item.assigned_to_id ?? idx,
                 rank: item.rank ?? idx + 1,
-              }))}
-              pagination={false}
-              showHeader={true}
-              rowClassName={(record) => getRowClassName(record)}
-              className="executive-performance-leaderboard-table"
-            />
+              })),
+              getRowId: row => String(row.key),
+              enablePagination: false, enableBottomToolbar: false,
+              enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+              enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+              enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+              muiTableBodyRowProps: ({ row }) => ({ className: getRowClassName(row.original) }),
+              muiTablePaperProps: { className: 'executive-performance-leaderboard-table' },
+            }} />
           </div>
           <div className="leaderboard-footer">
             Updated daily • Last update: Today at {lastUpdate}

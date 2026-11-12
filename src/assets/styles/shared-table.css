@@ -1,0 +1,19 @@
+/* One visual surface for all interactive listing tables. Feature/state options
+   stay with their callers; change these values to restyle every shared table. */
+.app-data-table {
+  --listing-table-radius: 14px;
+  --listing-table-border: #e1e8f3;
+  --listing-table-shadow: 0 4px 12px rgb(31 58 99 / 6%);
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--listing-table-radius);
+  box-shadow: var(--listing-table-shadow) !important;
+}
+.app-data-table > .MuiPaper-root {
+  border: 1px solid var(--listing-table-border) !important;
+  border-radius: var(--listing-table-radius) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  background: var(--background, #fff);
+}
+.app-data-table .MuiTableCell-root { font-family: inherit; }
