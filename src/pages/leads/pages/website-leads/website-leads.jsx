@@ -624,7 +624,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         onSuccess: (data) => {
           message.success(data?.message || 'Lead reassigned successfully');
           queryClient.invalidateQueries('leads');
-          queryClient.invalidateQueries('leadStats', { exact: false });
           refetch();
           refetchCounts();
           setAssignmentModal({ visible: false, lead: null, newAssigneeId: null, newAssigneeName: null });
