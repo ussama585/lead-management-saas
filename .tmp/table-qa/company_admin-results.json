@@ -1,0 +1,109 @@
+[
+  {
+    "route": "user-management",
+    "tableCount": 1,
+    "headers": [
+      "#",
+      "Name0",
+      "Company0",
+      "User Type0",
+      "Phone0",
+      "Email0",
+      "Edit User",
+      "Delete User",
+      "Active/Deactive User",
+      "Reset Password"
+    ],
+    "errors": []
+  },
+  {
+    "route": "leads",
+    "tableCount": 1,
+    "headers": [
+      "",
+      "#",
+      "Name0",
+      "Designation0",
+      "Company0",
+      "Phone0",
+      "Follow Ups and Remarks",
+      "Status0",
+      "Project Size0",
+      "Assigned To0",
+      "Client Contact Date0",
+      "Follow Up Date0",
+      "Job0",
+      "No. of Resources0",
+      "Proposal0",
+      "Contract Currency0",
+      "Contract Amount0",
+      "Industry0",
+      "Date0",
+      "Hear About Us0",
+      "Action"
+    ],
+    "errors": []
+  },
+  {
+    "route": "data-leads",
+    "tableCount": 1,
+    "headers": [
+      "#",
+      "Name0",
+      "Designation0",
+      "Company0",
+      "Phone0",
+      "Follow Ups and Remarks",
+      "Status0",
+      "Project Size0",
+      "Assigned To0",
+      "Jobs0",
+      "No. of Resources0",
+      "Date0",
+      "Proposal0",
+      "Contract Currency0",
+      "Contract Price0",
+      "Industry0",
+      "Added By0",
+      "Actions"
+    ],
+    "errors": []
+  },
+  {
+    "route": "meta-leads",
+    "tableCount": 1,
+    "headers": [
+      "No.",
+      "Full Name0",
+      "Job Title0",
+      "Company Name0",
+      "Job Count",
+      "Phone Number0",
+      "Follow Ups and Remarks",
+      "Status0",
+      "Project Size0",
+      "Assigned To0",
+      "Who Are You0",
+      "Role Hiring For0",
+      "City0",
+      "Preferred Contact Method0",
+      "How Many Hires0",
+      "Created At0",
+      "Advance Payment Terms0",
+      "Monthly Salary Budget0",
+      "Extra Fields",
+      "Action"
+    ],
+    "errors": []
+  },
+  {
+    "route": "settings",
+    "tableCount": 1,
+    "headers": [
+      "ID",
+      "Status name",
+      "Actions"
+    ],
+    "errors": []
+  }
+]
