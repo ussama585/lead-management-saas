@@ -1,3 +1,4 @@
+import { syncTableColumns } from '../../../../components/tables/sync-table-columns.jsx';
 import { Button as JobActionButton } from '../../../../components/ui/app-controls.jsx';
 import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
@@ -262,6 +263,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
           const value = cell.getValue();
           return <span>{value == "101" || value == 101 ? "100+" : value || "-"}</span>;
         },
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue() === "101" ? "100+" : cell.getValue());
           return (
@@ -291,6 +293,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "job_type", // Explicit id for sorting
         accessorKey: "job_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -320,6 +323,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "employment_type", // Explicit id for sorting
         accessorKey: "employment_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(normalizeEmploymentType(cell.getValue()));
           return (
@@ -537,6 +541,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "currency", // Explicit id for sorting
         accessorKey: "currency",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -566,6 +571,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "payment_term", // Explicit id for sorting
         accessorKey: "payment_term",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -595,6 +601,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "gender_preference", // Explicit id for sorting
         accessorKey: "gender_preference",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -678,11 +685,13 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
     setSorting(newSorting || []);
   }, []);
 
+  const sharedColumns = useMemo(() => syncTableColumns(columns), [columns]);
+
   const table = useMaterialReactTable({
-    columns,
+    columns: sharedColumns,
     data: Array.isArray(jobs) ? jobs : [],
     enableEditing: !isReadOnlyLead,
-    editDisplayMode: "cell",
+    editDisplayMode: "table",
     muiTableBodyCellProps: ({ cell, column, table }) => ({
       onClick: () => {
         if (column.id !== "job_title" && !isReadOnlyLead) {

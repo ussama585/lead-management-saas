@@ -1,3 +1,4 @@
+import { syncTableColumns } from '../../../../components/tables/sync-table-columns.jsx';
 import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
@@ -228,6 +229,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
     const value = cell.getValue();
     return <span>{value == '101' || value == 101 ? '100+' : value}</span>;
 },
+    meta: { inlineDropdown: true },
     Edit: ({ cell, row, table }) => {
         const [value, setValue] = React.useState(cell.getValue() === '101' ? '100+' : cell.getValue());
         return (
@@ -259,6 +261,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             size: 0.5,
             sortUndefined: 'last', // Handle undefined/null values
             sortDescFirst: false, // Start with ascending order (A to Z)
+            meta: { inlineDropdown: true },
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
@@ -290,6 +293,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             size: 0.5,
             sortUndefined: 'last', // Handle undefined/null values
             sortDescFirst: false, // Start with ascending order (A to Z)
+            meta: { inlineDropdown: true },
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(normalizeEmploymentType(cell.getValue()));
                 return (
@@ -519,6 +523,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             size: 0.5,
             sortUndefined: 'last', // Handle undefined/null values
             sortDescFirst: false, // Start with ascending order (A to Z)
+            meta: { inlineDropdown: true },
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
@@ -550,6 +555,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             size: 0.5,
             sortUndefined: 'last', // Handle undefined/null values
             sortDescFirst: false, // Start with ascending order (A to Z)
+            meta: { inlineDropdown: true },
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
@@ -581,6 +587,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
             size: 0.5,
             sortUndefined: 'last', // Handle undefined/null values
             sortDescFirst: false, // Start with ascending order (A to Z)
+            meta: { inlineDropdown: true },
             Edit: ({ cell, row, table }) => {
                 const [value, setValue] = React.useState(cell.getValue());
                 return (
@@ -641,11 +648,13 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
         }] : []),
     ], [id, user?.user_type, navigate, isReadOnlyLead, canDeleteJob]);
 
-    const table = useMaterialReactTable({
-        columns,
+    const sharedColumns = useMemo(() => syncTableColumns(columns), [columns]);
+
+  const table = useMaterialReactTable({
+        columns: sharedColumns,
         data: jobs,
         enableEditing: !isReadOnlyLead,
-        editDisplayMode: 'cell',
+        editDisplayMode: 'table',
         muiTableBodyCellProps: ({ cell, column, table }) => ({
             onClick: () => {
                 if (column.id !== 'job_title' && !isReadOnlyLead) {

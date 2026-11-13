@@ -5,12 +5,13 @@ import { useQuery } from 'react-query';
 
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
-import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';
-import StatsCard from '../../../../components/stats-card.component.jsx';
-import LineChart from '../../../../components/charts/line-chart.component.jsx';
-import { getStats, getExecutivesList, getExecutiveStats } from '../../../shared/services/stats-service.js';
-import TableComponent from '../../../../components/tables/table.component.jsx';
-import SalesExecutivesIcon from '../../../../assets/images/stat-card-icons/sales-executives.svg';
+import useUserStore from '../../../shared/store/user-store.js';
+// import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';
+// import StatsCard from '../../../../components/stats-card.component.jsx';
+// import LineChart from '../../../../components/charts/line-chart.component.jsx';
+import { getExecutivesList } from '../../../shared/services/stats-service.js';
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
+// import SalesExecutivesIcon from '../../../../assets/images/stat-card-icons/sales-executives.svg';
 import ProfileImagePlaceholder from '../../../../assets/images/user-card-icons/user-placeholder.svg';
 import '../../../../assets/styles/legacy/sales-executive-listing-page.css';
 import '../../../../assets/styles/legacy/table-client-actions.css';
@@ -18,6 +19,8 @@ import '../../../../assets/styles/legacy/table-client-actions.css';
 export default function SalesExecutiveListing() {
 
   const navigate = useNavigate();
+  const { user } = useUserStore();
+  const isManager = user?.user_type === 'sales_manager';
 
   const [pagination, setPagination] = useState({
     pageIndex: 0, // Start at page 0
@@ -34,6 +37,7 @@ export default function SalesExecutiveListing() {
 
   const [sorting, setSorting] = useState([]);
 
+  /* Card and graph API queries temporarily disabled.
   const [selectedTimeFrameForExecutivesData, setSelectedTimeFrameForExecutivesData] = useState('week');
 
   const { data: metricsData, isLoading: loadingStats } = useQuery({
@@ -60,9 +64,11 @@ export default function SalesExecutiveListing() {
 
 
 
+  */
+
   // Fetch Executive listing with pagination
   const { data: executivesList = {}, isLoading: loadingExecutiveList } = useQuery({
-    queryKey: ['ExecutivesList', pagination.pageIndex, pagination.pageSize, sorting, globalFilter],
+    queryKey: ['ExecutivesList', user?.id, user?.user_type, pagination.pageIndex, pagination.pageSize, sorting, globalFilter],
     queryFn: () => getExecutivesList(undefined, pagination.pageIndex + 1, pagination.pageSize, sorting, globalFilter),
     staleTime: 0,
     cacheTime: 0,
@@ -71,6 +77,7 @@ export default function SalesExecutiveListing() {
   });
 
 
+  /*
   const metrics = metricsData
     ? [
       {
@@ -83,8 +90,17 @@ export default function SalesExecutiveListing() {
     ]
     : [];
 
+  */
+
   const columns = useMemo(
-    () => [
+    () => isManager ? [
+      { header: '#', accessorKey: 'id', Cell: ({ row }) => <span>{row.index + 1 + pagination.pageIndex * pagination.pageSize}</span> },
+      { header: 'Name', accessorKey: 'name' },
+      { header: 'Email', accessorKey: 'email' },
+      { header: 'Phone', accessorKey: 'phone' },
+      { header: 'Company', accessorKey: 'company_name' },
+      { header: 'Status', accessorKey: 'is_active', Cell: ({ cell }) => <span>{cell.getValue() ? 'Active' : 'Inactive'}</span> },
+    ] : [
       {
         header: '#',
         accessorKey: 'id',
@@ -143,17 +159,21 @@ export default function SalesExecutiveListing() {
         Cell: ({ cell }) => <span>{cell.getValue()}</span>,
       },
     ],
-    [navigate]
+    [navigate, isManager, pagination.pageIndex, pagination.pageSize]
   );
 
 
+  /*
   const handleTimeFrameFromExecutivesStats = (value) => {
     setSelectedTimeFrameForExecutivesData(value);
   };
 
 
+  */
+
   const transformedData = executivesList?.results
     ? executivesList.results.map((executive) => ({
+      ...executive,
       id: executive?.id ?? "-",
       user: executive?.user ?? "-",
       slug: executive?.slug ?? "-",
@@ -170,10 +190,13 @@ export default function SalesExecutiveListing() {
     }))
     : [];
 
+  /*
   // Structure the data to match LineChart requirements
   const chartData = {
     executives: executiveStats?.executives || [] // Here we directly map the Executives array
   };
+
+  */
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -185,10 +208,11 @@ export default function SalesExecutiveListing() {
 
   return (
     <>
-      <BreadCrumb linkText="Sales Executives" />
+      {!isManager && <BreadCrumb linkText="Sales Executives" />}
       <div className="container">
 
 
+        {/* Sales executive card and graph temporarily disabled.
         {loadingStats ? (
           <div className="sop-branded-spin-wrap" style={{ minHeight: 140, padding: '32px 24px' }}>
             <Spin
@@ -233,6 +257,8 @@ export default function SalesExecutiveListing() {
           )}
         </div>
 
+        */}
+
         <div className="table-container">
           {loadingExecutiveList ? (
             <div className="sop-branded-spin-wrap">
@@ -243,7 +269,7 @@ export default function SalesExecutiveListing() {
               <p className="sop-branded-spin-text">Loading sales executives...</p>
             </div>
           ) : (
-            <TableComponent
+            <NewTableComponent serverListing
               columns={columns}
               data={transformedData}
               totalCount={executivesList.count || 0}

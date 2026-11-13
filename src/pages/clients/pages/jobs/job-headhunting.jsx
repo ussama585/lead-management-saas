@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -9,7 +10,7 @@ import { Card, Typography, Upload, Row, Col, DatePicker, Tabs, Divider, Popconfi
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import { listingColumns, listingPagination, nextListingPagination } from '../../../../components/tables/listing-table-options.js';
 import dayjs from 'dayjs';
-import { MessageSquare as MessageOutlined, MessageCircle as CommentOutlined, MessageCircle as WhatsAppOutlined, Link as LinkOutlined, Share2 as ShareAltOutlined, FileText as FilePdfOutlined, Clock as ClockCircleOutlined, History as HistoryOutlined, User as UserOutlined } from 'lucide-react';
+import { MessageSquare as MessageOutlined, MessageCircle as CommentOutlined, MessageCircle as WhatsAppOutlined, Link as LinkOutlined, Share2 as ShareAltOutlined, FileText as FilePdfOutlined, Clock as ClockCircleOutlined, User as UserOutlined } from 'lucide-react';
 import ProfileImagePlaceholder from '../../../../assets/images/user-card-icons/user-placeholder.svg';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import { Upload as UploadOutlined, Plus as PlusOutlined, Pencil as EditOutlined, LoaderCircle as LoadingOutlined, Trash2 as DeleteOutlined } from 'lucide-react';
@@ -2139,7 +2140,7 @@ export default function JobHeadhunting() {
       render: (_, record) => (
         <Button
           type="link"
-          icon={<HistoryOutlined size="1em" className="app-icon" />}
+          icon={<AnimatedFollowUpIcon variant="history" />}
           onClick={() => setStatusHistoryModal({ visible: true, entity: record })}
           style={{ padding: 0 }}
           title="View Status History"

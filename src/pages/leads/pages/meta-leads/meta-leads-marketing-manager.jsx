@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { formatSalaryBudget } from '../../../shared/utils/salary-budget.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
@@ -7,7 +8,7 @@ import { Select } from '../../../../components/ui/app-select.jsx';
 import { Button, Tooltip } from '../../../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useEffect, useRef, useCallback, Suspense } from 'react';
 import { Space } from 'antd';
-import { MessageCircle as CommentOutlined, Upload as UploadOutlined, Download as DownloadOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, List as UnorderedListOutlined } from 'lucide-react';
+import { Upload as UploadOutlined, Download as DownloadOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useSearchParams } from 'react-router-dom';
 
@@ -157,20 +158,20 @@ export default function MetaLeadsMarketingManager() {
   const projectSizesQuery = useProjectSizeOptions();
   const PROJECT_SIZE_OPTIONS = projectSizesQuery.options;
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   // Load persisted state from sessionStorage
   const initialState = loadTableState('meta-leads-marketing-manager', searchParams, {
     defaultStatus: 'All',
     status: 'All',
   });
-  
-  const [pagination, setPagination] = useState({ 
-    pageIndex: initialState.pageIndex, 
-    pageSize: initialState.pageSize 
+
+  const [pagination, setPagination] = useState({
+    pageIndex: initialState.pageIndex,
+    pageSize: initialState.pageSize
   });
   const [globalFilter, setGlobalFilter] = useState(initialState.search || '');
   const [sorting, setSorting] = useState(initialState.sorting);
-  
+
   // Restore date range from sessionStorage (convert ISO strings to dayjs objects)
   const [dateRange, setDateRange] = useState(() => {
     if (initialState.dateRange && Array.isArray(initialState.dateRange) && initialState.dateRange.length === 2) {
@@ -181,7 +182,7 @@ export default function MetaLeadsMarketingManager() {
     }
     return null;
   });
-  
+
   const [showDateModal, setShowDateModal] = useState(false);
   const [datePickerResetKey, setDatePickerResetKey] = useState(0);
   const [selectedCampaign, setSelectedCampaign] = useState(initialState.selectedCampaign || null);
@@ -224,7 +225,7 @@ export default function MetaLeadsMarketingManager() {
   const user = useUserStore((state) => state.user);
   const [remarksModal, setRemarksModal] = useState({ visible: false, lead: null, newStatus: null, forStatusChange: false });
   const [remarksLoading, setRemarksLoading] = useState(false);
-  
+
   // Duplicate lead hook
   const { duplicateModal, openDuplicateModal, closeDuplicateModal, isDuplicate, getRowStyle } = useDuplicateLead();
 
@@ -904,6 +905,7 @@ export default function MetaLeadsMarketingManager() {
           return <span>{pageIndex * pageSize + rowIndex + 1}</span>;
         },
       },
+
       {
         header: 'Created Date',
         id: 'created_time', // Explicit id for sorting
@@ -1016,6 +1018,7 @@ export default function MetaLeadsMarketingManager() {
       },
     {
       header: 'Remarks',
+      Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
       id: 'remarks', // Explicit id for sorting
       accessorKey: 'remarks',
       sortUndefined: 'last', // Handle undefined/null values
@@ -1025,7 +1028,7 @@ export default function MetaLeadsMarketingManager() {
           row.original.remarks && row.original.remarks.trim() !== '';
 
         return (
-          <CommentOutlined size="1em" className="app-icon"
+          <AnimatedFollowUpIcon size="1em" className="app-icon"
             style={{
               cursor: 'pointer',
               color: hasRemarks ? '#1890ff' : '#aaa',
@@ -1044,6 +1047,11 @@ export default function MetaLeadsMarketingManager() {
         );
       },
     },
+      {
+        header: 'Follow Up Date',
+        accessorKey: 'followup_date',
+        Cell: ({ cell }) => <span style={{ whiteSpace: 'nowrap' }}>{cell.getValue() ? formatDateUniversal(cell.getValue(), false) : '-'}</span>,
+      },
 
       {
         header: 'Name',
@@ -1084,7 +1092,7 @@ export default function MetaLeadsMarketingManager() {
               </button>
             </Tooltip>
           );
-          
+
           return (
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               {name}
@@ -1195,53 +1203,10 @@ export default function MetaLeadsMarketingManager() {
          onOpenHistory: (lead) => setStatusHistoryModal({ visible: true, lead }),
        }),
       {
-        header: 'Advance Payment Terms',
-        id: 'advance_payment', // Explicit id for sorting
-        accessorKey: 'advance_payment',
-        sortUndefined: 'last', // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ row }) => {
-          const extraData = row.original.extra_data;
-          if (!extraData || !Array.isArray(extraData)) return <span>-</span>;
-
-          const paymentData = extraData.find(item =>
-            item && item.key === 'are_you_prepared_to_pay_a_portion_of_the_fee_(advance)_to_initiate_the_specialized_headhunting_search?'
-          );
-
-          if (!paymentData || !paymentData.value) return <span>-</span>;
-
-          // Format the value to be more readable
-          const formattedValue = paymentData.value
-            .replace(/,/g, ', ')
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, l => l.toUpperCase())
-            .replace(/\s+/g, ' ')
-            .trim();
-
-          return <span>{formattedValue}</span>;
-        },
-      },
-      {
-        header: 'Monthly Salary Budget',
-        id: 'salary_budget', // Explicit id for sorting
-        accessorKey: 'salary_budget',
-        sortUndefined: 'last', // Handle undefined/null values
-        sortDescFirst: false, // Start with ascending order (A to Z)
-        Cell: ({ row }) => {
-          const extraData = row.original.extra_data;
-          if (!extraData || !Array.isArray(extraData)) return <span>-</span>;
-
-          const salaryData = extraData.find(item =>
-            item && item.key === 'what_is_the_approximate_monthly_salary_budget_for_this_role?'
-          );
-
-          if (!salaryData || !salaryData.value) return <span>-</span>;
-
-          return <span style={{ whiteSpace: 'nowrap' }}>{formatSalaryBudget(salaryData.value)}</span>;
-        },
-      },
-      {
         header: 'Extra Fields',
+        Header: () => <span className="follow-up-remarks-heading">Extra Fields</span>,
+        muiTableHeadCellProps: { align: 'center' },
+        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center' } },
         accessorKey: 'extra_data',
         enableSorting: false,
         Cell: ({ row }) => {
@@ -1250,20 +1215,16 @@ export default function MetaLeadsMarketingManager() {
           if (!hasExtraData) return <span>-</span>;
           return (
             <Tooltip title="View extra fields">
-              <Button
-                type="link"
-                
-                onClick={() =>
+              <AnimatedFollowUpIcon variant="fields" aria-label="View extra fields"
+              onClick={() =>
                   setExtraDataModal({
                     visible: true,
                     data: extraData,
                     leadName: row.original.full_name || row.original.company_name || 'Lead',
                   })
                 }
-                style={{ padding: 0 }}
-              >
-                View
-              </Button>
+
+              />
             </Tooltip>
           );
         },

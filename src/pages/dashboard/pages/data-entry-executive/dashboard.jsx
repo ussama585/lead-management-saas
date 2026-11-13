@@ -1,5 +1,4 @@
-import { Select } from '../../../../components/ui/app-select.jsx';
-import React, { useState } from 'react';
+import React from 'react';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import { Row, Col } from 'antd';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
@@ -8,11 +7,10 @@ import { useQuery } from 'react-query';
 import { getDataEntryExecutiveStats, getDataEntryExecutiveGraphStats } from '../../../shared/services/data-entry-service.js';
 import LineChart from '../../../../components/charts/line-chart.component.jsx';
 
-const { Option } = Select;
 
 const DataEntryExecutiveDashboard = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState('week'); // default filter
+  const filter = 'week';
 
   const { data, isLoading } = useQuery('data-entry-executive-stats', getDataEntryExecutiveStats);
 
@@ -39,11 +37,6 @@ const DataEntryExecutiveDashboard = () => {
       <div style={{ padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2>Sales Data Executive Dashboard</h2>
-          <Select placeholder="Select time period" value={filter} onChange={setFilter} style={{ width: 150 }}>
-            <Option value="week">Week</Option>
-            <Option value="month">Month</Option>
-            <Option value="year">Year</Option>
-          </Select>
         </div>
 
         <Row gutter={16} style={{ marginBottom: 32 }}>
@@ -63,7 +56,7 @@ const DataEntryExecutiveDashboard = () => {
             legendNames={['Total', 'Today']}
             colors={["#3E6A9F", "#27ae60"]}
             initialTimeFrame={filter}
-            onTimeFrameChange={setFilter}
+            showTimeFrameFilter={false}
           />
         </div>
       </div>

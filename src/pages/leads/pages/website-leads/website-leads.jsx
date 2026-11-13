@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import '../../../../assets/styles/data-leads-page.css';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
@@ -44,7 +45,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
   import { useQuery, useMutation, useQueryClient } from 'react-query';
   import { useQueryApi } from '../../../../components/hooks/useQueryApi.js';
   import api, { fetchLeadCounts, fetchLeadStats } from '../../../shared/services/api.js';
-  import { updateLeadById, getProposalUrl } from '../../../shared/services/manager-service.js';
+  import { updateLeadById } from '../../../shared/services/manager-service.js';
   import { createWebsiteLeadFollowUp, getAssignedUsers, addUserAssignments, removeUserAssignments } from '../../../shared/services/leads.js';
   import ManageAssigneesModal from '../../../../components/manage-assignees-modal.jsx';
   import { getManangersExecutives } from '../../../shared/services/users-service.js';
@@ -65,7 +66,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
 
   //icons
-  import { LoaderCircle as LoadingOutlined, MessageCircle as CommentOutlined, Upload as UploadOutlined, FileText as FilePdfOutlined, FileText as FileTextOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined, Download as DownloadOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
+  import { Info as InfoCircleOutlined, Minus as MinusOutlined, Download as DownloadOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
   //css
   import "../../../../assets/styles/legacy/sales-data.generated.css";
 
@@ -840,18 +841,19 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         },
 
         ...(['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType) ? [{
-          header: 'Follow Ups and Remarks',
+          header: 'Follow Ups',
+          Header: () => <span className="follow-up-remarks-heading">Follow Ups</span>,
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           id: 'follow_up',
           accessorKey: 'follow_up',
           enableSorting: false,
           size: 0.65,
           Cell: ({ row }) => (
-            <Tooltip title={<span style={{ color: '#fff' }}>Follow Ups and Remarks</span>}>
-              <ClockCircleOutlined size="1em" className="app-icon"
+            <Tooltip title={<span style={{ color: '#fff' }}>Follow Ups</span>}>
+              <AnimatedFollowUpIcon size="1em" className="app-icon"
                 role="button"
                 tabIndex={0}
-                aria-label="Follow Ups and Remarks"
+                aria-label="Follow Ups"
                 style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
                 onClick={() => {
                   setFollowUpModal({ visible: true, lead: row.original });
@@ -924,8 +926,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // 4. Follow up date
         {
           header: 'Follow Up Date',
-          id: 'follow_up_date',
-          accessorKey: 'follow_up_date',
+          id: 'followup_date',
+          accessorKey: 'followup_date',
           size: 0.5,
           sortUndefined: 'last',
           sortDescFirst: false,
@@ -1103,64 +1105,6 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             if (!raw && raw !== 0) return <span>-</span>;
             return <span>{Number.isFinite(value) ? (value > 100 ? '100+' : value) : '-'}</span>;
           },
-        },
-        // 13. Proposal
-        {
-          header: 'Proposal',
-          id: 'proposal',
-          accessorKey: 'proposal',
-          size: 0.5,
-          sortUndefined: 'last',
-          sortDescFirst: false,
-          Cell: ({ row }) => {
-            const proposalFileName = row.original.proposal;
-            const handleProposalClick = async () => {
-              if (!proposalFileName) {
-                message.warning('No proposal available');
-                return;
-              }
-              try {
-                const proposalUrl = await getProposalUrl(proposalFileName);
-                if (proposalUrl) {
-                  window.open(proposalUrl, '_blank', 'noopener,noreferrer');
-                } else {
-                  message.error('Failed to load proposal');
-                }
-              } catch (error) {
-                message.error('Failed to open proposal');
-              }
-            };
-            return proposalFileName ? (
-              <Tooltip title="View Proposal">
-                <FilePdfOutlined size="1em" className="app-icon"
-                  style={{ fontSize: 20, color: '#d4380d', cursor: 'pointer' }}
-                  onClick={handleProposalClick}
-                />
-              </Tooltip>
-            ) : null;
-          },
-        },
-
-        // 14. Contract Currency
-        {
-          header: 'Contract Currency',
-          id: 'contract_currency',
-          accessorKey: 'contract_currency',
-        muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
-          size: 0.5,
-          sortUndefined: 'last',
-          sortDescFirst: false,
-          Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
-        },
-        // 15. Contract Amount
-        {
-          header: 'Contract Amount',
-          id: 'contract_price',
-          accessorKey: 'contract_price',
-          size: 0.5,
-          sortUndefined: 'last',
-          sortDescFirst: false,
-          Cell: ({ cell }) => <span>{cell.getValue() ? cell.getValue().toLocaleString() : '-'}</span>,
         },
         // 16. Industry
         {

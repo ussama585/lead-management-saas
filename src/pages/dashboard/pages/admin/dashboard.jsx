@@ -822,7 +822,7 @@ function DashboardCompanyTabsSection() {
         <span style={{ marginLeft: 6, marginRight: 6 }}>
           <ExecutiveTabButton
             executive={{ id: 'system-stats' }}
-            label="System Stats"
+            label="Stats"
             showRoleSuffix={false}
             showCount={false}
             isSelected={activeSection === 'systemStats'}
@@ -830,7 +830,7 @@ function DashboardCompanyTabsSection() {
             className="executive-section-tab"
           />
         </span>
-        <span style={{ marginLeft: 6, marginRight: 6 }}>
+        {/* <span style={{ marginLeft: 6, marginRight: 6 }}>
           <ExecutiveTabButton
             executive={{ id: 'sales-executives' }}
             label="Sales Executives Performance"
@@ -840,7 +840,7 @@ function DashboardCompanyTabsSection() {
             onClick={() => handleTabChange('salesExecutives')}
             className="executive-section-tab"
           />
-        </span>
+        </span> */}
         
         <span style={{ marginLeft: 6, marginRight: 6 }}>
           <ExecutiveTabButton
@@ -1153,7 +1153,7 @@ function DashboardCompanyTabsSection() {
               <span>{totalLeadsReceivedError.message || 'Could not load total leads received.'}</span>
               <Button variant="outline" onClick={() => refetchTotalLeadsReceived()}>Retry</Button>
             </div> : <TotalLeadsReceivedChart
-              showPeriodFilter={!superAdmin && currentUser?.user_type !== 'company_admin'}
+              showPeriodFilter={false}
               showSourceFilter={!superAdmin && currentUser?.user_type !== 'company_admin'}
               title="Total Leads Received"
               totalCount={totalLeadsReceivedTotalCount}

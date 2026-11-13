@@ -11,9 +11,8 @@ import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
 import CompanyFilteredPage from '../../../components/company-filtered-page.jsx';
 import { selectedCompany } from '../../shared/utils/company-filter.js';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { Table } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
-import TableComponent from '../../../components/tables/table.component.jsx';
+import NewTableComponent from '../../../components/tables/new-table.jsx';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import '../../../assets/styles/legacy/user-management-page.css';
 import { ToggleRight as ToggleOnIcon } from 'lucide-react';
@@ -654,7 +653,7 @@ function UserManagementContent({ superAdminScope = 'company' }) {
       {(isError || accountCompany.isError) && <Alert className="mb-4" type="error" showIcon message={(error || accountCompany.error)?.response?.data?.message || (error || accountCompany.error)?.message || 'Could not load users.'} action={<Button onClick={() => accountCompany.isError ? accountCompany.refetch() : refetch()}>Retry</Button>} />}
 
       <div>
-        <TableComponent
+        <NewTableComponent serverListing
           initialState={pagination}
           pagination={pagination}
           onPaginationChange={setPagination}

@@ -1,3 +1,4 @@
+import { syncTableColumns } from '../../../../components/tables/sync-table-columns.jsx';
 import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
@@ -264,6 +265,7 @@ const DataLead = () => {
           const value = cell.getValue();
           return <span>{value == "101" || value == 101 ? "100+" : value || "-"}</span>;
         },
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue() === "101" ? "100+" : cell.getValue());
           return (
@@ -292,6 +294,7 @@ const DataLead = () => {
         header: "Job Type",
         accessorKey: "job_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -320,6 +323,7 @@ const DataLead = () => {
         header: "Employment Type",
         accessorKey: "employment_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(normalizeEmploymentType(cell.getValue()));
           return (
@@ -531,6 +535,7 @@ const DataLead = () => {
         header: "Currency",
         accessorKey: "currency",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -559,6 +564,7 @@ const DataLead = () => {
         header: "Payment Term",
         accessorKey: "payment_term",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -587,6 +593,7 @@ const DataLead = () => {
         header: "Gender",
         accessorKey: "gender_preference",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -669,11 +676,13 @@ const DataLead = () => {
     }
   }, [sorting]);
 
+  const sharedColumns = useMemo(() => syncTableColumns(columns), [columns]);
+
   const table = useMaterialReactTable({
-    columns,
+    columns: sharedColumns,
     data: jobs,
     enableEditing: !isReadOnlyLead,
-    editDisplayMode: "cell",
+    editDisplayMode: "table",
     muiTableBodyCellProps: ({ cell, column, table }) => ({
       onClick: () => {
         if (column.id !== "job_title" && !isReadOnlyLead) {

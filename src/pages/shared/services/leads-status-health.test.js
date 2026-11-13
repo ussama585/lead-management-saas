@@ -10,7 +10,7 @@ describe('Super Admin lead status health', () => {
     const rows = [{ status: 'Activated', count: 3 }];
     api.get.mockResolvedValue({ data: { data: rows } });
     expect(await getLeadsStatusHealth({ userType, startDate: '2026-10-01', endDate: '2026-10-29' })).toEqual(rows);
-    expect(api.get).toHaveBeenLastCalledWith('/company-admin/leads-status-health', { params: { start_date: '2026-10-01', end_date: '2026-10-29' } });
+    expect(api.get).toHaveBeenLastCalledWith('/accounts/leads-status-health', { params: { start_date: '2026-10-01', end_date: '2026-10-29' } });
   });
   it('sends source, company and dates and unwraps the status counts', async () => {
     const rows = [{ status: 'Activated', count: 4 }, { status: 'Pending', count: 0 }];

@@ -3,7 +3,7 @@ import { Button, Tooltip } from './ui/app-controls.jsx';
 import React from 'react';
 import { Alert } from 'antd';
 import { useQuery } from 'react-query';
-import { History as HistoryOutlined } from 'lucide-react';
+import AnimatedFollowUpIcon from './animated-follow-up-icon.jsx';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 import '../assets/styles/legacy/table-client-actions.css';
 
@@ -257,8 +257,7 @@ export const createStatusHistoryColumn = ({
   muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
   Cell: ({ row }) => (
     <Tooltip title={<span style={{ color: '#fff' }}>{buttonTitle}</span>}>
-      <HistoryOutlined size="1em"
-        className={["app-icon", "table-icon-action table-icon-action--history"].filter(Boolean).join(' ')}
+      <AnimatedFollowUpIcon variant="history"
         onClick={() => onOpenHistory(row.original)}
         aria-label={buttonTitle}
       />

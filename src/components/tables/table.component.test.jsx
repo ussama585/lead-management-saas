@@ -1,11 +1,11 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, expect, it, vi } from 'vitest';
-import TableComponent from './table.component.jsx';
+import TableComponent from './new-table.jsx';
 
 const captured = vi.hoisted(() => ({ options: null }));
-vi.mock('./new-table.jsx', () => ({ default: ({ mrtOptions }) => {
-  captured.options = mrtOptions;
+vi.mock('material-react-table', () => ({ MaterialReactTable: props => {
+  captured.options = props;
   return null;
 } }));
 
@@ -24,7 +24,7 @@ beforeEach(() => {
   onPaginationChange = vi.fn();
   onSortingChange = vi.fn();
   onGlobalFilterChange = vi.fn();
-  renderToStaticMarkup(<TableComponent columns={columns} data={rows} totalCount={41}
+  renderToStaticMarkup(<TableComponent serverListing columns={columns} data={rows} totalCount={41}
     heading="All users" pagination={pagination} sorting={sorting} globalFilter="Ada"
     onPaginationChange={onPaginationChange} onSortingChange={onSortingChange}
     onGlobalFilterChange={onGlobalFilterChange} isFetching />);
@@ -32,7 +32,9 @@ beforeEach(() => {
 
 it('delegates the same rows, normalized accessors and custom cells', () => {
   expect(captured.options.data).toBe(rows);
-  expect(captured.options.columns[0]).toMatchObject({ accessorKey: 'name', accessorFn, Cell: nameCell, enableSorting: true });
+  expect(captured.options.columns[0]).toMatchObject({ accessorKey: 'name', accessorFn, enableSorting: true });
+  const args = { cell: { getValue: () => 'A user' }, row: { original: rows[0] } };
+  expect(renderToStaticMarkup(captured.options.columns[0].Cell(args))).toBe(renderToStaticMarkup(nameCell(args)));
   expect(captured.options.columns[1].enableSorting).toBe(false);
   expect(captured.options.columns[0].muiTableHeadCellProps.align).toBe('center');
   expect(captured.options.columns[0].muiTableBodyCellProps.align).toBe('center');

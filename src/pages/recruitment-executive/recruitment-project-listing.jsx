@@ -1,9 +1,10 @@
+import AnimatedFollowUpIcon from '../../components/animated-follow-up-icon.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import { Select } from '../../components/ui/app-select.jsx';
 import { Spin, Tooltip, Button } from '../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect, useRef, useCallback, Suspense } from 'react';
 
-import { LoaderCircle as LoadingOutlined, Pencil as EditOutlined, MessageSquare as MessageOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
+import { LoaderCircle as LoadingOutlined, Pencil as EditOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';
 import JobListingTabs from '../../components/job-listing-tabs.jsx';
@@ -509,6 +510,7 @@ useEffect(() => {
         ? [
             {
               header: 'Follow Up',
+              Header: () => <span className="follow-up-remarks-heading">Follow Up</span>,
               id: 'follow_up_actions',
               enableSorting: false,
               muiTableHeadCellProps: {
@@ -523,7 +525,7 @@ useEffect(() => {
               Cell: ({ row }) => (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                   <Tooltip title="View & manage follow-ups">
-                    <ClockCircleOutlined size="1em" className="app-icon"
+                    <AnimatedFollowUpIcon size="1em" className="app-icon"
                       style={{
                         cursor: 'pointer',
                         fontSize: 18,
@@ -542,6 +544,7 @@ useEffect(() => {
             },
             {
               header: 'Remarks',
+              Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
               id: 'remarks_actions',
               enableSorting: false,
               muiTableHeadCellProps: {
@@ -556,7 +559,7 @@ useEffect(() => {
               Cell: ({ row }) => (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                   <Tooltip title="View & manage remarks">
-                    <MessageOutlined size="1em" className="app-icon"
+                    <AnimatedFollowUpIcon size="1em" className="app-icon"
                       style={{
                         cursor: 'pointer',
                         fontSize: 18,
@@ -579,6 +582,7 @@ useEffect(() => {
         ? [
             {
               header: 'Recruiter Remarks',
+              Header: () => <span className="follow-up-remarks-heading">Recruiter Remarks</span>,
               id: 'recruitment_remarks_actions',
               enableSorting: false,
               muiTableHeadCellProps: {
@@ -595,7 +599,7 @@ useEffect(() => {
                 return (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                     <Tooltip title={editable ? 'View & update remarks' : 'View remarks'}>
-                      <MessageOutlined size="1em" className="app-icon"
+                      <AnimatedFollowUpIcon size="1em" className="app-icon"
                         style={{
                           cursor: 'pointer',
                           fontSize: 18,
@@ -759,6 +763,7 @@ useEffect(() => {
       ? [
           {
             header: 'PM Remarks',
+            Header: () => <span className="follow-up-remarks-heading">PM Remarks</span>,
             id: 'pm_remarks_action',
             accessorKey: 'pm_remarks_action',
             enableSorting: false,
@@ -772,7 +777,7 @@ useEffect(() => {
               return (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                   <Tooltip title="View PM remarks">
-                    <MessageOutlined size="1em"
+                    <AnimatedFollowUpIcon size="1em"
                       className={["app-icon", `table-remarks-icon ${hasPmRemarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
                       onClick={() => setPmRemarksModalState({ visible: true, jobId: row.original.id })}
                     />

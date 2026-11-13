@@ -1,8 +1,9 @@
+import AnimatedFollowUpIcon from '../../../components/animated-follow-up-icon.jsx';
 import { Select } from '../../../components/ui/app-select.jsx';
 import { Button as AntButton, Tooltip } from '../../../components/ui/app-controls.jsx';
 import React from 'react';
 
-import { MessageCircle as CommentOutlined, Pencil as EditOutlined, Clock as ClockCircleOutlined, MessageSquare as MessageOutlined, Trash2 as DeleteOutlined, CirclePlus as PlusCircleOutlined, Table as TableOutlined } from 'lucide-react';
+import { Pencil as EditOutlined, Trash2 as DeleteOutlined, CirclePlus as PlusCircleOutlined } from 'lucide-react';
 import { formatDateUniversal } from '../../shared/utils/formatDate.js';
 import { formatSalaryNum } from '../../shared/utils/formatters.js';
 import '../../../assets/styles/legacy/table-remarks-icon.css';
@@ -207,12 +208,13 @@ export const createJobColumns = ({
       ? [
           {
             header: 'Follow Up',
+            Header: () => <span className="follow-up-remarks-heading">Follow Up</span>,
             id: 'follow_up_actions',
             enableSorting: false,
             Cell: ({ row }) => (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                 <Tooltip title="View & manage follow-ups">
-                  <ClockCircleOutlined size="1em" className="app-icon"
+                  <AnimatedFollowUpIcon size="1em" className="app-icon"
                     style={{
                       cursor: 'pointer',
                       fontSize: 18,
@@ -231,12 +233,13 @@ export const createJobColumns = ({
           },
           {
             header: 'Remarks',
+            Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
             id: 'remarks_actions',
             enableSorting: false,
             Cell: ({ row }) => (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                 <Tooltip title="View & manage remarks">
-                  <MessageOutlined size="1em" className="app-icon"
+                  <AnimatedFollowUpIcon size="1em" className="app-icon"
                     style={{
                       cursor: 'pointer',
                       fontSize: 18,
@@ -258,9 +261,10 @@ export const createJobColumns = ({
           // For other users: Show original Remarks column
           {
             header: 'Remarks',
+            Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
             accessorKey: 'remarks',
             Cell: ({ row }) => (
-              <CommentOutlined size="1em"
+              <AnimatedFollowUpIcon size="1em"
                 className={["app-icon", `table-remarks-icon ${row.original.remarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
                 onClick={() => setRemarksModal({ visible: true, job: row.original })}
               />
@@ -335,6 +339,7 @@ export const createJobColumns = ({
       ? [
           {
             header: 'PM Remarks',
+            Header: () => <span className="follow-up-remarks-heading">PM Remarks</span>,
             id: 'pm_remarks_action',
             accessorKey: 'pm_remarks_action',
             enableSorting: false,
@@ -348,7 +353,7 @@ export const createJobColumns = ({
               return (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                   <Tooltip title="View PM remarks">
-                    <MessageOutlined size="1em"
+                    <AnimatedFollowUpIcon size="1em"
                       className={["app-icon", `table-remarks-icon ${hasPmRemarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
                       onClick={() => setPmRemarksModalState({ visible: true, jobId: row.original.id })}
                     />
@@ -364,6 +369,7 @@ export const createJobColumns = ({
       ? [
           {
             header: 'PM Job Remarks',
+            Header: () => <span className="follow-up-remarks-heading">PM Job Remarks</span>,
             id: 'pm_job_remarks_matrix',
             enableSorting: false,
             size: 100,
@@ -374,7 +380,7 @@ export const createJobColumns = ({
             Cell: () => (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                 <Tooltip title="View PM job remarks matrix">
-                  <TableOutlined size="1em" className="app-icon"
+                  <AnimatedFollowUpIcon size="1em" className="app-icon"
                     style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
                     onClick={onOpenPmJobRemarksMatrix}
                   />

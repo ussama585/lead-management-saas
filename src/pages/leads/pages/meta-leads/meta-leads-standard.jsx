@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import '../../../../assets/styles/data-leads-page.css';
 import { formatSalaryBudget } from '../../../shared/utils/salary-budget.js';
@@ -21,7 +22,7 @@ import { Button, Tooltip } from '../../../../components/ui/app-controls.jsx';
 import { Avatar, AvatarFallback } from '../../../../components/ui/avatar.jsx';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Space } from 'antd';
-import { MessageCircle as CommentOutlined, Pencil as EditOutlined, Calendar as CalendarOutlined, Upload as UploadOutlined, History as HistoryOutlined, Download as DownloadOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
+import { Upload as UploadOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import StatusFilterTabs from '../../../../components/status-filter-tabs.jsx'
@@ -623,15 +624,16 @@ export default function MetaLeadsStandard() {
       Cell: ({ row }) => pagination.pageIndex * pagination.pageSize + row.index + 1,
     },
     ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
-      header: 'Follow Ups and Remarks',
+      header: 'Follow Ups',
+      Header: () => <span className="follow-up-remarks-heading">Follow Ups</span>,
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
       id: 'follow_up',
       accessorKey: 'follow_up',
       enableSorting: false,
       Cell: ({ row }) => (
-        <Tooltip title="Follow Ups and Remarks">
-          <ClockCircleOutlined size="1em" className="app-icon"
-            role="button" tabIndex={0} aria-label="Follow Ups and Remarks"
+        <Tooltip title="Follow Ups">
+          <AnimatedFollowUpIcon size="1em" className="app-icon"
+            role="button" tabIndex={0} aria-label="Follow Ups"
             style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
             onClick={() => {
               setFollowUpModal({ visible: true, lead: row.original });
@@ -871,6 +873,11 @@ export default function MetaLeadsStandard() {
       Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
     },
     {
+      header: 'Follow Up Date',
+      accessorKey: 'followup_date',
+      Cell: ({ cell }) => <span style={{ whiteSpace: 'nowrap' }}>{cell.getValue() ? formatDateUniversal(cell.getValue(), false) : '-'}</span>,
+    },
+    {
       header: 'Created At',
       id: 'created_time', // Explicit id for sorting
       accessorKey: 'created_time',
@@ -879,53 +886,10 @@ export default function MetaLeadsStandard() {
       Cell: ({ cell }) => <span>{cell.getValue() ? formatDateUniversal(cell.getValue(), true) : '-'}</span>,
     },
     {
-      header: 'Advance Payment Terms',
-      id: 'advance_payment', // Explicit id for sorting
-      accessorKey: 'advance_payment',
-      sortUndefined: 'last', // Handle undefined/null values
-      sortDescFirst: false, // Start with ascending order (A to Z)
-      Cell: ({ row }) => {
-        const extraData = row.original.extra_data;
-        if (!extraData || !Array.isArray(extraData)) return <span>-</span>;
-
-        const paymentData = extraData.find(item =>
-          item && item.key === 'are_you_prepared_to_pay_a_portion_of_the_fee_(advance)_to_initiate_the_specialized_headhunting_search?'
-        );
-
-        if (!paymentData || !paymentData.value) return <span>-</span>;
-
-        // Format the value to be more readable
-        const formattedValue = paymentData.value
-          .replace(/,/g, ', ')
-          .replace(/_/g, ' ')
-          .replace(/\b\w/g, l => l.toUpperCase())
-          .replace(/\s+/g, ' ')
-          .trim();
-
-        return <span>{formattedValue}</span>;
-      },
-    },
-    {
-      header: 'Monthly Salary Budget',
-      id: 'salary_budget', // Explicit id for sorting
-      accessorKey: 'salary_budget',
-      sortUndefined: 'last', // Handle undefined/null values
-      sortDescFirst: false, // Start with ascending order (A to Z)
-      Cell: ({ row }) => {
-        const extraData = row.original.extra_data;
-        if (!extraData || !Array.isArray(extraData)) return <span>-</span>;
-
-        const salaryData = extraData.find(item =>
-          item && item.key === 'what_is_the_approximate_monthly_salary_budget_for_this_role?'
-        );
-
-        if (!salaryData || !salaryData.value) return <span>-</span>;
-
-        return <span style={{ whiteSpace: 'nowrap' }}>{formatSalaryBudget(salaryData.value)}</span>;
-      },
-    },
-    {
       header: 'Extra Fields',
+      Header: () => <span className="follow-up-remarks-heading">Extra Fields</span>,
+      muiTableHeadCellProps: { align: 'center' },
+      muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center' } },
       accessorKey: 'extra_data',
       enableSorting: false,
       Cell: ({ row }) => {
@@ -934,10 +898,7 @@ export default function MetaLeadsStandard() {
         if (!hasExtraData) return <span>-</span>;
         return (
           <Tooltip title="View extra fields">
-            <Button
-              type="primary"
-              size="small"
-              className="sop-brand-primary"
+            <AnimatedFollowUpIcon variant="fields" aria-label="View extra fields"
               onClick={() =>
                 setExtraDataModal({
                   visible: true,
@@ -945,9 +906,7 @@ export default function MetaLeadsStandard() {
                   leadName: row.original.full_name || row.original.company_name || 'Lead',
                 })
               }
-            >
-              View
-            </Button>
+            />
           </Tooltip>
         );
       },

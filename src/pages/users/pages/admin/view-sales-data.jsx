@@ -1,10 +1,11 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Spin, Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from 'react-query';
 
-import { LoaderCircle as LoadingOutlined, FileText as FileTextOutlined, Info as InfoCircleOutlined } from 'lucide-react';
+import { LoaderCircle as LoadingOutlined, Info as InfoCircleOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import { getCallingList, getCallingCount } from '../../../shared/services/headhunting.js';
@@ -213,11 +214,12 @@ export default function ViewSalesLeads() {
       },
       {
         header: "Remarks",
+        Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
         accessorKey: "remarks",
         Cell: ({ row }) => {
         const remarksValue = row.original.remarks;
         return remarksValue ? 
-            <FileTextOutlined size="1em" className="app-icon" style={{ fontSize: '2rem', cursor: 'pointer', textAlign: "center"}} onClick={() => openRemakrsModal(remarksValue)}/>
+            <AnimatedFollowUpIcon size="1em" className="app-icon" style={{ fontSize: '2rem', cursor: 'pointer', textAlign: "center"}} onClick={() => openRemakrsModal(remarksValue)}/>
             : "-" ;
         },
       },

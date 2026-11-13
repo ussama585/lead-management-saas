@@ -11,7 +11,6 @@ import { LoaderCircle as LoadingOutlined, User as UserOutlined, CircleHelp as Qu
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import StatsCard from '../../components/stats-card.component.jsx';
 import LineChart from '../../components/charts/line-chart.component.jsx';
-import TableComponent from '../../components/tables/table.component.jsx';
 import ActiveProjectsIcon from '../../assets/images/stat-card-icons/active-projects.svg';
 import CompletedProjectsIcon from '../../assets/images/stat-card-icons/completed-projects.svg';
 import TerminatedProjectsIcon from '../../assets/images/stat-card-icons/terminated-projects.svg';
@@ -621,7 +620,7 @@ export default function ProjectListing() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={activeProjectsColumns}
               data={transformedActiveProjectsData}
               totalCount={projectsList?.count || 0} // Update as necessary
@@ -644,7 +643,7 @@ export default function ProjectListing() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={completedProjectsColumns}
               data={transformedCompletedProjectsData}
               totalCount={projectsList?.count || 0} // Update as necessary
@@ -665,7 +664,7 @@ export default function ProjectListing() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={terminatedProjectsColumns}
               data={transformedTerminatedProjectsData}
               totalCount={projectsList?.count || 0} // Update as necessary

@@ -335,7 +335,7 @@ export const getSuperAdminLeadsStatusHealth = async ({ startDate, endDate, compa
 };
 
 export const getSuperAdminLeadStatusDistribution = async ({ startDate, endDate, leadType, companyId, userType } = {}) => {
-  const { data } = await api.get(dashboardEndpoint('lead-status-distribute', userType), {
+  const { data } = await api.get(userType === 'company_admin' ? '/accounts/lead-status-distribute' : dashboardEndpoint('lead-status-distribute', userType), {
     params: {
       ...(leadType ? { lead_type: leadType } : {}),
       ...(companyId ? { company_id: companyId } : {}),
@@ -416,7 +416,7 @@ export const getLeadsStatusHealth = async ({
 } = {}) => {
   const rolePaths = { company_admin: 'company-admin', sales_manager: 'sales-manager', sales_executive: 'sales-executive' };
   if (rolePaths[userType]) {
-    const { data } = await api.get(dashboardEndpoint('leads-status-health', userType), {
+    const { data } = await api.get(userType === 'company_admin' ? '/accounts/leads-status-health' : dashboardEndpoint('leads-status-health', userType), {
       params: { ...(startDate ? { start_date: startDate } : {}), ...(endDate ? { end_date: endDate } : {}) },
     });
     if (data?.status === false || data?.success === false || !Array.isArray(data?.data)) throw new Error(data?.message || 'Could not load lead status health.');

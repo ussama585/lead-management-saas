@@ -59,13 +59,7 @@ const FILTER_GRID = {
   alignItems: 'center',
 };
 
-const PERIOD_OPTIONS = [
-  { label: '7 Days', value: '7_days' },
-  { label: '30 Days', value: '30_days' },
-  { label: '90 Days', value: '90_days' },
-  { label: '12 Months', value: '12_months' },
-  { label: 'Custom', value: 'date_range' },
-];
+
 
 export default function MainStatsPage() {
   const { user } = useUserStore();
@@ -89,7 +83,7 @@ export default function MainStatsPage() {
   );
 
   const [selectedSeries, setSelectedSeries] = useState('job_seekers');
-  const [selectedPeriod, setSelectedPeriod] = useState('7_days');
+  const selectedPeriod = 'date_range';
   const [startDate, setStartDate] = useState(dayjs().startOf('month'));
   const [endDate, setEndDate] = useState(dayjs().endOf('month'));
   const [signupStartDate, setSignupStartDate] = useState(dayjs().startOf('month'));
@@ -815,14 +809,6 @@ export default function MainStatsPage() {
                   onChange={setSelectedSeries}
                   options={seriesOptions}
                   style={{ width: 150 }}
-                  size="small"
-                />
-                <span style={{ fontSize: 12 }}>Period:</span>
-                <Select placeholder="Select time period"
-                  value={selectedPeriod}
-                  onChange={setSelectedPeriod}
-                  options={PERIOD_OPTIONS}
-                  style={{ width: 130 }}
                   size="small"
                 />
                 <span style={{ fontSize: 12 }}>Start:</span>

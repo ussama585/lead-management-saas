@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../components/animated-follow-up-icon.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import { Modal } from '../../components/ui/app-modal.jsx';
 import { Select } from '../../components/ui/app-select.jsx';
@@ -10,7 +11,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import UserDetailCard from '../../components/user-detail-card.component.jsx';
-import TableComponent from '../../components/tables/table.component.jsx';
+import NewTableComponent from '../../components/tables/new-table.jsx';
 import '../../assets/styles/legacy/client-detail-page.css'
 import { updateStatus, editProject, getProjectDetails, getAllProjectsList, getAllProjectsCount } from '../shared/services/headhunting.js';
 import moment from 'moment';
@@ -250,12 +251,13 @@ export default function HeadhuntingProjectsListingForExecutive() {
       },
       {
         header: "Remarks",
+        Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
         accessorKey: "remarks",
         size: 150,
         Cell: ({ row }) => {
           const remarksValue = row.original.remarks;
           return remarksValue ? 
-              <FileTextOutlined size="1em" className="app-icon" style={{ fontSize: '2rem', cursor: 'pointer', textAlign: "center"}} onClick={() => openRemakrsModal(remarksValue)}/>
+              <AnimatedFollowUpIcon size="1em" className="app-icon" style={{ fontSize: '2rem', cursor: 'pointer', textAlign: "center"}} onClick={() => openRemakrsModal(remarksValue)}/>
             : "-" ;
         },
       },
@@ -435,7 +437,7 @@ export default function HeadhuntingProjectsListingForExecutive() {
 
         {/* table section */}
         <div>
-          <TableComponent
+          <NewTableComponent serverListing
             columns={columnForTable}
             data={transformedProjectsData}
             totalCount={projectCount[selectedProjectsTab] || 0}
