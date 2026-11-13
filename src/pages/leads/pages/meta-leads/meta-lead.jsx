@@ -1,3 +1,5 @@
+import { syncTableColumns } from '../../../../components/tables/sync-table-columns.jsx';
+import { Button as JobActionButton } from '../../../../components/ui/app-controls.jsx';
 import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
@@ -10,7 +12,8 @@ import { useNavigate, useParams, useSearchParams, useLocation } from "react-rout
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import { useMaterialReactTable } from "material-react-table";
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
@@ -260,6 +263,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
           const value = cell.getValue();
           return <span>{value == "101" || value == 101 ? "100+" : value || "-"}</span>;
         },
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue() === "101" ? "100+" : cell.getValue());
           return (
@@ -289,6 +293,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "job_type", // Explicit id for sorting
         accessorKey: "job_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -318,6 +323,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "employment_type", // Explicit id for sorting
         accessorKey: "employment_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(normalizeEmploymentType(cell.getValue()));
           return (
@@ -535,6 +541,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "currency", // Explicit id for sorting
         accessorKey: "currency",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -564,6 +571,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "payment_term", // Explicit id for sorting
         accessorKey: "payment_term",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -593,6 +601,7 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         id: "gender_preference", // Explicit id for sorting
         accessorKey: "gender_preference",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -625,30 +634,6 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
         enableEditing: false,
         Cell: ({ cell }) => <span>{cell.getValue() || "—"}</span>,
       },
-      {
-        header: "Job Description",
-        id: "job_description", // Explicit id for sorting
-        accessorKey: "job_description",
-        size: 1,
-        Cell: ({ cell, row }) => (
-          <>
-            
-            <Button
-              size="small"
-              style={{ marginLeft: 8 }}
-              disabled={isReadOnlyLead}
-              onClick={() => {
-                if (isReadOnlyLead) return;
-                setDescEditValue(cell.getValue() || "");
-                setDescEditRow(row.original);
-                setDescModalOpen(true);
-              }}
-            >
-              Edit
-            </Button>
-          </>
-      ),
-    },
     {
       header: 'View Details', id: 'view_details', enableSorting: false, enableEditing: false,
       Cell: ({ row }) => <Button size="small" onClick={event => {
@@ -700,11 +685,13 @@ const canDeleteJob = ['super_admin', 'company_admin', 'sales_manager'].includes(
     setSorting(newSorting || []);
   }, []);
 
+  const sharedColumns = useMemo(() => syncTableColumns(columns), [columns]);
+
   const table = useMaterialReactTable({
-    columns,
+    columns: sharedColumns,
     data: Array.isArray(jobs) ? jobs : [],
     enableEditing: !isReadOnlyLead,
-    editDisplayMode: "cell",
+    editDisplayMode: "table",
     muiTableBodyCellProps: ({ cell, column, table }) => ({
       onClick: () => {
         if (column.id !== "job_title" && !isReadOnlyLead) {
@@ -794,27 +781,7 @@ const getMetaLeadUrl = () => {
         }}
       >
         {leadForCard && <LeadCard lead={leadForCard} leadType="Meta Lead" refetchLeadDetail={refetchLeadDetail} />}
-        <Stack direction="row" spacing={1} sx={{ mb: 2, mt: 2 }}>
-          <Button
-            className="custom-button"
-            onClick={handleCreateJob}
-            disabled={!leadId || isReadOnlyLead}
-            size="large"
-            style={{
-              backgroundColor: "#3e6a9f",
-              borderColor: "#3e6a9f",
-              color: "white",
-              height: 40,
-              borderRadius: 8,
-              fontWeight: 600,
-              padding: "0 24px",
-            }}
-          >
-            Add New Job
-          </Button>
-        </Stack>
-
-            <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs} activeColumns={columns}><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs} activeColumns={columns} actions={true && <JobActionButton type="primary" onClick={handleCreateJob} disabled={!leadId || isReadOnlyLead}>Add New Job</JobActionButton>}><NewTableComponent table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>

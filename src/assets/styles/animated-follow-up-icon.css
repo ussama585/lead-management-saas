@@ -1,0 +1,52 @@
+.animated-follow-up-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  vertical-align: middle;
+  transition: transform 300ms ease;
+}
+button.animated-follow-up-icon { cursor: pointer; }
+.animated-follow-up-icon svg { width: 32px; height: 32px; overflow: visible; }
+.animated-follow-up-icon__face,
+.animated-follow-up-icon__hands { stroke: var(--table-icon-color, #3e6a9f); transition: fill 300ms ease, stroke 300ms ease; }
+.animated-follow-up-icon__hands { color: var(--table-icon-color, #3e6a9f); }
+.animated-follow-up-icon__hands svg { width: 14px; height: 14px; }
+.animated-follow-up-icon:hover .animated-follow-up-icon__hands,
+.animated-follow-up-icon:focus-visible .animated-follow-up-icon__hands { color: #fff; }
+.animated-follow-up-icon__face { fill: transparent; }
+.animated-follow-up-icon:hover,
+.animated-follow-up-icon:focus-visible,
+button:hover > .animated-follow-up-icon { transform: rotate(90deg); }
+.animated-follow-up-icon:hover .animated-follow-up-icon__face,
+.animated-follow-up-icon:focus-visible .animated-follow-up-icon__face,
+button:hover > .animated-follow-up-icon .animated-follow-up-icon__face { fill: var(--table-icon-color, #3e6a9f); }
+.animated-follow-up-icon:active .animated-follow-up-icon__face { fill: var(--table-icon-color, #3e6a9f); }
+.animated-follow-up-icon:active .animated-follow-up-icon__face,
+.animated-follow-up-icon:active .animated-follow-up-icon__hands { stroke: #ffffff; transition-duration: 0ms; }
+.animated-follow-up-icon:focus-visible { outline: 2px solid var(--table-icon-color, #3e6a9f); outline-offset: 3px; }
+.animated-follow-up-icon:disabled { cursor: default; opacity: .45; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .animated-follow-up-icon,
+  .animated-follow-up-icon__face,
+  .animated-follow-up-icon__hands { transition: none; }
+  .animated-follow-up-icon:hover,
+  .animated-follow-up-icon:focus-visible,
+  button:hover > .animated-follow-up-icon { transform: none; }
+}
+
+.animated-follow-up-icon:hover .animated-follow-up-icon__hands,
+.animated-follow-up-icon:focus-visible .animated-follow-up-icon__hands,
+button:hover > .animated-follow-up-icon .animated-follow-up-icon__hands { stroke: #fff; }
+
+.app-data-table th:has(.follow-up-remarks-heading) { text-align: center; }
+.app-data-table th:has(.follow-up-remarks-heading) .Mui-TableHeadCell-Content,
+.app-data-table th:has(.follow-up-remarks-heading) .Mui-TableHeadCell-Content-Labels {
+  justify-content: center;
+}

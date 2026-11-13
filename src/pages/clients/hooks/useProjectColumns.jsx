@@ -1,8 +1,9 @@
+import AnimatedFollowUpIcon from '../../../components/animated-follow-up-icon.jsx';
 import { Select } from '../../../components/ui/app-select.jsx';
 import { Tooltip } from '../../../components/ui/app-controls.jsx';
 import { useMemo } from 'react';
 import { Switch } from 'antd';
-import { FileText as FilePdfOutlined, Pencil as EditOutlined, Trash2 as DeleteOutlined, MessageSquare as MessageOutlined, ChartBar as AuditOutlined, Info as InfoCircleOutlined, DollarSign as DollarOutlined } from 'lucide-react';
+import { FileText as FilePdfOutlined, Pencil as EditOutlined, Trash2 as DeleteOutlined, Info as InfoCircleOutlined, DollarSign as DollarOutlined } from 'lucide-react';
 import { createStatusHistoryColumn } from '../../../components/status-history-modal.jsx';
 import { ApprovalPill } from '../utils/project-columns.jsx';
 import { formatDateUniversal } from '../../shared/utils/formatDate.js';
@@ -270,6 +271,7 @@ export function useProjectColumns({
       },
       {
         header: 'PM Job Remarks',
+        Header: () => <span className="follow-up-remarks-heading">PM Job Remarks</span>,
         id: 'pm_job_remarks_matrix',
         enableSorting: false,
         size: 110,
@@ -278,7 +280,7 @@ export function useProjectColumns({
         Cell: ({ row }) => (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
             <Tooltip title="View PM job remarks for all jobs in this project">
-              <AuditOutlined size="1em" className="app-icon"
+              <AnimatedFollowUpIcon size="1em" className="app-icon"
                 style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
                 onClick={() => setPmJobRemarksMatrix({ visible: true, projectId: row.original.id })}
               />
@@ -288,6 +290,7 @@ export function useProjectColumns({
       },
       {
         header: 'PM Remarks',
+        Header: () => <span className="follow-up-remarks-heading">PM Remarks</span>,
         id: 'project_remarks',
         enableSorting: false,
         size: 110,
@@ -299,7 +302,7 @@ export function useProjectColumns({
           return (
             <div className="pp-pm-remarks-cell" style={{ display: 'flex', justifyContent: 'center' }}>
               <Tooltip title={userType === 'project_manager' ? 'View & update remarks' : 'View remarks'}>
-                <MessageOutlined size="1em"
+                <AnimatedFollowUpIcon size="1em"
                   className={["app-icon", `table-remarks-icon ${hasPmRemarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
                   onClick={() => {
                     setProjectRemarksModal({

@@ -180,7 +180,7 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
 
   return (
     <Modal
-      title="Follow Ups and Remarks"
+      title="Follow Ups"
       open={open}
       onCancel={closeModal}
       footer={null}

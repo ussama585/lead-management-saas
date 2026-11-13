@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { Avatar, Table } from 'antd';
+import { Avatar } from 'antd';
+import NewTableComponent from '../tables/new-table.jsx';
+import { listingColumns } from '../tables/listing-table-options.js';
 import { Crown as CrownOutlined, Star as StarOutlined, User as UserOutlined } from 'lucide-react';
 import dayjs from 'dayjs';
 import BootstrapDateRangeModal from '../bootstrap-date-range-modal.component.jsx';
@@ -115,19 +117,16 @@ const RecruiterPerformanceLeaderboardChart = ({
         <div className="recruiter-performance-empty">{emptyMessage}</div>
       ) : (
         <div className="recruiter-performance-table-wrap">
-          <Table
-            columns={columns}
-            dataSource={rows}
-            pagination={false}
-            showHeader
-            rowClassName={(record) => {
-              if (record.rank === 1) return 'recruiter-row-1';
-              if (record.rank === 2) return 'recruiter-row-2';
-              if (record.rank === 3) return 'recruiter-row-3';
-              return '';
-            }}
-            className="recruiter-performance-table"
-          />
+          <NewTableComponent mrtOptions={{
+            columns: listingColumns(columns), data: rows,
+            getRowId: (row, index) => String(row.key ?? index),
+            enablePagination: false, enableBottomToolbar: false,
+            enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+            enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+            enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+            muiTableBodyRowProps: ({ row }) => ({ className: [1, 2, 3].includes(row.original.rank) ? `recruiter-row-${row.original.rank}` : '' }),
+            muiTablePaperProps: { className: 'recruiter-performance-table' },
+          }} />
         </div>
       )}
     </div>

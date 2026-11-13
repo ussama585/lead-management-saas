@@ -1,3 +1,4 @@
+import NewTableComponent from '../../components/tables/new-table.jsx';
 import CompanySelectOption from '../../components/company-select-option.jsx';
 import ManualLocationInput from '../../components/manual-location-input.jsx';
 import { message } from '../../components/ui/notifications.jsx';
@@ -813,28 +814,22 @@ const AddUpdateLead = () => {
             {/* Show invalid rows with reasons in a table */}
             {invalidData.length > 0 && (
               <div style={{ maxHeight: 200, overflowY: 'auto', marginTop: 12 }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, tableLayout: 'fixed' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ border: '1px solid #eee', padding: 3, background: '#f5f5f5' }}>Reason</th>
-                      {csvData[0]?.map((header, idx) => (
-                        <th key={idx} style={{ border: '1px solid #eee', padding: 3, background: '#f5f5f5' }}>{header}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invalidData.map(({ row, reason }, idx) => (
-                      <tr key={idx}>
-                        <td style={{ border: '1px solid #eee', padding: 3, color: '#d4380d', fontWeight: 'bold', maxWidth: 200 }}>
-                          <span title={reason}>{reason}</span>
-                        </td>
-                        {row.map((cell, cidx) => (
-                          <td key={cidx} style={{ border: '1px solid #eee', padding: 3 }}>{cell}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <NewTableComponent mrtOptions={{
+                  columns: [
+                    { id: 'reason', header: 'Reason', accessorKey: 'reason',
+                      Cell: ({ cell }) => <span title={cell.getValue()}>{cell.getValue()}</span>,
+                      muiTableBodyCellProps: { sx: { color: '#d4380d', fontWeight: 'bold', maxWidth: 200 } } },
+                    ...(csvData[0] || []).map((header, index) => ({ id: `csv-column-${index}`, header: String(header), accessorFn: record => record.row[index] })),
+                  ],
+                  data: invalidData, getRowId: (_row, index) => String(index),
+                  enablePagination: false, enableBottomToolbar: false,
+                  enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+                  enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+                  enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+                  initialState: { density: 'compact' },
+                  muiTableHeadCellProps: { sx: { fontSize: 11, padding: '3px' } },
+                  muiTableBodyCellProps: { sx: { fontSize: 11, padding: '3px' } },
+                }} />
               </div>
             )}
           </div>
@@ -863,40 +858,23 @@ const AddUpdateLead = () => {
         <div style={{ marginBottom: 8, color: '#ff4d4f', fontSize: '14px' }}>{uploadResult.message}</div>
         {uploadResult.skipped.length > 0 ? (
           <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, tableLayout: 'fixed' }}>
-              <thead>
-                <tr>
-                  <th style={{ border: '1px solid #eee', padding: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: '#f5f5f5' }}>Reason</th>
-                  <th style={{ border: '1px solid #eee', padding: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: '#f5f5f5' }}>Phone</th>
-                  <th style={{ border: '1px solid #eee', padding: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', background: '#f5f5f5' }}>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                {uploadResult.skipped.map((item, idx) => {
-                  let reasonDisplay;
-                  if (item.reason === null || item.reason === undefined) {
-                    reasonDisplay = '';
-                  } else if (typeof item.reason === 'object') {
-                    reasonDisplay = JSON.stringify(item.reason);
-                  } else {
-                    reasonDisplay = String(item.reason);
-                  }
-                  return (
-                    <tr key={idx}>
-                      <td style={{ border: '1px solid #eee', padding: 3, color: '#d4380d', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
-                        <span title={reasonDisplay}>{reasonDisplay}</span>
-                      </td>
-                      <td style={{ border: '1px solid #eee', padding: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
-                        <span title={item.data?.phone ?? ''}>{item.data?.phone ?? ''}</span>
-                      </td>
-                      <td style={{ border: '1px solid #eee', padding: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
-                        <span title={item.data?.email ?? ''}>{item.data?.email ?? ''}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <NewTableComponent mrtOptions={{
+              columns: [
+                { id: 'reason', header: 'Reason', accessorFn: item => item.reason == null ? '' : typeof item.reason === 'object' ? JSON.stringify(item.reason) : String(item.reason),
+                  Cell: ({ cell }) => <span title={cell.getValue()}>{cell.getValue()}</span>,
+                  muiTableBodyCellProps: { sx: { color: '#d4380d', fontWeight: 'bold', maxWidth: 200 } } },
+                { id: 'phone', header: 'Phone', accessorFn: item => item.data?.phone ?? '', Cell: ({ cell }) => <span title={cell.getValue()}>{cell.getValue()}</span> },
+                { id: 'email', header: 'Email', accessorFn: item => item.data?.email ?? '', Cell: ({ cell }) => <span title={cell.getValue()}>{cell.getValue()}</span> },
+              ],
+              data: uploadResult.skipped, getRowId: (_row, index) => String(index),
+              enablePagination: false, enableBottomToolbar: false,
+              enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+              enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+              enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+              initialState: { density: 'compact' },
+              muiTableHeadCellProps: { sx: { fontSize: 11, padding: '3px' } },
+              muiTableBodyCellProps: { sx: { fontSize: 11, padding: '3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 } },
+            }} />
           </div>
         ) : (
           <div>No skipped records.</div>

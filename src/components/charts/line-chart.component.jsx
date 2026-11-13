@@ -14,6 +14,7 @@ const LineChart = ({
   colors,
   initialTimeFrame = 'week', // Default selected time frame
   onTimeFrameChange, // Callback to handle time frame changes
+  showTimeFrameFilter = true,
   addOrderByFilter = false,
   statsFilter,
   handleStatsFilterChange,
@@ -159,7 +160,7 @@ const LineChart = ({
         <h2 className="line-chart-title">{title}</h2>
         <div className="dropdown-section">
 
-        <Select placeholder="Select time period"
+        {showTimeFrameFilter && <Select placeholder="Select time period"
           defaultValue={selectedTimeFrame}
           style={{ width: 200 }}
           onChange={handleTimeFrameChange}
@@ -167,7 +168,7 @@ const LineChart = ({
           <Option value="week">This Week</Option>
           <Option value="month">This Month</Option>
           <Option value="year">This Year</Option>
-        </Select>
+        </Select>}
 
 
       { addOrderByFilter && 

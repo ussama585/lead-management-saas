@@ -9,7 +9,7 @@ import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import LineChart from '../../../../components/charts/line-chart.component.jsx';
 import { getStats, getManagersList, getManagerStats } from '../../../shared/services/stats-service.js';
-import TableComponent from '../../../../components/tables/table.component.jsx';
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import SalesManagersIcon from '../../../../assets/images/stat-card-icons/sales-managers.svg';
 import '../../../../assets/styles/legacy/sales-manager-listing-page.css';
 import '../../../../assets/styles/legacy/table-client-actions.css';
@@ -244,7 +244,7 @@ export default function SalesManagerListing() {
                             <p className="sop-branded-spin-text">Loading sales managers...</p>
                         </div>
                     ) : (
-                        <TableComponent
+                        <NewTableComponent serverListing
                             columns={columns}
                             data={transformedData}
                             totalCount={managersList.count || 0}

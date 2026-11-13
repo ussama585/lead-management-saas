@@ -1,7 +1,9 @@
 import { Modal } from './ui/app-modal.jsx';
 import { Spin, Button, Tooltip } from './ui/app-controls.jsx';
 import React from 'react';
-import { Descriptions, Table, Typography, Alert } from 'antd';
+import { Descriptions, Typography, Alert } from 'antd';
+import NewTableComponent from './tables/new-table.jsx';
+import { listingColumns } from './tables/listing-table-options.js';
 import { LoaderCircle as LoadingOutlined, ExternalLink as ExportOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import { getProjectApprovalDetails } from '../pages/shared/services/headhunting.js';
@@ -104,14 +106,14 @@ export default function ProjectApprovalDetailsModal({ visible, projectId, onClos
 
           <div>
             <Title level={5} style={{ color: PRIMARY_COLOR }}>Jobs Overview</Title>
-            <Table
-              dataSource={details.jobs}
-              columns={jobColumns}
-              rowKey="id"
-              pagination={false}
-              size="small"
-              bordered
-            />
+            <NewTableComponent mrtOptions={{
+              columns: listingColumns(jobColumns), data: details.jobs || [], getRowId: row => String(row.id),
+              enablePagination: false, enableBottomToolbar: false,
+              enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+              enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+              enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+              initialState: { density: 'compact' },
+            }} />
           </div>
         </div>
       ) : (

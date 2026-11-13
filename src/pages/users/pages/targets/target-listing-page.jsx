@@ -1,3 +1,5 @@
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
+import { targetTableColumns } from '../../../../components/tables/target-table-columns.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -9,7 +11,7 @@ import moment from 'moment';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
 
 import { Trash2 as DeleteOutlined, LoaderCircle as LoadingOutlined } from 'lucide-react';
-import { Row, Col, Form, Table, DatePicker } from 'antd';
+import { Row, Col, Form, DatePicker } from 'antd';
 import { Formik, Form as FormikForm, Field, ErrorMessage,useField  } from "formik";
 import { newTargetValidationSchema } from '../../../shared/schemas/schema.js';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
@@ -598,138 +600,25 @@ export default function TargetListingPage() {
       <Spin indicator={<LoadingOutlined size="1em" className="app-icon app-icon-spin"  />} size="large" spinning={loadingTargetListing}>
       
       
-      <Table
-        dataSource={transformedDataForTargetListing}
-        pagination={false}
-        scroll={{
-            x: 2100, // Horizontal scroll for wide tables (set to 'max-content' if needed)
-            y: 500,  // Vertical scroll (height in pixels)
-          }}
-    
-        bordered
-        className="custom-table"
-        onRow={(record) => ({
-            onClick: () => handleRowClick(record), // Detect row click
-          })}
-
-        rowClassName={() => 'clickable-row'}
-
-        >
-        <Table.Column
-        title="#"
-        key="sr"
-        render={(text, record, index) => index + 1} // Show index + 1 as Sr#
-        align="center"
-        width={60}
-        />
-        <Table.Column
-          title="Week"
-          dataIndex="weekRange"
-          key="weekRange"
-          align="center"
-        />
-        <Table.Column title = "Date" dataIndex="date" key="date" width={200} align="center" />
-        <Table.Column title = "Name" dataIndex="name" key="name" align="center" />
-        <Table.ColumnGroup title="Companies Reached Out">
-          <Table.Column
-            title="Target"
-            dataIndex="companiesReachedOutTarget"
-            key="companiesReachedOutTarget"
-            align="center"
-            
-          />
-          <Table.Column
-            title="Completed"
-            dataIndex="companiesReachedOutCompleted"
-            key="companiesReachedOutCompleted"
-            align="center"
-          />
-        </Table.ColumnGroup>
-        <Table.ColumnGroup title="Companies Sign Up">
-          <Table.Column
-            title="Target"
-            dataIndex="companiesSignUpTarget"
-            key="companiesSignUpTarget"
-            align="center"
-          />
-          <Table.Column
-            title="Completed"
-            dataIndex="companiesSignUpCompleted"
-            key="companiesSignUpCompleted"
-            align="center"
-          />
-        </Table.ColumnGroup>
-        <Table.ColumnGroup title="Applications Received">
-          <Table.Column
-            title="Target"
-            dataIndex="applicationsReceivedTarget"
-            key="applicationsReceivedTarget"
-            align="center"
-          />
-          <Table.Column
-            title="Completed"
-            dataIndex="applicationsReceivedCompleted"
-            key="applicationsReceivedCompleted"
-            align="center"
-          />
-        </Table.ColumnGroup>
-        <Table.ColumnGroup title="Hirings">
-          <Table.Column
-            title="Target"
-            dataIndex="hiringsTarget"
-            key="hiringsTarget"
-            align="center"
-          />
-          <Table.Column
-            title="Completed"
-            dataIndex="hiringsCompleted"
-            key="hiringsCompleted"
-            align="center"
-          />
-        </Table.ColumnGroup>
-        <Table.ColumnGroup title="Job Posts">
-          <Table.Column
-            title="Target"
-            dataIndex="jobPostsTarget"
-            key="jobPostsTarget"
-            align="center"
-          />
-          <Table.Column
-            title="Completed"
-            dataIndex="jobPostsCompleted"
-            key="jobPostsCompleted"
-            align="center"
-          />
-        </Table.ColumnGroup>
-        <Table.ColumnGroup title="Candidates Reached">
-          <Table.Column
-            title="Target"
-            dataIndex="candidatesReachedTarget"
-            key="candidatesReachedTarget"
-            align="center"
-          />
-          <Table.Column
-            title="Completed"
-            dataIndex="candidatesReachedCompleted"
-            key="candidatesReachedCompleted"
-            align="center"
-          />
-        </Table.ColumnGroup>
-        <Table.ColumnGroup title="Candidates Registered">
-          <Table.Column
-            title="Target"
-            dataIndex="candidatesRegisteredTarget"
-            key="candidatesRegisteredTarget"
-            align="center"
-          />
-          <Table.Column
-            title="Completed"
-            dataIndex="candidatesRegisteredCompleted"
-            key="candidatesRegisteredCompleted"
-            align="center"
-          />
-        </Table.ColumnGroup>
-      </Table> 
+      <NewTableComponent mrtOptions={{
+              data: transformedDataForTargetListing,
+              columns: targetTableColumns({ rowNumbers: true, weekKey: 'weekRange', showName: true, dateWidth: 200 }),
+              enablePagination: false,
+              enableSorting: false,
+              enableColumnActions: false,
+              enableColumnFilters: false,
+              enableGlobalFilter: false,
+              enableHiding: false,
+              enableRowSelection: false,
+              enableTopToolbar: false,
+              enableBottomToolbar: false,
+              getRowId: (row, index) => String(row.key ?? index),
+              muiTableHeadCellProps: { align: 'center' },
+              muiTableBodyCellProps: { align: 'center' },
+              muiTableProps: { className: 'custom-table', sx: { minWidth: 2100 } },
+              muiTableContainerProps: { sx: { overflowX: 'auto', maxHeight: 500 } },
+              muiTableBodyRowProps: ({ row }) => ({ className: 'clickable-row', onClick: () => handleRowClick(row.original) }),
+            }} /> 
 
       </Spin>
 

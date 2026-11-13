@@ -2,7 +2,9 @@ import { message } from './ui/notifications.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useState, useRef } from 'react';
-import { Table, Tabs, Alert } from 'antd';
+import { Tabs, Alert } from 'antd';
+import NewTableComponent from './tables/new-table.jsx';
+import { listingColumns } from './tables/listing-table-options.js';
 import { Upload as UploadOutlined, Pencil as EditOutlined, CircleCheck as CheckCircleOutlined, CircleX as CloseCircleOutlined } from 'lucide-react';
 import { useMutation } from 'react-query';
 import Papa from 'papaparse';
@@ -452,19 +454,21 @@ const renderResponseContent = () => {
                       label: 'Raw CSV Data',
                       children: (
                         <div className="import-leads-button__tab-panel">
-                          <Table
-                            columns={getTableColumns(csvColumns)}
-                            dataSource={csvData.map((item, idx) => ({
+                          <NewTableComponent mrtOptions={{
+                            columns: listingColumns(getTableColumns(csvColumns)),
+                            data: csvData.map((item, idx) => ({
                               key: idx,
                               ...item
-                            }))}
-                            pagination={{
-                              pageSize: 10,
-                              size: 'small',
-                            }}
-                            size="small"
-                            scroll={{ x: 1500 }}
-                          />
+                            })),
+                            getRowId: row => String(row.key),
+                            manualPagination: false, manualSorting: false, manualFiltering: false,
+                            initialState: { pagination: { pageIndex: 0, pageSize: 10 }, density: 'compact' },
+                            enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+                            enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+                            enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+                            muiTableProps: { sx: { minWidth: 1500 } },
+                            muiPaginationProps: { rowsPerPageOptions: csvData.length > 50 ? [10, 20, 50, 100] : [10] },
+                          }} />
                         </div>
                       ),
                     },
@@ -547,19 +551,21 @@ const renderResponseContent = () => {
                       label: 'Raw CSV Data',
                       children: (
                         <div className="import-leads-button__tab-panel">
-                          <Table
-                            columns={getTableColumns(updateCsvColumns)}
-                            dataSource={updateCsvData.map((item, idx) => ({
+                          <NewTableComponent mrtOptions={{
+                            columns: listingColumns(getTableColumns(updateCsvColumns)),
+                            data: updateCsvData.map((item, idx) => ({
                               key: idx,
                               ...item
-                            }))}
-                            pagination={{
-                              pageSize: 10,
-                              size: 'small',
-                            }}
-                            size="small"
-                            scroll={{ x: 1500 }}
-                          />
+                            })),
+                            getRowId: row => String(row.key),
+                            manualPagination: false, manualSorting: false, manualFiltering: false,
+                            initialState: { pagination: { pageIndex: 0, pageSize: 10 }, density: 'compact' },
+                            enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+                            enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+                            enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+                            muiTableProps: { sx: { minWidth: 1500 } },
+                            muiPaginationProps: { rowsPerPageOptions: updateCsvData.length > 50 ? [10, 20, 50, 100] : [10] },
+                          }} />
                         </div>
                       ),
                     },

@@ -1,0 +1,53 @@
+/* One visual surface for all interactive listing tables. Feature/state options
+   stay with their callers; change these values to restyle every shared table. */
+.app-data-table {
+  --listing-table-radius: 14px;
+  --listing-table-border: #e1e8f3;
+  --listing-table-shadow: 0 4px 12px rgb(31 58 99 / 6%);
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--listing-table-radius);
+  box-shadow: var(--listing-table-shadow) !important;
+}
+.app-data-table > .MuiPaper-root {
+  border: 1px solid var(--listing-table-border) !important;
+  border-radius: var(--listing-table-radius) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  background: var(--background, #fff);
+}
+.app-data-table .MuiTableCell-root { font-family: inherit; }
+.app-data-table .MuiTableCell-body { font-size: 14px; padding: 8px; vertical-align: middle; }
+.app-data-table .MuiTableCell-head { font-size: 14px; padding: 12px 8px; line-height: 20px; }
+.table-action-menu { display: inline-flex; align-items: center; justify-content: center; }
+.table-action-menu__trigger { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #3e6a9f; cursor: pointer; }
+.table-action-menu__trigger:hover { background: rgb(62 106 159 / 10%); }
+.table-action-menu__trigger:focus-visible { outline: 2px solid #3e6a9f; outline-offset: 2px; }
+.table-action-menu__custom { display: flex; align-items: center; gap: 8px; padding: 6px 8px; }
+.app-data-table .MuiTableCell-body:hover { outline: none !important; }
+.app-data-table .table-inline-edit-editor .MuiInput-root::before,
+.app-data-table .table-inline-edit-editor .MuiInput-root:hover:not(.Mui-disabled)::before { border-bottom: 1px solid #3e6a9f; }
+.table-inline-edit-value { border: 0; background: transparent; padding: 4px 0; color: inherit; font: inherit; text-align: inherit; cursor: pointer; }
+.table-inline-edit-value:hover:not(:disabled) { text-decoration: underline dotted; text-underline-offset: 4px; }
+.table-inline-edit-value:disabled { cursor: default; }
+.table-inline-edit-value:focus-visible { outline: 2px solid #3e6a9f; outline-offset: 3px; }
+
+/* Shared header styling, including sticky headers and page-specific tables. */
+.app-data-table .MuiTableHead-root .MuiTableCell-head,
+.app-shared-document-table > thead > tr > th {
+  background: #3e6a9f !important;
+  color: #fff !important;
+  vertical-align: middle !important;
+}
+.app-data-table .MuiTableHead-root .Mui-TableHeadCell-Content,
+.app-data-table .MuiTableHead-root .Mui-TableHeadCell-Content-Labels {
+  align-items: center !important;
+}
+.app-data-table .MuiTableHead-root .Mui-TableHeadCell-Content-Wrapper,
+.app-data-table .MuiTableHead-root .MuiTypography-root,
+.app-data-table .MuiTableHead-root .MuiIconButton-root,
+.app-data-table .MuiTableHead-root .MuiTableSortLabel-root,
+.app-data-table .MuiTableHead-root .MuiTableSortLabel-icon,
+.app-data-table .MuiTableHead-root svg {
+  color: #fff !important;
+}

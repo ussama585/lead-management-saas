@@ -583,54 +583,18 @@ const DataEntryTable = () => {
         {assignSkippedResult.skipped &&
         assignSkippedResult.skipped.length > 0 ? (
           <div style={{ maxHeight: 350, overflowY: "auto" }}>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: 14,
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      border: "1px solid #eee",
-                      padding: 6,
-                      background: "#f5f5f5",
-                    }}
-                  >
-                    ID
-                  </th>
-                  <th
-                    style={{
-                      border: "1px solid #eee",
-                      padding: 6,
-                      background: "#f5f5f5",
-                    }}
-                  >
-                    Reason
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {assignSkippedResult.skipped.map((item, idx) => (
-                  <tr key={idx}>
-                    <td style={{ border: "1px solid #eee", padding: 6 }}>
-                      {item.id}
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #eee",
-                        padding: 6,
-                        color: "#d4380d",
-                      }}
-                    >
-                      {item.reason}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <NewTableComponent mrtOptions={{
+              columns: [
+                { id: 'id', header: 'ID', accessorKey: 'id' },
+                { id: 'reason', header: 'Reason', accessorKey: 'reason', muiTableBodyCellProps: { sx: { color: '#d4380d' } } },
+              ],
+              data: assignSkippedResult.skipped, getRowId: (_row, index) => String(index),
+              enablePagination: false, enableBottomToolbar: false,
+              enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+              enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+              enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+              initialState: { density: 'compact' },
+            }} />
           </div>
         ) : (
           <div style={{ color: "#666", fontSize: 14 }}>

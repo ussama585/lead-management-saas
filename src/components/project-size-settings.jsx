@@ -3,7 +3,9 @@ import { Modal } from './ui/app-modal.jsx';
 import { Input } from './ui/app-controls.jsx';
 import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Alert, Card, Descriptions, Space, Table } from 'antd';
+import { Alert, Card, Descriptions, Space } from 'antd';
+import NewTableComponent from './tables/new-table.jsx';
+import { listingColumns } from './tables/listing-table-options.js';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
@@ -63,7 +65,20 @@ export function ProjectSizeManager({ user, companyId = null }) {
     <Card title='Project sizes' extra={<span title={needsCompany ? 'Select company first' : 'Add size'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add size</Button></span>}>
       <p className='mb-4 text-sm text-muted-foreground'>Create and manage the available project size choices.</p>
       {list.isError ? <Alert type='error' showIcon message={projectSizeError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
-        <Table rowKey='id' columns={columns} dataSource={list.data || []} loading={list.isLoading || list.isFetching} scroll={{ x: 520 }} pagination={{ pageSize: 10, hideOnSinglePage: true }} locale={{ emptyText: 'No project sizes yet. Add a size to get started.' }} />}
+        <NewTableComponent mrtOptions={{
+          columns: listingColumns(columns), data: list.data || [],
+          getRowId: row => String(row.id),
+          manualPagination: false, manualSorting: false, manualFiltering: false,
+          initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+          state: { isLoading: list.isLoading || list.isFetching },
+          enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+          enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+          enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+          enableBottomToolbar: (list.data?.length || 0) > 10,
+          muiTableProps: { sx: { minWidth: 520 } },
+          muiPaginationProps: { rowsPerPageOptions: [10, 20, 50, 100] },
+          localization: { noRecordsToDisplay: 'No project sizes yet. Add a size to get started.' },
+        }} />}
     </Card>
     <SettingsDeleteModal title='Delete project size' itemName={deleteTarget?.value} open={deleteTarget != null}
       loading={remove.isLoading} error={remove.isError ? projectSizeError(remove.error) : null}

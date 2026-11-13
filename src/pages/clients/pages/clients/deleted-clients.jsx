@@ -1,8 +1,9 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import React, { useMemo, useState, useCallback } from 'react';
 import { useQuery } from 'react-query';
 
-import { MessageCircle as CommentOutlined } from 'lucide-react';
+
 import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
@@ -76,13 +77,14 @@ export default function DeletedClientsPage() {
       },
       {
         header: 'Remarks',
+        Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
         id: 'remarks',
         accessorKey: 'remarks',
         enableSorting: false,
         Cell: ({ row, cell }) => {
           const remarks = cell.getValue();
           return (
-            <CommentOutlined size="1em"
+            <AnimatedFollowUpIcon size="1em"
               className={["app-icon", `table-remarks-icon ${remarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
               onClick={() =>
                 setRemarksModal({
