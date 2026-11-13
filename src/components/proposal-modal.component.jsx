@@ -1,3 +1,4 @@
+import SharedDocumentTable from './tables/new-table.jsx';
 import { message } from './ui/notifications.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Input } from './ui/app-controls.jsx';
@@ -471,7 +472,7 @@ const ProposalModal = ({
               You have requested our services to hire {totalPositions > 1 ? 'resources' : 'a resource'}:
             </p>
 
-            <table className="proposal-modal__table">
+            <SharedDocumentTable documentTable className="proposal-modal__table">
               <thead>
                 <tr>
                   <th className="proposal-modal__table-th--position">
@@ -548,7 +549,7 @@ const ProposalModal = ({
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </SharedDocumentTable>
 
             <p className="proposal-modal__section-text--top">
               Our strategy will be aligned to identify, attract, and engage high-caliber professionals matching your job descriptions.
@@ -660,7 +661,7 @@ const ProposalModal = ({
               <strong>Flat Discounted Amount</strong> as a token of our long-term commitment and collaboration.
             </p>
 
-            <table className="proposal-modal__financial-table">
+            <SharedDocumentTable documentTable className="proposal-modal__financial-table">
               <tbody>
                 <tr>
                   <td className="proposal-modal__financial-label">
@@ -772,7 +773,7 @@ const ProposalModal = ({
                   </td>
                 </tr>
               </tbody>
-            </table>
+            </SharedDocumentTable>
             <p className="proposal-modal__section-text--bottom-8">
               • In case of in-house or reference-based hiring, remaining payment will be cleared by the client as committed.
             </p>

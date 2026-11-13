@@ -24,7 +24,7 @@ export function deletedJobDataColumns(activeColumns) {
     }));
 }
 
-export default function JobListingTabs({ children, source, leadId, fetchDeletedJobs, onRestored, activeColumns }) {
+export default function JobListingTabs({ children, source, leadId, fetchDeletedJobs, onRestored, activeColumns, actions }) {
   const [tab, setTab] = useState('active');
   const [deletedSorting, setDeletedSorting] = useState([]);
   const [restoreTarget, setRestoreTarget] = useState(null);
@@ -69,10 +69,13 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
         onClick={() => { restore.reset(); setRestoreTarget(row.original); }} />,
     }] : [])];
   return <Tabs value={tab} onValueChange={setTab} className="w-full min-w-0">
-    <TabsList aria-label="Job listings" className="mb-3">
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-3" style={{ alignItems: 'center' }}>
+    <TabsList aria-label="Job listings">
       <TabsTrigger value="active">Active Jobs</TabsTrigger>
       <TabsTrigger value="deleted">Deleted Jobs</TabsTrigger>
     </TabsList>
+    {actions && <div className="ml-auto flex items-center">{actions}</div>}
+    </div>
     <TabsContent value="active" forceMount hidden={tab !== 'active'}>{children}</TabsContent>
     <TabsContent value="deleted">
       {!canLoad && <p className="mb-3 text-sm text-muted-foreground">Deleted jobs are not available yet.</p>}

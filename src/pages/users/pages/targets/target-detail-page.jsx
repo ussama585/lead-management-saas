@@ -1,3 +1,5 @@
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
+import { targetTableColumns } from '../../../../components/tables/target-table-columns.js';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
@@ -6,7 +8,7 @@ import {React, useEffect, useState} from 'react'
 import dayjs from 'dayjs';
 import moment from 'moment';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
-import { Row, Col, Form, Table, DatePicker } from 'antd';
+import { Row, Col, Form, DatePicker } from 'antd';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
@@ -377,53 +379,25 @@ export default function TargetDetailPage() {
             <Spin indicator={<LoadingOutlined size="1em" className="app-icon app-icon-spin"  />} size="large" spinning={loadingTargetDetails}>
 
 
-            <Table dataSource={dataSource} pagination={false} scroll={{ x: "max-content" }} bordered className="custom-table">
-            <Table.Column title="Week" dataIndex="week" key="week" align="center" />
-            <Table.Column title="Date" dataIndex="date" key="date" align="center" />
-            
-            {/* Companies Reached Out */}
-            <Table.ColumnGroup title="Companies Reached Out" >
-                <Table.Column title="Target" dataIndex="companiesReachedOutTarget" key="companiesReachedOutTarget" align="center" />
-                <Table.Column title="Completed" dataIndex="companiesReachedOutCompleted" key="companiesReachedOutCompleted" align="center" />
-            </Table.ColumnGroup>
-
-            {/* Companies Sign Up */}
-            <Table.ColumnGroup title="Companies Sign Up">
-                <Table.Column title="Target" dataIndex="companiesSignUpTarget" key="companiesSignUpTarget" align="center" />
-                <Table.Column title="Completed" dataIndex="companiesSignUpCompleted" key="companiesSignUpCompleted" align="center" />
-            </Table.ColumnGroup>
-
-            {/* Applications Received */}
-            <Table.ColumnGroup title="Applications Received">
-                <Table.Column title="Target" dataIndex="applicationsReceivedTarget" key="applicationsReceivedTarget" align="center" />
-                <Table.Column title="Completed" dataIndex="applicationsReceivedCompleted" key="applicationsReceivedCompleted" align="center" />
-            </Table.ColumnGroup>
-
-            {/* Hirings */}
-            <Table.ColumnGroup title="Hirings">
-                <Table.Column title="Target" dataIndex="hiringsTarget" key="hiringsTarget" align="center" />
-                <Table.Column title="Completed" dataIndex="hiringsCompleted" key="hiringsCompleted" align="center" />
-            </Table.ColumnGroup>
-
-            {/* Job Posts */}
-            <Table.ColumnGroup title="Job Posts">
-                <Table.Column title="Target" dataIndex="jobPostsTarget" key="jobPostsTarget" align="center" />
-                <Table.Column title="Completed" dataIndex="jobPostsCompleted" key="jobPostsCompleted" align="center" />
-            </Table.ColumnGroup>
-
-            {/* Candidates Reached */}
-            <Table.ColumnGroup title="Candidates Reached">
-                <Table.Column title="Target" dataIndex="candidatesReachedTarget" key="candidatesReachedTarget" align="center" />
-                <Table.Column title="Completed" dataIndex="candidatesReachedCompleted" key="candidatesReachedCompleted" align="center" />
-            </Table.ColumnGroup>
-            {/* Job Posts */}
-            <Table.ColumnGroup title="Candidates Registered">
-                <Table.Column title="Target" dataIndex="candidatesRegisteredTarget" key="candidatesRegisteredTarget" align="center" />
-                <Table.Column title="Completed" dataIndex="candidatesRegisteredCompleted" key="candidatesRegisteredCompleted" align="center" />
-            </Table.ColumnGroup>
-
-
-            </Table>
+            <NewTableComponent mrtOptions={{
+              data: dataSource || [],
+              columns: targetTableColumns({}),
+              enablePagination: false,
+              enableSorting: false,
+              enableColumnActions: false,
+              enableColumnFilters: false,
+              enableGlobalFilter: false,
+              enableHiding: false,
+              enableRowSelection: false,
+              enableTopToolbar: false,
+              enableBottomToolbar: false,
+              getRowId: (row, index) => String(row.key ?? index),
+              muiTableHeadCellProps: { align: 'center' },
+              muiTableBodyCellProps: { align: 'center' },
+              muiTableProps: { className: 'custom-table', sx: { minWidth: 'max-content' } },
+              muiTableContainerProps: { sx: { overflowX: 'auto' } },
+              
+            }} />
 
             </Spin>
 

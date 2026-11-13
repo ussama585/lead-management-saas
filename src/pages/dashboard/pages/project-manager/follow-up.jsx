@@ -1,8 +1,9 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Button, Tooltip } from '../../../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useCallback } from 'react';
 import { Tabs } from 'antd';
-import { MessageSquare as MessageOutlined, Clock as ClockCircleOutlined, Eye as EyeOutlined } from 'lucide-react';
+import { Eye as EyeOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
@@ -66,6 +67,7 @@ const getRemarksColumns = (onViewRemarks, onOpenFollowups, onOpenRemarks, onView
   { header: 'Follow up time', accessorKey: 'follow_up_time' },
   {
     header: 'Remarks',
+    Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
     accessorKey: 'remarks',
     Cell: ({ cell, row }) => {
       const value = cell.getValue();
@@ -77,7 +79,7 @@ const getRemarksColumns = (onViewRemarks, onOpenFollowups, onOpenRemarks, onView
           <Button
             type="text"
             size="small"
-            icon={<MessageOutlined size="1em" className="app-icon" />}
+            icon={<AnimatedFollowUpIcon size="1em" className="app-icon" />}
             onClick={() => onViewRemarks(row.original)}
             title="View remarks"
             style={{ padding: '0 4px', minWidth: 28, color: hasRemarks ? '#1890ff' : '#bbb' }}
@@ -93,6 +95,7 @@ const getRemarksColumns = (onViewRemarks, onOpenFollowups, onOpenRemarks, onView
   { header: 'Sales Executive Name', accessorKey: 'sales_executive_name' },
   {
     header: 'Follow Up',
+    Header: () => <span className="follow-up-remarks-heading">Follow Up</span>,
     id: 'follow_up_actions',
     enableSorting: false,
     muiTableHeadCellProps: { align: 'center' },
@@ -103,7 +106,7 @@ const getRemarksColumns = (onViewRemarks, onOpenFollowups, onOpenRemarks, onView
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
           <Tooltip title="View & manage follow-ups">
-            <ClockCircleOutlined size="1em" className="app-icon"
+            <AnimatedFollowUpIcon size="1em" className="app-icon"
               style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
               onClick={() => onOpenFollowups(jobId)}
             />
@@ -114,6 +117,7 @@ const getRemarksColumns = (onViewRemarks, onOpenFollowups, onOpenRemarks, onView
   },
   {
     header: 'Remarks',
+    Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
     id: 'remarks_actions',
     enableSorting: false,
     muiTableHeadCellProps: { align: 'center' },
@@ -124,7 +128,7 @@ const getRemarksColumns = (onViewRemarks, onOpenFollowups, onOpenRemarks, onView
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
           <Tooltip title="View & manage remarks">
-            <MessageOutlined size="1em" className="app-icon"
+            <AnimatedFollowUpIcon size="1em" className="app-icon"
               style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
               onClick={() => onOpenRemarks(jobId)}
             />

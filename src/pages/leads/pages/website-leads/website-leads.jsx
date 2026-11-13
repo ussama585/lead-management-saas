@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import '../../../../assets/styles/data-leads-page.css';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
@@ -65,7 +66,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
 
 
   //icons
-  import { LoaderCircle as LoadingOutlined, MessageCircle as CommentOutlined, Upload as UploadOutlined, FileText as FileTextOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined, Download as DownloadOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
+  import { Info as InfoCircleOutlined, Minus as MinusOutlined, Download as DownloadOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
   //css
   import "../../../../assets/styles/legacy/sales-data.generated.css";
 
@@ -840,18 +841,19 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         },
 
         ...(['admin', 'super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType) ? [{
-          header: 'Follow Ups and Remarks',
+          header: 'Follow Ups',
+          Header: () => <span className="follow-up-remarks-heading">Follow Ups</span>,
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           id: 'follow_up',
           accessorKey: 'follow_up',
           enableSorting: false,
           size: 0.65,
           Cell: ({ row }) => (
-            <Tooltip title={<span style={{ color: '#fff' }}>Follow Ups and Remarks</span>}>
-              <ClockCircleOutlined size="1em" className="app-icon"
+            <Tooltip title={<span style={{ color: '#fff' }}>Follow Ups</span>}>
+              <AnimatedFollowUpIcon size="1em" className="app-icon"
                 role="button"
                 tabIndex={0}
-                aria-label="Follow Ups and Remarks"
+                aria-label="Follow Ups"
                 style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
                 onClick={() => {
                   setFollowUpModal({ visible: true, lead: row.original });

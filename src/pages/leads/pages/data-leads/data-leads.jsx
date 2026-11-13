@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
@@ -30,7 +31,7 @@ import { alpha } from "@mui/material/styles";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { useLocation, useNavigate, Link as RouterLink, useSearchParams } from "react-router-dom";
 import { Avatar as AntAvatar, Alert as AntAlert, Space } from 'antd';
-import { Info as InfoCircleOutlined, MessageCircle as CommentOutlined, Upload as UploadOutlined, Minus as MinusOutlined, Clock as ClockCircleOutlined } from 'lucide-react';
+import { Info as InfoCircleOutlined, Upload as UploadOutlined, Minus as MinusOutlined } from 'lucide-react';
 import DuplicateLeadModal from '../../../../components/duplicate-lead-modal.component.jsx';
 import { useDuplicateLead } from '../../../../components/hooks/useDuplicateLead.js';
 import NewTableComponent from "../../../../components/tables/new-table.jsx";
@@ -649,16 +650,17 @@ const DataLeads = () => {
         },
       },
       ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
-        header: "Follow Ups and Remarks",
+        header: "Follow Ups",
+        Header: () => <span className="follow-up-remarks-heading">Follow Ups</span>,
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
         id: "follow_up",
         accessorKey: "follow_up",
         enableSorting: false,
         size: 200,
         Cell: ({ row }) => (
-          <AntTooltip title="Follow Ups and Remarks">
-            <ClockCircleOutlined size="1em" className="app-icon"
-              role="button" tabIndex={0} aria-label="Follow Ups and Remarks"
+          <AntTooltip title="Follow Ups">
+            <AnimatedFollowUpIcon size="1em" className="app-icon"
+              role="button" tabIndex={0} aria-label="Follow Ups"
               style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
               onClick={() => {
                 setFollowUpModal({ visible: true, lead: row.original });

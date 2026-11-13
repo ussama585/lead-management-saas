@@ -1,9 +1,10 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Tooltip, Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useCallback, useMemo, useState } from 'react';
 import { leadModalCompanyPayload } from '../../../shared/utils/lead-modal-company.js';
 import { Alert, Tag } from 'antd';
-import { MessageCircle as CommentOutlined, Clock as ClockCircleOutlined, FileText as FilePdfOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined } from 'lucide-react';
+import { FileText as FilePdfOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LeadDateFilter from '../../../../components/lead-date-filter-slot.jsx';
@@ -233,7 +234,8 @@ const CommonLeadsFollowUp = () => {
         Cell: ({ row }) => <span>{row.original.next_followup_time_display}</span>,
       },
       {
-        header: 'Follow Ups and Remarks',
+        header: 'Follow Ups',
+        Header: () => <span className="follow-up-remarks-heading">Follow Ups</span>,
         id: 'follow_up_icon',
         enableSorting: false,
         size: 90,
@@ -246,7 +248,7 @@ const CommonLeadsFollowUp = () => {
 
           return (
             <Tooltip title="Open follow-up">
-              <ClockCircleOutlined size="1em" className="app-icon"
+              <AnimatedFollowUpIcon size="1em" className="app-icon"
                 role="button"
                 tabIndex={0}
                 onClick={() => openFollowUpModal(row.original)}

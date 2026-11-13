@@ -1,7 +1,8 @@
+import AnimatedFollowUpIcon from '../../../components/animated-follow-up-icon.jsx';
 import { Select } from '../../../components/ui/app-select.jsx';
 import React from 'react';
 
-import { MessageCircle as CommentOutlined, Pencil as EditOutlined, Trash2 as DeleteOutlined, CirclePlus as PlusCircleOutlined } from 'lucide-react';
+import { Pencil as EditOutlined, Trash2 as DeleteOutlined, CirclePlus as PlusCircleOutlined } from 'lucide-react';
 import { createAssignedToColumn } from '../../shared/utils/assignedToColumn.jsx';
 import formatDateUniversal from '../../shared/utils/formatDate.js';
 import { statusColors, statusOptions } from '../constants/client-constants.js';
@@ -75,13 +76,14 @@ export const createClientColumns = ({
     // Remarks immediately after Status
     {
       header: 'Remarks',
+      Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
       id: 'remarks',
       accessorKey: 'remarks',
       size: 70,
       sortUndefined: 'last',
       sortDescFirst: false,
       Cell: ({ row }) => (
-        <CommentOutlined size="1em"
+        <AnimatedFollowUpIcon size="1em"
           className={["app-icon", `table-remarks-icon ${row.original.remarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
           onClick={() => handleRemarksModal(row.original)}
         />

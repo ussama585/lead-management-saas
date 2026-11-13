@@ -3,7 +3,9 @@ import { Modal } from './ui/app-modal.jsx';
 import { Input } from './ui/app-controls.jsx';
 import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Alert, Card, Descriptions, Space, Table } from 'antd';
+import { Alert, Card, Descriptions, Space } from 'antd';
+import NewTableComponent from './tables/new-table.jsx';
+import { listingColumns } from './tables/listing-table-options.js';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
@@ -67,7 +69,20 @@ export function LeadStatusManager({ user, companyId = null }) {
     <Card title='Lead statuses' extra={<span title={needsCompany ? 'Select company first' : 'Add status'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add status</Button></span>}>
       <p className='mb-4 text-sm text-muted-foreground'>Create and manage the statuses used for leads.</p>
       {list.isError ? <Alert type='error' showIcon message={leadStatusError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
-        <Table rowKey='id' columns={columns} dataSource={statusesNewestFirst} loading={list.isLoading || list.isFetching} scroll={{ x: 520 }} pagination={{ pageSize: 10, hideOnSinglePage: true }} locale={{ emptyText: 'No lead statuses yet. Add a status to get started.' }} />}
+        <NewTableComponent mrtOptions={{
+          columns: listingColumns(columns), data: statusesNewestFirst,
+          getRowId: row => String(row.id),
+          manualPagination: false, manualSorting: false, manualFiltering: false,
+          initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+          state: { isLoading: list.isLoading || list.isFetching },
+          enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
+          enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+          enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+          enableBottomToolbar: statusesNewestFirst.length > 10,
+          muiTableProps: { sx: { minWidth: 520 } },
+          muiPaginationProps: { rowsPerPageOptions: [10, 20, 50, 100] },
+          localization: { noRecordsToDisplay: 'No lead statuses yet. Add a status to get started.' },
+        }} />}
     </Card>
     <SettingsDeleteModal title='Delete lead status' itemName={deleteTarget?.name} open={deleteTarget != null}
       loading={remove.isLoading} error={remove.isError ? leadStatusError(remove.error) : null}

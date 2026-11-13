@@ -103,7 +103,7 @@ const LeadEditModal = ({
     setIsVisible(true);
   };
 
-const TriggerComponent = trigger === 'icon' ? (
+const TriggerComponent = typeof trigger === 'function' ? trigger({ onClick: handleTriggerClick, disabled: opening }) : trigger === 'icon' ? (
   <EditOutlined size="1em" className="app-icon" 
     style={{ cursor: 'pointer', color: '#3e6a9f', marginLeft: 8 }}
     onClick={handleTriggerClick}

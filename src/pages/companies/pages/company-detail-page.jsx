@@ -6,7 +6,9 @@ import { Select } from '../../../components/ui/app-select.jsx';
 import { Input } from '../../../components/ui/app-controls.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Avatar, Card, Descriptions, Space, Switch, Table, Tag } from 'antd';
+import { Alert, Avatar, Card, Descriptions, Space, Switch, Tag } from 'antd';
+import NewTableComponent from '../../../components/tables/new-table.jsx';
+import { listingColumns, listingPagination, nextListingPagination, listingSorting, nextListingSorting } from '../../../components/tables/listing-table-options.js';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { Avatar as UserAvatar, AvatarImage, AvatarFallback } from '../../../components/ui/avatar.jsx';
 import { useFormik } from 'formik';
@@ -279,14 +281,25 @@ function CompanyDetail({ companyId }) {
           </div>
           {users.isError && <Alert className="mb-4" type="error" showIcon message={companyError(users.error)} action={<Button onClick={() => users.refetch()}>Retry</Button>} />}
           <div className="overflow-hidden rounded-lg border border-border">
-            <Table rowKey="id" columns={columns} dataSource={users.isError ? [] : users.data?.results || []} loading={users.isFetching} scroll={{ x: 800 }}
-              pagination={{ ...pagination, total: users.data?.count || 0, showSizeChanger: true, showTotal: total => `${total} users` }}
-              onChange={(next, filters, sorter) => {
-                const nextSorting = sorter.order ? { sortBy: sorter.field, order: sorter.order === 'descend' ? 'desc' : 'asc' } : {};
-                const resetPage = next.pageSize !== pagination.pageSize || nextSorting.sortBy !== sorting.sortBy || nextSorting.order !== sorting.order;
-                setPagination({ current: resetPage ? 1 : next.current, pageSize: next.pageSize });
-                setSorting(nextSorting);
-              }} locale={{ emptyText: users.isError ? 'Company users could not be loaded.' : 'No users found for this company.' }} />
+            <NewTableComponent mrtOptions={{
+              columns: listingColumns(columns), data: users.isError ? [] : users.data?.results || [],
+              getRowId: row => String(row.id),
+              manualPagination: true, manualSorting: true, manualFiltering: true,
+              rowCount: users.data?.count || 0,
+              state: { pagination: listingPagination(pagination), sorting: listingSorting(sorting), isLoading: users.isFetching },
+              onPaginationChange: updater => setPagination(previous => nextListingPagination(updater, previous)),
+              onSortingChange: updater => {
+                const next = nextListingSorting(updater, sorting);
+                if (next.sortBy !== sorting.sortBy || next.order !== sorting.order) setPagination(previous => ({ ...previous, current: 1 }));
+                setSorting(next);
+              },
+              enableMultiSort: false, enableGlobalFilter: false, enableColumnFilters: false,
+              enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+              enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+              muiTableProps: { sx: { minWidth: 800 } },
+              muiPaginationProps: { rowsPerPageOptions: [10, 20, 50, 100] },
+              localization: { noRecordsToDisplay: users.isError ? 'Company users could not be loaded.' : 'No users found for this company.' },
+            }} />
           </div>
         </section>
       </>}

@@ -4,7 +4,9 @@ import { Input } from '../../../components/ui/app-controls.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Alert, Avatar, Card, Space, Switch, Table, Tag } from 'antd';
+import { Alert, Avatar, Card, Space, Switch, Tag } from 'antd';
+import NewTableComponent from '../../../components/tables/new-table.jsx';
+import { listingColumns, listingPagination, nextListingPagination, listingSorting, nextListingSorting } from '../../../components/tables/listing-table-options.js';
 import { Eye, Pencil, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
@@ -270,12 +272,25 @@ export default function CompaniesPage() {
     <Card extra={<Button type='primary' icon={<Plus size={16} />} disabled={busy} onClick={() => openDialog('create')}>Create company</Button>}>
       <Input.Search aria-label='Search companies' placeholder='Search companies...' allowClear onSearch={value => { setSearch(value.trim()); setPagination(previous => ({ ...previous, current: 1 })); }} className='mb-4' style={{ maxWidth: 360 }} />
       {list.isError && <Alert type='error' showIcon message={companyError(list.error)} className='mb-4' action={<Button onClick={() => list.refetch()}>Retry</Button>} />}
-      <Table rowKey='id' columns={columns} dataSource={list.data?.results || []} loading={list.isLoading || list.isFetching} scroll={{ x: 1550 }}
-        pagination={{ ...pagination, total: list.data?.count || 0, showSizeChanger: true, showTotal: total => `${total} companies` }}
-        onChange={(next, _filters, sorter, extra) => {
-          setPagination({ current: extra.action === 'sort' || next.pageSize !== pagination.pageSize ? 1 : next.current, pageSize: next.pageSize });
-          setSorting(sorter.order ? { sortBy: sorter.field, order: sorter.order === 'descend' ? 'desc' : 'asc' } : {});
-        }} locale={{ emptyText: list.isError ? 'Companies could not be loaded.' : 'No companies found.' }} />
+      <NewTableComponent mrtOptions={{
+        columns: listingColumns(columns),
+        data: list.data?.results || [],
+        getRowId: row => String(row.id),
+        manualPagination: true, manualSorting: true, manualFiltering: true,
+        rowCount: list.data?.count || 0,
+        state: { pagination: listingPagination(pagination), sorting: listingSorting(sorting), isLoading: list.isLoading || list.isFetching },
+        onPaginationChange: updater => setPagination(previous => nextListingPagination(updater, previous)),
+        onSortingChange: updater => {
+          setSorting(previous => nextListingSorting(updater, previous));
+          setPagination(previous => ({ ...previous, current: 1 }));
+        },
+        enableMultiSort: false, enableGlobalFilter: false, enableColumnFilters: false,
+        enableColumnActions: false, enableRowSelection: false, enableHiding: false,
+        enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
+        muiTableProps: { sx: { minWidth: 1550 } },
+        muiPaginationProps: { rowsPerPageOptions: [10, 20, 50, 100] },
+        localization: { noRecordsToDisplay: list.isError ? 'Companies could not be loaded.' : 'No companies found.' },
+      }} />
     </Card>
     <Modal title='Restore company' open={Boolean(restoreTarget)} okText='Restore' confirmLoading={restore.isLoading}
       onCancel={() => { if (!restore.isLoading) setRestoreTarget(null); }}

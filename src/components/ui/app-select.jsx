@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { MenuItem, TextField } from '@mui/material';
+import { InlineDropdownContext } from '../tables/inline-dropdown-context.js';
 import { fieldPlaceholder } from '../lib/field-placeholder.js';
 import { Check, ChevronDown, LoaderCircle, X } from 'lucide-react';
 import { Button } from './button.jsx';
@@ -24,6 +26,7 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
   placeholder = fieldPlaceholder({ placeholder, name }, 'Select');
   const [local, setLocal] = useState(defaultValue);
   const [search, setSearch] = useState('');
+  const inlineDropdown = useContext(InlineDropdownContext);
   const multiple = mode === 'multiple' || mode === 'tags';
   const current = value === undefined ? local : value;
   const selected = (multiple ? current || [] : current == null ? [] : [current])
@@ -53,6 +56,16 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
     if (!values.length) return;
     emit([...new Set([...selected, ...values])]); setSearch(''); onSearch?.('');
   };
+  if (inlineDropdown && !multiple && !labelInValue) return <TextField select fullWidth size="small" variant="standard"
+    className="table-inline-edit-editor" value={current ?? ''} disabled={disabled || loading}
+    inputProps={{ 'aria-label': typeof placeholder === 'string' ? placeholder : name }}
+    onBlur={onBlur} onFocus={onFocus} onClick={event => event.stopPropagation()}
+    onChange={event => {
+      const option = allOptions.find(item => String(item.value) === String(event.target.value));
+      if (option) choose(option);
+    }}>
+    {allOptions.map(option => <MenuItem key={option.value} value={option.value} disabled={option.disabled}>{option.label}</MenuItem>)}
+  </TextField>;
   return <div className={cn('relative inline-flex min-w-0', className)} style={style} title={disabled ? disabledReason : undefined}>
     <DropdownMenu modal={false} onOpenChange={open => { onDropdownVisibleChange?.(open); onOpenChange?.(open); if (!open) { setSearch(''); onBlur?.({ target: { name, value: current } }); } }}>
       <DropdownMenuTrigger asChild>

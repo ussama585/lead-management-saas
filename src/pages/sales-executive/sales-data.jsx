@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../components/animated-follow-up-icon.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import { Modal } from '../../components/ui/app-modal.jsx';
 import { Select } from '../../components/ui/app-select.jsx';
@@ -7,7 +8,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 
-import { LoaderCircle as LoadingOutlined, FileText as FileTextOutlined, Pencil as EditOutlined, RefreshCw as SyncOutlined } from 'lucide-react';
+import { LoaderCircle as LoadingOutlined, Pencil as EditOutlined, RefreshCw as SyncOutlined } from 'lucide-react';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';
 import { getCallingList, updateCallingClientStatus, getCallingCount, convertLeads } from '../shared/services/headhunting.js';
@@ -305,11 +306,12 @@ export default function SalesDataForExecutive() {
       },
       {
         header: "Remarks",
+        Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
         accessorKey: "remarks",
         Cell: ({ row }) => {
         const remarksValue = row.original.remarks;
         return remarksValue ? 
-            <FileTextOutlined size="1em" className="app-icon" style={{ fontSize: '2rem', cursor: 'pointer', textAlign: "center"}} onClick={() => { setIdForRemarks(row.original.id); setAddedById(row.original.added_by); setShowRemarksModal(true); }}/>
+            <AnimatedFollowUpIcon size="1em" className="app-icon" style={{ fontSize: '2rem', cursor: 'pointer', textAlign: "center"}} onClick={() => { setIdForRemarks(row.original.id); setAddedById(row.original.added_by); setShowRemarksModal(true); }}/>
             : "-" ;
             // openRemakrsModal(remarksValue)
         },

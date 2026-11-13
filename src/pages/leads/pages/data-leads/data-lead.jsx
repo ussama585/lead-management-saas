@@ -1,3 +1,4 @@
+import { syncTableColumns } from '../../../../components/tables/sync-table-columns.jsx';
 import ManualLocationInput from '../../../../components/manual-location-input.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
@@ -10,7 +11,8 @@ import { Link, useNavigate, useParams, useSearchParams, useLocation } from "reac
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
-import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
+import { useMaterialReactTable } from "material-react-table";
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import { deleteDataLeadJobWithRemarks } from '../../../shared/services/lead-job-lifecycle.js';
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
@@ -263,6 +265,7 @@ const DataLead = () => {
           const value = cell.getValue();
           return <span>{value == "101" || value == 101 ? "100+" : value || "-"}</span>;
         },
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue() === "101" ? "100+" : cell.getValue());
           return (
@@ -291,6 +294,7 @@ const DataLead = () => {
         header: "Job Type",
         accessorKey: "job_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -319,6 +323,7 @@ const DataLead = () => {
         header: "Employment Type",
         accessorKey: "employment_type",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(normalizeEmploymentType(cell.getValue()));
           return (
@@ -530,6 +535,7 @@ const DataLead = () => {
         header: "Currency",
         accessorKey: "currency",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -558,6 +564,7 @@ const DataLead = () => {
         header: "Payment Term",
         accessorKey: "payment_term",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -586,6 +593,7 @@ const DataLead = () => {
         header: "Gender",
         accessorKey: "gender_preference",
         size: 0.5,
+        meta: { inlineDropdown: true },
         Edit: ({ cell, row, table }) => {
           const [value, setValue] = React.useState(cell.getValue());
           return (
@@ -609,28 +617,6 @@ const DataLead = () => {
             />
           );
         },
-      },
-      {
-        header: "Job Description",
-        accessorKey: "job_description",
-        size: 1,
-        Cell: ({ cell, row }) => (
-          <>
-           
-            <AntButton
-              size="small"
-              style={{ marginLeft: 8 }}
-              disabled={isReadOnlyLead}
-              onClick={() => {
-                setDescEditValue(cell.getValue() || "");
-                setDescEditRow(row.original);
-                setDescModalOpen(true);
-              }}
-          >
-            Edit
-            </AntButton>
-          </>
-        ),
       },
       {
         header: 'View Details', id: 'view_details', enableSorting: false, enableEditing: false,
@@ -690,11 +676,13 @@ const DataLead = () => {
     }
   }, [sorting]);
 
+  const sharedColumns = useMemo(() => syncTableColumns(columns), [columns]);
+
   const table = useMaterialReactTable({
-    columns,
+    columns: sharedColumns,
     data: jobs,
     enableEditing: !isReadOnlyLead,
-    editDisplayMode: "cell",
+    editDisplayMode: "table",
     muiTableBodyCellProps: ({ cell, column, table }) => ({
       onClick: () => {
         if (column.id !== "job_title" && !isReadOnlyLead) {
@@ -779,25 +767,7 @@ const DataLead = () => {
         }}
       >
         {leadForCard && <LeadCard lead={leadForCard} leadType="Data Lead" refetchLeadDetail={refetchLeadDetail} />}
-        {(!isReadOnlyLead || isSuperAdmin(user?.user_type)) && (
-          <Stack direction="row" spacing={1} sx={{ mb: 2, mt: 2 }}>
-            <Button
-              className="custom-button"
-              onClick={handleCreateJob}
-              disabled={!dataLeadId}
-              sx={{
-                backgroundColor: "#3e6a9f",
-                "&:hover": { backgroundColor: "#2d5a8a" },
-                textTransform: "none",
-                fontWeight: 600,
-              }}
-            >
-              Add New Job
-            </Button>
-          </Stack>
-        )}
-
-            <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs} activeColumns={columns}><MaterialReactTable table={table} /></JobListingTabs>
+            <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs} activeColumns={columns} actions={(!isReadOnlyLead || isSuperAdmin(user?.user_type)) && <AntButton type="primary" onClick={handleCreateJob} disabled={!dataLeadId}>Add New Job</AntButton>}><NewTableComponent table={table} /></JobListingTabs>
           </Box>
         </div>
       </div>

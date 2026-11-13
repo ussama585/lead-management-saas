@@ -10,7 +10,7 @@ import useUserStore from '../../../shared/store/user-store.js';
 // import StatsCard from '../../../../components/stats-card.component.jsx';
 // import LineChart from '../../../../components/charts/line-chart.component.jsx';
 import { getExecutivesList } from '../../../shared/services/stats-service.js';
-import TableComponent from '../../../../components/tables/table.component.jsx';
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 // import SalesExecutivesIcon from '../../../../assets/images/stat-card-icons/sales-executives.svg';
 import ProfileImagePlaceholder from '../../../../assets/images/user-card-icons/user-placeholder.svg';
 import '../../../../assets/styles/legacy/sales-executive-listing-page.css';
@@ -269,7 +269,7 @@ export default function SalesExecutiveListing() {
               <p className="sop-branded-spin-text">Loading sales executives...</p>
             </div>
           ) : (
-            <TableComponent
+            <NewTableComponent serverListing
               columns={columns}
               data={transformedData}
               totalCount={executivesList.count || 0}

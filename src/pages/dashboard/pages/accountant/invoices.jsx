@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Select } from '../../../../components/ui/app-select.jsx';
@@ -9,7 +10,7 @@ import dayjs from 'dayjs';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 
-import { FileImage as FileImageOutlined, MessageCircle as CommentOutlined } from 'lucide-react';
+import { FileImage as FileImageOutlined } from 'lucide-react';
 import ApprovalStatusTabs from '../../../../components/approval-status-tabs.component.jsx';
 import { ConfirmationModal } from '../../../clients/components/LazyModals.jsx';
 import { getProjectPaymentCount, getOverallProjectPaymentList, updateProjectPaymentStatus } from '../../../shared/services/headhunting.js';
@@ -156,9 +157,10 @@ const AccountantInvoices = () => {
     },
     ...(selectedTab === 'Rejected' ? [{
       header: 'Remarks',
+      Header: () => <span className="follow-up-remarks-heading">Remarks</span>,
       accessorKey: 'reason',
       Cell: ({ cell }) => (
-        <CommentOutlined size="1em"
+        <AnimatedFollowUpIcon size="1em"
           className={["app-icon", `table-remarks-icon ${cell.getValue() ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
           onClick={() => setModal({ visible: true, remarks: cell.getValue() || '' })}
         />

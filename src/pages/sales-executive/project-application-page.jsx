@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { LoaderCircle as LoadingOutlined, User as UserOutlined } from 'lucide-react';
 import { useQuery } from 'react-query';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
-import TableComponent from '../../components/tables/table.component.jsx';
+import NewTableComponent from '../../components/tables/new-table.jsx';
 import ProfileImagePlaceholder from '../../assets/images/user-card-icons/user-placeholder.svg'
 import DocIcon from '../../assets/images/table-icons/doc icon.png';
 import '../../assets/styles/legacy/project-application-page.css';
@@ -252,7 +252,7 @@ export default function ProjectApplication() {
 
           <Spin indicator={<LoadingOutlined size="1em" className="app-icon app-icon-spin"  />} size="large" spinning={loadingProjectApplications}>
 
-            <TableComponent
+            <NewTableComponent serverListing
               columns={projectApplicationColumns}
               data={transformedData}
               totalCount={projectApplications?.count || 0}

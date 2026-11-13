@@ -11,7 +11,7 @@ import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import UserDetailCard from '../../../../components/user-detail-card.component.jsx';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import LineChart from '../../../../components/charts/line-chart.component.jsx';
-import TableComponent from '../../../../components/tables/table.component.jsx';
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 
 import SalesExecutivesIcon from '../../../../assets/images/stat-card-icons/sales-executives.svg';
 import PotentialClientsIcon from '../../../../assets/images/stat-card-icons/potential-clients.svg';
@@ -976,7 +976,7 @@ export default function SalesManagerDetail() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={potentialClientsColumns}
               data={transformedPotentialClientsData}
               totalCount={clientsList?.count || 0} // Update as necessary
@@ -998,7 +998,7 @@ export default function SalesManagerDetail() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={opportunitiesLostColumns}
               data={transformedOpportunitiesLosData}
               totalCount={clientsList?.count || 0} // Update as necessary
@@ -1030,7 +1030,7 @@ export default function SalesManagerDetail() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={activeProjectsColumns}
               data={transformedActiveProjectsData}
               totalCount={projectsList?.count || 0} // Update as necessary
@@ -1053,7 +1053,7 @@ export default function SalesManagerDetail() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={completedProjectsColumns}
               data={transformedCompletedProjectsData}
               totalCount={projectsList?.count || 0} // Update as necessary
@@ -1076,7 +1076,7 @@ export default function SalesManagerDetail() {
         return (
 
           <div>
-            <TableComponent
+            <NewTableComponent serverListing
               columns={terminatedProjectsColumns}
               data={transformedTerminatedProjectsData}
               totalCount={projectsList?.count || 0} // Update as necessary
@@ -1231,7 +1231,7 @@ export default function SalesManagerDetail() {
         </Spin>
 
 
-        <TableComponent
+        <NewTableComponent serverListing
           columns={executiveColumns}
           data={transformedExecutivesData}
           totalCount={executivesList?.count || 0} // Total number of items

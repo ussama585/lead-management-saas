@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../components/animated-follow-up-icon.jsx';
 import { message } from '../../components/ui/notifications.jsx';
 import { Select } from '../../components/ui/app-select.jsx';
 import { Button, Tooltip } from '../../components/ui/app-controls.jsx';
@@ -7,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../components/tables/new-table.jsx';
 import JobListingTabs from '../../components/job-listing-tabs.jsx';
-import { Trash2 as DeleteOutlined, Pencil as EditOutlined, MessageSquare as MessageOutlined } from 'lucide-react';
+import { Trash2 as DeleteOutlined, Pencil as EditOutlined } from 'lucide-react';
 import '../../assets/styles/legacy/table-client-actions.css';
 import { ConfirmationModal } from '../clients/components/LazyModals.jsx';
 import '../../assets/styles/legacy/prominent-scrollbar.css';
@@ -427,6 +428,7 @@ export default function JobsPage() {
         ? [
             {
               header: 'PM Remarks',
+              Header: () => <span className="follow-up-remarks-heading">PM Remarks</span>,
               id: 'pm_remarks_action',
               accessorKey: 'pm_remarks_action',
               enableSorting: false,
@@ -440,7 +442,7 @@ export default function JobsPage() {
                 return (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                     <Tooltip title="View PM remarks">
-                      <MessageOutlined size="1em"
+                      <AnimatedFollowUpIcon size="1em"
                         className={["app-icon", `table-remarks-icon ${hasPmRemarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
                         onClick={() => setPmRemarksModalState({ visible: true, jobId: row.original.id })}
                       />

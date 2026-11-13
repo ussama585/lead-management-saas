@@ -1,3 +1,4 @@
+import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import React, { useMemo } from 'react';
 import {
   Alert,
@@ -8,12 +9,6 @@ import {
   IconButton,
   Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -484,98 +479,45 @@ const MetaSpendingDetail = () => {
                       <Typography variant="h6" sx={{ color: '#3E6A9F', fontWeight: 600, mb: 1 }}>
                         Actions Breakdown
                       </Typography>
-                      <TableContainer>
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 600 }}>Action</TableCell>
-                              <TableCell sx={{ fontWeight: 600 }}>Magnitude</TableCell>
-                              <TableCell sx={{ fontWeight: 600 }} align="right">
-                                Value
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {!actions.length ? (
-                              <TableRow>
-                                <TableCell colSpan={3}>No actions available.</TableCell>
-                              </TableRow>
-                            ) : (
-                              ACTION_GROUP_ORDER.flatMap((category) => {
-                                const rows = groupedActions[category] || [];
-                                if (!rows.length) return [];
-
-                                const sectionRows = [
-                                  <TableRow key={`group-${category}`}>
-                                    <TableCell
-                                      colSpan={3}
-                                      sx={{
-                                        fontSize: '11px',
-                                        color: '#8c8c8c',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: 0.5,
-                                        backgroundColor: '#fafafa',
-                                        borderTop: '1px solid #eee',
-                                        borderBottom: '1px solid #eee',
-                                        py: 0.75,
-                                      }}
-                                    >
-                                      {category}
-                                    </TableCell>
-                                  </TableRow>,
-                                ];
-
-                                rows.forEach((item, index) => {
-                                  const percent = maxActionValue > 0 ? (item.numericValue / maxActionValue) * 100 : 0;
-                                  sectionRows.push(
-                                    <TableRow
-                                      key={`${item.actionType}-${index}`}
-                                      sx={{ backgroundColor: item.isLead ? '#e8f3ff' : 'transparent' }}
-                                    >
-                                      <TableCell sx={{ fontWeight: item.isLead ? 700 : 500 }}>
-                                        <Stack direction="row" alignItems="center" spacing={1}>
-                                          <span>{getActionIcon(item.actionType)}</span>
-                                          <Tooltip title={item.actionType} placement="top" arrow>
-                                            <span>{toTitle(item.actionType)}</span>
-                                          </Tooltip>
-                                        </Stack>
-                                      </TableCell>
-                                      <TableCell sx={{ minWidth: 220 }}>
-                                        <Box
-                                          sx={{
-                                            width: '100%',
-                                            height: 8,
-                                            backgroundColor: '#f2f2f2',
-                                            borderRadius: 99,
-                                            overflow: 'hidden',
-                                          }}
-                                        >
-                                          <Box
-                                            sx={{
-                                              width: `${Math.max(2, percent)}%`,
-                                              height: '100%',
-                                              backgroundColor: 'rgba(62, 106, 159, 0.2)',
-                                              borderRadius: 99,
-                                            }}
-                                          />
-                                        </Box>
-                                      </TableCell>
-                                      <TableCell
-                                        align="right"
-                                        sx={{ fontWeight: item.isLead ? 700 : 600, fontSize: '0.95rem' }}
-                                      >
-                                        {formatNumber(item.numericValue, 0)}
-                                      </TableCell>
-                                    </TableRow>
-                                  );
-                                });
-
-                                return sectionRows;
-                              })
-                            )}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
+                      <NewTableComponent mrtOptions={{
+                        data: ACTION_GROUP_ORDER.flatMap(category => {
+                          const rows = groupedActions[category] || [];
+                          return rows.length ? [
+                            { id: 'group-' + category, category, isCategory: true },
+                            ...rows.map((item, index) => ({ ...item, id: item.actionType + '-' + index })),
+                          ] : [];
+                        }),
+                        columns: [
+                          { id: 'action', header: 'Action', Cell: ({ row: { original: item } }) => item.isCategory ? item.category :
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              <span>{getActionIcon(item.actionType)}</span>
+                              <Tooltip title={item.actionType} placement="top" arrow><span>{toTitle(item.actionType)}</span></Tooltip>
+                            </Stack> },
+                          { id: 'magnitude', header: 'Magnitude', Cell: ({ row: { original: item } }) => !item.isCategory &&
+                            <Box sx={{ width: '100%', height: 8, backgroundColor: '#f2f2f2', borderRadius: 99, overflow: 'hidden' }}>
+                              <Box sx={{ width: Math.max(2, maxActionValue > 0 ? (item.numericValue / maxActionValue) * 100 : 0) + '%', height: '100%', backgroundColor: 'rgba(62, 106, 159, 0.2)', borderRadius: 99 }} />
+                            </Box> },
+                          { id: 'value', header: 'Value', muiTableHeadCellProps: { align: 'right' }, Cell: ({ row: { original: item } }) => !item.isCategory && formatNumber(item.numericValue, 0) },
+                        ],
+                        getRowId: row => row.id,
+                        muiTableBodyRowProps: ({ row }) => ({ sx: { backgroundColor: row.original.isLead ? '#e8f3ff' : 'transparent' } }),
+                        muiTableHeadCellProps: { sx: { fontWeight: 600 } },
+                        muiTableBodyCellProps: ({ row, column }) => row.original.isCategory ? column.id === 'action'
+                          ? { colSpan: 3, sx: { fontSize: '11px', color: '#8c8c8c', textTransform: 'uppercase', letterSpacing: 0.5, backgroundColor: '#fafafa', borderTop: '1px solid #eee', borderBottom: '1px solid #eee', py: 0.75 } }
+                          : { sx: { display: 'none' } }
+                          : { align: column.id === 'value' ? 'right' : 'left', sx: { fontWeight: row.original.isLead ? 700 : column.id === 'value' ? 600 : 500, ...(column.id === 'magnitude' ? { minWidth: 220 } : {}), ...(column.id === 'value' ? { fontSize: '0.95rem' } : {}) } },
+                        initialState: { density: 'compact' },
+                        enableSorting: false,
+                        enableGlobalFilter: false,
+                        enableColumnFilters: false,
+                        enableColumnActions: false,
+                        enableHiding: false,
+                        enableRowSelection: false,
+                        enablePagination: false,
+                        enableTopToolbar: false,
+                        enableBottomToolbar: false,
+                        renderEmptyRowsFallback: () => <div className="p-4 text-sm">No actions available.</div>,
+                      }} />
                     </Paper>
                   </Grid>
 
@@ -584,45 +526,29 @@ const MetaSpendingDetail = () => {
                       <Typography variant="h6" sx={{ color: '#3E6A9F', fontWeight: 600, mb: 1 }}>
                         Cost Per Action
                       </Typography>
-                      <TableContainer>
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 600 }}>Action</TableCell>
-                              <TableCell sx={{ fontWeight: 600 }} align="right">
-                                Cost
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {!costPerAction.length ? (
-                              <TableRow>
-                                <TableCell colSpan={2}>No cost-per-action values available.</TableCell>
-                              </TableRow>
-                            ) : (
-                              costPerAction.map((item, index) => {
-                                const highlighted = highlightCostRow(item?.action_type);
-                                return (
-                                  <TableRow
-                                    key={`${item?.action_type || 'cost-action'}-${index}`}
-                                    sx={{
-                                      backgroundColor: highlighted ? '#e8f3ff' : 'transparent',
-                                      '& td': { borderLeft: highlighted ? '2px solid #9bc6ff' : 'none' },
-                                    }}
-                                  >
-                                    <TableCell sx={{ fontWeight: highlighted ? 700 : 500 }}>
-                                      {toTitle(item?.action_type)}
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: highlighted ? 700 : 500 }}>
-                                      {formatCurrency(item?.value)}
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })
-                            )}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
+                      <NewTableComponent mrtOptions={{
+                        data: costPerAction,
+                        columns: [
+                          { id: 'action', accessorKey: 'action_type', header: 'Action', Cell: ({ cell }) => toTitle(cell.getValue()) },
+                          { id: 'cost', accessorKey: 'value', header: 'Cost', muiTableHeadCellProps: { align: 'right' }, muiTableBodyCellProps: { align: 'right' }, Cell: ({ cell }) => formatCurrency(cell.getValue()) },
+                        ],
+                        muiTableHeadCellProps: { sx: { fontWeight: 600 } },
+                        muiTableBodyRowProps: ({ row }) => {
+                          const highlighted = highlightCostRow(row.original?.action_type);
+                          return { sx: { backgroundColor: highlighted ? '#e8f3ff' : 'transparent', '& td': { borderLeft: highlighted ? '2px solid #9bc6ff' : 'none', fontWeight: highlighted ? 700 : 500 } } };
+                        },
+                        initialState: { density: 'compact' },
+                        enableSorting: false,
+                        enableGlobalFilter: false,
+                        enableColumnFilters: false,
+                        enableColumnActions: false,
+                        enableHiding: false,
+                        enableRowSelection: false,
+                        enablePagination: false,
+                        enableTopToolbar: false,
+                        enableBottomToolbar: false,
+                        renderEmptyRowsFallback: () => <div className="p-4 text-sm">No cost-per-action values available.</div>,
+                      }} />
                     </Paper>
                   </Grid>
                 </Grid>

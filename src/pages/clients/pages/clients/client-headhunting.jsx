@@ -1,3 +1,4 @@
+import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
@@ -5,7 +6,7 @@ import { Button, Tooltip } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect, useCallback, Suspense } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { List } from 'antd';
-import { Pencil as EditOutlined, MessageSquare as MessageOutlined } from 'lucide-react';
+import { Pencil as EditOutlined } from 'lucide-react';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import api from '../../../shared/services/api.js';
@@ -634,6 +635,7 @@ export default function ClientHeadhunting() {
         ] : []),
         {
           header: 'PM Remarks',
+          Header: () => <span className="follow-up-remarks-heading">PM Remarks</span>,
           id: 'project_manager_remarks_action',
           enableSorting: false,
           size: 64,
@@ -647,7 +649,7 @@ export default function ClientHeadhunting() {
             return (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                 <Tooltip title={userType === 'project_manager' ? 'View & update remarks' : 'View remarks'}>
-                  <MessageOutlined size="1em"
+                  <AnimatedFollowUpIcon size="1em"
                     className={["app-icon", `table-remarks-icon ${hasPmRemarks ? 'table-remarks-icon--filled' : 'table-remarks-icon--empty'}`].filter(Boolean).join(' ')}
                     onClick={() => {
                       setPmRemarksModal({ visible: true, project: row.original });
