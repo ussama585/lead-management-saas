@@ -918,7 +918,7 @@ export default function MetaLeadsStandard() {
       }),
     ] : []),
     ];
-    if (['super_admin', 'company_admin'].includes(user?.user_type)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
+    if (['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
       Cell: ({ row }) => <LeadListingActions lead={row.original} source="meta" /> });
     const leadingKeys = ['row_number', 'full_name', 'job_title', 'company_name', 'job_count', 'phone_number'];
     return dateBeforeStatusHistory([

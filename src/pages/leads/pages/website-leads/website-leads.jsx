@@ -624,6 +624,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         onSuccess: (data) => {
           message.success(data?.message || 'Lead reassigned successfully');
           queryClient.invalidateQueries('leads');
+          queryClient.invalidateQueries('leadStats', { exact: false });
           refetch();
           refetchCounts();
           setAssignmentModal({ visible: false, lead: null, newAssigneeId: null, newAssigneeName: null });
@@ -1156,7 +1157,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // Extra columns at the end
         ...extraColumns,
       ];
-      if (['super_admin', 'company_admin'].includes(userType)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
+      if (['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
         Cell: ({ row }) => <LeadListingActions lead={row.original} source="website" /> });
       const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
       const adjacentKeys = ['project_size', 'assigned_to_name'];

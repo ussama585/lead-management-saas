@@ -154,7 +154,7 @@ const LeadDetailPage = () => {
     const lead = data ?? {};
     console.log(lead,"leadleadlead")
     const isReadOnlyLead = false;
-const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type)) && !isReadOnlyLead;
+const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_manager'].includes(user?.user_type)) && !isReadOnlyLead;
 
     const deleteJobMutation = useMutation(
         ({ jobId, reason }) => deleteWebsiteLeadJob(jobId, reason),

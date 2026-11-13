@@ -117,9 +117,10 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   const isMetaLead = leadType === 'Meta Lead';
   const isWebsiteLead = !isDataLead && !isMetaLead;
   const optionCompanyId = leadOptionCompanyId(lead?.company_id ?? lead?.company?.id ?? (typeof lead?.company === 'object' ? null : lead?.company));
-  const companyStatusList = useLeadStatusOptions({ enabled: ['super_admin', 'company_admin'].includes(user?.user_type), companyId: optionCompanyId });
+  const useApiStatusOptions = ['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type);
+  const companyStatusList = useLeadStatusOptions({ enabled: useApiStatusOptions, companyId: optionCompanyId });
   const projectSizeList = useProjectSizeOptions({ enabled: user?.user_type === 'super_admin', companyId: optionCompanyId });
-  const statusOptions = ['super_admin', 'company_admin'].includes(user?.user_type) ? companyStatusList.options : isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
+  const statusOptions = useApiStatusOptions ? companyStatusList.options : isWebsiteLead ? WEBSITE_STATUS_OPTIONS : DATA_STATUS_OPTIONS;
   const projectSizeMutation = useMutation(value => isMetaLead ? updateMetaLeadProjectSize(lead.id, value) : updateLeadCardFields(leadType, lead.id, { project_size: value }), {
     onSuccess: async result => { message.success(result?.message || 'Project size updated.'); await refetchLeadDetail?.(); },
     onError: error => message.error(error?.response?.data?.message || error.message || 'Could not update project size.'),
@@ -577,8 +578,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               labelRender={({ label }) => <span className="lead-card__status-label"><span className="lead-card__status-dot" />{label}</span>}
               popupMatchSelectWidth={false}
               disabledReason={companyStatusList.disabled ? 'To change status, select company first' : undefined}
-              disabled={companyStatusList.disabled || updateStatusMutation.isLoading || remarksLoading || (['super_admin', 'company_admin'].includes(user?.user_type) && companyStatusList.isLoading)}
-              loading={['super_admin', 'company_admin'].includes(user?.user_type) && companyStatusList.isLoading}
+              disabled={companyStatusList.disabled || updateStatusMutation.isLoading || remarksLoading || (useApiStatusOptions && companyStatusList.isLoading)}
+              loading={useApiStatusOptions && companyStatusList.isLoading}
               notFoundContent={companyStatusList.isError ? 'Could not load statuses.' : 'No statuses available.'}
               options={statusOptions.map((option) => ({
                 label: option,
