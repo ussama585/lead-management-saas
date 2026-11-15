@@ -1087,7 +1087,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         },
         // 11. Job
         ...(userType !== 'marketing_manager' ? [{
-          header: 'Job',
+          header: 'Jobs',
           accessorKey: 'job_count',
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           size: 0.5,

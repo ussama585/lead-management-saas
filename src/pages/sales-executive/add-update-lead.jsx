@@ -11,6 +11,7 @@ import { Alert, Form, Row, Col, InputNumber } from 'antd';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import { salesDataValidationSchema } from '../shared/schemas/sales-data.js';
 import { dataEntryCreateSchema } from './schemas/data-entry-create-schema.js';
+import { salesDataError } from './sales-data-error.js';
 import api from '../shared/services/api.js';
 import useUserStore from '../shared/store/user-store.js';
 import { isSuperAdmin } from '../auth/role-access.js';
@@ -41,11 +42,12 @@ export async function listCompanies() {
 export async function createDataEntry(values, role) {
   const payload = {};
   for (const field of ['representative_name', 'designation', 'company_name', 'industry_sector', 'phone', 'email', 'city', 'country', 'company_address', 'company_website', 'company_social_link', 'acquired_through', 'status']) {
+    if (field === 'status' && role === 'data_entry_executive') continue;
     payload[field] = String(values[field] ?? '').trim();
   }
   if (isSuperAdmin(role)) payload.company = Number(values.company);
   const { data } = await api.post('/data-entry/create', payload);
-  if (data?.status === false || data?.success === false) throw new Error(data.message || 'Could not create sales data.');
+  if (data?.status === false || data?.success === false) throw new Error(role === 'data_entry_executive' ? salesDataError(data, 'Could not create sales data.') : data.message || 'Could not create sales data.');
   return data;
 }
 
@@ -142,6 +144,7 @@ const AddUpdateLead = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
   const superAdmin = isSuperAdmin(user?.user_type);
+  const dataEntryExecutive = user?.user_type === 'data_entry_executive';
   const queryClient = useQueryClient();
   const { data: companies = [], isLoading: loadingCompanies, isError: companiesError, error: companyError, refetch: refetchCompanies } = useQuery({
     queryKey: ['data-entry-company-options', '/accounts/simple-users-list', user?.id, user?.user_type],
@@ -159,7 +162,7 @@ const AddUpdateLead = () => {
       navigate('/data-entry-executive/leads-table'); // Go back to leads table
     },
     onError: (error) => {
-      message.error(error?.response?.data?.message || error?.message || 'Failed to add lead');
+      message.error(dataEntryExecutive ? salesDataError(error, 'Failed to add lead') : error?.response?.data?.message || error?.message || 'Failed to add lead');
     },
   });
 
@@ -335,7 +338,7 @@ const AddUpdateLead = () => {
       }
     },
     onError: (error) => {
-      message.error('Error uploading data. Please try again.');
+      message.error(dataEntryExecutive ? salesDataError(error, 'Error uploading data. Please try again.') : 'Error uploading data. Please try again.');
     }
   });
 
@@ -491,22 +494,25 @@ const AddUpdateLead = () => {
   return (
       <>
     
-      <BreadCrumb linkText="Add Sales Data" goBack={goBack} />
+      {!dataEntryExecutive && <BreadCrumb linkText="Add Sales Data" goBack={goBack} />}
     <div className="container " >
       <div style={{ marginTop: 24, maxWidth: 1440, marginLeft: 'auto', marginRight: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-          <h2 style={{ 
+        <div style={{ display: 'flex', justifyContent: dataEntryExecutive ? 'flex-end' : 'space-between', alignItems: 'center', marginBottom: 32 }}>
+          {!dataEntryExecutive && <h2 style={{ 
             margin: 0, 
             textAlign: 'left',
             color: '#3E6A9F',
             fontSize: '28px',
             fontWeight: '600'
-          }}>Add Sales Data</h2>
+          }}>Add Sales Data</h2>}
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button className='custom-button' onClick={handleDownloadEmptyTemplate}>
+            {dataEntryExecutive ? <>
+              <Button type="primary" onClick={handleDownloadEmptyTemplate} icon={<DownloadOutlined size={16} />}>Download Empty</Button>
+              <Button type="primary" onClick={handleUploadButtonClick}>Upload CSV</Button>
+            </> : <><button className='custom-button' onClick={handleDownloadEmptyTemplate}>
               <DownloadOutlined size="1em" className="app-icon" style={{ marginRight: 4 }} />Download Empty
             </button>
-            <button className='custom-button' onClick={handleUploadButtonClick}>Upload CSV</button>
+            <button className='custom-button' onClick={handleUploadButtonClick}>Upload CSV</button></>}
             <input
               type="file"
               accept=".xls,.xlsx,.csv,text/csv"
@@ -519,9 +525,10 @@ const AddUpdateLead = () => {
         </div>
         <Formik
           initialValues={{ ...initialState, company: null }}
-          validationSchema={dataEntryCreateSchema(superAdmin)}
+          validationSchema={dataEntryCreateSchema(superAdmin, !dataEntryExecutive)}
           onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
             createLead(values, { onError: error => {
+              if (dataEntryExecutive) return;
               const body = error?.response?.data;
               const fields = body?.errors || body;
               const errors = {};
@@ -535,7 +542,7 @@ const AddUpdateLead = () => {
         >
           {({ handleSubmit, status }) => (
             <FormikForm onSubmit={handleSubmit}>
-              {status && <Alert type="error" showIcon message={status} className="mb-4" />}
+              {!dataEntryExecutive && status && <Alert type="error" showIcon message={status} className="mb-4" />}
               <Row gutter={[24, 24]}>
                 {superAdmin && <Col xs={24} sm={12} lg={8}>
                   <label htmlFor="data-entry-company" className="form-label">Company {requiredMark}</label>
@@ -549,13 +556,13 @@ const AddUpdateLead = () => {
                   {companiesError && <div role="alert">{companyError?.response?.data?.message || companyError?.message || 'Could not load companies.'} <Button type="link" onClick={() => refetchCompanies()}>Retry</Button></div>}
                   <ErrorMessage name="company" component="div" className="form-error" />
                 </Col>}
-                <Col xs={24} sm={12} lg={8}>
+                {!dataEntryExecutive && <Col xs={24} sm={12} lg={8}>
                   <label htmlFor="data-entry-status" className="form-label">Status {requiredMark}</label>
                   <Field name="status">{({ field, form }) => <Select placeholder="Select status" id="data-entry-status" value={field.value}
                     onChange={value => form.setFieldValue('status', value)} style={{ width: '100%' }}
                     options={['Pending', 'Converted', 'Contacted But No Response'].map(value => ({ value, label: value }))} />}</Field>
                   <ErrorMessage name="status" component="div" className="form-error" />
-                </Col>
+                </Col>}
                 <Col xs={24} sm={12} md={12} lg={8} xl={8} xxl={6}>
                   <label htmlFor="representative_name" className="form-label text-start mt-3 mb-1" style={{ color: '#3E6A9F', fontWeight: 500 }}>
                     Representative Name 
@@ -743,9 +750,9 @@ const AddUpdateLead = () => {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  className="custom-button"
+                  className={dataEntryExecutive ? undefined : 'custom-button'}
                   loading={isLoading}
-                  style={{ minWidth: 120, height: '40px', fontSize: '14px', fontWeight: '500', borderRadius: '6px' }}
+                  style={dataEntryExecutive ? undefined : { minWidth: 120, height: '40px', fontSize: '14px', fontWeight: '500', borderRadius: '6px' }}
                 >
                   Submit
                 </Button>

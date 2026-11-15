@@ -94,6 +94,9 @@ const CommonLeadsFollowUp = () => {
     {
       onSuccess: (response) => {
         message.success(response?.message || 'Follow up saved successfully');
+        if (userType === 'company_admin') {
+          setFollowUpModal({ visible: false, lead: null, leadType: 'website' });
+        }
         queryClient.invalidateQueries({
           predicate: ({ queryKey }) =>
             Array.isArray(queryKey) && queryKey[0] === 'commonLeadsFollowUp',
@@ -241,7 +244,7 @@ const CommonLeadsFollowUp = () => {
         size: 90,
         Cell: ({ row }) => {
           const canUseFollowUp =
-            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'super_admin';
+            userType === 'sales_manager' || userType === 'sales_executive' || userType === 'super_admin' || userType === 'company_admin';
 
 
           if (!canUseFollowUp) return <span>-</span>;

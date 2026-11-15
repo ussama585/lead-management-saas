@@ -28,6 +28,7 @@ import { STATUS_OPTIONS as WEBSITE_STATUS_OPTIONS } from '../pages/leads/pages/w
 import { STATUS_OPTIONS as DATA_STATUS_OPTIONS } from '../pages/leads/pages/data-leads/data-leads-constants.js';
 import { updateLeadCardFields } from './lead-card-updates.js';
 import useLeadStatusOptions from '../pages/shared/services/use-lead-status-options.js';
+import { canSalesExecutiveEditMetaLead } from '../pages/shared/utils/meta-lead-edit-permission.js';
 import useProjectSizeOptions from '../pages/shared/services/use-project-size-options.js';
 import { updateMetaLeadProjectSize } from '../pages/shared/services/metaLeads.js';
 
@@ -109,7 +110,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
 
   const { user } = useUserStore();
   // Allow super admins, sales managers, and the person assigned to the lead to edit
-  const canEdit = (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || (user?.user_type === 'company_admin' && ['Website Lead', 'Data Lead', 'Meta Lead'].includes(leadType)) || user?.id === lead?.assigned_to);
+  const canEdit = (user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || (user?.user_type === 'company_admin' && ['Website Lead', 'Data Lead', 'Meta Lead'].includes(leadType)) || user?.id === lead?.assigned_to || (leadType === 'Meta Lead' && canSalesExecutiveEditMetaLead(user, lead)));
   const { Option } = Select;
   const queryClient = useQueryClient();
 

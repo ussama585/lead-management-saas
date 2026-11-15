@@ -842,7 +842,7 @@ export default function MetaLeadsStandard() {
       Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
     },
     {
-      header: 'Job Count',
+      header: 'Jobs',
       accessorKey: 'job_count',
       size: 100,
       enableSorting: false,

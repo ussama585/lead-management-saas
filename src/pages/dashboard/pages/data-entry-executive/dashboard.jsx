@@ -2,17 +2,19 @@ import React from 'react';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import { Row, Col } from 'antd';
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { getDataEntryExecutiveStats, getDataEntryExecutiveGraphStats } from '../../../shared/services/data-entry-service.js';
 import LineChart from '../../../../components/charts/line-chart.component.jsx';
 
 
 const DataEntryExecutiveDashboard = () => {
-  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const filter = 'week';
 
-  const { data, isLoading } = useQuery('data-entry-executive-stats', getDataEntryExecutiveStats);
+  const { data, isLoading } = useQuery('data-entry-executive-stats', getDataEntryExecutiveStats, {
+    enabled: pathname.replace(/\/+$/, '') === '/data-entry-executive',
+  });
 
   const { data: graphData, isLoading: loadingGraph } = useQuery(
     ['data-entry-executive-graph-stats', filter],

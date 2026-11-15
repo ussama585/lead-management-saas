@@ -28,6 +28,17 @@ describe('data entry company dropdown', () => {
 });
 
 describe('company selection by role', () => {
+  it('omits status and does not require it for Data Entry Executives', async () => {
+    api.post.mockResolvedValue({ data: { success: true } });
+    await createDataEntry({ company_name: 'Example', status: 'Converted' }, 'data_entry_executive');
+    expect(api.post.mock.lastCall[1]).not.toHaveProperty('status');
+    await expect(dataEntryCreateSchema(false, false).fields.status.validate(undefined)).resolves.toBeUndefined();
+  });
+  it('preserves status submission for other roles', async () => {
+    api.post.mockResolvedValue({ data: { success: true } });
+    await createDataEntry({ status: 'Pending' }, 'sales_manager');
+    expect(api.post.mock.lastCall[1]).toHaveProperty('status', 'Pending');
+  });
   it.each(['super_admin', 'admin'])('includes the company ID for %s', async role => {
     api.post.mockResolvedValue({ data: { success: true } });
     await createDataEntry({ company: '2', status: 'Pending' }, role);
