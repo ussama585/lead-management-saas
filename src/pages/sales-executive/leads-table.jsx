@@ -30,7 +30,6 @@ const baseColumns = [
   { header: 'Company Website', accessorKey: 'company_website' },
   { header: 'Company Social Media', accessorKey: 'company_social_link' },
   { header: 'Data Acquired Through', accessorKey: 'acquired_through' },
-  { header: 'Status', accessorKey: 'status' },
   { header: 'Added By', accessorKey: 'added_by_name' },
   { 
     header: 'Date', 
