@@ -4,7 +4,7 @@ import { useQueryClient } from 'react-query';
 import { LogOut, Command, KeyRound, Settings, House, UsersRound, BriefcaseBusiness, Globe, Database, ContactRound, CalendarClock, Building2, FolderKanban, ReceiptText, FileUser, ClipboardList, ChartNoAxesCombined, History, Presentation, BadgeCheck, CircleDollarSign } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar.jsx';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu.jsx';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger, useSidebar } from '@/components/ui/sidebar.jsx';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar.jsx';
 import { Separator } from '@/components/ui/separator.jsx';
 import useUserStore from '@/pages/shared/store/user-store.js';
 import { getRolePath } from '@/pages/auth/role-home.js';
@@ -77,7 +77,7 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
           {Number(badges[item.key]) > 0 && <SidebarMenuBadge className='right-3 rounded-full bg-primary px-2 text-primary-foreground peer-hover/menu-button:text-primary-foreground'>{badges[item.key] > 99 ? '99+' : badges[item.key]}</SidebarMenuBadge>}
         </SidebarMenuItem>; })}</SidebarMenu>
       </SidebarGroupContent></SidebarGroup>)}</SidebarContent>
-      <SidebarRail />
+
     </Sidebar>
     <SidebarInset className='min-w-0'>
       <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-primary/10 bg-background px-4'>
