@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
-import { LogOut, Command, KeyRound, Settings } from 'lucide-react';
+import { LogOut, Command, KeyRound, Settings, House, UsersRound, BriefcaseBusiness, Globe, Database, ContactRound, CalendarClock, Building2, FolderKanban, ReceiptText, FileUser, ClipboardList, ChartNoAxesCombined, History, Presentation, BadgeCheck, CircleDollarSign } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar.jsx';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu.jsx';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger, useSidebar } from '@/components/ui/sidebar.jsx';
@@ -10,6 +10,19 @@ import useUserStore from '@/pages/shared/store/user-store.js';
 import { getRolePath } from '@/pages/auth/role-home.js';
 import { isSuperAdmin } from '@/pages/auth/role-access.js';
 import ChangePasswordDialog from '@/components/change-password-dialog.jsx';
+
+const copyrightYear = new Date().getFullYear();
+
+const navigationIcons = {
+  Dashboard: House, 'User Management': UsersRound, 'Sales Managers': UsersRound,
+  'Sales Executives': ContactRound, Clients: ContactRound, Companies: Building2,
+  Jobs: BriefcaseBusiness, Projects: FolderKanban, 'Website Leads': Globe,
+  'Data Leads': Database, 'Meta Leads': ContactRound, 'Sales Data': Database,
+  'Follow-up': CalendarClock, Invoices: ReceiptText, 'CV Pool': FileUser,
+  Questionnaires: ClipboardList, 'Main Stats': ChartNoAxesCombined,
+  'User Activity': History, 'Demo Request': Presentation, Deliverables: BadgeCheck,
+  'Meta Spending': CircleDollarSign, 'JD Request': ClipboardList, Settings,
+};
 
 function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
   const { user, clearUser } = useUserStore();
@@ -53,31 +66,33 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
         </SidebarMenuButton></SidebarMenuItem></SidebarMenu>
       </SidebarHeader>
       <SidebarContent className='gap-1 py-2'>{orderedMenuGroups.map(([group, items]) => <SidebarGroup key={group} aria-label={group}>
-        <SidebarGroupLabel className='mb-2 text-[11px] font-semibold uppercase tracking-widest text-primary/70'>{group}</SidebarGroupLabel><SidebarGroupContent>
-        <SidebarMenu className='gap-1.5'>{items.map(item => <SidebarMenuItem key={item.key}>
-          <SidebarMenuButton className='h-10 rounded-lg text-muted-foreground transition-colors hover:bg-primary/8 hover:text-primary active:bg-primary/12 data-[active=true]:bg-primary data-[active=true]:font-medium data-[active=true]:text-primary-foreground data-[active=true]:shadow-sm [&>svg]:text-primary data-[active=true]:[&>svg]:text-primary-foreground' tooltip={item.label} isActive={item.key === selectedKey} onClick={() => select(item.key)}>
-            {item.icon}<span>{item.label}</span>
+        <SidebarGroupLabel className='relative mb-3 text-[11px] font-bold uppercase tracking-widest text-primary after:absolute after:bottom-0 after:left-2 after:h-0.5 after:w-8 after:rounded-full after:bg-primary'>{group}</SidebarGroupLabel><SidebarGroupContent>
+        <SidebarMenu className='gap-2'>{items.map(item => {
+          const Icon = navigationIcons[item.label];
+          return <SidebarMenuItem key={item.key}>
+          <SidebarMenuButton className='before:absolute before:inset-x-0 before:bottom-0 before:h-0.5 before:origin-left before:scale-x-0 before:bg-primary before:transition-transform before:duration-300 hover:before:scale-x-100 focus-visible:before:scale-x-100 motion-reduce:before:transition-none relative h-11 gap-3 rounded-md px-3 text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/10 data-[active=true]:bg-transparent data-[active=true]:font-semibold data-[active=true]:text-primary data-[active=true]:after:absolute data-[active=true]:after:inset-y-1 data-[active=true]:after:right-0 data-[active=true]:after:w-[5px] data-[active=true]:after:rounded-full data-[active=true]:after:bg-primary [&>svg]:size-5 [&>svg]:stroke-[1.75] data-[active=true]:[&>svg]:stroke-[2.25] group-data-[collapsible=icon]:p-1.5!' tooltip={item.label} isActive={item.key === selectedKey} onClick={() => select(item.key)}>
+            {Icon ? <Icon /> : item.icon}<span>{item.label}</span>
           </SidebarMenuButton>
-          {Number(badges[item.key]) > 0 && <SidebarMenuBadge className={item.key === selectedKey ? 'rounded-md bg-white/20 text-white peer-hover/menu-button:text-white' : 'rounded-md bg-primary/10 text-primary'}>{badges[item.key] > 99 ? '99+' : badges[item.key]}</SidebarMenuBadge>}
-        </SidebarMenuItem>)}</SidebarMenu>
+          {Number(badges[item.key]) > 0 && <SidebarMenuBadge className='right-3 rounded-full bg-primary px-2 text-primary-foreground peer-hover/menu-button:text-primary-foreground'>{badges[item.key] > 99 ? '99+' : badges[item.key]}</SidebarMenuBadge>}
+        </SidebarMenuItem>; })}</SidebarMenu>
       </SidebarGroupContent></SidebarGroup>)}</SidebarContent>
       <SidebarRail />
     </Sidebar>
     <SidebarInset className='min-w-0'>
-      <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b bg-background px-4'>
-        <SidebarTrigger /><Separator orientation='vertical' className='h-4' />
-        <span className='min-w-0 truncate text-sm font-medium'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Workspace'}</span>
+      <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-primary/10 bg-background px-4'>
+        <SidebarTrigger className='rounded-lg border border-primary/15 bg-primary/5 text-primary transition-colors hover:bg-primary/10 hover:text-primary' /><Separator orientation='vertical' className='h-4 bg-primary/15' />
+        <span className='min-w-0 truncate text-sm font-semibold text-primary'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Overview'}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button type='button' aria-label='Open account menu' className='ml-auto flex min-w-0 shrink-0 items-center gap-2 rounded-xl border border-border px-3 py-1.5 text-left outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
-              <Avatar className='size-8'><AvatarImage src={user?.profile_pic} alt='' /><AvatarFallback>{initials}</AvatarFallback></Avatar>
+            <button type='button' aria-label='Open account menu' className='ml-auto flex min-w-0 shrink-0 items-center gap-2 rounded-xl border border-primary/15 bg-primary/[0.025] px-3 py-1.5 text-left outline-none transition-colors hover:border-primary/30 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
+              <Avatar className='size-8 rounded-lg'><AvatarImage src={user?.profile_pic} alt='' /><AvatarFallback className='rounded-lg bg-primary/10 font-semibold text-primary'>{initials}</AvatarFallback></Avatar>
               <span className='grid min-w-0 max-w-[130px] leading-tight sm:max-w-[220px]'>
-                <span className='truncate text-sm font-semibold'>{user?.name || 'User'}</span>
+                <span className='truncate text-sm font-semibold text-primary'>{user?.name || 'User'}</span>
                 <span className='truncate text-xs text-muted-foreground'>{user?.email}</span>
               </span>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side='bottom' align='end' className='min-w-56'>
+          <DropdownMenuContent side='bottom' align='end' className='min-w-56 rounded-xl border-primary/15 [&_svg]:text-primary'>
             <DropdownMenuLabel><div>{user?.name}</div><div className='text-xs font-normal text-muted-foreground'>{user?.email}</div></DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => navigate(getRolePath(user?.user_type, '/settings'))}><Settings />Settings</DropdownMenuItem>
@@ -89,7 +104,16 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
       </header>
       <ChangePasswordDialog open={passwordOpen} onClose={() => setPasswordOpen(false)} />
       <main id='main-content' tabIndex={-1} className='sop-page-content'>{children}</main>
-      <footer className='flex flex-wrap items-center justify-between gap-2 border-t px-6 py-4 text-xs text-muted-foreground'><span>Search O Pal · Management workspace</span><span className='capitalize'>{role}</span></footer>
+      <footer className='mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-primary/10 bg-primary/[0.025] px-5 py-3 text-xs text-muted-foreground sm:px-6'>
+        <div className='flex items-center gap-2.5'>
+          <span className='flex size-7 items-center justify-center rounded-lg border border-primary/10 bg-background text-primary'><Command className='size-3.5' aria-hidden='true' /></span>
+          <div className='flex flex-wrap items-baseline gap-x-2 gap-y-0.5'>
+            <span className='font-semibold text-primary'>Search O Pal</span>
+            <span>© {copyrightYear} All rights reserved.</span>
+          </div>
+        </div>
+        <span className='rounded-full border border-primary/10 bg-background px-3 py-1 font-medium capitalize text-primary'>{role} workspace</span>
+      </footer>
     </SidebarInset>
   </>;
 }
