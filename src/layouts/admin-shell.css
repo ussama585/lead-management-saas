@@ -1,0 +1,55 @@
+.sop-admin-shell [data-sidebar='content'] {
+  gap: 0;
+  padding-block: 6px;
+}
+
+.sop-admin-shell [data-sidebar='group'] {
+  padding-block: 4px;
+}
+
+.sop-admin-shell [data-sidebar='menu'] {
+  gap: 2px;
+}
+
+.sop-admin-shell [data-sidebar='content'] [data-sidebar='menu-button'] {
+  height: 32px;
+}
+
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='group-label'],
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='menu-button'] > span {
+  display: none;
+}
+
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='header'],
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='group'] {
+  padding-inline: 4px;
+  align-items: center;
+}
+
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='menu'] {
+  align-items: center;
+}
+
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='menu-button'] {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  gap: 0;
+  justify-content: center;
+}
+
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='menu-button'] > svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='menu-button']::before,
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='menu-button']::after {
+  display: none;
+}
+
+.sop-admin-shell [data-collapsible='icon'] [data-sidebar='menu-button'][data-active='true'] {
+  background-color: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
