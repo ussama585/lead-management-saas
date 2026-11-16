@@ -12,7 +12,7 @@ import { requestPasswordResetOtp, resetPasswordWithOtp } from '../../shared/serv
 import { otpErrorMessage } from '../../shared/utils/otp-error.js';
 import useOtpResend from '../hooks/use-otp-resend.js';
 
-export default function ForgotPasswordPage() {
+export default function ForgotPasswordPage({ signInPath = '/' }) {
   const navigate = useNavigate();
   const [resetEmail, setResetEmail] = useState('');
   const requestOtp = useMutation(requestPasswordResetOtp, {
@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
     onSuccess: result => {
       resetForm.resetForm();
       message.success(result?.message || 'Password reset successfully. Sign in with your new password.');
-      navigate('/', { replace: true });
+      navigate(signInPath, { replace: true });
     },
     onError: error => message.error(otpErrorMessage(error) || 'Could not reset password. Please try again.'),
   });
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
   const fieldError = (form, name) => form.touched[name] && form.errors[name]
     ? <span id={`${name}-error`} className="sop-field-error">{form.errors[name]}</span> : null;
 
-  return <AuthCard title={resetEmail ? 'Reset password' : 'Forgot password?'}
+  return <AuthCard signInPath={signInPath} title={resetEmail ? 'Reset password' : 'Forgot password?'}
     description={resetEmail ? `Enter the OTP sent to ${resetEmail} and choose your new password.` : 'Enter your email address to receive a password reset OTP.'}>
     {!resetEmail ? <form onSubmit={emailForm.handleSubmit} noValidate className="grid gap-4">
       <div className="sop-field">
