@@ -60,6 +60,7 @@ export default function SuperAdminLoginPage() {
             aria-invalid={Boolean(formik.touched[name] && formik.errors[name])} aria-describedby={formik.touched[name] && formik.errors[name] ? `super-admin-${name}-error` : undefined} />
           {formik.touched[name] && formik.errors[name] && <span id={`super-admin-${name}-error`} className='sop-field-error'>{formik.errors[name]}</span>}
         </div>)}
+        <Link to='/super-admin/forgot-password' className='block text-right text-sm text-primary underline underline-offset-4'>Forgot password?</Link>
         <Button type='submit' disabled={mutation.isLoading}>{mutation.isLoading && <Loader2 className='size-4 animate-spin' />}{mutation.isLoading ? 'Signing in...' : 'Sign in'}</Button>
         {mutation.isError && <p role='alert' className='sop-field-error'>{mutation.error.message}</p>}
       </form>

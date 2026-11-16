@@ -21,6 +21,20 @@ function render(role, path = '/') {
 beforeEach(() => { state.navigate.mockClear(); state.shell = null; });
 
 describe('role navigation after the shadcn migration', () => {
+  it.each([
+    ['sales_manager', '/sales-manager/data-entry-table'],
+    ['sales_manager', '/data-entry-table/'],
+    ['sales_manager', '/data-entry/edit/7'],
+    ['company_admin', '/company-admin/data-entry-table/'],
+    ['super_admin', '/super-admin/data-entry-table'],
+  ])('highlights Sales Data instead of Dashboard for %s at %s', (role, path) => {
+    expect(render(role, path).selectedKey).toBe('11');
+  });
+  it.each(['/data-entry/edit/7', '/data-entry-executive/data-entry/edit/7', '/data-entry-executive/leads-table/'])('keeps Sales Data highlighted in the data entry layout at %s', path => {
+    state.path = path;
+    renderToStaticMarkup(<DataEntryLayout />);
+    expect(state.shell.selectedKey).toBe('2');
+  });
   it('shows and opens Demo Request only for Super Admin', () => {
     const shell = render('super_admin', '/super-admin/demo-requests');
     expect(shell.selectedKey).toBe('27');

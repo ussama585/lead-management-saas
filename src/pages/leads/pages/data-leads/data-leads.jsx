@@ -971,7 +971,7 @@ const DataLeads = () => {
             }),
           ]
         : []),
-      ...(['super_admin', 'company_admin'].includes(user?.user_type) ? [{
+      ...(['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type) ? [{
         header: 'Actions', id: 'lead_actions', enableSorting: false, size: 160,
         Cell: ({ row }) => <LeadListingActions lead={row.original} source="data" onEdit={() => setLeadDialog({ mode: 'edit', id: row.original.id })} />,
       }] : []),

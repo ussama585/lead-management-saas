@@ -161,7 +161,7 @@ function App() {
   const location = useLocation();
 
   // Exclude layout for login page
-  const isLoginPage = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/super-admin/login' || location.pathname === '/forgot-password' || location.pathname === '/reset-password';
+  const isLoginPage = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/super-admin/login' || location.pathname === '/super-admin/forgot-password' || location.pathname === '/forgot-password' || location.pathname === '/reset-password';
   
 
   const getLayout = (element) => {
@@ -430,6 +430,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/super-admin/login" element={<SuperAdminLoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/super-admin/forgot-password" element={<ForgotPasswordPage signInPath="/super-admin/login" />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Routes>
       )}

@@ -1087,7 +1087,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         },
         // 11. Job
         ...(userType !== 'marketing_manager' ? [{
-          header: 'Job',
+          header: 'Jobs',
           accessorKey: 'job_count',
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           size: 0.5,
@@ -1156,7 +1156,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // Extra columns at the end
         ...extraColumns,
       ];
-      if (['super_admin', 'company_admin'].includes(userType)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
+      if (['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
         Cell: ({ row }) => <LeadListingActions lead={row.original} source="website" /> });
       const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
       const adjacentKeys = ['project_size', 'assigned_to_name'];

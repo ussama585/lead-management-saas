@@ -19,6 +19,7 @@ import { countriesNames } from '../shared/utils/countries.js';
 import { useFormik } from 'formik';
 import useUserStore from '../shared/store/user-store.js';
 import { getRolePath } from '../auth/role-home.js';
+import { salesDataError } from './sales-data-error.js';
 
 const industryOptions = [
     { label: "Technology", value: "Technology" },
@@ -56,6 +57,7 @@ const EditDataEntry = () => {
   const requiredMark = <span style={{ color: '#3E6A9F', marginLeft: 2 }}>*</span>;
   const navigate = useNavigate();
   const user = useUserStore(state => state.user);
+  const dataEntryExecutive = user?.user_type === 'data_entry_executive';
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [initialValues, setInitialValues] = useState(initialState);
@@ -72,7 +74,7 @@ const EditDataEntry = () => {
           country: data.country || null,
         });
       } catch (err) {
-        message.error(err?.message || 'Failed to fetch data entry');
+        message.error(dataEntryExecutive ? salesDataError(err, 'Failed to fetch data entry') : err?.message || 'Failed to fetch data entry');
         navigate(-1);
       } finally {
         setLoading(false);
@@ -83,14 +85,18 @@ const EditDataEntry = () => {
   }, [id]);
 
   const { mutate: updateLead, isLoading } = useMutation(
-    ({ id, values }) => updateDataEntryById(id, values),
+    ({ id, values }) => {
+      const payload = { ...values };
+      if (user?.user_type === 'data_entry_executive') delete payload.status;
+      return updateDataEntryById(id, payload);
+    },
     {
       onSuccess: (data) => {
         message.success(data?.message || 'Data updated successfully');
         navigate(getRolePath(user?.user_type, '/data-entry-table'), { replace: true });
       },
       onError: (error) => {
-        message.error(error?.message || 'Failed to update data entry');
+        message.error(dataEntryExecutive ? salesDataError(error, 'Failed to update data entry') : error?.message || 'Failed to update data entry');
       },
     }
   );
@@ -134,16 +140,16 @@ const EditDataEntry = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Edit Sales Data" goBack={() => navigate(-1)} />
+      {!dataEntryExecutive && <BreadCrumb linkText="Edit Sales Data" goBack={() => navigate(-1)} />}
       <div className="container ">
         <div style={{ marginTop: 24, maxWidth: 1200, marginLeft: 'auto', marginRight: 'auto' }}>
-          <h2 style={{
+          {!dataEntryExecutive && <h2 style={{
             margin: '0 0 32px 0',
             textAlign: 'left',
             color: '#3E6A9F',
             fontSize: '28px',
             fontWeight: '600'
-          }}>Edit Sales Data</h2>
+          }}>Edit Sales Data</h2>}
           <Formik
             enableReinitialize
             initialValues={initialValues}
@@ -369,9 +375,9 @@ const EditDataEntry = () => {
                 <div style={{ textAlign: 'left', marginTop: '16px' }}>
                   <Button
                     type="submit"
-                    className="custom-button"
+                    className={dataEntryExecutive ? undefined : 'custom-button'}
                     disabled={isLoading}
-                    style={{ minWidth: 120, height: '40px', fontSize: '14px', fontWeight: '500', borderRadius: '6px' }}
+                    style={dataEntryExecutive ? undefined : { minWidth: 120, height: '40px', fontSize: '14px', fontWeight: '500', borderRadius: '6px' }}
                   >
                     {isLoading ? 'Updating...' : 'Update'}
                   </Button>

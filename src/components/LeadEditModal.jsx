@@ -7,6 +7,7 @@ import { Form } from 'antd';
 import { Pencil as EditOutlined } from 'lucide-react';
 import api from '../pages/shared/services/api.js';
 import { useMutation, useQueryClient } from 'react-query';
+import { canSalesExecutiveEditMetaLead } from '../pages/shared/utils/meta-lead-edit-permission.js';
 
 const LeadEditModal = ({
   lead,
@@ -72,7 +73,8 @@ const LeadEditModal = ({
   };
 
   const canEdit = user?.user_type === 'super_admin' || user?.user_type === 'sales_manager' || (user?.user_type === 'company_admin' && ['Website Lead', 'Meta Lead'].includes(leadType)) ||
-                 (user?.user_type === 'sales_executive' && user?.id === leadToUse?.assigned_to);
+                 (user?.user_type === 'sales_executive' && user?.id === leadToUse?.assigned_to) ||
+                 (isMetaLead && canSalesExecutiveEditMetaLead(user, leadToUse));
 
   if (!canEdit) {
     return null;

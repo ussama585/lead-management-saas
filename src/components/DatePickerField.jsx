@@ -1,5 +1,5 @@
 // src/components/DatePickerField.jsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { fieldPlaceholder } from './lib/field-placeholder.js';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
@@ -27,6 +27,7 @@ const DatePickerField = (props) => {
   } = props;
 
   const resolvedShowTime = showTimeConfig ?? (showTime ? true : false);
+  const pickerValue = useMemo(() => value ? dayjs(value) : null, [value]);
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -42,7 +43,7 @@ const DatePickerField = (props) => {
         showTime={resolvedShowTime}
         format={format}
         placeholder={fieldPlaceholder({ placeholder, label: label || name || (showTime ? 'date and time' : 'date') }, 'Select')}
-        value={value ? dayjs(value) : null}
+        value={pickerValue}
         onChange={onChange}
         onBlur={onBlur}
         style={{ width: '100%', ...style }}

@@ -147,13 +147,14 @@ export default function AppLayout({ children, role }) {
     if (path.includes('/google-form') || path.includes('/screening-forms') || path.includes('/available-questionnaires') || path.includes('/edit-google-form') || path.includes('/add-google-form') || path.includes('/admin/screening-forms')) return '16';
     // Sales Data
     if (
+      /\/data-entry-table(?:\/|$)/.test(path) ||
+      /\/data-entry\/edit(?:\/|$)/.test(path) ||
       path.includes('/sales-data') ||
       path.includes('/set-data') ||
       path.includes('/view-sales-data')
     ) return '11';
     // Leads
     if (/\/leads(\/|$)/.test(path) || path.includes('/add-new-lead')) return '10';
-    if (path === '/data-entry-table' || path === '/admin/data-entry-table') return '11';
     if (path === '/add-data-entry') return '12';
     return '1'; // default
   };

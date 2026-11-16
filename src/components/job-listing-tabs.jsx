@@ -32,6 +32,7 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
   const [search, setSearch] = useState('');
   const [textDetail, setTextDetail] = useState(null);
   const { user } = useUserStore();
+  const canRestore = Boolean(source && user) && user.user_type !== 'sales_executive';
   const queryClient = useQueryClient();
   const canLoad = Boolean(fetchDeletedJobs || (source && leadId));
   const queryKey = ['deletedLeadJobs', user?.id, user?.user_type, source, leadId, pagination, deletedSorting, search];
@@ -62,7 +63,7 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
       className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800" icon={<Eye size={16} />}
       onClick={() => setTextDetail({ title: 'Delete reason', job: row.original.job_title, text: row.original.delete_reason })} />,
   },
-    ...(source ? [{ header: 'Restore', id: 'restore', enableSorting: false,
+    ...(canRestore ? [{ header: 'Restore', id: 'restore', enableSorting: false,
       Cell: ({ row }) => <Button type="text" title="Restore job" aria-label={`Restore ${row.original.job_title || 'job'}`}
         className="bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800"
         icon={<RotateCcw size={16} />} disabled={restore.isLoading}
@@ -92,11 +93,11 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
       {textDetail?.job && <p className="mb-3 font-semibold">{textDetail.job}</p>}
       <p className="whitespace-pre-wrap break-words rounded-lg border bg-muted/30 p-4 text-sm leading-6">{textDetail?.text || 'No information recorded.'}</p>
     </Modal>
-    <Modal title="Restore job" open={Boolean(restoreTarget)} okText="Restore" cancelText="Cancel"
+    <Modal title="Restore job" open={canRestore && Boolean(restoreTarget)} okText="Restore" cancelText="Cancel"
       confirmLoading={restore.isLoading} cancelButtonProps={{ disabled: restore.isLoading }}
       closable={!restore.isLoading} maskClosable={!restore.isLoading} keyboard={!restore.isLoading}
       onCancel={() => { if (!restore.isLoading) setRestoreTarget(null); }}
-      onOk={() => { if (restoreTarget && !restore.isLoading) restore.mutate(restoreTarget); }}>
+      onOk={() => { if (canRestore && restoreTarget && !restore.isLoading) restore.mutate(restoreTarget); }}>
       <p>Are you sure you want to restore <strong>{restoreTarget?.job_title || 'this job'}</strong>?</p>
       {restore.isError && <Alert type="error" message={restore.error?.message || 'Could not restore job.'} />}
     </Modal>
