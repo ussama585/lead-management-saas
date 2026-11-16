@@ -1,4 +1,19 @@
 import api from './api.js';
+import { getAccountCompanyId } from './users-service.js';
+
+export const bulkUploadDataEntry = async ({ file, companyId, userId }) => {
+  const resolvedCompanyId = companyId || await getAccountCompanyId(userId);
+  const formData = new FormData();
+  formData.append('company_id', resolvedCompanyId);
+  formData.append('file', file);
+  const { data } = await api.post('/data-entry/bulk-upload', formData);
+  if (data?.success === false || data?.status === false) {
+    const error = new Error(data.message || 'Could not upload sales data.');
+    error.response = { data };
+    throw error;
+  }
+  return data;
+};
 
 export const getSalesDataAssigneeFilters = async ({ companyId, startDate, endDate, superAdmin = false, assigned, status } = {}) => {
   const { data } = await api.get('/data-entry/stats', {

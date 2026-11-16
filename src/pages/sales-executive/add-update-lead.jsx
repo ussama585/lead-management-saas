@@ -21,7 +21,8 @@ import '../../assets/styles/legacy/select-black-text.css';
 import BreadCrumb from '../../components/breadcrumb.component.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { bulkCreateDataEntry } from '../shared/services/data-entry-service.js';
+import { bulkCreateDataEntry, bulkUploadDataEntry } from '../shared/services/data-entry-service.js';
+import { companyIdFromUser } from '../users/stored-company-id.js';
 
 import { countriesNames } from '../shared/utils/countries.js';
 import { Upload as UploadOutlined, Download as DownloadOutlined, CircleHelp as QuestionCircleOutlined } from 'lucide-react';
@@ -178,7 +179,18 @@ const AddUpdateLead = () => {
   const [uploadResult, setUploadResult] = useState({ skipped: [], message: '' });
   const [lastUploadResponse, setLastUploadResponse] = useState(null);
 
+  const bulkUpload = useMutation(bulkUploadDataEntry, {
+    onSuccess: data => {
+      message.success(data?.message || 'Data uploaded successfully.');
+      queryClient.invalidateQueries(['data-entry-list']);
+      queryClient.invalidateQueries(['data-entry-executive-stats']);
+      navigate('/data-entry-executive/leads-table');
+    },
+    onError: error => message.error(salesDataError(error, 'Error uploading data. Please try again.')),
+  });
+
   const handleUploadButtonClick = () => {
+    if (bulkUpload.isLoading) return;
     if (fileInputRef.current) {
       fileInputRef.current.value = null; // reset file input
       fileInputRef.current.click();
@@ -191,6 +203,15 @@ const AddUpdateLead = () => {
     setInvalidData([]);
     const file = e.target.files[0];
     if (!file) return;
+    if (dataEntryExecutive) {
+      if (bulkUpload.isLoading) return;
+      if (!/\.(csv|xlsx|xls)$/i.test(file.name)) {
+        message.error('Please upload a valid Excel or CSV file (.xls, .xlsx, .csv)');
+        return;
+      }
+      bulkUpload.mutate({ file, companyId: companyIdFromUser(user), userId: user?.id });
+      return;
+    }
     const allowedTypes = [
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -508,7 +529,7 @@ const AddUpdateLead = () => {
           <div style={{ display: 'flex', gap: '8px' }}>
             {dataEntryExecutive ? <>
               <Button type="primary" onClick={handleDownloadEmptyTemplate} icon={<DownloadOutlined size={16} />}>Download Empty</Button>
-              <Button type="primary" onClick={handleUploadButtonClick}>Upload CSV</Button>
+              <Button type="primary" onClick={handleUploadButtonClick} loading={bulkUpload.isLoading} disabled={bulkUpload.isLoading}>Upload CSV</Button>
             </> : <><button className='custom-button' onClick={handleDownloadEmptyTemplate}>
               <DownloadOutlined size="1em" className="app-icon" style={{ marginRight: 4 }} />Download Empty
             </button>
