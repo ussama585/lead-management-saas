@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
 import { LogOut, Command, KeyRound, Settings } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar.jsx';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar.jsx';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu.jsx';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger, useSidebar } from '@/components/ui/sidebar.jsx';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger, useSidebar } from '@/components/ui/sidebar.jsx';
 import { Separator } from '@/components/ui/separator.jsx';
 import useUserStore from '@/pages/shared/store/user-store.js';
 import { getRolePath } from '@/pages/auth/role-home.js';
@@ -45,30 +45,23 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
   }
   return <>
     <a href='#main-content' className='sop-skip'>Skip to content</a>
-    <Sidebar collapsible='icon' variant='inset'>
-      <SidebarHeader>
-        <SidebarMenu><SidebarMenuItem><SidebarMenuButton size='lg' onClick={() => select('1')}>
-          <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground'><Command className='size-4' /></div>
-          <div className='grid flex-1 text-left text-sm leading-tight'><span className='truncate font-semibold'>Search O Pal</span><span className='truncate text-xs capitalize'>{role} workspace</span></div>
+    <Sidebar collapsible='icon' variant='inset' className='[&_[data-slot=sidebar-inner]]:rounded-2xl [&_[data-slot=sidebar-inner]]:border [&_[data-slot=sidebar-inner]]:border-primary/15 [&_[data-slot=sidebar-inner]]:bg-background [&_[data-slot=sidebar-inner]]:shadow-sm'>
+      <SidebarHeader className='border-b border-primary/10 pb-4 pt-3'>
+        <SidebarMenu><SidebarMenuItem><SidebarMenuButton size='lg' aria-label='Search O Pal home' className='hover:bg-primary/5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!' onClick={() => select('1')}>
+          <div className='flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm'><Command className='size-4' /></div>
+          <div className='grid min-w-0 flex-1 gap-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'><span className='truncate font-semibold text-primary'>Search O Pal</span><span className='truncate text-xs capitalize text-muted-foreground'>{role} workspace</span></div>
         </SidebarMenuButton></SidebarMenuItem></SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>{orderedMenuGroups.map(([group, items]) => <SidebarGroup key={group} aria-label={group}>
-        <SidebarGroupLabel className='text-base font-semibold tracking-wide'>{group}</SidebarGroupLabel><SidebarGroupContent>
-        <SidebarMenu>{items.map(item => <SidebarMenuItem key={item.key}>
-          <SidebarMenuButton tooltip={item.label} isActive={item.key === selectedKey} onClick={() => select(item.key)}>
+      <SidebarContent className='gap-1 py-2'>{orderedMenuGroups.map(([group, items]) => <SidebarGroup key={group} aria-label={group}>
+        <SidebarGroupLabel className='mb-2 text-[11px] font-semibold uppercase tracking-widest text-primary/70'>{group}</SidebarGroupLabel><SidebarGroupContent>
+        <SidebarMenu className='gap-1.5'>{items.map(item => <SidebarMenuItem key={item.key}>
+          <SidebarMenuButton className='h-10 rounded-lg text-muted-foreground transition-colors hover:bg-primary/8 hover:text-primary active:bg-primary/12 data-[active=true]:bg-primary data-[active=true]:font-medium data-[active=true]:text-primary-foreground data-[active=true]:shadow-sm [&>svg]:text-primary data-[active=true]:[&>svg]:text-primary-foreground' tooltip={item.label} isActive={item.key === selectedKey} onClick={() => select(item.key)}>
             {item.icon}<span>{item.label}</span>
           </SidebarMenuButton>
-          {Number(badges[item.key]) > 0 && <SidebarMenuBadge>{badges[item.key] > 99 ? '99+' : badges[item.key]}</SidebarMenuBadge>}
+          {Number(badges[item.key]) > 0 && <SidebarMenuBadge className={item.key === selectedKey ? 'rounded-md bg-white/20 text-white peer-hover/menu-button:text-white' : 'rounded-md bg-primary/10 text-primary'}>{badges[item.key] > 99 ? '99+' : badges[item.key]}</SidebarMenuBadge>}
         </SidebarMenuItem>)}</SidebarMenu>
       </SidebarGroupContent></SidebarGroup>)}</SidebarContent>
-      <SidebarFooter>
-        <div className='flex items-center gap-2 overflow-hidden rounded-md p-2'>
-          <Avatar className='size-8 shrink-0 rounded-lg'><AvatarFallback className='rounded-lg'>{initials}</AvatarFallback></Avatar>
-          <div className='grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'>
-            <span className='truncate font-semibold'>{user?.name}</span><span className='truncate text-xs'>{user?.email}</span>
-          </div>
-        </div>
-      </SidebarFooter><SidebarRail />
+      <SidebarRail />
     </Sidebar>
     <SidebarInset className='min-w-0'>
       <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b bg-background px-4'>
@@ -76,8 +69,12 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
         <span className='min-w-0 truncate text-sm font-medium'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Workspace'}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button type='button' aria-label='Open account menu' className='ml-auto shrink-0 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
-              <Avatar className='size-8'><AvatarFallback>{initials}</AvatarFallback></Avatar>
+            <button type='button' aria-label='Open account menu' className='ml-auto flex min-w-0 shrink-0 items-center gap-2 rounded-xl border border-border px-3 py-1.5 text-left outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
+              <Avatar className='size-8'><AvatarImage src={user?.profile_pic} alt='' /><AvatarFallback>{initials}</AvatarFallback></Avatar>
+              <span className='grid min-w-0 max-w-[130px] leading-tight sm:max-w-[220px]'>
+                <span className='truncate text-sm font-semibold'>{user?.name || 'User'}</span>
+                <span className='truncate text-xs text-muted-foreground'>{user?.email}</span>
+              </span>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side='bottom' align='end' className='min-w-56'>
