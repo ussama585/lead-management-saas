@@ -4,15 +4,15 @@
 }
 
 .sop-admin-shell [data-sidebar='group'] {
-  padding-block: 4px;
+  padding-block: 6px;
 }
 
 .sop-admin-shell [data-sidebar='menu'] {
-  gap: 2px;
+  gap: 4px;
 }
 
 .sop-admin-shell [data-sidebar='content'] [data-sidebar='menu-button'] {
-  height: 32px;
+  height: 36px;
 }
 
 .sop-admin-shell [data-collapsible='icon'] [data-sidebar='group-label'],
