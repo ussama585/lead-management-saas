@@ -10,7 +10,7 @@ import { salesDataValidationSchema } from '../shared/schemas/sales-data.js';
 import '../../assets/styles/legacy/create-user.css';
 import '../../assets/styles/legacy/leads.generated.css';
 import '../../assets/styles/legacy/select-black-text.css';
-import BreadCrumb from '../../components/breadcrumb.component.jsx';
+import '../../assets/styles/edit-sales-data.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { getDataEntryById, updateDataEntryById } from '../shared/services/data-entry-service.js';
@@ -140,16 +140,9 @@ const EditDataEntry = () => {
 
   return (
     <>
-      {!dataEntryExecutive && <BreadCrumb linkText="Edit Sales Data" goBack={() => navigate(-1)} />}
-      <div className="container ">
-        <div style={{ marginTop: 24, maxWidth: 1200, marginLeft: 'auto', marginRight: 'auto' }}>
-          {!dataEntryExecutive && <h2 style={{
-            margin: '0 0 32px 0',
-            textAlign: 'left',
-            color: '#3E6A9F',
-            fontSize: '28px',
-            fontWeight: '600'
-          }}>Edit Sales Data</h2>}
+      <div className="edit-sales-data-page min-w-0 w-full">
+        <div className="min-w-0 w-full" style={{ marginTop: 24 }}>
+          <h2 style={{ margin: '0 0 32px', color: '#3E6A9F', fontSize: 22, fontWeight: 600 }}>Edit Sales Data</h2>
           <Formik
             enableReinitialize
             initialValues={initialValues}

@@ -1,4 +1,8 @@
 .lead-listing-filters { display: grid; gap: 20px; width: 100%; min-width: 0; margin-bottom: 24px; }
+.sop-page-content .listing-page-content.sales-data-page {
+  padding-left: 0;
+  padding-right: 0;
+}
 .user-activity-filter-panel .activity-filter-row {
   display: flex;
   flex-direction: row;

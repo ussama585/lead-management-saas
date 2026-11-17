@@ -21,7 +21,7 @@ export default function LeadListingActions({ lead, source, onView, onEdit }) {
   const menu = ({ onClick: editLead, disabled = false } = {}) => <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <button type="button" title="Lead actions" aria-label="Lead actions" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[#3e6a9f] hover:bg-[#3e6a9f]/10 focus-visible:outline-2 focus-visible:outline-[#3e6a9f]">
-        <MoreVertical size={32} aria-hidden="true" />
+        <MoreVertical size={20} aria-hidden="true" />
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" onClick={event => event.stopPropagation()}>

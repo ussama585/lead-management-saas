@@ -817,7 +817,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         // Status History is available to Super Admin, including the legacy admin role.
         ...(isSuperAdmin(userType) ? [
           createStatusHistoryColumn({
-            header: 'Status History',
+              iconSize: 24,
+            header: 'History',
             buttonTitle: 'View lead history',
             onOpenHistory: (entity) => setStatusHistoryModal({ visible: true, entity }),
             accessorKey: 'status_history_website',
@@ -850,7 +851,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
           size: 0.65,
           Cell: ({ row }) => (
             <Tooltip title={<span style={{ color: '#fff' }}>Follow Ups</span>}>
-              <AnimatedFollowUpIcon size="1em" className="app-icon"
+              <AnimatedFollowUpIcon iconSize={24} size="1em" className="app-icon"
                 role="button"
                 tabIndex={0}
                 aria-label="Follow Ups"

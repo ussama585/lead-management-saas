@@ -4,12 +4,12 @@ import '../assets/styles/animated-follow-up-icon.css';
 // Can be a standalone action or the decorative icon inside an existing button.
 const AnimatedFollowUpIcon = forwardRef(function AnimatedFollowUpIcon({
   onClick, onKeyDown, title, 'aria-label': ariaLabel, className = '', style, variant = 'clock', icon: Icon, tone = 'primary',
-  size: _size, role: _role, tabIndex: _tabIndex, ...props
+  size: _size, iconSize, role: _role, tabIndex: _tabIndex, ...props
 }, ref) {
   const interactive = Boolean(onClick);
   const Element = interactive ? 'button' : 'span';
   return <Element {...props} ref={ref} className={`animated-follow-up-icon ${className}`}
-    style={{ ...style, color: undefined, fontSize: undefined, '--table-icon-color': tone === 'danger' ? '#dc2626' : '#3e6a9f' }}
+    style={{ ...style, ...(iconSize ? { '--follow-up-icon-size': `${iconSize}px`, width: iconSize, height: iconSize, padding: 0 } : {}), color: undefined, fontSize: undefined, '--table-icon-color': tone === 'danger' ? '#dc2626' : '#3e6a9f' }}
     {...(interactive ? { type: 'button', onClick, onKeyDown, 'aria-label': ariaLabel || title || 'Follow Ups' } : { 'aria-hidden': true })}
     title={title}>
     <svg viewBox="0 0 24 24" width="32" height="32" fill="none" aria-hidden="true">

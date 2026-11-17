@@ -1,3 +1,8 @@
+.sop-page-content .listing-page-content.demo-requests-page {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .button-style-tabs {
   display: flex;
   align-items: center;

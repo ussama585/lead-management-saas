@@ -19,6 +19,18 @@
 .app-data-table .MuiTableCell-root { font-family: inherit; }
 .app-data-table .MuiTableCell-body { font-size: 14px; padding: 8px; vertical-align: middle; }
 .app-data-table .MuiTableCell-head { font-size: 14px; padding: 12px 8px; line-height: 20px; }
+/* Cap column icons across shared and legacy tables without enlarging small icons. */
+.sop-page-content table :is(th, td) :is(svg, button img, img[src*='/table-icons/']),
+.app-data-table .MuiTableCell-root :is(svg, button img, img[src*='/table-icons/']) {
+  max-width: 24px !important;
+  max-height: 24px !important;
+}
+.sop-page-content table :is(th, td) .animated-follow-up-icon,
+.app-data-table .MuiTableCell-root .animated-follow-up-icon {
+  max-width: 24px !important;
+  max-height: 24px !important;
+  padding: 0;
+}
 .table-action-menu { display: inline-flex; align-items: center; justify-content: center; }
 .table-action-menu__trigger { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #3e6a9f; cursor: pointer; }
 .table-action-menu__trigger:hover { background: rgb(62 106 159 / 10%); }

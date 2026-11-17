@@ -773,7 +773,7 @@ const getMetaLeadUrl = () => {
   goBack={() => navigate(navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo || getMetaLeadUrl())}
 />
       <div className="leads">
-        <div className="container">
+        <div className="min-w-0 w-full">
      <Box
         sx={{
           padding: "0rem",

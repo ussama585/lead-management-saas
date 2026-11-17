@@ -249,6 +249,7 @@ export const createStatusHistoryColumn = ({
   header = 'Status History',
   accessorKey = 'status_history',
   buttonTitle = 'View Status History',
+  iconSize,
 }) => ({
   header,
   accessorKey,
@@ -257,7 +258,7 @@ export const createStatusHistoryColumn = ({
   muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
   Cell: ({ row }) => (
     <Tooltip title={<span style={{ color: '#fff' }}>{buttonTitle}</span>}>
-      <AnimatedFollowUpIcon variant="history"
+      <AnimatedFollowUpIcon variant="history" iconSize={iconSize}
         onClick={() => onOpenHistory(row.original)}
         aria-label={buttonTitle}
       />

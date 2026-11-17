@@ -44,6 +44,13 @@
     padding: 0;
   }
 
+  .listing-page-content.follow-up-page,
+  .follow-up-page .follow-up-section-tabs,
+  .follow-up-page .follow-up-content {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .follow-up-page,
   .follow-up-page .follow-up-content,
   .follow-up-page .follow-up-content .table-wrapper {

@@ -1,0 +1,9 @@
+/* Custom dropdown triggers use the same dimensions and border as text fields. */
+html body .edit-sales-data-page form :is(input[data-slot='input'], button[aria-haspopup='menu']) {
+  height: var(--form-control-height, 40px) !important;
+  min-height: var(--form-control-height, 40px) !important;
+  box-sizing: border-box;
+  border: 1px solid var(--field-border-color, #d2d2d2) !important;
+  border-radius: 6px;
+  font-size: 14px;
+}

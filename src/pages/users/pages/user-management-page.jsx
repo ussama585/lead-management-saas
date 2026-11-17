@@ -638,19 +638,20 @@ function UserManagementContent({ superAdminScope = 'company' }) {
 
         </div>}
 
-        <button className="createUserBtn" onClick={handleCreateUser}>
-          Create New User
-        </button>
-
       </div>
 
       <Divider />
-      {(isSuperAdminViewer || isCompany) && <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex items-center justify-between gap-3">
+      {(isSuperAdminViewer || isCompany) && <div className="flex items-center gap-3">
         <label htmlFor="user-active-filter">Account status</label>
-        <Select placeholder="Select account status" id="user-active-filter" value={activeFilter} style={{ width: 180 }} options={[
-          { value: '', label: 'All statuses' }, { value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' },
-        ]} onChange={value => { setActiveFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
+        <Select placeholder="Select account status" id="user-active-filter" value={activeFilter || 'all'} style={{ width: 180 }} options={[
+          { value: 'all', label: 'All Statuses' }, { value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' },
+        ]} onChange={value => { setActiveFilter(value === 'all' ? '' : value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
       </div>}
+        <button className="createUserBtn ml-auto shrink-0" onClick={handleCreateUser}>
+          Create New User
+        </button>
+      </div>
       {(isError || accountCompany.isError) && <Alert className="mb-4" type="error" showIcon message={(error || accountCompany.error)?.response?.data?.message || (error || accountCompany.error)?.message || 'Could not load users.'} action={<Button onClick={() => accountCompany.isError ? accountCompany.refetch() : refetch()}>Retry</Button>} />}
 
       <div>

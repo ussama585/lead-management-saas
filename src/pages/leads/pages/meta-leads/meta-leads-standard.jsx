@@ -632,7 +632,7 @@ export default function MetaLeadsStandard() {
       enableSorting: false,
       Cell: ({ row }) => (
         <Tooltip title="Follow Ups">
-          <AnimatedFollowUpIcon size="1em" className="app-icon"
+          <AnimatedFollowUpIcon iconSize={24} size="1em" className="app-icon"
             role="button" tabIndex={0} aria-label="Follow Ups"
             style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
             onClick={() => {
@@ -913,6 +913,8 @@ export default function MetaLeadsStandard() {
     },
     ...(user?.user_type === 'super_admin' ? [
       createStatusHistoryColumn({
+              iconSize: 24,
+              header: 'History',
         onOpenHistory: (lead) => setStatusHistoryModal({ visible: true, lead }),
         accessorKey: 'status_history_meta_standard',
       }),

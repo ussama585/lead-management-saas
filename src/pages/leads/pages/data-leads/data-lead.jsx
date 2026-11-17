@@ -759,7 +759,7 @@ const DataLead = () => {
         returnTo ? navigate(returnTo) : navigate(-1);
       }} />
       <div className="leads">
-        <div className="container">
+        <div className="min-w-0 w-full">
       <Box
         sx={{
          

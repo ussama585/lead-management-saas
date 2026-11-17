@@ -288,7 +288,7 @@ export default function AuditHistoryListPage() {
       {selectedChangeId && <ActivityDetailModal key={selectedChangeId} changeId={selectedChangeId} onClose={() => setSelectedChangeId(null)} />}
       {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load user activity.'}
         action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
-      <div className="container">
+      <div className="min-w-0 w-full">
         <Tabs value={activityTab} onValueChange={value => {
           setPagination(previous => ({ ...previous, pageIndex: 0 }));
           setModelNameFilter('');

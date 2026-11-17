@@ -530,7 +530,7 @@ const CommonLeadsFollowUp = () => {
         </div>
 
         <div className="follow-up-section-tabs">
-          <span style={{ marginLeft: 6, marginRight: 6 }}>
+          <span>
             <ExecutiveTabButton
               executive={{ id: 'follow-ups-future' }}
               label="Follow ups"
@@ -541,7 +541,7 @@ const CommonLeadsFollowUp = () => {
               className="executive-section-tab"
             />
           </span>
-          <span style={{ marginLeft: 6, marginRight: 6 }}>
+          <span>
             <ExecutiveTabButton
               executive={{ id: 'follow-ups-past' }}
               label="Past Follow ups"

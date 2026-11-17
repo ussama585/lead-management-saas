@@ -604,7 +604,7 @@ const DataEntryTable = () => {
           <DialogFooter><Button onClick={() => setAssignSkippedModalVisible(false)}>Close</Button></DialogFooter>
         </DialogContent>
       </Dialog>
-      <div className="listing-page-content">
+      <div className="listing-page-content sales-data-page">
         {superAdmin && <div className="lead-company-date-toolbar lead-company-date-toolbar--compact sales-data-company-toolbar">
           <div className="lead-company-filter">
             <label htmlFor="sales-data-company-filter">Company</label>

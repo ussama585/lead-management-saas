@@ -13,7 +13,7 @@
   transition: transform 300ms ease;
 }
 button.animated-follow-up-icon { cursor: pointer; }
-.animated-follow-up-icon svg { width: 32px; height: 32px; overflow: visible; }
+.animated-follow-up-icon svg { width: var(--follow-up-icon-size, 32px); height: var(--follow-up-icon-size, 32px); overflow: visible; }
 .animated-follow-up-icon__face,
 .animated-follow-up-icon__hands { stroke: var(--table-icon-color, #3e6a9f); transition: fill 300ms ease, stroke 300ms ease; }
 .animated-follow-up-icon__hands { color: var(--table-icon-color, #3e6a9f); }

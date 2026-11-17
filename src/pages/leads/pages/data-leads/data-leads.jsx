@@ -659,7 +659,7 @@ const DataLeads = () => {
         size: 200,
         Cell: ({ row }) => (
           <AntTooltip title="Follow Ups">
-            <AnimatedFollowUpIcon size="1em" className="app-icon"
+            <AnimatedFollowUpIcon iconSize={24} size="1em" className="app-icon"
               role="button" tabIndex={0} aria-label="Follow Ups"
               style={{ cursor: 'pointer', fontSize: 18, color: '#3E6A9F' }}
               onClick={() => {
@@ -963,6 +963,7 @@ const DataLeads = () => {
       ...(isSuperAdmin(user?.user_type)
         ? [
             createStatusHistoryColumn({
+              iconSize: 24,
               header: 'History',
               buttonTitle: 'View lead history',
               onOpenHistory: (entity) =>

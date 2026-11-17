@@ -131,7 +131,7 @@ export default function DemoRequestsPage() {
   }], [pagination.pageIndex, pagination.pageSize]);
 
   return <>
-    <div className="listing-page-content">
+    <div className="listing-page-content demo-requests-page">
       <Tabs value={status || 'all'} onValueChange={value => { setStatus(value === 'all' ? '' : value); resetPage(); }} className="mb-4">
         <TabsList aria-label="Demo request status" className="button-style-tabs">
           {[['all', 'All', 'total'], ['pending', 'Pending', 'pending'], ['approved', 'Approved', 'approved'], ['rejected', 'Rejected', 'rejected']].map(([value, label, key]) =>

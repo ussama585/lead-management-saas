@@ -727,7 +727,7 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
     return (
         <>
             <BreadCrumb goBack={goBack} linkText="Lead" />
-            <div className="container">
+            <div className="min-w-0 w-full">
              
                     
                         {isLoading ? <div className="py-6 text-center"><Spin /></div> : detailError
