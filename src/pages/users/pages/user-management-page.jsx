@@ -15,6 +15,7 @@ import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import NewTableComponent from '../../../components/tables/new-table.jsx';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import '../../../assets/styles/legacy/user-management-page.css';
+import '../../../assets/styles/job-listing-tabs.css';
 import { ToggleRight as ToggleOnIcon } from 'lucide-react';
 import { ToggleLeft as ToggleOffIcon } from 'lucide-react';
 
@@ -51,7 +52,7 @@ export default function UserManagement() {
       next.set('users_scope', value);
       setSearchParams(next, { replace: true });
     }} className="mb-5">
-      <TabsList aria-label="User management sections">
+      <TabsList aria-label="User management sections" className="button-style-tabs">
         <TabsTrigger value="super_admin">Super Admin</TabsTrigger>
         <TabsTrigger value="company">Company Users</TabsTrigger>
       </TabsList>
@@ -564,7 +565,7 @@ function UserManagementContent({ superAdminScope = 'company' }) {
 
       <div className="client-tabs-container">
 
-        {!superAdminOnly && <div className="client-tabs">
+        {!superAdminOnly && <div className="button-style-tabs" role="group" aria-label="Filter users by role">
           {isSuperAdminViewer || currentUser?.user_type === 'company_admin' ? [
             ['all', 'All Users'], ['company_admin', 'Company Admins'],
             ['sales_manager', 'Sales Managers'], ['sales_executive', 'Sales Executives'], ['data_entry_executive', 'Data Entry Executives'],

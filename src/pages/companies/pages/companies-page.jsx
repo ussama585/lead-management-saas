@@ -10,6 +10,7 @@ import { listingColumns, listingPagination, nextListingPagination, listingSortin
 import { Eye, Pencil, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
+import '../../../assets/styles/job-listing-tabs.css';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import api from '../../shared/services/api.js';
@@ -264,7 +265,7 @@ export default function CompaniesPage() {
   const detailReady = dialog?.id == null || (!detail.isFetching && !detail.isError && detail.data);
   return <>
     <Tabs value={companyTab} onValueChange={value => { setCompanyTab(value); setPagination(previous => ({ ...previous, current: 1 })); }} className='mb-4'>
-      <TabsList>
+      <TabsList aria-label='Company listings' className='button-style-tabs'>
         <TabsTrigger value='active'>Active Companies</TabsTrigger>
         <TabsTrigger value='deleted'>Deleted Companies</TabsTrigger>
       </TabsList>

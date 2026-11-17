@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs.jsx';
+import '../assets/styles/job-listing-tabs.css';
 import NewTableComponent from './tables/new-table.jsx';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { RotateCcw, Eye } from 'lucide-react';
@@ -71,7 +72,7 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
     }] : [])];
   return <Tabs value={tab} onValueChange={setTab} className="w-full min-w-0">
     <div className="mb-3 flex flex-wrap items-center justify-between gap-3" style={{ alignItems: 'center' }}>
-    <TabsList aria-label="Job listings">
+    <TabsList aria-label="Job listings" className="button-style-tabs">
       <TabsTrigger value="active">Active Jobs</TabsTrigger>
       <TabsTrigger value="deleted">Deleted Jobs</TabsTrigger>
     </TabsList>

@@ -1,0 +1,45 @@
+.button-style-tabs {
+  display: flex;
+  align-items: center;
+  height: auto;
+  max-width: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
+}
+
+.button-style-tabs :is([role="tab"], button.tab) {
+  flex: 0 1 auto;
+  height: auto;
+  min-height: 40px;
+  max-width: 100%;
+  padding: 8px 18px;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.button-style-tabs :is(:is([role="tab"], button.tab)[data-state='active'], button.active) {
+  background: #3e6a9f;
+  border-color: #3e6a9f;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(62, 106, 159, .18) !important;
+}
+
+.button-style-tabs :is([role="tab"], button.tab):hover {
+  border-color: #3e6a9f;
+}
+
+.button-style-tabs :is([role="tab"], button.tab):focus-visible {
+  outline: 2px solid #3e6a9f !important;
+  outline-offset: 2px;
+}

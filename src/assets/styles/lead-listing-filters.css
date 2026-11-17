@@ -1,4 +1,31 @@
 .lead-listing-filters { display: grid; gap: 20px; width: 100%; min-width: 0; margin-bottom: 24px; }
+.user-activity-filter-panel .activity-filter-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.user-activity-filter-panel .activity-filter-row > div {
+  flex: 0 1 380px;
+  width: calc((100% - 12px) / 2);
+  min-width: 0;
+}
+.user-activity-filter-panel .lead-date-range-field { width: 100%; }
+.user-activity-filter-panel { --field-border-color: #94a3b8; }
+html body .user-activity-filter-panel button[data-slot='select-trigger'],
+html body .user-activity-filter-panel button[aria-haspopup='menu'],
+html body .user-activity-filter-panel button[aria-haspopup='menu']:hover,
+html body .user-activity-filter-panel button[aria-haspopup='menu']:focus,
+html body .user-activity-filter-panel button[aria-haspopup='menu'][data-state='open'],
+html body .user-activity-filter-panel .date-range-trigger {
+  border: 1px solid #94a3b8 !important;
+  min-height: 40px;
+  height: 40px;
+  box-sizing: border-box;
+}
 .lead-listing-filters .lead-filter-card { min-width: 0; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 4px 18px rgba(15,23,42,.05) !important; }
 .lead-listing-filters .lead-filter-card__header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; min-width: 0; }
 .lead-listing-filters .lead-filter-card__icon { display: flex; align-items: center; justify-content: center; flex: 0 0 40px; height: 40px; border-radius: 50%; background: #f0f4f9; color: #3e6a9f; }

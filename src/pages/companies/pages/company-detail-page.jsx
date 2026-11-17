@@ -272,7 +272,7 @@ function CompanyDetail({ companyId }) {
             { key: 'created_at', label: 'Created', children: company.data.created_at ? formatDateUniversal(company.data.created_at, true) : '—' },
           ]} />
         </Card>
-        <section aria-label="Company users" className="min-w-0">
+        <section aria-label="Company users" className="min-w-0 pt-6">
           <h2 className="mb-3 text-lg font-semibold">Company users</h2>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <Input.Search aria-label="Search company users" placeholder="Search users..." allowClear style={{ maxWidth: 360 }}
@@ -280,7 +280,7 @@ function CompanyDetail({ companyId }) {
             <Button type="primary" icon={<Plus size={16} />} onClick={() => setUserDialog({ mode: 'create' })}>Create company user</Button>
           </div>
           {users.isError && <Alert className="mb-4" type="error" showIcon message={companyError(users.error)} action={<Button onClick={() => users.refetch()}>Retry</Button>} />}
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="min-w-0">
             <NewTableComponent mrtOptions={{
               columns: listingColumns(columns), data: users.isError ? [] : users.data?.results || [],
               getRowId: row => String(row.id),

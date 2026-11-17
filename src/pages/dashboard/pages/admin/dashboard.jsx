@@ -1,13 +1,12 @@
 import React, { lazy, Suspense, useState, useMemo } from 'react';
 import { Outlet, useSearchParams } from 'react-router-dom';
-import { Tabs, TabsList, TabsTrigger } from '../../../../components/ui/tabs.jsx';
+import '../../../../assets/styles/lead-listing-filters.css';
 import CompanyFilteredPage from '../../../../components/company-filtered-page.jsx';
 import dayjs from 'dayjs';
 
 //components
 import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';
-import ExecutiveTabButton from '../../../../components/executive-tab-button.component.jsx';
 
 //hooks
 import { useQueryApi } from '../../../../components/hooks/useQueryApi.js';
@@ -91,6 +90,18 @@ const COL = { flex: '1 1 380px', minWidth: 320, display: 'flex' };
 
 const VALID_TAB_KEYS = ['systemStats', 'salesExecutives', 'systemLeads'];
 const DEFAULT_TAB = 'systemStats';
+function DashboardNavigation({ title, value, onChange, items }) {
+  return <div className="lead-listing-filters">
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label={title}>
+        {items.map(item => <Button key={item.value} type="button" size="sm"
+          variant={value === item.value ? 'default' : 'outline'}
+          aria-pressed={value === item.value} onClick={() => onChange(item.value)}>
+          {item.label}
+        </Button>)}
+      </div>
+  </div>;
+}
+
 const DEMO_SYSTEM_STATS = {
   user_stats: { count: 248, trend: 12.5 },
   sales_manager_stats: { count: 18, trend: 5.9 },
@@ -118,16 +129,11 @@ export function DashboardTabsSection() {
     : searchParams.get('stats_scope') === 'system' ? 'system'
       : searchParams.has('company_id') || ['salesExecutives', 'systemLeads'].includes(searchParams.get('tab') || searchParams.get('selected')) ? 'company' : 'system';
   return <div className="min-w-0">
-    <Tabs value={scope} onValueChange={value => {
+    <DashboardNavigation title="Dashboard Statistics" subtitle="Choose system or company statistics" value={scope} onChange={value => {
       const next = new URLSearchParams(searchParams);
       next.set('stats_scope', value);
       setSearchParams(next, { replace: true });
-    }} className="mb-5">
-      <TabsList aria-label="Dashboard statistics">
-        <TabsTrigger value="system">System Stats</TabsTrigger>
-        <TabsTrigger value="company">Company Stats</TabsTrigger>
-      </TabsList>
-    </Tabs>
+    }} items={[{ value: 'system', label: 'System Stats' }, { value: 'company', label: 'Company Stats' }]} />
     {scope === 'system' ? <SuperAdminStats userId={currentUser?.id} userType={currentUser?.user_type} />
       : <CompanyFilteredPage dashboardCompanyScope><DashboardCompanyTabsSection /></CompanyFilteredPage>}
   </div>;
@@ -817,44 +823,9 @@ function DashboardCompanyTabsSection() {
 
   return (
     <>
-      {/* Section Tabs (ExecutiveTabButton UI) - fixed bar with margin on each tab */}
-      <div className="admin-dashboard-section-tabs">
-        <span style={{ marginLeft: 6, marginRight: 6 }}>
-          <ExecutiveTabButton
-            executive={{ id: 'system-stats' }}
-            label="Stats"
-            showRoleSuffix={false}
-            showCount={false}
-            isSelected={activeSection === 'systemStats'}
-            onClick={() => handleTabChange('systemStats')}
-            className="executive-section-tab"
-          />
-        </span>
-        {/* <span style={{ marginLeft: 6, marginRight: 6 }}>
-          <ExecutiveTabButton
-            executive={{ id: 'sales-executives' }}
-            label="Sales Executives Performance"
-            showRoleSuffix={false}
-            showCount={false}
-            isSelected={activeSection === 'salesExecutives'}
-            onClick={() => handleTabChange('salesExecutives')}
-            className="executive-section-tab"
-          />
-        </span> */}
-        
-        <span style={{ marginLeft: 6, marginRight: 6 }}>
-          <ExecutiveTabButton
-            executive={{ id: 'system-leads' }}
-            label="System Leads"
-            showRoleSuffix={false}
-            showCount={false}
-            isSelected={activeSection === 'systemLeads'}
-            onClick={() => handleTabChange('systemLeads')}
-            className="executive-section-tab"
-          />
-        </span>
-      </div>
-
+      <DashboardNavigation title="Dashboard Sections" subtitle="Choose which dashboard statistics to view"
+        value={activeSection} onChange={handleTabChange}
+        items={[{ value: 'systemStats', label: 'Stats' }, { value: 'systemLeads', label: 'System Leads' }]} />
 
       {/* SYSTEM STATS SECTION (cards) */}
       {activeSection === 'systemStats' && (

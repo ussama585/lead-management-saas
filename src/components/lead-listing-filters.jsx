@@ -4,7 +4,7 @@ import { Button } from './ui/button.jsx';
 import StatusFilterTabs from './status-filter-tabs.jsx';
 import '../assets/styles/lead-listing-filters.css';
 
-function FilterCard({ title, subtitle, Icon, selectedLabel, children }) {
+export function FilterCard({ title, subtitle, Icon, selectedLabel, children }) {
   const [expanded, setExpanded] = useState(true);
   const id = useId();
   return <section className="lead-filter-card" aria-label={title}>

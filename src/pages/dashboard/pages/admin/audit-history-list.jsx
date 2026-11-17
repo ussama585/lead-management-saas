@@ -1,11 +1,14 @@
 import { Select } from '../../../../components/ui/app-select.jsx';
 import { Tabs, TabsList, TabsTrigger } from '../../../../components/ui/tabs.jsx';
+import '../../../../assets/styles/job-listing-tabs.css';
 import { useSearchParams } from 'react-router-dom';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useContext } from 'react';
+import { ActivityCompanyFilterSlot } from '../../../../components/activity-company-filter-slot.js';
+import { FilterCard } from '../../../../components/lead-listing-filters.jsx';
 import { Alert } from 'antd';
-import { LoaderCircle as LoadingOutlined, Eye } from 'lucide-react';
+import { LoaderCircle as LoadingOutlined, Eye, ListFilter } from 'lucide-react';
 import ActivityDetailModal from '../../../../components/activity-detail-modal.jsx';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
@@ -88,6 +91,7 @@ const resolveSortField = (sorting) => {
 const getCurrentMonthRange = () => [dayjs().startOf('month'), dayjs().endOf('month')];
 
 export default function AuditHistoryListPage() {
+  const setCompanyFilterSlot = useContext(ActivityCompanyFilterSlot);
   const { user } = useUserStore();
   const [selectedChangeId, setSelectedChangeId] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -290,47 +294,16 @@ export default function AuditHistoryListPage() {
           setModelNameFilter('');
           setSearchParams(previous => { const next = new URLSearchParams(previous); next.set('activity_tab', value); return next; }, { replace: true });
         }} className="mb-4">
-          <TabsList aria-label="Activity type">
+          <TabsList aria-label="Activity type" className="button-style-tabs">
             <TabsTrigger value="system_activity">System Activity</TabsTrigger>
             <TabsTrigger value="user_accounts_activity">User Accounts Activity</TabsTrigger>
           </TabsList>
         </Tabs>
-        <div className="user-activity-filters mb-3 grid min-w-0 grid-cols-1 items-end gap-3 md:grid-cols-2">
-          <div className="order-1 min-w-0">
-          <Select
-            className="user-activity-filter-select"
-            placeholder="Filter by Category"
-            value={modelNameFilter || undefined}
-            onChange={(value) => {
-              setModelNameFilter(value ? String(value) : '');
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-            }}
-            options={modelNameDropdownOptions}
-            showSearch
-            optionFilterProp="label"
-            style={{ width: 'fit-content', minWidth: 240, maxWidth: '100%' }}
-            allowClear
-          />
-          </div>
-          <div className="order-3 min-w-0 md:col-span-2">
-          <Select
-            className="user-activity-filter-select"
-            placeholder="Filter by changed by user"
-            value={changedByFilter[0] ?? ''}
-            onChange={(value) => {
-              setChangedByFilter(value == null || value === '' ? [] : [String(value)]);
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-            }}
-            options={usersDropdownOptions}
-            showSearch
-            optionFilterProp="label"
-            dropdownMatchSelectWidth
-            dropdownStyle={{ maxWidth: 'calc(100vw - 32px)' }}
-            style={{ width: 520, minWidth: 0, maxWidth: '100%' }}
-            allowClear
-          />
-          </div>
-          <div className="lead-filter-toolbar order-2 min-w-0 md:justify-self-end" style={{ margin: 0 }}>
+        <div className="lead-listing-filters user-activity-filter-panel">
+        <FilterCard title="Activity Filters" subtitle="Filter activity by company, category, user and date" Icon={ListFilter}>
+        <div className="activity-filter-row mb-3">
+        {setCompanyFilterSlot && <div ref={setCompanyFilterSlot} />}
+          <div className="lead-filter-toolbar min-w-0" style={{ margin: 0 }}>
           <LeadDateRangeField hasValue={Boolean(dateRangeFilter)} onClear={() => {
             setDateRangeFilter(null);
             setPagination(previous => ({ ...previous, pageIndex: 0 }));
@@ -347,9 +320,47 @@ export default function AuditHistoryListPage() {
           />
           </LeadDateRangeField>
           </div>
-          <div className="order-4 flex justify-end md:col-span-2">
+        </div>
+        <div className="user-activity-filters activity-filter-row mb-3">
+          <div className="min-w-0">
+          <Select
+            className="user-activity-filter-select"
+            placeholder="Filter by Category"
+            value={modelNameFilter || undefined}
+            onChange={(value) => {
+              setModelNameFilter(value ? String(value) : '');
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }}
+            options={modelNameDropdownOptions}
+            showSearch
+            optionFilterProp="label"
+            style={{ width: '100%', minWidth: 0 }}
+            allowClear
+          />
+          </div>
+          <div className="min-w-0">
+          <Select
+            className="user-activity-filter-select"
+            placeholder="Filter by changed by user"
+            value={changedByFilter[0] ?? ''}
+            onChange={(value) => {
+              setChangedByFilter(value == null || value === '' ? [] : [String(value)]);
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }}
+            options={usersDropdownOptions}
+            showSearch
+            optionFilterProp="label"
+            dropdownMatchSelectWidth
+            dropdownStyle={{ maxWidth: 'calc(100vw - 32px)' }}
+            style={{ width: '100%', minWidth: 0 }}
+            allowClear
+          />
+          </div>
+          </div>
+          <div className="mb-3 flex justify-end">
             <Button className="user-activity-clear-filters" onClick={clearFilters}>Clear Filters</Button>
           </div>
+        </FilterCard>
         </div>
         <div className="table-container">
           {isLoading ? (

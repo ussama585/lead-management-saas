@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { message } from '../../components/ui/notifications.jsx';
 import DemoRequestEditDialog from './demo-request-edit-dialog.jsx';
 import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs.jsx';
+import '../../assets/styles/job-listing-tabs.css';
 
 export async function getDemoRequestCounts() {
   const { data } = await api.get('/demo/list-count');
@@ -132,7 +133,7 @@ export default function DemoRequestsPage() {
   return <>
     <div className="listing-page-content">
       <Tabs value={status || 'all'} onValueChange={value => { setStatus(value === 'all' ? '' : value); resetPage(); }} className="mb-4">
-        <TabsList aria-label="Demo request status" className="h-auto flex-wrap">
+        <TabsList aria-label="Demo request status" className="button-style-tabs">
           {[['all', 'All', 'total'], ['pending', 'Pending', 'pending'], ['approved', 'Approved', 'approved'], ['rejected', 'Rejected', 'rejected']].map(([value, label, key]) =>
             <TabsTrigger key={value} value={value}>{label} ({counts.data?.[key] ?? '…'})</TabsTrigger>)}
         </TabsList>
