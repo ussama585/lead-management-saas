@@ -4,25 +4,41 @@ import { Button } from './ui/button.jsx';
 import StatusFilterTabs from './status-filter-tabs.jsx';
 import '../assets/styles/lead-listing-filters.css';
 
-export function FilterCard({ title, subtitle, Icon, selectedLabel, children }) {
+export function FilterCard({ title, subtitle, Icon, selectedLabel, collapsedSelections = [], children, collapsible = true }) {
   const [expanded, setExpanded] = useState(true);
   const id = useId();
-  return <section className="lead-filter-card" aria-label={title}>
+  return <section className={collapsible ? 'lead-filter-card' : 'lead-filter-section'} aria-label={title}>
     <div className="lead-filter-card__header">
       <span className="lead-filter-card__icon"><Icon size={20} /></span>
       <div className="lead-filter-card__heading"><h2>{title}</h2><p>{subtitle}</p></div>
       {selectedLabel && <span className="lead-filter-card__selected" title={selectedLabel}>{selectedLabel}</span>}
-      <Button type="button" variant="ghost" size="icon" className="lead-filter-card__collapse" aria-label={`${expanded ? 'Collapse' : 'Expand'} ${title}`}
-        aria-expanded={expanded} aria-controls={id} onClick={() => setExpanded(value => !value)}>{expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}</Button>
+      {!expanded && collapsedSelections.length > 0 && <div className="lead-filter-card__collapsed-selections">
+        {collapsedSelections.map(({ label, value, kind }) => <span key={kind}
+          className={`lead-filter-card__selected lead-filter-card__selected--${kind}`} title={`${label}: ${value}`}>
+          <span className="sr-only">{label}: </span>{value}
+        </span>)}
+      </div>}
+      {collapsible && <Button type="button" variant="ghost" size="icon" className="lead-filter-card__collapse" aria-label={`${expanded ? 'Collapse' : 'Expand'} ${title}`}
+        aria-expanded={expanded} aria-controls={id} onClick={() => setExpanded(value => !value)}>{expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}</Button>}
     </div>
-    <div id={id} hidden={!expanded}>{children}</div>
+    <div id={id} hidden={collapsible && !expanded}>{children}</div>
   </section>;
 }
 
-function FilterCards({ statusFirst, children, accordion }) {
+function FilterCards({ statusFirst, children }) {
   const cards = React.Children.toArray(children);
-  const content = <div className="lead-listing-filters">{statusFirst ? cards.reverse() : cards}</div>;
-  return accordion ? <details open className="leads-filters-accordion"><summary>Filters<ChevronDown size={16} aria-hidden="true" /></summary>{content}</details> : content;
+  const collapsedSelections = cards.filter(card => card.props.selectedLabel).map(card => ({
+    label: card.props.title === 'Status Filters' ? 'Status' : 'Assignee',
+    value: card.props.selectedLabel,
+    kind: card.props.title === 'Status Filters' ? 'status' : 'assignee',
+  }));
+  return <div className="lead-listing-filters">
+    <FilterCard title="Filters" subtitle="Filter by assignee and status" Icon={ListFilter} collapsedSelections={collapsedSelections}>
+      <div className="lead-filter-sections">
+        {(statusFirst ? cards.reverse() : cards).map(card => React.cloneElement(card, { collapsible: false }))}
+      </div>
+    </FilterCard>
+  </div>;
 }
 
 export default function LeadListingFilters({ executives = [], selectedExecutive, onExecutiveChange, getExecutiveCount, getAssigneeTotalCount,
