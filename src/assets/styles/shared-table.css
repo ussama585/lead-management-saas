@@ -2,7 +2,7 @@
    stay with their callers; change these values to restyle every shared table. */
 .app-data-table {
   --listing-table-radius: 14px;
-  --listing-table-border: #e1e8f3;
+  --listing-table-border: #d3d3d3;
   --listing-table-shadow: 0 4px 12px rgb(31 58 99 / 6%);
   min-width: 0;
   max-width: 100%;
@@ -19,6 +19,52 @@
 .app-data-table .MuiTableCell-root { font-family: inherit; }
 .app-data-table .MuiTableCell-body { font-size: 14px; padding: 8px; vertical-align: middle; }
 .app-data-table .MuiTableCell-head { font-size: 14px; padding: 12px 8px; line-height: 20px; }
+.app-data-table .MuiTableCell-root,
+.app-shared-document-table,
+.app-shared-document-table :is(th, td) { border-color: #d3d3d3 !important; }
+.app-data-table [data-slot='select-trigger'] {
+  border-color: #d3d3d3;
+  border-radius: 12px !important;
+}
+.app-data-table .MuiOutlinedInput-root:has(.MuiSelect-select),
+.app-data-table .MuiOutlinedInput-root:has(.MuiSelect-select) > fieldset {
+  border-radius: 12px;
+  border-color: #d3d3d3;
+}
+[data-table-select-options='true'] [data-slot='dropdown-menu-item'] { gap: 12px; }
+[data-table-select-options='true'] [data-slot='dropdown-menu-item'] > svg { order: 2; margin-left: auto; }
+.app-data-table .table-inline-edit-editor .MuiInput-root {
+  border: 1px solid #d3d3d3;
+  border-radius: 12px;
+  padding: 6px 12px;
+}
+.app-data-table .table-inline-edit-editor .MuiInput-root::before,
+.app-data-table .table-inline-edit-editor .MuiInput-root::after { display: none; }
+.app-data-table .MuiTableCell-body:has(.table-empty-value, .table-centered-value) {
+  text-align: center !important;
+  justify-content: center;
+}
+.table-empty-value,
+.table-centered-value { display: block; width: 100%; text-align: center; }
+.app-data-table input[type='number'] { text-align: center; }
+.app-shared-document-table td:empty { text-align: center; }
+.app-shared-document-table td:empty::after { content: '-'; }
+.app-data-table .animated-follow-up-icon,
+.app-data-table .animated-follow-up-icon * {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+.app-data-table .animated-follow-up-icon:hover,
+.app-data-table .animated-follow-up-icon:focus-visible { background: rgb(62 106 159 / 10%); }
+.app-data-table .animated-follow-up-icon__face {
+  fill: transparent !important;
+  stroke: var(--table-icon-color, #3e6a9f) !important;
+}
+.app-data-table .animated-follow-up-icon__hands {
+  color: var(--table-icon-color, #3e6a9f) !important;
+  stroke: var(--table-icon-color, #3e6a9f) !important;
+}
 /* Cap column icons across shared and legacy tables without enlarging small icons. */
 .sop-page-content table :is(th, td) :is(svg, button img, img[src*='/table-icons/']),
 .app-data-table .MuiTableCell-root :is(svg, button img, img[src*='/table-icons/']) {

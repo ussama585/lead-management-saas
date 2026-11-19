@@ -1,4 +1,4 @@
-/* Shared text-action buttons: gradient surface and expanding icon panel. */
+/* Shared text-action buttons: fixed icon panel and a subtle hover color. */
 button[data-slot='button'].button-flight {
   --action-icon-size: 30px;
   position: relative;
@@ -21,6 +21,9 @@ button[data-slot='button'].button-flight {
   letter-spacing: .015em;
   cursor: pointer;
 }
+button[data-slot='button'].button-flight:hover:not(:disabled) {
+  background: linear-gradient(110deg, #4c77a9 0%, #326dae 100%) !important;
+}
 .button-flight .button-flight-label {
   display: inline-block;
   flex-shrink: 0;
@@ -42,20 +45,7 @@ button[data-slot='button'].button-flight {
   background: #fff;
   color: #205da5;
   box-shadow: 1px 1px 7px 1px rgb(17 59 111 / 18%);
-  transition: width .3s ease, transform .15s ease;
 }
 .button-flight .svg-wrapper { display: flex; align-items: center; justify-content: center; }
 .button-flight .svg-wrapper > svg,
-.button-flight .svg-wrapper > img { display: block; width: 17px; height: 17px; color: #205da5; transition: transform .3s ease; }
-@media (prefers-reduced-motion: no-preference) {
-  .button-flight:hover .button-flight-icon,
-  .button-flight:focus-visible .button-flight-icon { width: calc(100% - 10px); }
-  .button-flight:hover .svg-wrapper > svg,
-  .button-flight:focus-visible .svg-wrapper > svg { transform: translateX(2px); }
-  .button-flight:active .button-flight-icon { transform: scale(.95); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .button-flight .button-flight-icon,
-  .button-flight .svg-wrapper > svg,
-  .button-flight .svg-wrapper > img { transition: none; }
-}
+.button-flight .svg-wrapper > img { display: block; width: 17px; height: 17px; color: #205da5; }

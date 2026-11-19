@@ -19,7 +19,7 @@ function replaceSelect(element, target, replacement) {
 }
 
 // Keep each column's existing permissions and mutation callbacks. Only its
-// presentation changes: MRT renders the editor in each editable cell by default.
+// presentation changes: select controls stay visible in their table cells.
 export function inlineSelectColumns(columns = []) {
   return columns.map(column => {
     if (column.columns) return { ...column, columns: inlineSelectColumns(column.columns) };
@@ -35,26 +35,29 @@ export function inlineSelectColumns(columns = []) {
     if (!column.Cell) return { ...column, enableEditing: false };
     const originalCell = column.Cell;
     const getSelect = args => findSelect(originalCell(args));
+    const originalHeadProps = column.muiTableHeadCellProps;
     return {
       ...column,
       meta: { ...column.meta, inlineDropdown: true },
-      enableEditing: row => {
-        if (typeof column.enableEditing === 'function' && !column.enableEditing(row)) return false;
-        const cell = row.getAllCells().find(item => item.column.id === (column.id || column.accessorKey));
-        if (!cell) return false;
-        const select = getSelect({ cell, row, column: cell.column });
-        return Boolean(select && !select.props.disabled && !select.props.loading && !select.props.mode && !select.props.labelInValue);
+      enableEditing: false,
+      muiTableHeadCellProps: args => {
+        const props = typeof originalHeadProps === 'function' ? originalHeadProps(args) : originalHeadProps || {};
+        const rows = args.table?.getPrePaginationRowModel?.().flatRows || [];
+        const hasSelect = rows.slice(0, 5).some(row => {
+          const cell = row.getAllCells().find(item => item.column.id === (column.id || column.accessorKey));
+          return cell && getSelect({ ...args, cell, row });
+        });
+        return hasSelect ? { ...props, align: 'center', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'center', '& .Mui-TableHeadCell-Content': { justifyContent: 'center' } }] } : props;
       },
       Cell: args => {
         const element = originalCell(args);
         const select = findSelect(element);
         if (!select || select.props.mode || select.props.labelInValue) return element;
-        const { value, options, children, disabled, loading, disabledReason } = select.props;
-        const label = selectOptions(options, children).find(option => String(option.value) === String(value))?.label ?? value ?? '-';
-        const display = <button type="button" className="table-inline-edit-value" disabled={disabled || loading}
-          title={disabled ? disabledReason : `Edit ${column.header}`}
-          onClick={event => { event.stopPropagation(); args.table.setEditingCell(args.cell); }}>{label || '-'}</button>;
-        return replaceSelect(element, select, display);
+        if ((typeof column.enableEditing === 'function' && !column.enableEditing(args.row)) || args.table?.options?.enableEditing === false
+          || (typeof args.table?.options?.enableEditing === 'function' && !args.table.options.enableEditing(args.row))) {
+          return replaceSelect(element, select, React.cloneElement(select, { disabled: true }));
+        }
+        return element;
       },
       Edit: args => {
         const select = getSelect(args);

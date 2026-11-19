@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { MenuItem, TextField } from '@mui/material';
-import { InlineDropdownContext } from '../tables/inline-dropdown-context.js';
+import { InlineDropdownContext, TableSelectContext } from '../tables/inline-dropdown-context.js';
 import { fieldPlaceholder } from '../lib/field-placeholder.js';
 import { Check, ChevronDown, LoaderCircle, X } from 'lucide-react';
 import { Button } from './button.jsx';
@@ -27,6 +27,7 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
   const [local, setLocal] = useState(defaultValue);
   const [search, setSearch] = useState('');
   const inlineDropdown = useContext(InlineDropdownContext);
+  const tableSelect = useContext(TableSelectContext);
   const multiple = mode === 'multiple' || mode === 'tags';
   const current = value === undefined ? local : value;
   const selected = (multiple ? current || [] : current == null ? [] : [current])
@@ -80,7 +81,7 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
           {loading ? <LoaderCircle className="size-4 shrink-0 animate-spin" /> : <ChevronDown className="size-4 shrink-0" />}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-[90vw]" style={dropdownStyle}>
+      <DropdownMenuContent align="start" data-select-options="true" data-table-select-options={tableSelect || undefined} className="min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-[90vw]" style={dropdownStyle}>
         {(showSearch || mode === 'tags') && <Input aria-label="Search options" placeholder="Search..." value={search}
           onChange={event => {
             const next = event.target.value;

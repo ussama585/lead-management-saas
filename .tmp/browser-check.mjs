@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
-const pages = await (await fetch('http://127.0.0.1:9222/json/list')).json();
+const pages = await (await fetch(`http://127.0.0.1:${process.env.FILTER_BROWSER_PORT || 9223}/json/list`)).json();
 const page = pages.find(page => page.type === 'page');
 const socket = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });

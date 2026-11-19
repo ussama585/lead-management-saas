@@ -14,14 +14,13 @@ function setup(disabled = false) {
   return { column, args: { cell, row, table }, onChange, table };
 }
 
-it('displays text until the user opens native cell editing', () => {
+it('shows the select directly without a separate cell-editing click', () => {
   const { column, args, table } = setup();
   const view = column.Cell(args);
-  expect(view.type).toBe('button');
-  expect(view.props.children).toBe('Ali');
-  view.props.onClick({ stopPropagation: vi.fn() });
-  expect(table.setEditingCell).toHaveBeenCalledWith(args.cell);
-  expect(column.enableEditing(args.row)).toBe(true);
+  expect(view.type).toBe(Select);
+  expect(view.props.value).toBe('2');
+  expect(table.setEditingCell).not.toHaveBeenCalled();
+  expect(column.enableEditing).toBe(false);
 });
 
 it('preserves ID-based assignment and closes the editor after a change', () => {
@@ -37,7 +36,7 @@ it('preserves ID-based assignment and closes the editor after a change', () => {
 
 it('keeps disabled permissions and cancels without saving', () => {
   const { column, args, onChange, table } = setup(true);
-  expect(column.enableEditing(args.row)).toBe(false);
+  expect(column.enableEditing).toBe(false);
   expect(column.Cell(args).props.disabled).toBe(true);
   column.Edit(args).props.onKeyDown({ key: 'Escape', stopPropagation: vi.fn() });
   expect(table.setEditingCell).toHaveBeenCalledWith(null);
@@ -50,7 +49,7 @@ it('retains existing explicit editors and never edits plain text columns', () =>
   const plain = { accessorKey: 'name', Cell: () => <span>Name</span> };
   const [column] = inlineSelectColumns([plain]);
   const cell = { column: { id: 'name' } };
-  expect(column.enableEditing({ getAllCells: () => [cell] })).toBe(false);
+  expect(column.enableEditing).toBe(false);
 });
 
 it('never enables automatic text editors for accessor-only or custom text editor columns', () => {
@@ -90,4 +89,19 @@ it('preserves adjacent cell content and avoids saving an unchanged selection', (
   expect(view.props.children[1].props.children).toBe('Additional action');
   column.Edit(args).props.onChange({ target: { value: 'Active' } });
   expect(onChange).not.toHaveBeenCalled();
+});
+
+it('honors row-level and table-level permission checks with visible selects', () => {
+  const [column] = inlineSelectColumns([{ header: 'Department', accessorKey: 'department', enableEditing: row => !row.original.locked,
+    Cell: () => <Select value="sales" options={[{ value: 'sales', label: 'Sales' }]} /> }]);
+  expect(column.Cell({ row: { original: { locked: true } } }).props.disabled).toBe(true);
+  expect(column.Cell({ row: { original: {} }, table: { options: { enableEditing: false } } }).props.disabled).toBe(true);
+  expect(column.Cell({ row: { original: {} }, table: { options: { enableEditing: () => false } } }).props.disabled).toBe(true);
+});
+
+it('centers arbitrary select headings while retaining header metadata', () => {
+  const [column] = inlineSelectColumns([{ header: 'Department', accessorKey: 'department', muiTableHeadCellProps: { title: 'Department' }, Cell: () => <Select /> }]);
+  const row = { getAllCells: () => [{ column: { id: 'department' } }] };
+  expect(column.muiTableHeadCellProps({ table: { getPrePaginationRowModel: () => ({ flatRows: [row] }) } }))
+    .toMatchObject({ title: 'Department', align: 'center' });
 });

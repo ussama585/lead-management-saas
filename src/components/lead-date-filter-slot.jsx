@@ -3,6 +3,12 @@ import { createPortal } from 'react-dom';
 
 export const LeadDateFilterSlot = createContext(null);
 export const LeadProjectFilterSlot = createContext(null);
+export const LeadTopActionsSlot = createContext(null);
+
+export function LeadTopActions({ children }) {
+  const target = useContext(LeadTopActionsSlot);
+  return target ? createPortal(children, target) : children;
+}
 
 export function LeadProjectFilter({ children }) {
   const target = useContext(LeadProjectFilterSlot);

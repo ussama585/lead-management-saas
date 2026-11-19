@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import { syncTableColumns, actionsLastOrder } from './sync-table-columns.jsx';
+import { TableSelectContext } from './inline-dropdown-context.js';
 import '../../assets/styles/legacy/table/table-component.css';
 import '../../assets/styles/shared-table.css';
 
@@ -52,7 +53,9 @@ function TableRenderer(props) {
     ...(props.initialState?.columnOrder ? { initialState: { ...props.initialState, columnOrder: actionsLastOrder(columns, props.initialState.columnOrder) } } : {}),
   };
   return <ThemeProvider theme={theme}>
-    <div className="table-wrapper app-data-table"><MaterialReactTable {...options} /></div>
+    <TableSelectContext.Provider value={true}>
+      <div className="table-wrapper app-data-table"><MaterialReactTable {...options} /></div>
+    </TableSelectContext.Provider>
   </ThemeProvider>;
 }
 

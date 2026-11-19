@@ -141,7 +141,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
           onClick={handleTriggerClick}
           style={triggerStyle}
         >
-          {displayText}<i className="fa fa-chevron-down ms-2"></i>
+          <span className="date-range-trigger__text">{displayText}</span><i className="fa fa-chevron-down ms-2"></i>
         </div>
       </Tooltip>
 

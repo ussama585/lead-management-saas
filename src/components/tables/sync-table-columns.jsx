@@ -2,6 +2,7 @@ import React from 'react';
 import AnimatedFollowUpIcon from '../animated-follow-up-icon.jsx';
 import TableActionMenu, { collectTableActions } from './table-action-menu.jsx';
 import { inlineSelectColumns } from './inline-select-columns.jsx';
+import { companyBeforeName, tablePresentation } from './table-presentation.jsx';
 
 const isActionColumn = column => column.id !== 'lead_actions' && typeof column.header === 'string' &&
   /^(actions?|edit(?:\s+\w+)?|delete(?:\s+\w+)?|restore|details?|view(?:\s*\/\s*edit|\s+(?:details?|job|lead|profile|invoice|cv|usage)))$/i.test(column.header) && !/reason/i.test(column.header);
@@ -48,10 +49,10 @@ export function syncTableColumns(columns = []) {
     if (!column.Cell) return [column];
     return [{ ...column, Cell: args => syncIcon(column.Cell(args), column.header) }];
   });
-  return inlineSelectColumns([
+  return tablePresentation(inlineSelectColumns([
     ...synced.filter(column => !isFinalActionColumn(column)),
     ...synced.filter(isFinalActionColumn),
-  ]);
+  ]));
 }
 
 function isFinalActionColumn(column) {
@@ -65,5 +66,6 @@ export function actionsLastOrder(columns, order) {
   const ids = leafColumns.map(column => column.id || column.accessorKey).filter(Boolean);
   const valid = new Set([...ids, 'mrt-row-select', 'mrt-row-numbers', 'mrt-row-expand', 'mrt-row-actions']);
   const current = [...new Set([...order.filter(id => valid.has(id)), ...ids])];
-  return [...current.filter(id => !actionIds.includes(id)), ...current.filter(id => actionIds.includes(id))];
+  return companyBeforeName(current.map(id => ({ id }))).map(column => column.id)
+    .filter(id => !actionIds.includes(id)).concat(current.filter(id => actionIds.includes(id)));
 }

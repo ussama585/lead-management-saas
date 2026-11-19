@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { ActivityCompanyFilterSlot } from './activity-company-filter-slot.js';
 import { Select } from './ui/app-select.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
-import { LeadDateFilterSlot, LeadProjectFilterSlot } from './lead-date-filter-slot.jsx';
+import { LeadDateFilterSlot, LeadProjectFilterSlot, LeadTopActionsSlot } from './lead-date-filter-slot.jsx';
 import { Alert } from 'antd';
 import { QueryClient, QueryClientProvider, useIsMutating, useQuery, useQueryClient } from 'react-query';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -26,6 +26,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
   const leadListing = /\/(?:leads|data-leads|meta-leads|follow-up)\/?$/.test(pathname);
   const [dateSlot, setDateSlot] = useState(null);
   const [projectSlot, setProjectSlot] = useState(null);
+  const [topActionsSlot, setTopActionsSlot] = useState(null);
   const [activityCompanySlot, setActivityCompanySlot] = useState(null);
   const activityPage = /\/audit-history-list\/?$/.test(pathname);
   const companyControl = <div className={activityPage ? 'min-w-0' : leadListing ? 'lead-company-filter' : 'mb-4 flex flex-wrap items-center gap-2'}>
@@ -45,6 +46,8 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
     {activityPage && activityCompanySlot && createPortal(companyControl, activityCompanySlot)}
     <LeadDateFilterSlot.Provider value={leadListing ? dateSlot : null}>
     <LeadProjectFilterSlot.Provider value={leadListing ? projectSlot : null}>
+    <LeadTopActionsSlot.Provider value={leadListing ? topActionsSlot : null}>
+    {leadListing && <div ref={setTopActionsSlot} />}
 {!activityPage && <LeadTopFiltersAccordion enabled={/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname)}
       company={options.find(option => String(option.value) === String(companyId))?.label}
       projectSize={filterParams.get('project_size')}
@@ -57,6 +60,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
     {leadListing && <div ref={setDateSlot} className="lead-filter-toolbar lead-company-date-toolbar__date" />}
     </div></LeadTopFiltersAccordion>}
     {children}
+    </LeadTopActionsSlot.Provider>
     </LeadProjectFilterSlot.Provider>
   </LeadDateFilterSlot.Provider>
   </ActivityCompanyFilterSlot.Provider>;

@@ -1,11 +1,12 @@
+import LeadListingDropdownFilters from '../../../../components/lead-listing-dropdown-filters.jsx';
+import { leadTablePresentation } from '../../../shared/utils/lead-table-presentation.jsx';
 import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import '../../../../assets/styles/data-leads-page.css';
 import { formatSalaryBudget } from '../../../shared/utils/salary-budget.js';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
-import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
-import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
+import LeadDateFilter, { LeadProjectFilter, LeadTopActions } from '../../../../components/lead-date-filter-slot.jsx';
 import { leadCountTabs, getMetaLeadFilterCounts } from '../../../shared/services/lead-filter-counts.js';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
@@ -749,9 +750,9 @@ export default function MetaLeadsStandard() {
       Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
     },
     {
-      header: 'Full Name',
-      id: 'full_name', // Explicit id for sorting
-      accessorKey: 'full_name',
+      header: 'Company',
+      id: 'company_name',
+      accessorKey: 'company_name',
       size: 320,
       sortUndefined: 'last', // Handle undefined/null values
       sortDescFirst: false, // Start with ascending order (A to Z)
@@ -834,9 +835,9 @@ export default function MetaLeadsStandard() {
       Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
     },
     {
-      header: 'Company Name',
-      id: 'company_name', // Explicit id for sorting
-      accessorKey: 'company_name',
+      header: 'Name',
+      id: 'full_name',
+      accessorKey: 'full_name',
       sortUndefined: 'last', // Handle undefined/null values
       sortDescFirst: false, // Start with ascending order (A to Z)
       Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
@@ -922,11 +923,11 @@ export default function MetaLeadsStandard() {
     ];
     if (['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(user?.user_type)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
       Cell: ({ row }) => <LeadListingActions lead={row.original} source="meta" /> });
-    const leadingKeys = ['row_number', 'full_name', 'job_title', 'company_name', 'job_count', 'phone_number'];
-    return dateBeforeStatusHistory([
+    const leadingKeys = ['row_number', 'company_name', 'full_name', 'job_title', 'job_count', 'phone_number'];
+    return leadTablePresentation(dateBeforeStatusHistory([
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'work_email'),
-    ]);
+    ]));
   }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, canAssign, executivesList, loadingAssigningUsers, user?.user_type, canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize, assignmentMutation.isLoading, location.pathname, location.search]);
 
   const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, metaLeadsData?.results || [], projectSizeFilter);
@@ -935,7 +936,36 @@ export default function MetaLeadsStandard() {
       <div className="leads data-leads-ui">
         <>
             {/* Date Range Filter */}
-<LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>          <div className="lead-filter-toolbar data-leads-local-toolbar">
+<LeadTopActions>
+        {canAssign && <div className="flex justify-end" style={{ marginBottom: 20 }}>
+  
+  <Space>
+    {['super_admin', 'company_admin'].includes(user?.user_type) && (
+      <Button
+        className="website-manage-assignees-button"
+        icon={<UserAddOutlined size="1em" className="app-icon" />}
+        disabled={user?.user_type === 'super_admin' && !selectedCompany(searchParams.toString())}
+        onClick={() => setUserAssignmentModalVisible(true)}
+        style={{ backgroundColor: '#3E6A9F', borderColor: '#3E6A9F', color: 'white' }}
+      >Manage Assignees</Button>
+    )}
+    {user?.user_type === 'super_admin' && (
+      <ImportLeadsButton onSuccess={() => {
+        refetchMetaLeads();
+        refetchMetaLeadsStats();
+        refetchMetaLeadsCount();
+      }} />
+    )}
+  </Space>
+</div> }
+</LeadTopActions>
+<LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>          <div className="lead-filter-toolbar data-leads-ui data-leads-local-toolbar">
+            <LeadProjectFilter><LeadListingDropdownFilters executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []}
+              selectedExecutive={selectedExecId} onExecutiveChange={value => { setSelectedExecId(value || null); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
+              showExecutives={user?.user_type !== 'sales_executive'} getExecutiveCount={id => metaLeadsStatsData?.find(item => item.id === id)?.meta_leads_assigned || 0}
+              assigneeTotal={(Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []).reduce((total, executive) => total + (Number(executive.meta_leads_assigned) || 0), 0)}
+              status={statusFilter} onStatusChange={value => { setStatusFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
+              statuses={STATUS_CHOICES} getStatusCount={getStatusCount} total={getTotalCount()} disabled={statusList.disabled} /></LeadProjectFilter>
             <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
               options={projectSizeFilterOptions}
               onChange={value => { setProjectSizeFilter(value || null); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
@@ -955,38 +985,13 @@ export default function MetaLeadsStandard() {
 </LeadDateRangeField></LeadDateFilter>
 
       {/* Tabs Section (replaces stats cards) */}
-        {canAssign && <div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right" style={{ flexBasis: '100%' }}>
-  
-  <Space>
-    {['super_admin', 'company_admin'].includes(user?.user_type) && (
-      <Button
-        icon={<UserAddOutlined size="1em" className="app-icon" />}
-        disabled={user?.user_type === 'super_admin' && !selectedCompany(searchParams.toString())}
-        onClick={() => setUserAssignmentModalVisible(true)}
-        style={{ backgroundColor: '#3E6A9F', borderColor: '#3E6A9F', color: 'white' }}
-      >Manage Assignees</Button>
-    )}
-    {user?.user_type === 'super_admin' && (
-      <ImportLeadsButton onSuccess={() => {
-        refetchMetaLeads();
-        refetchMetaLeadsStats();
-        refetchMetaLeadsCount();
-      }} />
-    )}
-  </Space>
-</div> }
+
 
             </div></LeadTopFiltersAccordion>
 
 
 
-      <LeadListingFilters hideAllSummary requiresCompany={statusList.disabled} executives={Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []} selectedExecutive={selectedExecId}
-        getAssigneeTotalCount={() => (Array.isArray(metaLeadsStatsData) ? metaLeadsStatsData : []).reduce((total, executive) => total + (Number(executive.meta_leads_assigned) || 0), 0)}
-        showExecutives={user?.user_type !== 'sales_executive' && Array.isArray(metaLeadsStatsData) && metaLeadsStatsData.length > 0}
-        onExecutiveChange={id => { setSelectedExecId(previous => id == null || previous === id ? null : id); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
-        getExecutiveCount={id => metaLeadsStatsData?.find(item => item.id === id)?.meta_leads_assigned || 0}
-        statusFilter={statusFilter} setStatusFilter={value => { setStatusFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
-        statusChoices={STATUS_CHOICES} getTotalCount={getTotalCount} getStatusCount={getStatusCount} />        </>
+        </>
 
         <>
           <NewTableComponent

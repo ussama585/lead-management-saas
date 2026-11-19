@@ -50,7 +50,8 @@ it('normalizes standalone icon cells and keeps existing native editors', () => {
 it('adapts legacy dropdowns without overriding disabled permissions', () => {
   const [column] = syncTableColumns([{ header: 'Status', accessorKey: 'status', Cell: () => <Select disabled value="Active" options={[{ label: 'Active', value: 'Active' }]} /> }]);
   const cell = { column: { id: 'status' } };
-  expect(column.enableEditing({ getAllCells: () => [cell] })).toBe(false);
+  expect(column.enableEditing).toBe(false);
+  expect(column.Cell({cell,row:{original:{status:'Active'}}}).props.disabled).toBe(true);
 });
 
 it('places existing lead menus last and corrects controlled or saved column order', () => {

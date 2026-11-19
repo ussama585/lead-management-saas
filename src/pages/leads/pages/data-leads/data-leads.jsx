@@ -1,3 +1,5 @@
+import LeadListingDropdownFilters from '../../../../components/lead-listing-dropdown-filters.jsx';
+import { leadTablePresentation } from '../../../shared/utils/lead-table-presentation.jsx';
 import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
@@ -6,7 +8,6 @@ import '../../../../assets/styles/data-leads-page.css';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
 import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
-import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
 import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
@@ -20,7 +21,6 @@ import {
   Box,
   Typography,
   Button,
-  Stack,
   Link,
 } from "@mui/material";
 import { getDataLeadsStats, getDataLeadsListCount as fetchDataLeadsListCount } from "../../../shared/services/data-leads-service.js";
@@ -676,8 +676,8 @@ const DataLeads = () => {
         ),
       }] : []),
       {
-        header: "Name",
-        accessorKey: "contact_person_name",
+        header: "Company",
+        accessorKey: "company_name",
         size: 320,
         Cell: ({ cell, row }) => {
           const name = cell.getValue() || "-";
@@ -730,7 +730,10 @@ const DataLeads = () => {
                 {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
               </AntAvatar>
               <span className="min-w-0">
-                <span className="flex items-center gap-2">{name}{delayedInfoIcon}{duplicateIcon}</span>
+                <span className="flex items-center gap-2">
+                  {user?.user_type === 'marketing_manager' ? name : <Link component={RouterLink} to={`/data-lead/${lead.id}`}
+                    state={{ leadListingReturnTo: `${location.pathname}${location.search}` }} underline="always" sx={{ color: '#3E6A9F', fontWeight: 600 }}>{name}</Link>}
+                  {delayedInfoIcon}{duplicateIcon}</span>
                 <span data-table-secondary className="block text-xs text-muted-foreground">{lead.email || '-'}</span>
               </span>
             </span>
@@ -738,39 +741,10 @@ const DataLeads = () => {
         },
       },
       {
-        header: "Company",
-        accessorKey: "company_name",
-        size: 200,
-        Cell: ({ row, cell }) => {
-          // Marketing managers see simple text, no hyperlink
-          if (user?.user_type === 'marketing_manager') {
-            return <span>{cell.getValue() || "N/A"}</span>;
-          }
-          
-          // Other users see hyperlink
-          return (
-            <Link
-              component={RouterLink}
-              to={`/data-lead/${row.original.id}`}
-              state={{ leadListingReturnTo: `${location.pathname}${location.search}` }}
-              underline="always"
-              sx={{
-                fontWeight: 600,
-                color: "var(--primary)",
-                cursor: "pointer",
-                textDecoration: "underline !important",
-                textUnderlineOffset: "3px",
-                textDecorationThickness: "1px",
-                "&:hover, &:focus-visible": {
-                  color: "var(--primary)",
-                  textDecorationThickness: "2px",
-                },
-              }}
-            >
-              {cell.getValue() || "N/A"}
-            </Link>
-          );
-        },
+        header: "Name",
+        accessorKey: "contact_person_name",
+        size: 220,
+        Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
       },
       // Status column — use createStatusColumn for all users (it handles permissions based on converted_to_client)
       createStatusColumn({
@@ -977,11 +951,11 @@ const DataLeads = () => {
         Cell: ({ row }) => <LeadListingActions lead={row.original} source="data" onEdit={() => setLeadDialog({ mode: 'edit', id: row.original.id })} />,
       }] : []),
     ];
-    const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
-    return dateBeforeStatusHistory([
+    const leadingKeys = ['row_number', 'company_name', 'contact_person_name', 'contact_person_designation', 'phone_number'];
+    return leadTablePresentation(dateBeforeStatusHistory([
       ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
       ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && column.accessorKey !== 'email'),
-    ]);
+    ]));
   },
     [
       PROJECT_SIZE_OPTIONS,
@@ -1052,7 +1026,7 @@ const DataLeads = () => {
     navigate("/data-leads/create-job");
   }, [navigate]);
 
-  const useInlineFilterToolbar = ['sales_executive', 'company_admin'].includes(user?.user_type);
+
   const projectSizeFilterControl = (
     <LeadProjectFilter><div className='lead-project-size-filter lead-company-filter'>
         <label htmlFor='data-leads-project-size'>Project size</label>
@@ -1080,7 +1054,7 @@ const DataLeads = () => {
         statuses={[...STATUS_OPTIONS, ...tableData.map(row => row.status)].filter(Boolean)}
         projectSizes={[...PROJECT_SIZE_OPTIONS.map(option => option.value), ...tableData.map(row => row.project_size)].filter(Boolean)}
         assignees={Array.isArray(assigningUsersData) ? assigningUsersData : Array.isArray(assigningUsersData?.results) ? assigningUsersData.results : []} />}
-      {!useInlineFilterToolbar && projectSizeFilterControl}
+
       <div className="leads data-leads-ui">
         <div className="min-w-0">
       <Box
@@ -1090,23 +1064,15 @@ const DataLeads = () => {
           minHeight: "calc(100vh - 120px)",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 2,
-            flexWrap: "wrap",
-            gap: 1,
-          }}
-        >
-         
-         
-        </Box>
-
         {/* Date Range Filter and Add New Lead button */}
-<LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>        <div className={`lead-filter-toolbar data-leads-local-toolbar${useInlineFilterToolbar ? ' data-leads-executive-toolbar' : ''}`}>
-          {useInlineFilterToolbar && projectSizeFilterControl}
+
+<LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>        <div className="lead-filter-toolbar data-leads-ui data-leads-local-toolbar">
+          <LeadProjectFilter><LeadListingDropdownFilters executives={executivesList} selectedExecutive={selectedExecutive}
+            onExecutiveChange={handleExecutiveClick} getExecutiveCount={getExecutiveCount}
+            assigneeTotal={executivesList.reduce((total, executive) => total + (Number(executive.data_leads_assigned) || 0), 0)}
+            showExecutives={user?.user_type !== 'sales_executive'} status={selectedStatus} onStatusChange={handleStatusChange}
+            statuses={statusTabs} getStatusCount={getStatusCount} total={getStatusCount('total_count')} disabled={statusList.disabled} /></LeadProjectFilter>
+          {projectSizeFilterControl}
           <LeadDateFilter><LeadDateRangeField label="Date Range" hasValue={Boolean(dateRange)} onClear={clearDateRange}>
 <BootstrapDateRangeModal placeholder="Filter by date range"
               key={datePickerResetKey}
@@ -1121,11 +1087,19 @@ const DataLeads = () => {
               triggerStyle={{ border: '1px solid #d9d9d9' }}
             />
 </LeadDateRangeField></LeadDateFilter>
-          
+
+        </div></LeadTopFiltersAccordion>
+
+        {user?.user_type === 'marketing_manager' && <MarketingManagerFilters hidePrimaryFilters
+          executivesList={executivesList} statusTabs={statusTabs} duplicateCheck={duplicateCheck}
+          onDuplicateCheckChange={value => { setDuplicateCheck(value || 'all'); setPagination({ pageIndex: 0, pageSize: 10 }); }}
+          getExecutiveCount={getExecutiveCount} getStatusCount={(_counts, key) => getStatusCount(key)} leadCounts={statusCounts} userType={user?.user_type} />}
+
+{user?.user_type !== 'marketing_manager' && <div className="flex justify-end" style={{ marginBottom: 20 }}>
           {/* Add New Lead button */}
           {user?.user_type !== 'marketing_manager' && (
-            <LeadDateFilter><AntButton
-              className="data-leads-add-button"
+            <AntButton
+              className="data-leads-add-button website-manage-assignees-button"
               type="primary"
               icon={<Plus size={20} />}
               onClick={() => setLeadDialog({ mode: 'create' })}
@@ -1139,43 +1113,9 @@ const DataLeads = () => {
               }}
             >
               Add New Lead
-            </AntButton></LeadDateFilter>
+            </AntButton>
           )}
-        </div></LeadTopFiltersAccordion>
-
-        <Stack
-          direction="column"
-          spacing={1}
-          sx={{ mb: 2 }}
-        >
-          {user?.user_type === 'marketing_manager' ? (
-            <MarketingManagerFilters
-              executivesList={executivesList}
-              statusTabs={statusTabs}
-              selectedExecutive={selectedExecutive}
-              selectedStatus={selectedStatus}
-              duplicateCheck={duplicateCheck}
-              onDuplicateCheckChange={(val) => {
-                setDuplicateCheck(val || "all");
-                setPagination({ pageIndex: 0, pageSize: 10 });
-              }}
-              onExecutiveChange={handleExecutiveClick}
-              onStatusChange={handleStatusChange}
-              getExecutiveCount={getExecutiveCount}
-              getStatusCount={(_counts, apiKey) => getStatusCount(apiKey)}
-              leadCounts={statusCounts}
-              userType={user?.user_type}
-            />
-          ) : (
-            <>
-              <LeadListingFilters hideAllSummary requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
-                getAssigneeTotalCount={() => executivesList.reduce((total, executive) => total + (Number(executive.data_leads_assigned) || 0), 0)}
-                showExecutives={user?.user_type !== 'sales_executive'}
-                onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
-                statusFilter={selectedStatus} setStatusFilter={handleStatusChange} statusChoices={statusTabs}
-                getTotalCount={() => getStatusCount('total_count')} getStatusCount={getStatusCount} />            </>
-          )}
-        </Stack>
+</div>}
 
         <NewTableComponent
           heading={`Data Leads (${totalCount})`}

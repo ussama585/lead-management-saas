@@ -1,3 +1,10 @@
+import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
+import LeadDateRangeField from '../../../../components/lead-date-range-field.jsx';
+import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
+import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
+import { Avatar, AvatarFallback } from '../../../../components/ui/avatar.jsx';
+import { leadTablePresentation } from '../../../shared/utils/lead-table-presentation.jsx';
+import '../../../../assets/styles/data-leads-page.css';
 import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import { formatSalaryBudget } from '../../../shared/utils/salary-budget.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
@@ -890,7 +897,7 @@ export default function MetaLeadsMarketingManager() {
 
   const columns = useMemo(() => {
     // Marketing Manager specific column order
-    return [
+    const tableColumns = [
       {
         header: '#',
         accessorKey: 'row_number',
@@ -1054,9 +1061,9 @@ export default function MetaLeadsMarketingManager() {
       },
 
       {
-        header: 'Name',
-        id: 'full_name', // Explicit id for sorting
-        accessorKey: 'full_name',
+        header: 'Company',
+        id: 'company_name', // Explicit id for sorting
+        accessorKey: 'company_name',
         size: 320,
         sortUndefined: 'last', // Handle undefined/null values
         sortDescFirst: false, // Start with ascending order (A to Z)
@@ -1095,16 +1102,18 @@ export default function MetaLeadsMarketingManager() {
 
           return (
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {name}
-              {duplicateIcon}
+              <Avatar className="size-10 shrink-0" aria-hidden="true"><AvatarFallback className="bg-primary text-primary-foreground">{String(name).trim().charAt(0).toUpperCase()}</AvatarFallback></Avatar>
+              <span className="min-w-0"><span className="flex items-center gap-2">{name}{duplicateIcon}</span>
+                <span data-table-secondary className="block text-xs text-muted-foreground">{row.original.work_email || row.original.email || '-'}</span>
+              </span>
             </span>
           );
         },
       },
       {
-        header: 'Company Name',
-        id: 'company_name', // Explicit id for sorting
-        accessorKey: 'company_name',
+        header: 'Name',
+        id: 'full_name',
+        accessorKey: 'full_name',
         sortUndefined: 'last', // Handle undefined/null values
         sortDescFirst: false, // Start with ascending order (A to Z)
         Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
@@ -1230,46 +1239,36 @@ export default function MetaLeadsMarketingManager() {
         },
       },
     ];
+    const leadingKeys = ['row_number', 'company_name', 'full_name'];
+    return leadTablePresentation([
+      ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
+      ...tableColumns.filter(column => !leadingKeys.includes(column.accessorKey) && !['work_email', 'email'].includes(column.accessorKey)),
+    ]);
   }, [canViewProjectSize, canEditProjectSize, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, pagination.pageIndex, pagination.pageSize]);
 
   const projectSizeFilterOptions = useProjectSizeFilterOptions(projectSizesQuery, metaLeadsData?.results || [], projectSizeFilter);
   return (
     <>
-      <div className="leads">
+      <div className="leads data-leads-ui">
         <>
             {/* Date Range Filter */}
-          <div style={{ padding: '0 20px', marginTop: '20px',marginBottom: '20px' }}>
-            <Space align="center">
-              <span style={{ fontWeight: '500', fontSize: '14px', padding:"8px 12px", borderRadius:"6px" }}>Filter by Date Range:</span>
-                <BootstrapDateRangeModal
-                  key={datePickerResetKey}
-                  value={dateRange}
-                  onChange={handleDateRangeChange}
-                  showModal={showDateModal}
-                  setShowModal={setShowDateModal}
-                  onDone={(range) => {
-                    handleDateRangeChange(range);
-      setShowDateModal(false); // Close modal after selection
-                  }}
-                  triggerStyle={{ border: '1px solid #d9d9d9' }}
-                />
-
-                {dateRange && (
-                  <Button
-                    size="small"
-                    danger
-                    onClick={clearDateRange}
-                  >
-                    Clear
-                  </Button>
-                )}
-
-            </Space>
-
+          <LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>
+            <div className="lead-filter-toolbar data-leads-ui data-leads-local-toolbar">
+              <LeadProjectFilter><div className="lead-listing-filter-dropdowns"><div className="lead-listing-filter-dropdown">
+                <Select className="lead-listing-assignee-filter meta-marketing-assignee-filter" placeholder="Filter by assignee" value={executiveFilter || undefined} allowClear showSearch optionFilterProp="label"
+                  style={{ width: '100%' }} loading={loadingAssigningUsers}
+                  onChange={value => { setExecutiveFilter(value || null); setPagination({ pageIndex: 0, pageSize: 10 }); }}
+                  options={executivesList?.map(user => ({ label: `${user.name} (${user.user_type === 'sales_executive' ? 'Executive' : 'Manager'})`, value: user.id })) || []} />
+              </div></div></LeadProjectFilter>
+              <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter} options={projectSizeFilterOptions}
+                onChange={value => { setProjectSizeFilter(value || null); setPagination({ pageIndex: 0, pageSize: 10 }); }} /></LeadProjectFilter>
+              <LeadDateFilter><LeadDateRangeField hasValue={Boolean(dateRange)} onClear={clearDateRange}>
+                <BootstrapDateRangeModal placeholder="Filter by date range" key={datePickerResetKey} value={dateRange}
+                  onChange={handleDateRangeChange} showModal={showDateModal} setShowModal={setShowDateModal}
+                  onDone={range => { handleDateRangeChange(range); setShowDateModal(false); }} />
+              </LeadDateRangeField></LeadDateFilter>
             </div>
-
-
-
+          </LeadTopFiltersAccordion>
 
         {/* Campaign dropdown and Adset/Ad pills for marketing_manager */}
           <>
@@ -1466,58 +1465,6 @@ export default function MetaLeadsMarketingManager() {
                 </Box>
               )}
             </div>
-
-            {/* Project Size Filter Row */}
-            <div style={{ marginBottom: '16px', padding: '0 8px' }}>
-              <Space align="center">
-                <span style={{ fontWeight: '500', fontSize: '14px' }}>Project Size:</span>
-                <Select
-                  placeholder="Select Project Size"
-                  value={projectSizeFilter}
-                  onChange={(value) => {
-                    setProjectSizeFilter(value);
-                    // Reset pagination to default values
-                    setPagination({ pageIndex: 0, pageSize: 10 });
-                  }}
-                  style={{ width: 'fit-content', minWidth: '200px' }}
-                  allowClear
-                  popupMatchSelectWidth={false}
-                  options={projectSizeFilterOptions}
-                />
-              </Space>
-            </div>
-
-            {/* Executive Filter Row - Only for marketing manager */}
-            {user?.user_type === 'marketing_manager' && (
-              <div style={{ marginBottom: '16px', padding: '0 8px' }}>
-                <Space align="center">
-                  <span style={{ fontWeight: '500', fontSize: '14px' }}>Executive:</span>
-                  <Select
-                    placeholder="Select Executive"
-                    value={executiveFilter}
-                    onChange={(value) => {
-                       setExecutiveFilter(value);
-                      // Reset pagination to default values
-                      setPagination({ pageIndex: 0, pageSize: 10 });
-                      // Force refetch of queries
-                      setTimeout(() => {
-                        queryClient.invalidateQueries(['metaLeadsCount']);
-                        queryClient.invalidateQueries(['metaLeads']);
-                      }, 100);
-                    }}
-                    style={{ width: 'fit-content', minWidth: '200px' }}
-                    allowClear
-                    popupMatchSelectWidth={false}
-                    loading={loadingAssigningUsers}
-                    options={executivesList?.map(user => ({
-                      label: `${user.name} (${user.user_type === 'sales_executive' ? 'Executive' : 'Manager'})`,
-                      value: user.id
-                    })) || []}
-                  />
-                </Space>
-
-              </div>
-            )}
 
             {/* Duplicate Check Filter Row */}
             <div style={{ marginBottom: '16px', padding: '0 8px' }}>

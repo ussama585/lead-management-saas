@@ -1,3 +1,4 @@
+import { leadTablePresentation } from '../../../shared/utils/lead-table-presentation.jsx';
 import AnimatedFollowUpIcon from '../../../../components/animated-follow-up-icon.jsx';
 import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
 import '../../../../assets/styles/data-leads-page.css';
@@ -7,8 +8,7 @@ import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import LeadProjectSizeFilter from '../../../../components/lead-project-size-filter.jsx';
 import LeadListingActions from '../../../../components/lead-listing-actions.jsx';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
-import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
-import LeadListingFilters from '../../../../components/lead-listing-filters.jsx';
+import LeadDateFilter, { LeadProjectFilter, LeadTopActions } from '../../../../components/lead-date-filter-slot.jsx';
 import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
@@ -883,7 +883,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         //     </span>
         //   ),
         // },
-        // 2. Status — use createStatusColumn for all users (it handles permissions based on converted_to_client)
+        // 2. Status â€” use createStatusColumn for all users (it handles permissions based on converted_to_client)
         createStatusColumn({
           statusOptions: apiStatusOptions,
           readOnly: false,
@@ -938,20 +938,13 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             </span>
           ),
         },
-        // 6. Company
+        // Company owns the avatar, email, and lead detail link.
         {
           header: 'Company',
           accessorKey: 'company_name',
-          size: 220,
-          Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
-        },
-        // 7. Name
-        {
-          header: 'Name',
-          accessorKey: 'contact_person_name',
           size: 320,
           Cell: ({ cell, row }) => {
-            const name = cell.getValue();
+            const name = cell.getValue() || '-';
             const lead = row.original;
             const isDuplicateLead = isDuplicate(lead);
             const isFollowupDelayed =
@@ -1032,6 +1025,12 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             );
           },
         },
+        {
+          header: 'Name',
+          accessorKey: 'contact_person_name',
+          size: 220,
+          Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
+        },
         // 8. Phone
         {
           header: 'Phone',
@@ -1090,6 +1089,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         ...(userType !== 'marketing_manager' ? [{
           header: 'Jobs',
           accessorKey: 'job_count',
+          muiTableHeadCellProps: { align: 'center', sx: { textAlign: 'center', '& .Mui-TableHeadCell-Content': { justifyContent: 'center' } } },
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           size: 0.5,
           Cell: ({ cell }) => <span>{cell.getValue() || '-'}</span>,
@@ -1098,6 +1098,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         {
           header: 'No. of Resources',
           accessorKey: 'total_vacancies',
+          muiTableHeadCellProps: { align: 'center', sx: { textAlign: 'center', '& .Mui-TableHeadCell-Content': { justifyContent: 'center' } } },
         muiTableBodyCellProps: { align: 'center', sx: { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } } },
           size: 0.5,
           Cell: ({ cell }) => {
@@ -1159,7 +1160,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       ];
       if (['super_admin', 'company_admin', 'sales_manager', 'sales_executive'].includes(userType)) tableColumns.push({ header: 'Action', id: 'lead_actions', enableSorting: false,
         Cell: ({ row }) => <LeadListingActions lead={row.original} source="website" /> });
-      const leadingKeys = ['row_number', 'contact_person_name', 'contact_person_designation', 'company_name', 'phone_number'];
+      const leadingKeys = ['row_number', 'company_name', 'contact_person_name', 'contact_person_designation', 'phone_number'];
       const adjacentKeys = ['project_size', 'assigned_to_name'];
       const ordered = [
         ...leadingKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean),
@@ -1167,7 +1168,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       ];
       const statusIndex = ordered.findIndex(column => column.accessorKey === 'status');
       ordered.splice(statusIndex + 1, 0, ...adjacentKeys.map(key => tableColumns.find(column => column.accessorKey === key)).filter(Boolean));
-      return dateBeforeStatusHistory(ordered);
+      return leadTablePresentation(dateBeforeStatusHistory(ordered));
     }, [apiStatusOptions, statusList.disabled, projectSizesQuery.disabled, statusList.isLoading, statusList.isError, userType, navigate, user, updateStatusMutation.isLoading, PROJECT_SIZE_OPTIONS, updatingProjectSizeId, handleProjectSizeChange, executivesList, loadingAssigningUsers, handleAssignmentChange, pagination, location.pathname, location.search]);
 
 
@@ -1244,12 +1245,36 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       return null;
     }
 
+    const assigneeAndStatusDropdowns = <div className="lead-listing-filter-dropdowns">
+      {userType !== 'sales_executive' && <div className="lead-listing-filter-dropdown">
+        <label htmlFor="website-assignee-filter" className="sr-only">Assignee</label>
+        <Select id="website-assignee-filter" placeholder="Filter by assignee" showSearch optionFilterProp="label"
+          disabled={statusList.disabled} value={selectedExecutive ? String(selectedExecutive) : 'all'}
+          onChange={value => handleExecutiveClick(value === 'all' || value == null ? '' : String(value))}
+          options={[{ value: 'all', label: `All Assignees (${executivesList.reduce((total, executive) => total + (Number(executive.website_leads_assigned) || 0), 0)})` },
+            ...executivesList.map(executive => ({ value: String(executive.id),
+              label: `${executive.name}${executive.user_type ? ` - ${executive.user_type === 'sales_manager' ? 'Manager' : 'Executive'}` : ''} (${getExecutiveCount(executive.id)})` }))]}
+          style={{ width: '100%' }} />
+      </div>}
+      <div className="lead-listing-filter-dropdown">
+        <label htmlFor="website-status-filter" className="sr-only">Status</label>
+        <Select id="website-status-filter" placeholder="Filter by status" showSearch optionFilterProp="label"
+          disabled={statusList.disabled} value={selectedStatus || 'all'}
+          onChange={value => handleTabClick(value === 'all' || value == null ? '' : value)}
+          options={[{ value: 'all', label: `All Statuses (${getStatusCount(leadCounts, 'total_count')})` },
+            ...statusTabs.filter(tab => tab.value && tab.value !== 'All' && tab.label !== 'All'
+              && (tab.value !== 'Unassigned' || ['super_admin', 'company_admin', 'sales_manager', 'marketing_manager'].includes(userType)))
+              .map(tab => ({ value: tab.value, label: `${tab.label} (${getStatusCount(leadCounts, tab.apiKey)})` }))]}
+          style={{ width: '100%' }} />
+      </div>
+    </div>;
+
     const tableContent = (
       <>
 
         {/* For Marketing Manager: Show dropdowns instead of tabs */}
         {userType === 'marketing_manager' ? (
-          <MarketingManagerFilters
+          <MarketingManagerFilters hidePrimaryFilters
             executivesList={executivesList}
             statusTabs={statusTabs}
             selectedExecutive={selectedExecutive}
@@ -1279,14 +1304,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
             leadCounts={leadCounts}
             userType={userType}
           />
-        ) : (
-          <LeadListingFilters hideAllSummary requiresCompany={statusList.disabled} executives={executivesList} selectedExecutive={selectedExecutive}
-            getAssigneeTotalCount={() => executivesList.reduce((total, executive) => total + (Number(executive.website_leads_assigned) || 0), 0)}
-            showExecutives={userType !== 'sales_executive'}
-            onExecutiveChange={id => handleExecutiveClick(id == null ? '' : String(id))} getExecutiveCount={getExecutiveCount}
-            statusFilter={selectedStatus} setStatusFilter={handleTabClick}
-            statusChoices={statusTabs.filter(tab => tab.value !== 'Unassigned' || ['super_admin', 'company_admin', 'sales_manager', 'marketing_manager'].includes(userType))}
-            getTotalCount={() => getStatusCount(leadCounts, 'total_count')} getStatusCount={key => getStatusCount(leadCounts, key)} />        )}
+        ) : null}
+        {isDashboard && assigneeAndStatusDropdowns}
         {/* Export selected button */}
         {Object.keys(rowSelection).filter((key) => rowSelection[key]).length > 0 && (
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px', paddingRight: '20px' }}>
@@ -1467,7 +1486,21 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
       <>
 
         {/* Date Range Filter and Manage Assignees Button */}
+        <LeadTopActions>
+          {['super_admin', 'company_admin'].includes(userType) && (
+            <div className="flex justify-end" style={{ marginBottom: 20 }}>
+              <Button
+                className="website-manage-assignees-button"
+                icon={<UserAddOutlined size="1em" className="app-icon" />}
+                disabled={userType === 'super_admin' && !selectedCompany(searchParams.toString())}
+                onClick={() => setUserAssignmentModalVisible(true)}
+                style={{ backgroundColor: '#3e6a9f', borderColor: '#3e6a9f', color: '#fff' }}
+              >Manage Assignees</Button>
+            </div>
+          )}
+        </LeadTopActions>
 <LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>        <div className={`lead-filter-toolbar data-leads-ui data-leads-local-toolbar${userType === 'company_admin' ? ' website-company-filter-toolbar' : ''}`}>
+          <LeadProjectFilter>{assigneeAndStatusDropdowns}</LeadProjectFilter>
           <LeadProjectFilter><LeadProjectSizeFilter value={projectSizeFilter}
             options={projectSizeFilterOptions}
             onChange={value => { setProjectSizeFilter(value || ''); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} /></LeadProjectFilter>
@@ -1483,17 +1516,8 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
               triggerStyle={{ border: '1px solid #d9d9d9' }}
             />
 </LeadDateRangeField></LeadDateFilter>
-          {['super_admin', 'company_admin'].includes(userType) && (
-            <LeadDateFilter><div className="lead-filter-toolbar__actions lead-filter-toolbar__actions--right">
-              <Button
-                icon={<UserAddOutlined size="1em" className="app-icon" />}
-                disabled={userType === 'super_admin' && !selectedCompany(searchParams.toString())}
-                onClick={() => setUserAssignmentModalVisible(true)}
-                style={{ backgroundColor: '#3e6a9f', borderColor: '#3e6a9f', color: '#fff' }}
-              >Manage Assignees</Button>
-            </div></LeadDateFilter>
-          )}
         </div></LeadTopFiltersAccordion>
+
 
         <div className="leads data-leads-ui">
           <>

@@ -36,7 +36,7 @@ it('delegates the same rows, normalized accessors and custom cells', () => {
   const args = { cell: { getValue: () => 'A user' }, row: { original: rows[0] } };
   expect(renderToStaticMarkup(captured.options.columns[0].Cell(args))).toBe(renderToStaticMarkup(nameCell(args)));
   expect(captured.options.columns[1].enableSorting).toBe(false);
-  expect(captured.options.columns[0].muiTableHeadCellProps.align).toBe('center');
+  expect(captured.options.columns[0].muiTableHeadCellProps({}).align).toBe('center');
   expect(captured.options.columns[0].muiTableBodyCellProps.align).toBe('center');
 });
 

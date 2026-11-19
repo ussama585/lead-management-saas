@@ -9,6 +9,7 @@ import DuplicateCheckFilter from '../../../../../components/duplicate-check-filt
  * Both can be selected simultaneously, but only one of each at a time
  */
 const MarketingManagerFilters = ({
+  hidePrimaryFilters = false,
   executivesList = [],
   statusTabs = [],
   selectedExecutive = '',
@@ -48,7 +49,7 @@ const MarketingManagerFilters = ({
       alignItems: 'center' 
     }}>
       {/* Executive Dropdown */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {!hidePrimaryFilters && <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span style={{ fontWeight: '500', fontSize: '14px' }}>Executive:</span>
         <Select
           style={{ width: 'fit-content', minWidth: '200px' }}
@@ -83,7 +84,7 @@ const MarketingManagerFilters = ({
             );
           })}
         </Select>
-      </div>
+      </div>}
 
       {/* Duplicate Check Dropdown */}
       <DuplicateCheckFilter
@@ -94,7 +95,7 @@ const MarketingManagerFilters = ({
       />
 
       {/* Status Dropdown */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {!hidePrimaryFilters && <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span style={{ fontWeight: '500', fontSize: '14px' }}>Status:</span>
         <Select
           style={{ width: 'fit-content', minWidth: '200px' }}
@@ -128,7 +129,7 @@ const MarketingManagerFilters = ({
               );
             })}
         </Select>
-      </div>
+      </div>}
 
       {/* Hear About Us Dropdown */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
