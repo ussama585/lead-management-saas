@@ -1,4 +1,3 @@
-import { Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState } from 'react';
 import { Box, Button as MuiButton } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -212,7 +211,6 @@ const MetaSpendingAds = () => {
           <Box sx={{ minHeight: 'calc(100vh - 120px)' }}>
             <div style={{ marginBottom: 12 }}>
               <Space align="center">
-                <span style={{ fontWeight: 500, fontSize: 14, padding: '8px 12px', borderRadius: 6 }}>Filter by Date Range:</span>
                 <BootstrapDateRangeModal
                   value={dateRange}
                   onChange={setDateRange}
@@ -221,11 +219,6 @@ const MetaSpendingAds = () => {
                   onDone={(range) => { setDateRange(range); setPagination((p) => ({ ...p, pageIndex: 0 })); }}
                   triggerStyle={{ border: '1px solid #d9d9d9' }}
                 />
-                {dateRange && (
-                  <Button size="small" danger onClick={() => { setDateRange(null); setDateModalOpen(false); }}>
-                    Clear
-                  </Button>
-                )}
               </Space>
             </div>
             <NewTableComponent

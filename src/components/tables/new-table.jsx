@@ -255,7 +255,7 @@ function ConfiguredTable({
               muiTableBodyCellProps={{
                   sx: {
                       fontSize: '14px',
-                      height: '80px',
+                      height: '72px',
                       padding: denseCells ? '6px 6px' : '8px',
                   },
               }}

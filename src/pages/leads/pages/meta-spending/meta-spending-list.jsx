@@ -560,7 +560,6 @@ const MetaSpendingList = () => {
             {activeTab === TAB_DAILY && (
               <div style={{ marginBottom: 12 }}>
                 <Space align="center">
-                  <span style={{ fontWeight: 500, fontSize: 14, padding: '8px 12px', borderRadius: 6 }}>Filter by Date Range:</span>
                   <BootstrapDateRangeModal
                     value={dailyDateRange}
                     onChange={setDailyDateRange}
@@ -569,11 +568,6 @@ const MetaSpendingList = () => {
                     onDone={(range) => { setDailyDateRange(range); setDailyPagination((p) => ({ ...p, pageIndex: 0 })); }}
                     triggerStyle={{ border: '1px solid #d9d9d9' }}
                   />
-                  {dailyDateRange && (
-                    <Button size="small" danger onClick={() => { setDailyDateRange(null); setDailyDateModalOpen(false); }}>
-                      Clear
-                    </Button>
-                  )}
                 </Space>
               </div>
             )}
@@ -624,7 +618,6 @@ const MetaSpendingList = () => {
             {activeTab === TAB_CAMPAIGNS && (
               <div style={{ marginBottom: 12 }}>
                 <Space align="center">
-                  <span style={{ fontWeight: 500, fontSize: 14, padding: '8px 12px', borderRadius: 6 }}>Filter by Date Range:</span>
                   <BootstrapDateRangeModal
                     value={campaignDateRange}
                     onChange={setCampaignDateRange}
@@ -633,11 +626,6 @@ const MetaSpendingList = () => {
                     onDone={(range) => { setCampaignDateRange(range); setCampaignPagination((p) => ({ ...p, pageIndex: 0 })); }}
                     triggerStyle={{ border: '1px solid #d9d9d9' }}
                   />
-                  {campaignDateRange && (
-                    <Button size="small" danger onClick={() => { setCampaignDateRange(null); setCampaignDateModalOpen(false); }}>
-                      Clear
-                    </Button>
-                  )}
                 </Space>
               </div>
             )}

@@ -1,3 +1,41 @@
+.sop-admin-shell {
+  --shell-header-height: 64px;
+}
+
+.sop-admin-shell .sop-main-header {
+  box-sizing: border-box;
+  height: var(--shell-header-height);
+  min-height: var(--shell-header-height);
+  max-height: var(--shell-header-height);
+  flex-shrink: 0;
+}
+
+.sop-sidebar-header {
+  box-sizing: border-box;
+  height: var(--shell-header-height, 64px);
+  min-height: var(--shell-header-height, 64px);
+  flex-shrink: 0;
+  justify-content: center;
+  padding-block: 0;
+}
+
+@media (min-width: 768px) {
+  .sop-admin-shell .sop-main-header { top: 8px; }
+  .sop-admin-shell .sop-main-header::before {
+    content: '';
+    position: absolute;
+    inset: -8px 0 auto;
+    height: 8px;
+    background: var(--sidebar, var(--background, #fff));
+    pointer-events: none;
+  }
+  /* The sidebar's outer top border adds one pixel to its inset. */
+  .sop-admin-shell .sop-sidebar-header {
+    height: calc(var(--shell-header-height) - 1px);
+    min-height: calc(var(--shell-header-height) - 1px);
+  }
+}
+
 .sop-admin-shell [data-sidebar='content'] {
   gap: 0;
   padding-block: 6px;

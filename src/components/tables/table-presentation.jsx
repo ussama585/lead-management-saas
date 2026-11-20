@@ -17,6 +17,22 @@ function emptyContent(node) {
   return emptyContent(node.props.children);
 }
 
+const alphabetical = value => typeof value === 'string' && /\p{L}/u.test(value);
+
+function tablePills(node) {
+  if (!React.isValidElement(node)) return node;
+  const { style, children } = node.props;
+  const pill = node.type === 'span' && style?.padding != null && style?.borderRadius != null
+    && (style.backgroundColor != null || style.background != null);
+  if (!pill && !React.Children.toArray(children).some(React.isValidElement)) return node;
+  return React.cloneElement(node, {
+    ...(pill ? { className: `${node.props.className || ''} table-value-pill`.trim() } : {}),
+    ...(React.Children.toArray(children).some(React.isValidElement) ? {
+      children: Array.isArray(children) ? children.map(tablePills) : tablePills(children),
+    } : {}),
+  });
+}
+
 export function companyBeforeName(columns) {
   const result = [...columns];
   const companyIndex = result.findIndex(column => (column.id || column.accessorKey) === 'company_name');
@@ -34,6 +50,9 @@ export function tablePresentation(columns = []) {
     const select = column.editVariant === 'select' || /^(status|project_size|assigned_to(?:_name)?|job_type|job_nature|currency|country|city)$/.test(key);
     const originalCell = column.Cell;
     const originalHeadProps = column.muiTableHeadCellProps;
+    const originalBodyProps = column.muiTableBodyCellProps;
+    const textColumn = /(^|_)(name|title|email|designation|industry|address|city|country|currency|status|description|notes)(_|$)/i.test(key)
+      || ['project_size', 'assigned_to', 'assigned_to_name'].includes(key);
     return {
       ...column,
       meta: { ...column.meta, sharedTablePresentation: true },
@@ -42,12 +61,21 @@ export function tablePresentation(columns = []) {
           const sample = args.table?.getPrePaginationRowModel?.().flatRows
             ?.map(row => row.getAllCells().find(cell => cell.column.id === (column.id || column.accessorKey))?.getValue())
             .find(value => value != null && value !== '');
-          if (!numeric && !select && !numericColumn(column, sample)) return props;
-          return { ...props, align: 'center', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'center', '& .Mui-TableHeadCell-Content': { justifyContent: 'center' } }] };
+          const centered = numeric || numericColumn(column, sample);
+          const left = !centered && (textColumn || alphabetical(sample));
+          if (!centered && !left && !select) return props;
+          const align = left ? 'left' : 'center';
+          return { ...props, align, sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: align, '& .Mui-TableHeadCell-Content': { justifyContent: left ? 'flex-start' : 'center' } }] };
+      },
+      muiTableBodyCellProps: args => {
+        const props = typeof originalBodyProps === 'function' ? originalBodyProps(args) : originalBodyProps || {};
+        const value = args.cell?.getValue?.();
+        if (numeric || numericColumn(column, value) || !alphabetical(value)) return props;
+        return { ...props, align: 'left', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'left', justifyContent: 'flex-start', '& > *': { marginInline: 0 } }] };
       },
       Cell: args => {
         const value = args.cell?.getValue?.();
-        const rendered = originalCell ? originalCell(args) : typeof value === 'boolean' ? String(value) : value;
+        const rendered = tablePills(originalCell ? originalCell(args) : typeof value === 'boolean' ? String(value) : value);
         if (emptyContent(rendered)) return <span className="table-empty-value">-</span>;
         return numeric || numericColumn(column, value) ? <span className="table-centered-value">{rendered}</span> : rendered;
       },

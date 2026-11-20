@@ -9,7 +9,7 @@ const BADGE_STYLE_BASE = {
 };
 
 const StatusBadge = ({ status, statusColors = {} }) => (
-  <span style={{ ...BADGE_STYLE_BASE, color: statusColors[status] ?? DEFAULT_STATUS_COLOR }}>
+  <span className="table-value-pill" style={{ ...BADGE_STYLE_BASE, color: statusColors[status] ?? DEFAULT_STATUS_COLOR }}>
     {status ?? '-'}
   </span>
 );

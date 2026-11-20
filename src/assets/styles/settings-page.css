@@ -1,7 +1,7 @@
 .settings-page.dashboard-container { padding: 0 0 24px; background: transparent; overflow: visible; }
 .settings-layout {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 32px;
   width: 100%;
@@ -27,7 +27,7 @@
   background: var(--primary);
   color: var(--primary-foreground);
 }
-.settings-panel { min-width: 0; width: 100%; }
+.settings-panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; min-width: 0; width: 100%; }
 .settings-panel > [data-slot='card'],
 .settings-panel > .ant-card { width: 100%; max-width: none; margin-bottom: 0; }
 .settings-panel .ant-table-wrapper { overflow-x: auto; }

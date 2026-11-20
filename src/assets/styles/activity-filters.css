@@ -1,0 +1,39 @@
+.data-leads-topbar.activity-filter-toolbar {
+  --website-filter-columns: 4 !important;
+}
+.activity-filter-toolbar .activity-company-slot { grid-column: 1 / -1; min-width: 0; }
+.activity-filter-toolbar .activity-company-slot:empty { display: none; }
+.activity-filter-toolbar .lead-listing-filter-dropdown button[aria-label='Clear selection'] {
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 4px !important;
+  border-radius: 4px !important;
+  background: transparent;
+}
+.activity-filter-toolbar .lead-listing-filter-dropdown button[aria-label='Clear selection']:hover {
+  background: #f1f5f9 !important;
+}
+.activity-filter-toolbar .lead-listing-filter-dropdown:has(button[aria-label='Clear selection']) button[aria-haspopup='menu'] > svg {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.activity-filter-toolbar .lead-listing-filter-dropdown:has(button[aria-label='Clear selection']) button[aria-haspopup='menu'] > span {
+  max-width: calc(100% - 48px);
+}
+.activity-filter-toolbar .activity-company-slot > .lead-company-filter {
+  width: calc((100% - (var(--website-filter-columns) - 1) * 16px) / var(--website-filter-columns));
+  padding-bottom: 16px;
+  border-bottom: 2px solid #d3d3d3;
+}
+@container (max-width: 900px) {
+  .data-leads-topbar.activity-filter-toolbar { --website-filter-columns: 2 !important; }
+}
+@container (max-width: 600px) {
+  .data-leads-topbar.activity-filter-toolbar { --website-filter-columns: 1 !important; }
+}

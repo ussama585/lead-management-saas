@@ -13,6 +13,33 @@
   box-sizing: border-box;
 }
 
+/* The shell owns the header-to-page gap. Ignore empty portal slots and only
+   normalize transparent wrappers along the leading edge of the page. */
+.sop-page-content > :nth-child(1 of :not(:empty, [hidden], script, style, link)) {
+  margin-top: 0 !important;
+}
+.sop-page-content > :is(.container, .listing-page-content, .dashboard-container,
+  .leads, .settings-layout, .sales-manager-detail-container, .client-detail-container,
+  .MuiBox-root, .min-w-0, .table-container, .table-wrapper):nth-child(1 of :not(:empty, [hidden], script, style, link)) {
+  padding-top: 0 !important;
+}
+.sop-page-content > :is(.container, .listing-page-content, .dashboard-container,
+  .leads, .settings-layout, .sales-manager-detail-container, .client-detail-container,
+  .MuiBox-root, .min-w-0, .table-container, .table-wrapper):nth-child(1 of :not(:empty, [hidden], script, style, link))
+  > :nth-child(1 of :not(:empty, [hidden], script, style, link)) {
+  margin-top: 0 !important;
+}
+.sop-page-content > :is(.container, .listing-page-content, .dashboard-container,
+  .leads, .settings-layout, .sales-manager-detail-container, .client-detail-container,
+  .MuiBox-root, .min-w-0, .table-container, .table-wrapper):nth-child(1 of :not(:empty, [hidden], script, style, link))
+  > :is(.container, .listing-page-content, .dashboard-container, .leads, .MuiBox-root, .min-w-0, .table-container, .table-wrapper):nth-child(1 of :not(:empty, [hidden], script, style, link)) {
+  padding-top: 0 !important;
+
+  > :nth-child(1 of :not(:empty, [hidden], script, style, link)) {
+    margin-top: 0 !important;
+  }
+}
+
 .sop-page-content > *,
 .sop-page-content :is(.container, .listing-page-content, .dashboard-container,
   .table-container, .table-wrapper, .form-container, .content-container,

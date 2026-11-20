@@ -6,9 +6,11 @@ import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useCallback, useContext } from 'react';
 import { ActivityCompanyFilterSlot } from '../../../../components/activity-company-filter-slot.js';
-import { FilterCard } from '../../../../components/lead-listing-filters.jsx';
+import LeadTopFiltersAccordion from '../../../../components/lead-top-filters-accordion.jsx';
+import '../../../../assets/styles/data-leads-page.css';
+import '../../../../assets/styles/activity-filters.css';
 import { Alert } from 'antd';
-import { LoaderCircle as LoadingOutlined, Eye, ListFilter } from 'lucide-react';
+import { LoaderCircle as LoadingOutlined, Eye } from 'lucide-react';
 import ActivityDetailModal from '../../../../components/activity-detail-modal.jsx';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
@@ -289,21 +291,43 @@ export default function AuditHistoryListPage() {
       {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load user activity.'}
         action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
       <div className="min-w-0 w-full">
-        <Tabs value={activityTab} onValueChange={value => {
-          setPagination(previous => ({ ...previous, pageIndex: 0 }));
-          setModelNameFilter('');
-          setSearchParams(previous => { const next = new URLSearchParams(previous); next.set('activity_tab', value); return next; }, { replace: true });
-        }} className="mb-4">
-          <TabsList aria-label="Activity type" className="button-style-tabs">
-            <TabsTrigger value="system_activity">System Activity</TabsTrigger>
-            <TabsTrigger value="user_accounts_activity">User Accounts Activity</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <div className="lead-listing-filters user-activity-filter-panel">
-        <FilterCard title="Activity Filters" subtitle="Filter activity by company, category, user and date" Icon={ListFilter}>
-        <div className="activity-filter-row mb-3">
-        {setCompanyFilterSlot && <div ref={setCompanyFilterSlot} />}
-          <div className="lead-filter-toolbar min-w-0" style={{ margin: 0 }}>
+
+        <LeadTopFiltersAccordion dateRange={dateRangeFilter}>
+        <div className="data-leads-topbar data-leads-ui activity-filter-toolbar">
+        {setCompanyFilterSlot && <div className="activity-company-slot" ref={setCompanyFilterSlot} />}
+
+        <div className="lead-listing-filter-dropdowns">
+          <div className="lead-listing-filter-dropdown">
+          <Select
+            placeholder="Filter by Category"
+            value={modelNameFilter || undefined}
+            onChange={(value) => {
+              setModelNameFilter(value ? String(value) : '');
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }}
+            options={modelNameDropdownOptions}
+            showSearch
+            optionFilterProp="label"
+            style={{ width: '100%', minWidth: 0 }}
+            allowClear
+          />
+          </div>
+          <div className="lead-listing-filter-dropdown">
+          <Select
+            placeholder="Filter by changed by user"
+            value={changedByFilter[0] ?? ''}
+            onChange={(value) => {
+              setChangedByFilter(value == null || value === '' ? [] : [String(value)]);
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }}
+            options={usersDropdownOptions}
+            showSearch
+            optionFilterProp="label"
+            style={{ width: '100%', minWidth: 0 }}
+            allowClear
+          />
+          </div>
+          </div>
           <LeadDateRangeField hasValue={Boolean(dateRangeFilter)} onClear={() => {
             setDateRangeFilter(null);
             setPagination(previous => ({ ...previous, pageIndex: 0 }));
@@ -319,49 +343,21 @@ export default function AuditHistoryListPage() {
             }}
           />
           </LeadDateRangeField>
-          </div>
         </div>
-        <div className="user-activity-filters activity-filter-row mb-3">
-          <div className="min-w-0">
-          <Select
-            className="user-activity-filter-select"
-            placeholder="Filter by Category"
-            value={modelNameFilter || undefined}
-            onChange={(value) => {
-              setModelNameFilter(value ? String(value) : '');
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-            }}
-            options={modelNameDropdownOptions}
-            showSearch
-            optionFilterProp="label"
-            style={{ width: '100%', minWidth: 0 }}
-            allowClear
-          />
-          </div>
-          <div className="min-w-0">
-          <Select
-            className="user-activity-filter-select"
-            placeholder="Filter by changed by user"
-            value={changedByFilter[0] ?? ''}
-            onChange={(value) => {
-              setChangedByFilter(value == null || value === '' ? [] : [String(value)]);
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-            }}
-            options={usersDropdownOptions}
-            showSearch
-            optionFilterProp="label"
-            dropdownMatchSelectWidth
-            dropdownStyle={{ maxWidth: 'calc(100vw - 32px)' }}
-            style={{ width: '100%', minWidth: 0 }}
-            allowClear
-          />
-          </div>
-          </div>
-          <div className="mb-3 flex justify-end">
+        </LeadTopFiltersAccordion>
+          {/* <div className="flex justify-end" style={{ marginBottom: 20 }}>
             <Button className="user-activity-clear-filters" onClick={clearFilters}>Clear Filters</Button>
-          </div>
-        </FilterCard>
-        </div>
+          </div> */}
+        <Tabs value={activityTab} onValueChange={value => {
+          setPagination(previous => ({ ...previous, pageIndex: 0 }));
+          setModelNameFilter('');
+          setSearchParams(previous => { const next = new URLSearchParams(previous); next.set('activity_tab', value); return next; }, { replace: true });
+        }} style={{ marginBottom: 20 }}>
+          <TabsList aria-label="Activity type" className="button-style-tabs">
+            <TabsTrigger value="system_activity">System Activity</TabsTrigger>
+            <TabsTrigger value="user_accounts_activity">User Accounts Activity</TabsTrigger>
+          </TabsList>
+        </Tabs>
         <div className="table-container">
           {isLoading ? (
             <div className="sop-branded-spin-wrap">

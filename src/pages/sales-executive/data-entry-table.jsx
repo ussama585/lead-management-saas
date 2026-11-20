@@ -6,7 +6,6 @@ import { Avatar, AvatarFallback } from "../../components/ui/avatar.jsx";
 import { Select as FilterSelect } from '../../components/ui/app-select.jsx';
 import LeadDateRangeField from '../../components/lead-date-range-field.jsx';
 import BootstrapDateRangeModal from '../../components/bootstrap-date-range-modal.component.jsx';
-import { Building2 } from 'lucide-react';
 import { Button } from "../../components/ui/button.jsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog.jsx";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select.jsx";
@@ -17,7 +16,10 @@ import api from '../shared/services/api.js';
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Download as DownloadOutlined } from 'lucide-react';
 import { useQuery } from "react-query";
-import LeadListingFilters from "../../components/lead-listing-filters.jsx";
+import LeadListingDropdownFilters from '../../components/lead-listing-dropdown-filters.jsx';
+import LeadTopFiltersAccordion from '../../components/lead-top-filters-accordion.jsx';
+import '../../assets/styles/data-leads-page.css';
+import '../../assets/styles/sales-data-filters.css';
 import { changeSalesDataStatus, salesDataFilterParams } from './sales-data-filters.js';
 import { leadCountTabs, normalizeLeadCounts } from "../shared/services/lead-filter-counts.js";
 import {
@@ -605,55 +607,59 @@ const DataEntryTable = () => {
         </DialogContent>
       </Dialog>
       <div className="listing-page-content sales-data-page">
-        {superAdmin && <div className="lead-company-date-toolbar lead-company-date-toolbar--compact sales-data-company-toolbar">
-          <div className="lead-company-filter">
-            <label htmlFor="sales-data-company-filter">Company</label>
-            <div className="lead-company-filter__control">
-              <Building2 size={20} className="shrink-0" aria-hidden="true" />
-              <FilterSelect id="sales-data-company-filter" showSearch allowClear placeholder="All companies"
-                value={companyId ?? undefined} loading={companies.isFetching} style={{ width: '100%' }}
-                options={(companies.data || []).map(company => ({ value: company.id, label: company.name, email: company.email }))} optionRender={option => <CompanySelectOption option={option} />}
-                onChange={value => {
-                  setCompanyId(value ?? null);
-                  setStatusFilter('');
-                  setSelectedExecutive(null);
-                  setSelectedTab('all');
-                  setPagination(previous => ({ ...previous, pageIndex: 0 }));
-                  setRowSelection({}); setSelectedAssignee(null);
-                }} />
+        <LeadTopFiltersAccordion company={(companies.data || []).find(company => String(company.id) === String(companyId))?.name} dateRange={dateRange}>
+          <div className="lead-company-date-toolbar lead-company-date-toolbar--compact data-leads-ui data-leads-topbar sales-data-filter-toolbar"
+            data-filter-columns={1 + (superAdmin ? 1 : 0) + (canViewUserTabs && (!statusFilter || statusFilter === 'All' || statusFilter === 'assigned') ? 1 : 0)}>
+            <div className="lead-company-date-toolbar__left">
+              {superAdmin && <div className="lead-company-filter">
+                <label htmlFor="sales-data-company-filter">Company</label>
+                <div className="lead-company-filter__control">
+                  <FilterSelect id="sales-data-company-filter" showSearch allowClear placeholder="Filter by company"
+                    value={companyId ?? undefined} loading={companies.isFetching} style={{ width: '100%' }}
+                    labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}
+                    options={(companies.data || []).map(company => ({ value: company.id, label: company.name, email: company.email }))}
+                    optionRender={option => <CompanySelectOption option={option} />}
+                    onChange={value => {
+                      setCompanyId(value ?? null);
+                      setStatusFilter('');
+                      setSelectedExecutive(null);
+                      setSelectedTab('all');
+                      setPagination(previous => ({ ...previous, pageIndex: 0 }));
+                      setRowSelection({}); setSelectedAssignee(null);
+                    }} />
+                </div>
+                {companies.isError && <div role="alert">Could not load companies. <Button onClick={() => companies.refetch()}>Retry</Button></div>}
+              </div>}
+              <div className="lead-company-project-slot">
+                <LeadListingDropdownFilters
+                  disabled={superAdmin && !companyId}
+                  showExecutives={canViewUserTabs && (!statusFilter || statusFilter === 'All' || statusFilter === 'assigned')}
+                  executives={assigneeFilterOptions}
+                  getExecutiveCount={id => assigneeFilterOptions.find(option => String(option.id) === String(id))?.filterCount ?? 0}
+                  assigneeTotal={assigneeFilterOptions.reduce((total, option) => total + option.filterCount, 0)}
+                  selectedExecutive={selectedExecutive}
+                  onExecutiveChange={value => {
+                    setSelectedExecutive(value || null);
+                    if (value && selectedTab === 'unassigned') {
+                      setStatusFilter('');
+                      setSelectedTab('all');
+                    }
+                    setPagination(previous => ({ ...previous, pageIndex: 0 }));
+                    setRowSelection({});
+                  }}
+                  status={statusFilter} onStatusChange={handleScopeTabFilter} statuses={statusChoices}
+                  total={tabCounts.all} getStatusCount={key => tabCounts[key] ?? 0}
+                />
+              </div>
             </div>
-            {companies.isError && <div role="alert">Could not load companies. <Button onClick={() => companies.refetch()}>Retry</Button></div>}
+            {superAdmin && <div className="lead-filter-toolbar lead-company-date-toolbar__date">
+              <LeadDateRangeField hasValue={Boolean(dateRange)} onClear={() => { setDateRange(null); setPagination(previous => ({ ...previous, pageIndex: 0 })); setRowSelection({}); }}>
+                <BootstrapDateRangeModal placeholder="Filter by date range" value={dateRange} showModal={showDateModal} setShowModal={setShowDateModal}
+                  onDone={range => { setDateRange(range); setShowDateModal(false); setPagination(previous => ({ ...previous, pageIndex: 0 })); setRowSelection({}); }} />
+              </LeadDateRangeField>
+            </div>}
           </div>
-          <div className="lead-filter-toolbar lead-company-date-toolbar__date">
-            <LeadDateRangeField hasValue={Boolean(dateRange)} onClear={() => { setDateRange(null); setPagination(previous => ({ ...previous, pageIndex: 0 })); setRowSelection({}); }}>
-              <BootstrapDateRangeModal value={dateRange} showModal={showDateModal} setShowModal={setShowDateModal}
-                onDone={range => { setDateRange(range); setShowDateModal(false); setPagination(previous => ({ ...previous, pageIndex: 0 })); setRowSelection({}); }} />
-            </LeadDateRangeField>
-          </div>
-        </div>}
-        <LeadListingFilters
-          statusFirst
-          requiresCompany={superAdmin && !companyId}
-          showExecutives={canViewUserTabs && (!statusFilter || statusFilter === 'All' || statusFilter === 'assigned')}
-          executives={assigneeFilterOptions}
-          getExecutiveCount={id => assigneeFilterOptions.find(option => String(option.id) === String(id))?.filterCount ?? 0}
-          getAssigneeTotalCount={() => assigneeFilterOptions.reduce((total, option) => total + option.filterCount, 0)}
-          selectedExecutive={selectedExecutive}
-          onExecutiveChange={value => {
-            setSelectedExecutive(value);
-            if (value && selectedTab === 'unassigned') {
-              setStatusFilter('');
-              setSelectedTab('all');
-            }
-            setPagination(previous => ({ ...previous, pageIndex: 0 }));
-            setRowSelection({});
-          }}
-          statusFilter={statusFilter}
-          setStatusFilter={handleScopeTabFilter}
-          statusChoices={statusChoices}
-          getTotalCount={() => tabCounts.all}
-          getStatusCount={key => tabCounts[key] ?? 0}
-        />
+        </LeadTopFiltersAccordion>
 
         {canViewUserTabs &&
           Object.keys(rowSelection).some((key) => rowSelection[key]) && (
@@ -688,10 +694,10 @@ const DataEntryTable = () => {
 
         {(superAdmin || user?.user_type === 'company_admin') && (
           <div className="mb-3 flex w-full justify-end">
-            <button type="button" className="listing-btn-primary" onClick={handleExportAll}>
-              <DownloadOutlined size="1em" className="app-icon" style={{ marginRight: 8 }} />
+            <Button type="button" onClick={handleExportAll}>
+              <DownloadOutlined size={16} aria-hidden="true" />
               Export All to CSV
-            </button>
+            </Button>
           </div>
         )}
         <div className="table-container">

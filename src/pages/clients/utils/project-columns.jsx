@@ -10,7 +10,7 @@ export const ApprovalPill = ({ value, label, reason }) => {
   const color = value === 'Approved' ? '#52c41a' : value === 'Rejected' ? '#ff4d4f' : '#faad14';
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-      <span style={{ background: `${color}22`, color, border: `1px solid ${color}`, borderRadius: 4, padding: '1px 8px', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
+      <span className="table-value-pill" style={{ background: `${color}22`, color, border: `1px solid ${color}`, borderRadius: 4, padding: '1px 8px', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
         {label ? `${label}: ` : ''}{value ?? 'Pending'}
       </span>
       {value === 'Rejected' && (

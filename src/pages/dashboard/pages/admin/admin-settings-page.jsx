@@ -10,10 +10,8 @@ import api from '../../../shared/services/api.js';
 import { followUpDurationSchema } from '../schemas/follow-up-duration-schema.js';
 import { Alert, Card, Typography, InputNumber, Space } from 'antd';
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
-import { Clock, ListFilter, Ruler, Pencil, Trash2 } from 'lucide-react';
+import { Clock, Pencil, Trash2 } from 'lucide-react';
 // import { Palette, RefreshCw } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
-import { Button as SettingsNavButton } from '../../../../components/ui/button.jsx';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
 // import AppearanceSettings from '../../../../components/appearance-settings.jsx';
@@ -64,18 +62,11 @@ const AdminSettingsPage = () => {
   const superAdmin = isSuperAdmin(user?.user_type);
   const [selectedCompanyId, setCompanyId] = useState(undefined);
   // const canManageAppearance = isSuperAdmin(user?.user_type);
-  const settingsSections = [
-    // ...(canManageAppearance ? [{ key: 'appearance', label: 'Appearance', icon: Palette }] : []),
-    ...(canManageLeadStatuses(user?.user_type) || isSuperAdmin(user?.user_type) ? [{ key: 'leads', label: 'Leads', icon: ListFilter }] : []),
-    ...(canManageProjectSizes(user?.user_type) || isSuperAdmin(user?.user_type) ? [{ key: 'project-size', label: 'Project Size', icon: Ruler }] : []),
-    ...(getLayoutRole(user?.user_type) === 'admin' ? [{ key: 'follow-up-duration', label: 'Follow-up Duration', icon: Clock }] : []),
-    // { key: 'refresh-token', label: 'Refresh Token', icon: RefreshCw },
-  ];
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedSection = settingsSections.find(item => item.key === searchParams.get('section')) || settingsSections[0];
-  const section = selectedSection?.key;
+  const showLeadSettings = canManageLeadStatuses(user?.user_type) || superAdmin;
+  const showProjectSizeSettings = canManageProjectSizes(user?.user_type) || superAdmin;
+  const showDurationSettings = getLayoutRole(user?.user_type) === 'admin';
   const companies = useQuery(['overviewCompanies', user?.id], getCompanies, {
-    enabled: superAdmin && section === 'follow-up-duration', staleTime: 300000, refetchOnWindowFocus: false,
+    enabled: superAdmin && showDurationSettings, staleTime: 300000, refetchOnWindowFocus: false,
   });
   const companyId = selectedCompanyId === undefined ? companies.data?.[0]?.value ?? null : selectedCompanyId;
   const queryClient = useQueryClient();
@@ -83,7 +74,7 @@ const AdminSettingsPage = () => {
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const { data: durations, isLoading, isFetching, isError, error, refetch } = useQuery(durationQueryKey, () => listCheckupDurations(superAdmin ? companyId : null), {
-    enabled: section === 'follow-up-duration' && (!superAdmin || Boolean(companyId)), refetchOnWindowFocus: false,
+    enabled: showDurationSettings && (!superAdmin || Boolean(companyId)), refetchOnWindowFocus: false,
   });
   const canCreateDuration = Boolean(durations) && !isLoading && !isFetching && !isError
     && durations.results.length === 0 && (!superAdmin || Boolean(companyId));
@@ -149,25 +140,13 @@ const AdminSettingsPage = () => {
     <>
       <div className="dashboard-container settings-page">
         <div className="settings-layout">
-          <nav aria-label="Settings sections" className="settings-navigation">
-            <h2 className="w-full px-3 py-2 text-base font-semibold">Settings</h2>
-            {settingsSections.map(({ key, label, icon: Icon }) => <SettingsNavButton key={key} variant={section === key ? 'secondary' : 'ghost'} className="settings-navigation-item" aria-controls="settings-panel" aria-current={section === key ? 'page' : undefined} onClick={() => {
-              setSearchParams(previous => {
-                const next = new URLSearchParams(previous);
-                next.set('section', key);
-                return next;
-              });
-            }}><Icon />{label}</SettingsNavButton>)}
-          </nav>
-          <div id="settings-panel" className="settings-panel" role="region" aria-label={selectedSection ? `${selectedSection.label} settings` : 'Settings'}>
-        {!selectedSection && <p className="text-muted-foreground">No settings are available for your role at the moment.</p>}
-        {/* {canManageAppearance && section === 'appearance' && <AppearanceSettings />} */}
-        {section === 'leads' && (isSuperAdmin(user?.user_type) ? <CompanyLeadSettingsList key="leads" type="leads" /> : <LeadStatusSettings />)}
-        {section === 'project-size' && (isSuperAdmin(user?.user_type) ? <CompanyLeadSettingsList key="project-size" type="project-size" /> : <ProjectSizeSettings />)}
-        {/* {section === 'refresh-token' && <RefreshTokenSettings />} */}
+          <div id="settings-panel" className="settings-panel" role="region" aria-label="Settings">
+        {!showLeadSettings && !showProjectSizeSettings && !showDurationSettings && <p className="text-muted-foreground">No settings are available for your role at the moment.</p>}
+        {showLeadSettings && (superAdmin ? <CompanyLeadSettingsList key="leads" type="leads" /> : <LeadStatusSettings />)}
+        {showProjectSizeSettings && (superAdmin ? <CompanyLeadSettingsList key="project-size" type="project-size" /> : <ProjectSizeSettings />)}
         
 
-        {section === 'follow-up-duration' && <Card title="Check-up follow-up duration">
+        {showDurationSettings && <Card title="Check-up follow-up duration">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {superAdmin && <div>
               <label htmlFor="duration-company" className="mb-2 block text-sm font-medium">Company</label>

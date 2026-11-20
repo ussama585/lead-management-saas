@@ -1,10 +1,10 @@
+import UserManagementFilters from '../components/user-management-filters.jsx';
 import { message } from '../../../components/ui/notifications.jsx';
 import { Modal } from '../../../components/ui/app-modal.jsx';
-import { Select } from '../../../components/ui/app-select.jsx';
 import { Input } from '../../../components/ui/app-controls.jsx';
 import { Spin, Button, Tooltip } from '../../../components/ui/app-controls.jsx';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Row, Col, Form, DatePicker, Divider, Alert } from 'antd';
+import { Row, Col, Form, DatePicker, Alert } from 'antd';
 import { Formik, Form as FormikForm, Field, ErrorMessage, useField } from "formik";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
@@ -51,8 +51,8 @@ export default function UserManagement() {
       const next = new URLSearchParams(searchParams);
       next.set('users_scope', value);
       setSearchParams(next, { replace: true });
-    }} className="mb-5">
-      <TabsList aria-label="User management sections" className="button-style-tabs">
+    }} style={{ marginBottom: 20 }}>
+      <TabsList aria-label="User management sections" className="button-style-tabs user-management-section-tabs">
         <TabsTrigger value="super_admin">Super Admin</TabsTrigger>
         <TabsTrigger value="company">Company Users</TabsTrigger>
       </TabsList>
@@ -563,95 +563,17 @@ function UserManagementContent({ superAdminScope = 'company' }) {
     <>
       {!isSuperAdminViewer && <BreadCrumb linkText="All Users" />}
 
-      <div className="client-tabs-container">
-
-        {!superAdminOnly && <div className="button-style-tabs" role="group" aria-label="Filter users by role">
-          {isSuperAdminViewer || currentUser?.user_type === 'company_admin' ? [
-            ['all', 'All Users'], ['company_admin', 'Company Admins'],
-            ['sales_manager', 'Sales Managers'], ['sales_executive', 'Sales Executives'], ['data_entry_executive', 'Data Entry Executives'],
-          ].map(([value, label]) => <button key={value} type="button" className={`tab ${selectedTab === value ? 'active' : ''}`} onClick={() => handleTabClick(value)}>
-            {label} ({userCount[value] ?? 0})
-          </button>) : <>
-            <button
-              className={`tab ${selectedTab === 'all' ? 'active' : ''}`}
-              onClick={() => handleTabClick('all')}
-            >
-              All ({userCount['all'] || 0})
-            </button>
-            <button
-              className={`tab ${selectedTab === 'sales_manager' ? 'active' : ''}`}
-              onClick={() => handleTabClick('sales_manager')}
-            >
-              Sales Managers ({userCount['sales_manager'] || 0})
-            </button>
-            <button
-              className={`tab ${selectedTab === 'sales_executive' ? 'active' : ''}`}
-              onClick={() => handleTabClick('sales_executive')}
-            >
-              Sales Executives ({userCount['sales_executive'] || 0})
-            </button>
-            <button
-              className={`tab ${selectedTab === 'data_entry_executive' ? 'active' : ''}`}
-              onClick={() => handleTabClick('data_entry_executive')}
-            >
-              Data Entry Executives ({userCount['data_entry_executive'] || 0})
-            </button>
-            <button
-              className={`tab ${selectedTab === 'recruitment_manager' ? 'active' : ''}`}
-              onClick={() => handleTabClick('recruitment_manager')}
-            >
-              Recruitment Managers ({userCount['recruitment_manager'] || 0})
-            </button>
-            <button
-              className={`tab ${selectedTab === 'recruitment_executive' ? 'active' : ''}`}
-              onClick={() => handleTabClick('recruitment_executive')}
-            >
-              Recruitment Executives ({userCount['recruitment_executive'] || 0})
-            </button>
-            <button
-              className={`tab ${selectedTab === 'project_manager' ? 'active' : ''}`}
-              onClick={() => handleTabClick('project_manager')}
-            >
-              Project Managers ({userCount['project_manager'] || 0})
-            </button>
-
-            <button
-              className={`tab ${selectedTab === 'marketing_manager' ? 'active' : ''}`}
-              onClick={() => handleTabClick('marketing_manager')}
-            >
-              Marketing Manager ({userCount['marketing_manager'] || 0})
-            </button>
-
-            <button
-              className={`tab ${selectedTab === 'accountant' ? 'active' : ''}`}
-              onClick={() => handleTabClick('accountant')}
-            >
-              Accountant ({userCount['accountant'] || 0})
-            </button>
-            <button
-              className={`tab ${selectedTab === 'admin' ? 'active' : ''}`}
-              onClick={() => handleTabClick('admin')}
-            >
-              Admins ({userCount['admin'] || 0})
-            </button>
-          </>}
-
-        </div>}
-
-      </div>
-
-      <Divider />
-      <div className="mb-4 flex items-center justify-between gap-3">
-      {(isSuperAdminViewer || isCompany) && <div className="flex items-center gap-3">
-        <label htmlFor="user-active-filter">Account status</label>
-        <Select placeholder="Select account status" id="user-active-filter" value={activeFilter || 'all'} style={{ width: 180 }} options={[
-          { value: 'all', label: 'All Statuses' }, { value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' },
-        ]} onChange={value => { setActiveFilter(value === 'all' ? '' : value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }} />
-      </div>}
-        <button className="createUserBtn ml-auto shrink-0" onClick={handleCreateUser}>
-          Create New User
-        </button>
-      </div>
+      <UserManagementFilters
+        superAdminOnly={superAdminOnly}
+        companyRolesOnly={isSuperAdminViewer || isCompany}
+        showAccountStatus={isSuperAdminViewer || isCompany}
+        counts={userCount}
+        role={selectedTab}
+        onRoleChange={handleTabClick}
+        status={activeFilter}
+        onStatusChange={value => { setActiveFilter(value); setPagination(previous => ({ ...previous, pageIndex: 0 })); }}
+        onCreate={handleCreateUser}
+      />
       {(isError || accountCompany.isError) && <Alert className="mb-4" type="error" showIcon message={(error || accountCompany.error)?.response?.data?.message || (error || accountCompany.error)?.message || 'Could not load users.'} action={<Button onClick={() => accountCompany.isError ? accountCompany.refetch() : refetch()}>Retry</Button>} />}
 
       <div>

@@ -4,13 +4,14 @@ import { Input } from '../../../components/ui/app-controls.jsx';
 import { Button, Spin } from '../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Alert, Avatar, Card, Space, Switch, Tag } from 'antd';
+import { Alert, Avatar, Space, Switch, Tag } from 'antd';
 import NewTableComponent from '../../../components/tables/new-table.jsx';
 import { listingColumns, listingPagination, nextListingPagination, listingSorting, nextListingSorting } from '../../../components/tables/listing-table-options.js';
 import { Eye, Pencil, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
 import '../../../assets/styles/job-listing-tabs.css';
+import '../../../assets/styles/companies-page.css';
 import useUserStore from '../../shared/store/user-store.js';
 import { isSuperAdmin } from '../../auth/role-access.js';
 import api from '../../shared/services/api.js';
@@ -264,35 +265,38 @@ export default function CompaniesPage() {
   ];
   const detailReady = dialog?.id == null || (!detail.isFetching && !detail.isError && detail.data);
   return <>
-    <Tabs value={companyTab} onValueChange={value => { setCompanyTab(value); setPagination(previous => ({ ...previous, current: 1 })); }} className='mb-4'>
+    <Tabs value={companyTab} onValueChange={value => { setCompanyTab(value); setPagination(previous => ({ ...previous, current: 1 })); }} style={{ marginBottom: 20 }}>
       <TabsList aria-label='Company listings' className='button-style-tabs'>
         <TabsTrigger value='active'>Active Companies</TabsTrigger>
         <TabsTrigger value='deleted'>Deleted Companies</TabsTrigger>
       </TabsList>
     </Tabs>
-    <Card extra={<Button type='primary' icon={<Plus size={16} />} disabled={busy} onClick={() => openDialog('create')}>Create company</Button>}>
-      <Input.Search aria-label='Search companies' placeholder='Search companies...' allowClear onSearch={value => { setSearch(value.trim()); setPagination(previous => ({ ...previous, current: 1 })); }} className='mb-4' style={{ maxWidth: 360 }} />
+    <div className="companies-listing">
+      <div className="companies-listing-toolbar">
+        <Button type='primary' icon={<Plus size={16} />} disabled={busy} onClick={() => openDialog('create')}>Create company</Button>
+      </div>
       {list.isError && <Alert type='error' showIcon message={companyError(list.error)} className='mb-4' action={<Button onClick={() => list.refetch()}>Retry</Button>} />}
-      <NewTableComponent mrtOptions={{
-        columns: listingColumns(columns),
-        data: list.data?.results || [],
-        getRowId: row => String(row.id),
-        manualPagination: true, manualSorting: true, manualFiltering: true,
-        rowCount: list.data?.count || 0,
-        state: { pagination: listingPagination(pagination), sorting: listingSorting(sorting), isLoading: list.isLoading || list.isFetching },
-        onPaginationChange: updater => setPagination(previous => nextListingPagination(updater, previous)),
-        onSortingChange: updater => {
+      <NewTableComponent serverListing
+        heading={companyTab === 'active' ? 'Active Companies' : 'Deleted Companies'}
+        columns={listingColumns(columns)}
+        data={list.data?.results || []}
+        totalCount={list.data?.count || 0}
+        pagination={listingPagination(pagination)}
+        sorting={listingSorting(sorting)}
+        globalFilter={search}
+        isLoading={list.isLoading}
+        isFetching={list.isFetching}
+        onGlobalFilterChange={value => {
+          setSearch(previous => typeof value === 'function' ? value(previous) : value || '');
+          setPagination(previous => ({ ...previous, current: 1 }));
+        }}
+        onPaginationChange={updater => setPagination(previous => nextListingPagination(updater, previous))}
+        onSortingChange={updater => {
           setSorting(previous => nextListingSorting(updater, previous));
           setPagination(previous => ({ ...previous, current: 1 }));
-        },
-        enableMultiSort: false, enableGlobalFilter: false, enableColumnFilters: false,
-        enableColumnActions: false, enableRowSelection: false, enableHiding: false,
-        enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
-        muiTableProps: { sx: { minWidth: 1550 } },
-        muiPaginationProps: { rowsPerPageOptions: [10, 20, 50, 100] },
-        localization: { noRecordsToDisplay: list.isError ? 'Companies could not be loaded.' : 'No companies found.' },
-      }} />
-    </Card>
+        }}
+      />
+    </div>
     <Modal title='Restore company' open={Boolean(restoreTarget)} okText='Restore' confirmLoading={restore.isLoading}
       onCancel={() => { if (!restore.isLoading) setRestoreTarget(null); }}
       onOk={() => { if (restoreTarget && !restore.isLoading) restore.mutate(restoreTarget.id); }}>

@@ -1,0 +1,14 @@
+.companies-listing { min-width: 0; width: 100%; }
+.companies-listing-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+.companies-listing .table-wrapper { margin-top: 0; }
+@media (max-width: 640px) {
+  .companies-listing-toolbar > button { width: 100%; }
+}

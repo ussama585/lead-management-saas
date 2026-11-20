@@ -1,8 +1,10 @@
 import { Tooltip } from './ui/app-controls.jsx';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import { createPortal } from 'react-dom';
 
-import { X as CloseOutlined } from 'lucide-react';
+import { X as CloseOutlined, ChevronDown } from 'lucide-react';
+import LeadDateRangeField from './lead-date-range-field.jsx';
+import { DateRangeFieldContext } from './date-range-field-context.js';
 import { DateRangePicker } from 'react-date-range';
 import { format } from 'date-fns';
 import 'react-date-range/dist/styles.css';
@@ -17,7 +19,8 @@ const MOBILE_BREAKPOINT = 1050;
 const MIN_WIDTH_BREAKPOINT = 450;
 const DEBOUNCE_DELAY = 150;
 
-const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onDone, triggerStyle, placeholder = 'Select Date Range' }) => {
+const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onDone, triggerStyle, placeholder = 'Filter by date range' }) => {
+  const withinDateField = useContext(DateRangeFieldContext);
   const [isMobile, setIsMobile] = useState(false);
   const [isBelowMinWidth, setIsBelowMinWidth] = useState(false);
 
@@ -130,9 +133,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
     return placeholder;
   }, [selection]);
 
-  return (
-    <>
-      <Tooltip
+  const trigger = <Tooltip
         title={isBelowMinWidth ? 'Date range picker is not available on mobile' : ''}
         placement="top"
       >
@@ -141,9 +142,13 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
           onClick={handleTriggerClick}
           style={triggerStyle}
         >
-          <span className="date-range-trigger__text">{displayText}</span><i className="fa fa-chevron-down ms-2"></i>
+          <span className="date-range-trigger__text">{displayText}</span><ChevronDown className="date-range-trigger__arrow" aria-hidden="true" />
         </div>
-      </Tooltip>
+      </Tooltip>;
+
+  return (
+    <>
+      {withinDateField ? trigger : <LeadDateRangeField hasValue={Boolean(value?.[0] || value?.[1])} onClear={handleClearClick}>{trigger}</LeadDateRangeField>}
 
       {showModal && createPortal(
         <>

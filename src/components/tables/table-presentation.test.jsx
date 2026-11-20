@@ -45,3 +45,22 @@ it('puts Company before Name and leaves other table orders intact', () => {
   const columns = [{ id: 'job_title' }, { id: 'status' }];
   expect(companyBeforeName(columns)).toEqual(columns);
 });
+
+it('left-aligns text headings and values despite existing centered styles', () => {
+  for (const accessorKey of ['company_name', 'status', 'assigned_to_name', 'project_size']) {
+    const [column] = tablePresentation([{ accessorKey, muiTableHeadCellProps: { align: 'center' }, muiTableBodyCellProps: { align: 'center', sx: { color: 'red' } } }]);
+    expect(column.muiTableHeadCellProps({}).align).toBe('left');
+    expect(column.muiTableBodyCellProps({ cell: { getValue: () => 'Example' } })).toMatchObject({ align: 'left' });
+    expect(column.muiTableBodyCellProps({ cell: { getValue: () => 'Example' } }).sx[0]).toEqual({ color: 'red' });
+  }
+});
+
+it('normalizes pill spacing without altering its colors or callback', () => {
+  const onClick = vi.fn();
+  const style = { color: '#15803d', backgroundColor: '#dcfce7', padding: '2px 8px', borderRadius: 4 };
+  const [column] = tablePresentation([{ accessorKey: 'status', Cell: () => <span style={style} onClick={onClick}>Active</span> }]);
+  const pill = column.Cell({ cell: { getValue: () => 'Active' } });
+  expect(pill.props.className).toBe('table-value-pill');
+  expect(pill.props.style).toBe(style);
+  expect(pill.props.onClick).toBe(onClick);
+});

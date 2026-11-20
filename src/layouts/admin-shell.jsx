@@ -12,8 +12,6 @@ import { isSuperAdmin } from '@/pages/auth/role-access.js';
 import ChangePasswordDialog from '@/components/change-password-dialog.jsx';
 import './admin-shell.css';
 
-const copyrightYear = new Date().getFullYear();
-
 const navigationIcons = {
   Dashboard: House, 'User Management': UsersRound, 'Sales Managers': UsersRound,
   'Sales Executives': ContactRound, Clients: ContactRound, Companies: Building2,
@@ -60,7 +58,7 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
   return <>
     <a href='#main-content' className='sop-skip'>Skip to content</a>
     <Sidebar collapsible='icon' variant='inset' className='[&_[data-slot=sidebar-inner]]:rounded-2xl [&_[data-slot=sidebar-inner]]:border [&_[data-slot=sidebar-inner]]:border-primary/15 [&_[data-slot=sidebar-inner]]:bg-background [&_[data-slot=sidebar-inner]]:shadow-sm'>
-      <SidebarHeader className='border-b border-primary/10 pb-3 pt-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-1'>
+      <SidebarHeader className='sop-sidebar-header border-b border-primary/10 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-1'>
         <SidebarMenu><SidebarMenuItem><SidebarMenuButton size='lg' aria-label='Search O Pal home' className='hover:bg-primary/5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!' onClick={() => select('1')}>
           <div className='flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm'><Command className='size-4' /></div>
           <div className='grid min-w-0 flex-1 gap-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'><span className='truncate font-semibold text-primary'>Search O Pal</span><span className='truncate text-xs capitalize text-muted-foreground'>{role} workspace</span></div>
@@ -80,14 +78,14 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
 
     </Sidebar>
     <SidebarInset className='min-w-0'>
-      <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-primary/10 bg-background px-4'>
+      <header className='sop-main-header sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-primary/10 bg-background px-4'>
         <SidebarTrigger className='rounded-lg border border-primary/15 bg-primary/5 text-primary transition-colors hover:bg-primary/10 hover:text-primary' /><Separator orientation='vertical' className='h-4 bg-primary/15' />
         <span className='min-w-0 truncate text-sm font-semibold text-primary'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Overview'}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button type='button' aria-label='Open account menu' className='ml-auto flex min-w-0 shrink-0 items-center gap-2 rounded-xl border border-primary/15 bg-primary/[0.025] px-3 py-1.5 text-left outline-none transition-colors hover:border-primary/30 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'>
+            <button type='button' aria-label='Open account menu' className='ml-auto flex min-w-0 shrink-0 items-center gap-2 rounded-xl border-0 border-primary/15 bg-primary/[0.025] px-3 py-1.5 text-left outline-none transition-colors hover:border-primary/30 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:border'>
               <Avatar className='size-8 rounded-lg'><AvatarImage src={user?.profile_pic} alt='' /><AvatarFallback className='rounded-lg bg-primary/10 font-semibold text-primary'>{initials}</AvatarFallback></Avatar>
-              <span className='grid min-w-0 max-w-[130px] leading-tight sm:max-w-[220px]'>
+              <span className='hidden min-w-0 max-w-[220px] leading-tight md:grid'>
                 <span className='truncate text-sm font-semibold text-primary'>{user?.name || 'User'}</span>
                 <span className='truncate text-xs text-muted-foreground'>{user?.email}</span>
               </span>
@@ -105,16 +103,6 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
       </header>
       <ChangePasswordDialog open={passwordOpen} onClose={() => setPasswordOpen(false)} />
       <main id='main-content' tabIndex={-1} className='sop-page-content'>{children}</main>
-      <footer className='mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-primary/10 bg-primary/[0.025] px-5 py-3 text-xs text-muted-foreground sm:px-6'>
-        <div className='flex items-center gap-2.5'>
-          <span className='flex size-7 items-center justify-center rounded-lg border border-primary/10 bg-background text-primary'><Command className='size-3.5' aria-hidden='true' /></span>
-          <div className='flex flex-wrap items-baseline gap-x-2 gap-y-0.5'>
-            <span className='font-semibold text-primary'>Search O Pal</span>
-            <span>© {copyrightYear} All rights reserved.</span>
-          </div>
-        </div>
-        <span className='rounded-full border border-primary/10 bg-background px-3 py-1 font-medium capitalize text-primary'>{role} workspace</span>
-      </footer>
     </SidebarInset>
   </>;
 }

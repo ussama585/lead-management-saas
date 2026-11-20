@@ -1,0 +1,15 @@
+/* Use the shared lead-filter surface with Sales Data's available controls. */
+.data-leads-topbar.sales-data-filter-toolbar {
+  --website-filter-columns: 3 !important;
+}
+.data-leads-topbar.sales-data-filter-toolbar[data-filter-columns='2'] {
+  --website-filter-columns: 2 !important;
+}
+.data-leads-topbar.sales-data-filter-toolbar[data-filter-columns='1'] {
+  --website-filter-columns: 1 !important;
+}
+@container (max-width: 600px) {
+  .data-leads-topbar.sales-data-filter-toolbar[data-filter-columns] {
+    --website-filter-columns: 1 !important;
+  }
+}

@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import ExecutiveTabButton from '../../../components/executive-tab-button.component.jsx';
 import BootstrapDateRangeModal from '../../../components/bootstrap-date-range-modal.component.jsx';
-import ResumeClearAllFiltersButton from '../../resume/components/ResumeClearAllFiltersButton.jsx';
 import NewTableComponent from '../../../components/tables/new-table.jsx';
 import { getJobDeliverables, getJobDeliverablesCount, getDeliverableAssignCount } from '../../shared/services/headhunting.js';
 import { formatDateUniversal } from '../../shared/utils/formatDate.js';
@@ -19,6 +18,7 @@ const StatusPill = ({ value }) => {
   if (!value) return <span>-</span>;
   return (
     <span
+      className="table-value-pill"
       style={{
         color: statusColors[value] || '#666',
         fontWeight: 500,
@@ -288,14 +288,6 @@ const DeliverablesPage = () => {
         )}
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-          {dateRange && (
-            <ResumeClearAllFiltersButton
-              onClick={() => {
-                setDateRange(null);
-                setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-              }}
-            />
-          )}
           <BootstrapDateRangeModal
             value={dateRange}
             onChange={setDateRange}

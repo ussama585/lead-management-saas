@@ -11,7 +11,7 @@ import api from '../pages/shared/services/api.js';
 import useUserStore from '../pages/shared/store/user-store.js';
 import { companyFilterSection, selectedCompany } from '../pages/shared/utils/company-filter.js';
 import CompanySelectOption from './company-select-option.jsx';
-import { Building2 } from 'lucide-react';
+import '../assets/styles/listing-filter-controls.css';
 
 export async function getCompanies() {
   const { data } = await api.get('/company/simple-list');
@@ -23,18 +23,17 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
   const mutating = useIsMutating();
   const { pathname, search } = useLocation();
   const filterParams = new URLSearchParams(search);
-  const leadListing = /\/(?:leads|data-leads|meta-leads|follow-up)\/?$/.test(pathname);
+  const leadListing = /\/(?:leads|data-leads|meta-leads|follow-up|user-management)\/?$/.test(pathname);
   const [dateSlot, setDateSlot] = useState(null);
   const [projectSlot, setProjectSlot] = useState(null);
   const [topActionsSlot, setTopActionsSlot] = useState(null);
   const [activityCompanySlot, setActivityCompanySlot] = useState(null);
   const activityPage = /\/audit-history-list\/?$/.test(pathname);
-  const companyControl = <div className={activityPage ? 'min-w-0' : leadListing ? 'lead-company-filter' : 'mb-4 flex flex-wrap items-center gap-2'}>
-      <label htmlFor="overview-company-filter" className={activityPage ? 'lead-date-range-field__label' : 'text-sm font-medium'}>{activityPage ? 'Filter by Company:' : 'Company'}</label>
-      <div className={leadListing ? 'lead-company-filter__control' : undefined} style={leadListing ? undefined : { display: 'contents' }}>
-      {leadListing && <Building2 size={20} className="shrink-0" aria-hidden="true" />}
-      <Select id="overview-company-filter" aria-label="Company" placeholder={/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname) ? 'Filter by company' : 'Select Company'}
-        style={{ width: activityPage ? '100%' : 280, maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
+  const companyControl = <div className={`lead-company-filter${activityPage ? ' company-filter-full-width' : !leadListing ? ' company-filter-standalone' : ''}`}>
+      <label htmlFor="overview-company-filter">Company</label>
+      <div className="lead-company-filter__control">
+      <Select id="overview-company-filter" aria-label="Company" placeholder="Filter by company"
+        style={{ width: '100%', maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
         virtual={false} optionRender={option => <CompanySelectOption option={option} />}
         labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}
         options={options} loading={loading} disabled={mutating > 0} value={companyId ?? undefined}
@@ -48,11 +47,11 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
     <LeadProjectFilterSlot.Provider value={leadListing ? projectSlot : null}>
     <LeadTopActionsSlot.Provider value={leadListing ? topActionsSlot : null}>
     {leadListing && <div ref={setTopActionsSlot} />}
-{!activityPage && <LeadTopFiltersAccordion enabled={/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname)}
+{!activityPage && <LeadTopFiltersAccordion enabled={/\/(?:leads|data-leads|meta-leads|user-management)\/?$/.test(pathname)}
       company={options.find(option => String(option.value) === String(companyId))?.label}
       projectSize={filterParams.get('project_size')}
       dateRange={[filterParams.get('date_start'), filterParams.get('date_end')]}>
-    <div className={leadListing ? `lead-company-date-toolbar lead-company-date-toolbar--compact${/\/(?:leads|data-leads|meta-leads)\/?$/.test(pathname) ? ' data-leads-ui data-leads-topbar' : ''}` : undefined}>
+    <div className={leadListing ? `lead-company-date-toolbar lead-company-date-toolbar--compact${/\/(?:leads|data-leads|meta-leads|user-management)\/?$/.test(pathname) ? ' data-leads-ui data-leads-topbar' : ''}` : undefined}>
     <div className={leadListing ? 'lead-company-date-toolbar__left' : undefined} style={leadListing ? undefined : { display: 'contents' }}>
     {companyControl}
     {leadListing && <div ref={setProjectSlot} className="lead-company-project-slot" />}

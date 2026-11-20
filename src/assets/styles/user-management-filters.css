@@ -1,0 +1,19 @@
+.user-management-actions { display: flex; justify-content: flex-end; margin-bottom: 20px; min-width: 0; }
+.user-management-create-button { max-width: 100%; }
+.user-management-section-tabs { max-width: 100%; flex-wrap: wrap; height: auto; }
+:is(.data-leads-topbar, .data-leads-ui.data-leads-local-toolbar):has(.user-management-filter-fields[data-filter-columns]) {
+  --website-filter-columns: 4 !important;
+}
+@container (max-width: 900px) {
+  :is(.data-leads-topbar, .data-leads-ui.data-leads-local-toolbar):has(.user-management-filter-fields[data-filter-columns]) {
+    --website-filter-columns: 2 !important;
+  }
+}
+@container (max-width: 600px) {
+  :is(.data-leads-topbar, .data-leads-ui.data-leads-local-toolbar):has(.user-management-filter-fields[data-filter-columns]) {
+    --website-filter-columns: 1 !important;
+  }
+}
+@media (max-width: 640px) {
+  .user-management-create-button { width: 100%; }
+}

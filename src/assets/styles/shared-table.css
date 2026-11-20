@@ -17,7 +17,19 @@
   background: var(--background, #fff);
 }
 .app-data-table .MuiTableCell-root { font-family: inherit; }
-.app-data-table .MuiTableCell-body { font-size: 14px; padding: 8px; vertical-align: middle; }
+.app-data-table .MuiTableCell-body { font-size: 14px; padding: 6px 8px; padding-block: 6px !important; vertical-align: middle; }
+@layer legacy {
+.app-data-table .MuiTableCell-body :is(.table-value-pill, [data-slot='badge'], .ant-tag, .MuiChip-root, .status-pill, .client-table-status-pill),
+.app-shared-document-table td :is(.table-value-pill, [data-slot='badge'], .ant-tag, .MuiChip-root, .status-pill, .client-table-status-pill) {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  height: auto;
+  box-sizing: border-box;
+}
+}
+.app-data-table .MuiChip-root .MuiChip-label { padding-inline: 0; }
 .app-data-table .MuiTableCell-head { font-size: 14px; padding: 12px 8px; line-height: 20px; }
 .app-data-table .MuiTableCell-root,
 .app-shared-document-table,

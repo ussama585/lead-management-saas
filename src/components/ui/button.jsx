@@ -50,8 +50,7 @@ const Button = React.forwardRef(function Button({ className, variant, size, asCh
     const hasText = parts.some(part => typeof part === 'string' && part.trim());
     const animate = !asChild && hasText && size !== 'icon' && !props['aria-haspopup']
         && props['aria-pressed'] == null && props['aria-expanded'] == null && !props['aria-controls']
-        && props['data-slot'] !== 'select-trigger' && props.role !== 'tab'
-        && !props['aria-busy'] && !props.disabled;
+        && props['data-slot'] !== 'select-trigger' && props.role !== 'tab';
     let content = children;
     if (animate) {
         const iconIndex = parts.findIndex(part => React.isValidElement(part) && (part.type === 'svg'
