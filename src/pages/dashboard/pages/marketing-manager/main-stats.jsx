@@ -767,7 +767,7 @@ export default function MainStatsPage() {
     <div className="dashboard-container" style={{ width: '100%', maxWidth: '100%' }}>
       <div className="admin-stat-cards-grid mb-2">
         {statsCards.map((card) => (
-          <StatsCard
+          <StatsCard showTrend={false}
             key={card.key}
             title={card.title}
             value={card.value}

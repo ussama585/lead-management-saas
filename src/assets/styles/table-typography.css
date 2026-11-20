@@ -8,6 +8,19 @@ html body table td :is(a[href]:not([data-slot="button"]), .link-style, .sop-bran
 
 html body table :is(th, td) {
   font-size: 14px !important;
+  min-width: 150px !important;
+}
+
+html body table :is(th, td).table-row-number-cell {
+  min-width: 60px !important;
+  width: 60px;
+}
+
+/* Selection controls do not need the minimum width of data columns. */
+html body table :is(th, td):has(input[type='checkbox']),
+html body table :is(th, td):has([role='checkbox']) {
+  min-width: 48px !important;
+  width: 48px !important;
 }
 
 html body table :is(th, td) :is(div, span, p, a, strong, b, em, small) {
@@ -21,5 +34,5 @@ html body table :is(th, td) [data-table-secondary] * {
 }
 
 html body table tbody > tr {
-  height: 72px;
+  height: 64px;
 }

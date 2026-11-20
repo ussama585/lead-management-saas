@@ -1,7 +1,6 @@
 import React from 'react';
 import StatsCard from '../../../../components/stats-card.component.jsx';
 import { Row, Col } from 'antd';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { getDataEntryExecutiveStats, getDataEntryExecutiveGraphStats } from '../../../shared/services/data-entry-service.js';
@@ -35,7 +34,6 @@ const DataEntryExecutiveDashboard = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Dashboard" />
       <div style={{ padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2>Sales Data Executive Dashboard</h2>
@@ -43,10 +41,10 @@ const DataEntryExecutiveDashboard = () => {
 
         <Row gutter={16} style={{ marginBottom: 32 }}>
           <Col>
-            <StatsCard title="Total Data Entered" value={isLoading ? '...' : totalLeads} percentage={totalTrend} borderColor="#3E6A9F" />
+            <StatsCard showTrend={false} title="Total Data Entered" value={isLoading ? '...' : totalLeads} percentage={totalTrend} borderColor="#3E6A9F" />
           </Col>
           <Col>
-            <StatsCard title="Data Entered Today" value={isLoading ? '...' : leadsToday} percentage={todayTrend} borderColor="#27ae60" />
+            <StatsCard showTrend={false} title="Data Entered Today" value={isLoading ? '...' : leadsToday} percentage={todayTrend} borderColor="#27ae60" />
           </Col>
         </Row>
 

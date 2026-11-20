@@ -323,7 +323,21 @@ const DataEntryTable = () => {
         {
           header: "Representative Name",
           accessorKey: "representative_name",
-          Cell: ({ cell }) => <span>{cell.getValue() || "-"}</span>,
+          Cell: ({ cell, row }) => <div className="min-w-0">
+            <div>{cell.getValue() || '-'}</div>
+            {row.original.email ? <Tooltip><TooltipTrigger asChild>
+              <span data-table-secondary className="block cursor-pointer text-xs text-muted-foreground"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(row.original.email);
+                    message.success('Email copied to clipboard');
+                  } catch {
+                    message.error('Failed to copy email');
+                  }
+                }}>{row.original.email}</span>
+            </TooltipTrigger><TooltipContent>Click to copy email</TooltipContent></Tooltip> :
+              <span data-table-secondary className="block text-xs text-muted-foreground">-</span>}
+          </div>,
         },
         // 4. Phone
         {
@@ -341,33 +355,6 @@ const DataEntryTable = () => {
                 {cell.getValue()}
               </span>
             </TooltipTrigger><TooltipContent>Click to copy phone</TooltipContent></Tooltip>
-          ),
-        },
-        // 5. Email
-        {
-          header: "Email",
-          accessorKey: "email",
-          Cell: ({ cell }) => (
-            <Tooltip><TooltipTrigger asChild>
-              <span
-                className="cursor-pointer"
-                onClick={async () => {
-                  const text = cell.getValue();
-                  try {
-                    if (navigator.clipboard?.writeText) {
-                      await navigator.clipboard.writeText(text);
-                      message.success("Email copied to clipboard");
-                    } else {
-                      throw new Error("Clipboard API not supported");
-                    }
-                  } catch (err) {
-                    message.error("Failed to copy email");
-                  }
-                }}
-              >
-                {cell.getValue()}
-              </span>
-            </TooltipTrigger><TooltipContent>Click to copy email</TooltipContent></Tooltip>
           ),
         },
         // 6+. Rest of the fields (excluding those already added)

@@ -1,7 +1,7 @@
 (async () => {
  const {default:React}=await import('/node_modules/.vite/deps/react.js');
  const {default:ReactDOM}=await import('/node_modules/.vite/deps/react-dom_client.js');
- const {default:Table}=await import('/src/components/tables/new-table.jsx?pill-row-check=3');
+ const {default:Table}=await import('/src/components/tables/new-table.jsx?pill-row-check=4');
  const antd=await import('/node_modules/.vite/deps/antd.js');const Tag=antd.Tag||antd.default.Tag;
  const {Badge}=await import('/src/components/ui/badge.jsx');
  const {default:StatusBadge}=await import('/src/pages/clients/components/StatusBadge.jsx');

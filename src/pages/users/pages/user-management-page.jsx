@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '../../../components/ui/tabs.jsx';
 import CompanyFilteredPage from '../../../components/company-filtered-page.jsx';
 import { selectedCompany } from '../../shared/utils/company-filter.js';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { LoaderCircle as LoadingOutlined } from 'lucide-react';
+import { LoaderCircle as LoadingOutlined, Pencil } from 'lucide-react';
 import NewTableComponent from '../../../components/tables/new-table.jsx';
 import BreadCrumb from '../../../components/breadcrumb.component.jsx';
 import '../../../assets/styles/legacy/user-management-page.css';
@@ -587,7 +587,8 @@ function UserManagementContent({ superAdminScope = 'company' }) {
           onGlobalFilterChange={handleGlobalFilterChange}
           columns={['super_admin', 'company_admin'].includes(currentUser?.user_type) ? [...(isSuperAdminViewer ? columns.filter(column => column.accessorKey !== 'manager') : columns), {
             id: 'reset_password', header: 'Reset Password', enableSorting: false, enableColumnFilter: false,
-            Cell: ({ row }) => <Button size="small" onClick={() => setPasswordResetUser(row.original)}>Reset Password</Button>,
+            Cell: ({ row }) => <button type="button" className="table-action-menu__trigger" title="Reset password"
+              aria-label={`Reset password for ${row.original.name || 'user'}`} onClick={() => setPasswordResetUser(row.original)}><Pencil size={18} /></button>,
           }] : isSuperAdminViewer ? columns.filter(column => column.accessorKey !== 'manager') : columns}
           isLoading={isLoading || (isCompany && !companyId && accountCompany.isLoading)}
           isFetching={isFetching || accountCompany.isFetching}

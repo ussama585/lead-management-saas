@@ -28,11 +28,20 @@
 }
 
 .manage-assignees-modal__compact {
+  display: flex;
+  gap: 16px;
   width: 100%;
 }
 
 .manage-assignees-modal__select {
   flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .manage-assignees-modal__compact { flex-direction: column; }
+  .manage-assignees-modal__select,
+  .manage-assignees-modal__add-button { width: 100%; }
 }
 
 .manage-assignees-modal__add-button {

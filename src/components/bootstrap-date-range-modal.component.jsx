@@ -131,7 +131,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
       return `${start} - ${end}`;
     }
     return placeholder;
-  }, [selection]);
+  }, [selection, placeholder]);
 
   const trigger = <Tooltip
         title={isBelowMinWidth ? 'Date range picker is not available on mobile' : ''}
@@ -142,7 +142,8 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
           onClick={handleTriggerClick}
           style={triggerStyle}
         >
-          <span className="date-range-trigger__text">{displayText}</span><ChevronDown className="date-range-trigger__arrow" aria-hidden="true" />
+          <span className="date-range-trigger__text" data-placeholder={!selection[0]?.startDate || !selection[0]?.endDate}
+            style={{ '--filter-text-weight': selection[0]?.startDate && selection[0]?.endDate ? 600 : 400 }}>{displayText}</span><ChevronDown className="date-range-trigger__arrow" aria-hidden="true" />
         </div>
       </Tooltip>;
 

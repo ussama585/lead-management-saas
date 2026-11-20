@@ -7,7 +7,7 @@ import LeadListingActions from '../../../../components/lead-listing-actions.jsx'
 import '../../../../assets/styles/data-leads-page.css';
 import { selectedCompany } from '../../../shared/utils/company-filter.js';
 import { dateBeforeStatusHistory } from '../../../shared/utils/lead-column-order.js';
-import LeadDateFilter, { LeadProjectFilter } from '../../../../components/lead-date-filter-slot.jsx';
+import LeadDateFilter, { LeadProjectFilter, LeadTopActions } from '../../../../components/lead-date-filter-slot.jsx';
 import { leadCountTabs, normalizeLeadCounts } from '../../../shared/services/lead-filter-counts.js';
 import useProjectSizeOptions from '../../../shared/services/use-project-size-options.js';
 import useProjectSizeFilterOptions from '../../../shared/services/use-project-size-filter-options.js';
@@ -1066,6 +1066,27 @@ const DataLeads = () => {
       >
         {/* Date Range Filter and Add New Lead button */}
 
+<LeadTopActions>{user?.user_type !== 'marketing_manager' && <div className="flex justify-end" style={{ marginBottom: 20 }}>
+          {/* Add New Lead button */}
+          {user?.user_type !== 'marketing_manager' && (
+            <AntButton
+              className="data-leads-add-button website-manage-assignees-button"
+              type="primary"
+              icon={<Plus size={20} />}
+              onClick={() => setLeadDialog({ mode: 'create' })}
+              style={{
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                position: 'relative',
+                zIndex: 10,
+                background: '#3E6A9F',
+                borderColor: '#3E6A9F'
+              }}
+            >
+              Add New Lead
+            </AntButton>
+          )}
+</div>}</LeadTopActions>
 <LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>        <div className="lead-filter-toolbar data-leads-ui data-leads-local-toolbar">
           <LeadProjectFilter><LeadListingDropdownFilters executives={executivesList} selectedExecutive={selectedExecutive}
             onExecutiveChange={handleExecutiveClick} getExecutiveCount={getExecutiveCount}
@@ -1095,27 +1116,7 @@ const DataLeads = () => {
           onDuplicateCheckChange={value => { setDuplicateCheck(value || 'all'); setPagination({ pageIndex: 0, pageSize: 10 }); }}
           getExecutiveCount={getExecutiveCount} getStatusCount={(_counts, key) => getStatusCount(key)} leadCounts={statusCounts} userType={user?.user_type} />}
 
-{user?.user_type !== 'marketing_manager' && <div className="flex justify-end" style={{ marginBottom: 20 }}>
-          {/* Add New Lead button */}
-          {user?.user_type !== 'marketing_manager' && (
-            <AntButton
-              className="data-leads-add-button website-manage-assignees-button"
-              type="primary"
-              icon={<Plus size={20} />}
-              onClick={() => setLeadDialog({ mode: 'create' })}
-              style={{
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                position: 'relative',
-                zIndex: 10,
-                background: '#3E6A9F',
-                borderColor: '#3E6A9F'
-              }}
-            >
-              Add New Lead
-            </AntButton>
-          )}
-</div>}
+
 
         <NewTableComponent
           heading={`Data Leads (${totalCount})`}

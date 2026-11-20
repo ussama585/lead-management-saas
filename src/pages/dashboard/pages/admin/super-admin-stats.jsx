@@ -46,7 +46,7 @@ function StatsSection({ title, endpoint, queryKey, labels, userId }) {
     </div> : query.isError ? <div role="alert" className="flex items-center gap-3 rounded-md border p-4 text-destructive">
       <span>{query.error?.message || `Could not load ${title} stats.`}</span><Button variant="outline" onClick={() => query.refetch()}>Retry</Button>
     </div> : cards.length ? <div className="admin-stat-cards-grid">
-      {cards.map(({ key, title: cardTitle, Icon, count, trend }) => <StatsCard key={key} title={cardTitle} value={count} percentage={trend} icon={<Icon className="size-8" />} />)}
+      {cards.map(({ key, title: cardTitle, Icon, count, trend }) => <StatsCard showTrend={false} key={key} title={cardTitle} value={count} percentage={trend} icon={<Icon className="size-8" />} />)}
     </div> : <p className="text-muted-foreground">No statistics available.</p>}
   </section>;
 }

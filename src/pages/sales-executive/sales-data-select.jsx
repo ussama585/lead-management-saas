@@ -12,7 +12,7 @@ export default function SalesDataSelect({ value, onChange, onBlur, options = [],
   const visible = options.filter(option => String(option.label).toLowerCase().includes(search.toLowerCase()));
   return <DropdownMenu onOpenChange={open => { if (!open) { setSearch(''); onBlur?.({ target: { name } }); } }}>
     <DropdownMenuTrigger asChild>
-      <Button type="button" variant="outline" className="w-full justify-between font-normal" aria-label={placeholder}>
+      <Button type="button" variant="outline" className="w-full justify-between font-normal hover:bg-background dark:hover:bg-input/30" aria-label={placeholder}>
         <span className="truncate">{labels.length ? labels.join(', ') : placeholder}</span><ChevronDown className="size-4 shrink-0" />
       </Button>
     </DropdownMenuTrigger>

@@ -47,6 +47,8 @@ export function tablePresentation(columns = []) {
     if (column.meta?.sharedTablePresentation) return column;
     const key = column.accessorKey || column.id || '';
     const numeric = numericColumn(column);
+    const followUps = /^follow[\s_-]*ups?$/i.test(column.header || '')
+      || /^follow_up(?:_icon|_actions)?$/.test(key);
     const select = column.editVariant === 'select' || /^(status|project_size|assigned_to(?:_name)?|job_type|job_nature|currency|country|city)$/.test(key);
     const originalCell = column.Cell;
     const originalHeadProps = column.muiTableHeadCellProps;
@@ -61,7 +63,7 @@ export function tablePresentation(columns = []) {
           const sample = args.table?.getPrePaginationRowModel?.().flatRows
             ?.map(row => row.getAllCells().find(cell => cell.column.id === (column.id || column.accessorKey))?.getValue())
             .find(value => value != null && value !== '');
-          const centered = numeric || numericColumn(column, sample);
+          const centered = followUps || numeric || numericColumn(column, sample);
           const left = !centered && (textColumn || alphabetical(sample));
           if (!centered && !left && !select) return props;
           const align = left ? 'left' : 'center';
@@ -69,6 +71,7 @@ export function tablePresentation(columns = []) {
       },
       muiTableBodyCellProps: args => {
         const props = typeof originalBodyProps === 'function' ? originalBodyProps(args) : originalBodyProps || {};
+        if (followUps) return { ...props, align: 'center', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'center', justifyContent: 'center', '& > *': { marginInline: 'auto' } }] };
         const value = args.cell?.getValue?.();
         if (numeric || numericColumn(column, value) || !alphabetical(value)) return props;
         return { ...props, align: 'left', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'left', justifyContent: 'flex-start', '& > *': { marginInline: 0 } }] };
@@ -77,7 +80,7 @@ export function tablePresentation(columns = []) {
         const value = args.cell?.getValue?.();
         const rendered = tablePills(originalCell ? originalCell(args) : typeof value === 'boolean' ? String(value) : value);
         if (emptyContent(rendered)) return <span className="table-empty-value">-</span>;
-        return numeric || numericColumn(column, value) ? <span className="table-centered-value">{rendered}</span> : rendered;
+        return followUps || numeric || numericColumn(column, value) ? <span className="table-centered-value">{rendered}</span> : rendered;
       },
     };
   }));

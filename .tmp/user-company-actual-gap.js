@@ -1,0 +1,7 @@
+(async()=>{
+const {default:React}=await import('/node_modules/.vite/deps/react.js');const {default:ReactDOM}=await import('/node_modules/.vite/deps/react-dom_client.js');const {Form}=await import('/node_modules/.vite/deps/antd.js');const {Select}=await import('/src/components/ui/app-select.jsx');const {default:Input}=await import('/src/components/input-field.component.jsx');
+await import('/src/assets/styles/legacy/create-user.css');await import('/src/assets/styles/user-management-form.css');await import('/src/assets/styles/validation-messages.css');
+document.querySelector('#actual-user-gap')?.remove();const host=document.createElement('div');host.id='actual-user-gap';host.style='position:fixed;inset:0;background:white;z-index:9999;padding:24px';document.body.append(host);const h=React.createElement;
+ReactDOM.createRoot(host).render(h('form',{className:'user-management-form'},h(Form.Item,{className:'form-item'},h('label',null,'Company'),h(Select,{className:'dropdown-select',placeholder:'Select Company',options:[]}),h('div',{className:'error'},'Company is required')),h(Form.Item,{className:'form-item'},h('label',null,'Name'),h(Input,{placeholder:'Name'}),h('div',{className:'error'},'Name is required'))));await new Promise(r=>setTimeout(r,200));
+return [...host.querySelectorAll('.form-item')].map(field=>{const error=field.querySelector('.error'),control=field.querySelector('[data-slot="select-trigger"],input');return{field:field.querySelector('label').textContent,gap:error.getBoundingClientRect().top-control.getBoundingClientRect().bottom}});
+})()

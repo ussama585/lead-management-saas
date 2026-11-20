@@ -28,6 +28,13 @@
   min-width: 0;
 }
 
+/* Let select wrappers contain the full control height before error spacing. */
+.user-management-form .form-item .relative.inline-flex:has(> [data-slot='select-trigger']) {
+  display: flex;
+  height: auto;
+  min-height: var(--form-control-height, 40px);
+}
+
 @media (max-width: 767px) {
   .user-management-form .form-grid { grid-template-columns: minmax(0, 1fr); }
 }

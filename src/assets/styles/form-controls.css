@@ -63,7 +63,7 @@
 form.grid:has(> label) { row-gap: var(--form-label-gap); }
 form.grid:has(> label) > label { margin-bottom: 0 !important; }
 .sop-field { row-gap: 0; }
-.sop-field > .sop-field-error { margin-top: 4px; }
+.sop-field > .sop-field-error { margin-top: 10px; }
 
 :is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root) .MuiOutlinedInput-root:not(.MuiInputBase-multiline):not(:has(.MuiSelect-multiple)) {
   height: var(--form-control-height);

@@ -1,0 +1,7 @@
+(async()=>{
+await import('/src/assets/styles/validation-messages.css');
+const classes=['validation-message','sop-field-error','form-error','error-message','invalid-feedback','google-form-error-text','error text-sm','text-red','text-destructive text-sm','ant-form-item-explain-error','MuiFormHelperText-root Mui-error','contract-summary-form__error-text','contract-summary-form__error-text--tight','activate-project-content__error','gf-qcard-options-error','question-options__error-text','jobs-selection-table__error-text'];
+const host=document.createElement('div');host.style='position:fixed;inset:0;overflow:auto;z-index:9999;background:white';document.body.append(host);const results=[];
+for(const layout of ['block','grid','flex'])for(const cls of classes){const field=document.createElement('div');field.style=`display:${layout};flex-direction:column;gap:16px`;const input=document.createElement('input');input.style='display:block;height:40px;margin-bottom:8px';const error=document.createElement(cls.includes('text-destructive')?'p':'div');error.className=cls;error.textContent='Required';field.append(input,error);host.append(field);const gap=error.getBoundingClientRect().top-input.getBoundingClientRect().bottom;results.push({layout,cls,gap});}
+const failed=results.filter(x=>Math.abs(x.gap-10)>0.1);host.remove();if(failed.length)throw Error(JSON.stringify(failed));return{checked:results.length,gap:'10px',layouts:['block','grid','flex']};
+})()

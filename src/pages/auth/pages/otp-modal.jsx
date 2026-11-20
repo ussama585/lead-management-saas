@@ -12,6 +12,7 @@ import { getRoleHome } from '../role-home.js';
 import { otpErrorMessage } from '../../shared/utils/otp-error.js';
 import useOtpResend from '../hooks/use-otp-resend.js';
 import { message } from '@/components/ui/notifications.jsx';
+import '../../../assets/styles/otp-modal.css';
 
 export default function OtpModal({ openModal, setOpenModal, email, onSubmit, title = 'Check your email', description, submitText = 'Verify and continue' }) {
   const [otp, setOtp] = useState('');
@@ -33,10 +34,13 @@ export default function OtpModal({ openModal, setOpenModal, email, onSubmit, tit
   } });
   const busy = mutation.isLoading || resend.pending;
   useEffect(() => { if (!openModal) { setOtp(''); mutation.reset(); } }, [openModal]);
-  return <Dialog open={openModal} onOpenChange={value => !busy && setOpenModal(value)}><DialogContent>
+  return <Dialog open={openModal} onOpenChange={value => !busy && setOpenModal(value)}><DialogContent className="otp-verification-dialog">
     <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description || <>Enter the six digit verification code sent to {email}.</>}</DialogDescription></DialogHeader>
-    <form onSubmit={event => { event.preventDefault(); if (!busy && /^\d{6}$/.test(otp)) mutation.mutate(); }} className='grid gap-6'>
-      <OTPInput value={otp} onChange={setOtp} numInputs={6} inputType='tel' shouldAutoFocus containerStyle={{ display: 'flex', justifyContent: 'center', gap: 8 }} skipDefaultStyles renderInput={props => <Input {...props} placeholder="0" aria-label={`Verification code digit ${props['aria-label'] || ''}`} className='h-12 w-10 px-2 text-center text-lg' disabled={busy} />} />
+    <form onSubmit={event => { event.preventDefault(); if (!busy && /^\d{6}$/.test(otp)) mutation.mutate(); }} className='grid min-w-0 gap-6'>
+      <OTPInput value={otp} onChange={setOtp} numInputs={6} inputType='tel' shouldAutoFocus
+        containerStyle={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', width: '100%', maxWidth: 256, marginInline: 'auto', minWidth: 0, gap: 8 }}
+        skipDefaultStyles renderInput={props => <Input {...props} placeholder="0" aria-label={`Verification code digit ${props['aria-label'] || ''}`}
+          style={{ ...props.style, width: '100%', minWidth: 0, maxWidth: '100%' }} className='h-12 px-0 text-center text-lg' disabled={busy} />} />
       {mutation.isError && <p role='alert' className='sop-field-error'>{otpErrorMessage(mutation.error)}</p>}
       <Button type='submit' disabled={busy || !/^\d{6}$/.test(otp)}>{mutation.isLoading && <Loader2 className='size-4 animate-spin' />}{mutation.isLoading ? 'Verifying...' : submitText}</Button>
     </form>

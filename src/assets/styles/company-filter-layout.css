@@ -1,0 +1,29 @@
+/* Reserve the final company width before lazy page filters enter their slots. */
+.leads-top-filters-accordion:has(.lead-company-grid-layout) { container-type: inline-size; }
+.data-leads-topbar.lead-company-grid-layout:not(:has(.lead-listing-filter-dropdowns)) {
+  --website-filter-columns: 4;
+  display: grid;
+  grid-template-columns: repeat(var(--website-filter-columns), minmax(0, 1fr));
+  gap: 16px;
+  align-items: end;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lead-company-grid-layout:not(:has(.lead-listing-filter-dropdowns)) .lead-company-date-toolbar__left,
+.lead-company-grid-layout:not(:has(.lead-listing-filter-dropdowns)) .lead-company-project-slot,
+.lead-company-grid-layout:not(:has(.lead-listing-filter-dropdowns)) .lead-company-date-toolbar__date { display: contents; }
+.lead-company-grid-layout:not(:has(.lead-listing-filter-dropdowns)) .lead-company-date-toolbar__left > .lead-company-filter {
+  grid-column: 1 / -1;
+  width: calc((100% - (var(--website-filter-columns) - 1) * 16px) / var(--website-filter-columns));
+  padding-bottom: 16px;
+  border-bottom: 2px solid #d3d3d3;
+}
+@container (max-width: 900px) {
+  .data-leads-topbar.lead-company-grid-layout:not(:has(.lead-listing-filter-dropdowns)) { --website-filter-columns: 2; }
+}
+@container (max-width: 600px) {
+  .data-leads-topbar.company-grid-user-management:not(:has(.lead-listing-filter-dropdowns)) { --website-filter-columns: 1; }
+}
+@container (max-width: 480px) {
+  .data-leads-topbar.lead-company-grid-layout:not(:has(.lead-listing-filter-dropdowns)) { --website-filter-columns: 1; }
+}

@@ -2,7 +2,6 @@ import { Spin } from '../../../../components/ui/app-controls.jsx';
 import React from 'react';
 
 import StatsCard from '../../../../components/stats-card.component.jsx';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import '../../../../assets/styles/legacy/admin-dashboard-page.css';
 import InvoiceIcon from '../../../../assets/images/stat-card-icons/total-clients.svg';
 import PendingIcon from '../../../../assets/images/stat-card-icons/dormant-clients.svg';
@@ -18,14 +17,13 @@ const metrics = [
 
 const AccountantDashboard = () => (
   <>
-    <BreadCrumb linkText="Dashboard" />
     <div className="dashboard-container">
       <Spin spinning={false}>
         <div className="metrics-grid">
           {metrics.length > 0 ? (
             metrics.map((metric, index) => (
               <div key={index} className="metric-card">
-                <StatsCard
+                <StatsCard showTrend={false}
                   title={metric.title}
                   value={metric.count}
                   percentage={metric.percentage}

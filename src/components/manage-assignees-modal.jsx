@@ -3,7 +3,6 @@ import { Modal } from './ui/app-modal.jsx';
 import { Select } from './ui/app-select.jsx';
 import { Button, Input } from './ui/app-controls.jsx';
 import React, { useState, useMemo } from 'react';
-import { Space } from 'antd';
 import { Trash2 as DeleteOutlined, Plus as PlusOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
 import { useQuery, useMutation } from 'react-query';
 import api from '../pages/shared/services/api.js';
@@ -216,7 +215,7 @@ const ManageAssigneesModal = ({
       {/* Add Users Section */}
       <div className="manage-assignees-modal__add-section">
         <h4 className="manage-assignees-modal__section-heading">Add Users</h4>
-        <Space.Compact className="manage-assignees-modal__compact">
+        <div className="manage-assignees-modal__compact">
           <Select
             mode="multiple"
             placeholder="Search and select users to add..."
@@ -244,7 +243,7 @@ const ManageAssigneesModal = ({
           >
             Add Selected
           </Button>
-        </Space.Compact>
+        </div>
 
         {selectedExecutives.length > 0 && (
           <div className="mt-16">

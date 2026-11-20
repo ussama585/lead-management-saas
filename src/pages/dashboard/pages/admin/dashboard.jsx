@@ -5,7 +5,6 @@ import CompanyFilteredPage from '../../../../components/company-filtered-page.js
 import dayjs from 'dayjs';
 
 //components
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import SkeletonLoader from '../../../../components/skeleton-loader.component.jsx';
 
 //hooks
@@ -850,7 +849,7 @@ function DashboardCompanyTabsSection() {
                   .map((metric, index) => {
                     const iconSize = { width: 48, height: 48 };
                     return (
-                      <StatsCard
+                      <StatsCard showTrend={false}
                         key={`regular-${index}`}
                         title={metric.title}
                         value={metric.count}
@@ -878,7 +877,7 @@ function DashboardCompanyTabsSection() {
                   .map((metric, index) => {
                     const iconSize = { width: 48, height: 48 };
                     return (
-                      <StatsCard
+                      <StatsCard showTrend={false}
                         key={`small-${index}`}
                         title={metric.title}
                         value={metric.count}
@@ -1300,10 +1299,8 @@ function DashboardCompanyTabsSection() {
 // Query configuration is now handled by useQueryApi hook by default
 
 export default function AdminDashboard() {
-  const currentUser = useUserStore(state => state.user);
   return (
     <>
-      {!isSuperAdmin(currentUser?.user_type) && <BreadCrumb linkText="Dashboard" />}
       <Suspense fallback={<SkeletonLoader type="chart" />}>
         <div className="dashboard-container admin-dashboard-page">
           <Outlet />

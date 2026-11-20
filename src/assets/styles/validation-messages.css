@@ -1,0 +1,38 @@
+/* Shared field validation typography and spacing, including portal dialogs. */
+html body :is(
+  .validation-message,
+  .sop-field-error,
+  .form-error,
+  .error-message,
+  .invalid-feedback,
+  .google-form-error-text,
+  div.error,
+  div.text-red,
+  p.text-red,
+  span.text-red,
+  p.text-destructive,
+  .ant-form-item-explain-error,
+  .MuiFormHelperText-root.Mui-error,
+  [data-slot="form-message"],
+  .contract-summary-form__error-text,
+  .contract-summary-form__error-text--tight,
+  .activate-project-content__error,
+  .gf-qcard-options-error,
+  .question-options__error-text,
+  .jobs-selection-table__error-text
+) {
+  font-size: 12px !important;
+  display: block;
+  margin-top: 10px !important;
+  padding-top: 0 !important;
+
+  /* Field wrappers may already supply a grid/flex gap. Avoid adding it twice. */
+  :not(form):has(> &) {
+    row-gap: 0 !important;
+  }
+
+  /* Controls with legacy bottom margins must not increase the field gap. */
+  :has(+ &) {
+    margin-bottom: 0 !important;
+  }
+}

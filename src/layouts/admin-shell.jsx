@@ -83,7 +83,7 @@ function ShellContents({ children, menuItems, selectedKey, onSelect, badges }) {
         <span className='min-w-0 truncate text-sm font-semibold text-primary'>{location.pathname.endsWith('/settings') ? 'Settings' : active?.label || 'Overview'}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button type='button' aria-label='Open account menu' className='ml-auto flex min-w-0 shrink-0 items-center gap-2 rounded-xl border-0 border-primary/15 bg-primary/[0.025] px-3 py-1.5 text-left outline-none transition-colors hover:border-primary/30 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:border'>
+            <button type='button' aria-label='Open account menu' className='ml-auto flex min-w-0 shrink-0 cursor-pointer items-center gap-2 rounded-xl border-0 border-primary/15 bg-transparent px-3 py-1.5 text-left outline-none transition-colors hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:border md:bg-primary/[0.025] md:hover:border-primary/30 md:hover:bg-primary/5'>
               <Avatar className='size-8 rounded-lg'><AvatarImage src={user?.profile_pic} alt='' /><AvatarFallback className='rounded-lg bg-primary/10 font-semibold text-primary'>{initials}</AvatarFallback></Avatar>
               <span className='hidden min-w-0 max-w-[220px] leading-tight md:grid'>
                 <span className='truncate text-sm font-semibold text-primary'>{user?.name || 'User'}</span>

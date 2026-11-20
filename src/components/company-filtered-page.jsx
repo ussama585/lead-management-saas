@@ -12,6 +12,8 @@ import useUserStore from '../pages/shared/store/user-store.js';
 import { companyFilterSection, selectedCompany } from '../pages/shared/utils/company-filter.js';
 import CompanySelectOption from './company-select-option.jsx';
 import '../assets/styles/listing-filter-controls.css';
+import '../assets/styles/data-leads-page.css';
+import '../assets/styles/company-filter-layout.css';
 
 export async function getCompanies() {
   const { data } = await api.get('/company/simple-list');
@@ -24,6 +26,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
   const { pathname, search } = useLocation();
   const filterParams = new URLSearchParams(search);
   const leadListing = /\/(?:leads|data-leads|meta-leads|follow-up|user-management)\/?$/.test(pathname);
+  const gridFilters = /\/(?:leads|data-leads|meta-leads|user-management)\/?$/.test(pathname);
   const [dateSlot, setDateSlot] = useState(null);
   const [projectSlot, setProjectSlot] = useState(null);
   const [topActionsSlot, setTopActionsSlot] = useState(null);
@@ -51,7 +54,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
       company={options.find(option => String(option.value) === String(companyId))?.label}
       projectSize={filterParams.get('project_size')}
       dateRange={[filterParams.get('date_start'), filterParams.get('date_end')]}>
-    <div className={leadListing ? `lead-company-date-toolbar lead-company-date-toolbar--compact${/\/(?:leads|data-leads|meta-leads|user-management)\/?$/.test(pathname) ? ' data-leads-ui data-leads-topbar' : ''}` : undefined}>
+    <div className={leadListing ? `lead-company-date-toolbar lead-company-date-toolbar--compact${gridFilters ? ` data-leads-ui data-leads-topbar lead-company-grid-layout${pathname.endsWith('/user-management') ? ' company-grid-user-management' : ''}` : ''}` : undefined}>
     <div className={leadListing ? 'lead-company-date-toolbar__left' : undefined} style={leadListing ? undefined : { display: 'contents' }}>
     {companyControl}
     {leadListing && <div ref={setProjectSlot} className="lead-company-project-slot" />}

@@ -3,7 +3,7 @@
 .app-data-table {
   --listing-table-radius: 14px;
   --listing-table-border: #d3d3d3;
-  --listing-table-shadow: 0 4px 12px rgb(31 58 99 / 6%);
+  --listing-table-shadow: none;
   min-width: 0;
   max-width: 100%;
   border-radius: var(--listing-table-radius);
@@ -31,6 +31,10 @@
 }
 .app-data-table .MuiChip-root .MuiChip-label { padding-inline: 0; }
 .app-data-table .MuiTableCell-head { font-size: 14px; padding: 12px 8px; line-height: 20px; }
+.app-data-table .MuiTableCell-head,
+.app-data-table .Mui-TableHeadCell-Content-Wrapper,
+.app-shared-document-table th { font-size: 14px !important; }
+.app-data-table .MuiTypography-h6 { font-size: 14px !important; }
 .app-data-table .MuiTableCell-root,
 .app-shared-document-table,
 .app-shared-document-table :is(th, td) { border-color: #d3d3d3 !important; }
@@ -120,4 +124,41 @@
 .app-data-table .MuiTableHead-root .MuiTableSortLabel-icon,
 .app-data-table .MuiTableHead-root svg {
   color: #fff !important;
+}
+
+@media (max-width: 767px) {
+  .app-data-table > .MuiPaper-root > .MuiBox-root:first-child:has(.MuiTypography-h6) {
+    display: block !important;
+    height: auto;
+    min-height: 0;
+  }
+  .app-data-table > .MuiPaper-root > .MuiBox-root:first-child > .MuiBox-root:has(.MuiTypography-h6) {
+    position: relative !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+  }
+  .app-data-table > .MuiPaper-root > .MuiBox-root:first-child > .MuiBox-root:has(.MuiTypography-h6) > .MuiBox-root {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .app-data-table > .MuiPaper-root > .MuiBox-root:first-child > .MuiBox-root:has(.MuiTypography-h6) > .MuiBox-root:has(.MuiTypography-h6) {
+    padding: 0 !important;
+  }
+  .app-data-table .MuiTypography-h6 {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+  .app-data-table > .MuiPaper-root > .MuiBox-root:first-child > .MuiBox-root:has(.MuiTypography-h6) > .MuiBox-root:last-child {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .app-data-table > .MuiPaper-root > .MuiBox-root:first-child .MuiInputBase-root { min-width: 0; max-width: 100%; }
 }

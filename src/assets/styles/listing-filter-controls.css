@@ -50,7 +50,7 @@ html body .user-activity-filter-panel .lead-company-filter__control button[aria-
 .lead-company-filter .lead-company-filter__control [data-slot='select-trigger'] > span,
 .lead-date-range-field .date-range-trigger__text {
   color: #334155 !important;
-  font-weight: 600 !important;
+  font-weight: var(--filter-text-weight, 600) !important;
 }
 .lead-company-filter .lead-company-filter__control button[aria-label='Clear selection'],
 .lead-date-range-field .lead-date-range-field__clear {

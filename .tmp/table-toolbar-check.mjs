@@ -1,0 +1,8 @@
+const pages=await(await fetch('http://127.0.0.1:9223/json/list')).json();const socket=new WebSocket(pages.find(p=>p.type==='page').webSocketDebuggerUrl);await new Promise(resolve=>{socket.onopen=resolve});let id=0;const pending=new Map();socket.onmessage=event=>{const data=JSON.parse(event.data);if(pending.has(data.id)){pending.get(data.id)(data.result);pending.delete(data.id)}};const send=(method,params={})=>new Promise(resolve=>{pending.set(++id,resolve);socket.send(JSON.stringify({id,method,params}))});const evaluate=async expression=>{const r=await send('Runtime.evaluate',{expression,returnByValue:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value};
+try{
+ for(const width of [320,390,600,1440]){
+  await send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:false});await new Promise(resolve=>setTimeout(resolve,200));
+  const result=await evaluate(`(()=>{const h=document.querySelector('#filter-gap-test .MuiTypography-h6');h.textContent='Meta Leads (5)';const root=h.closest('.MuiPaper-root').firstElementChild,r=h.getBoundingClientRect(),buttons=[...root.querySelectorAll('button')],bounds=root.getBoundingClientRect();return {viewport:innerWidth,titleWidth:r.width,titleHeight:r.height,titleBottom:r.bottom,iconsTop:Math.min(...buttons.map(el=>el.getBoundingClientRect().top)),iconsOverflow:buttons.some(el=>el.getBoundingClientRect().right>bounds.right+1),toolbarHeight:bounds.height}})()`);
+  console.log(JSON.stringify(result));if(width<768&&(result.titleWidth<150||result.titleHeight>50||result.iconsTop<result.titleBottom||result.iconsOverflow))throw Error('Mobile toolbar layout failed');
+ }
+}finally{socket.close()}

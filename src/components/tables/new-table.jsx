@@ -255,7 +255,7 @@ function ConfiguredTable({
               muiTableBodyCellProps={{
                   sx: {
                       fontSize: '14px',
-                      height: '72px',
+                      height: '64px',
                       padding: denseCells ? '6px 6px' : '8px',
                   },
               }}
@@ -321,7 +321,7 @@ function ConfiguredTable({
                       overflowWrap: 'anywhere',
                       alignItems: 'center',
                       ...headingSx,
-                      fontSize: '18px',
+                      fontSize: '14px',
                     }}
                   >
                     {heading} 
@@ -383,7 +383,7 @@ function ServerListingTable({
       className: row.index % 2 === 0 ? 'table-body-row-odd' : 'table-body-row',
     }),
     renderTopToolbarCustomActions: () => <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '10px 20px' }}>
-      <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '18px', color: 'black', display: 'flex', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%', alignItems: 'center' }}>
+      <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '14px', color: 'black', display: 'flex', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%', alignItems: 'center' }}>
         {heading} ({totalCount})
       </Typography>
     </Box>,

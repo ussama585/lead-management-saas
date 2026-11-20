@@ -11,6 +11,7 @@ import AppThemeProvider from './components/providers/app-theme.jsx';
 import './assets/styles/shadcn.css';
 import './assets/styles/responsive-workspace.css';
 import './assets/styles/form-controls.css';
+import './assets/styles/validation-messages.css';
 import './assets/styles/field-appearance.css';
 import './assets/styles/dropdown-fields.css';
 import './assets/styles/table-typography.css';

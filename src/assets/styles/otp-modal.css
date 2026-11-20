@@ -1,0 +1,15 @@
+.otp-verification-dialog { min-width: 0; }
+.otp-verification-dialog > * { min-width: 0; max-width: 100%; }
+.otp-verification-dialog [data-slot='dialog-description'] { overflow-wrap: anywhere; }
+.otp-verification-dialog form { margin-top: 12px; row-gap: 32px; }
+.otp-verification-dialog .button-flight {
+  width: min(100%, 256px);
+  min-width: 0;
+  justify-self: center;
+}
+.otp-verification-dialog .button-flight .button-flight-label {
+  min-width: 0;
+  flex-shrink: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

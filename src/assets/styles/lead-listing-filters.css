@@ -61,7 +61,7 @@ html body .user-activity-filter-panel .date-range-trigger {
 .lead-listing-filters .lead-filter-card__header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; min-width: 0; }
 .lead-listing-filters .lead-filter-card__icon { display: flex; align-items: center; justify-content: center; flex: 0 0 40px; height: 40px; border-radius: 50%; background: #f0f4f9; color: #3e6a9f; }
 .lead-listing-filters .lead-filter-card__heading { min-width: 0; flex: 1; }
-.lead-listing-filters .lead-filter-card__heading h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 22px; color: #0f172a; }
+.lead-listing-filters .lead-filter-card__heading h2 { margin: 0; font-size: 16px; font-weight: 700; line-height: 22px; color: #0f172a; }
 .lead-listing-filters .lead-filter-card__heading p { margin: 2px 0 0; font-size: 13px; line-height: 18px; color: #64748b; }
 .lead-listing-filters .lead-filter-card__collapse { flex-shrink: 0; color: #64748b; }
 .lead-listing-filters .lead-filter-card__selected { max-width: 45%; min-width: 0; padding: 6px 12px; border-radius: 8px; background: #3e6a9f; color: #fff; font-size: 13px; line-height: 20px; overflow-wrap: anywhere; }

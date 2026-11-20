@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import { Alert } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import StatsCard from '../../../../components/stats-card.component.jsx';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
 import { getRecruitmentManagerStats } from '../../../shared/services/stats-service.js';
 import '../../../../assets/styles/legacy/admin-dashboard-page.css';
 import { Users as TeamOutlined, FolderOpen as FolderOpenOutlined, FileCheck as FileDoneOutlined, Ban as StopOutlined } from 'lucide-react';
@@ -93,14 +92,13 @@ const RecruitmentManagerDashboard = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Dashboard" />
       <div className="dashboard-container">
         <Spin indicator={<LoadingOutlined size="1em" className="app-icon app-icon-spin"  />} size="large" spinning={isLoading}>
           <div className="metrics-grid">
             {metrics.length > 0 ? (
               metrics.map((metric, index) => (
                 <div key={index} className="metric-card">
-                  <StatsCard
+                  <StatsCard showTrend={false}
                     title={metric.title}
                     value={metric.count}
                     icon={metric.icon}

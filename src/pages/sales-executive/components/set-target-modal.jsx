@@ -58,7 +58,7 @@ const SetTargetModal = ({ isModalOpen, setIsModalOpen, refetchTargets }) => {
             onChange={onChange}
             value={formik.values.date ? dayjs(formik.values.date) : null}
           />
-          {formik.errors.date && <div style={{ color: 'red' }}>{formik.errors.date}</div>}
+          {formik.errors.date && <div className="validation-message" style={{ color: 'red' }}>{formik.errors.date}</div>}
         </div>
 
         <div style={{ marginBottom: '1rem' }}>
@@ -73,7 +73,7 @@ const SetTargetModal = ({ isModalOpen, setIsModalOpen, refetchTargets }) => {
             onWheel={(e) => e.target.blur()}
           />
           {formik.errors.candidates_reached && (
-            <div style={{ color: 'red' }}>{formik.errors.candidates_reached}</div>
+            <div className="validation-message" style={{ color: 'red' }}>{formik.errors.candidates_reached}</div>
           )}
         </div>
 

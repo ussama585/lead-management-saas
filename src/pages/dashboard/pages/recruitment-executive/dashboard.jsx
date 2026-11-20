@@ -142,7 +142,7 @@ const RecruitmentExecutiveDashboard = () => {
           {metrics.length > 0 ? (
             metrics.map((metric, index) => (
               <div key={index} className="metric-card">
-                <StatsCard
+                <StatsCard showTrend={false}
                   title={metric.title}
                   value={metric.count}
                   icon={metric.icon}

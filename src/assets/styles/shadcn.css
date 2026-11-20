@@ -52,7 +52,7 @@ a[data-slot], [data-slot] a { color: inherit; text-decoration: none; }
 .sop-auth-form form { display: grid; gap: 20px; margin-top: 28px; }
 .sop-field { display: grid; gap: 8px; }
 .sop-field label { font-size: 14px; font-weight: 500; }
-.sop-field-error { color: var(--destructive); font-size: 13px; }
+.sop-field-error { color: var(--destructive); font-size: 12px; }
 .sop-muted { color: var(--muted-foreground); font-size: 14px; }
 .sop-skip { position: fixed; left: 12px; top: -100px; z-index: 100; background: var(--background); padding: 12px; }
 .sop-skip:focus { top: 12px; }

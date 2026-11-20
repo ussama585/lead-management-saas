@@ -78,6 +78,16 @@ it('uses the same native inline field for existing job dropdown editors', () => 
   expect(html).not.toContain('data-slot="select-trigger"');
 });
 
+it.each([undefined, null, '', '  '])('shows the job field placeholder for an empty value %s', value => {
+  const [column] = inlineSelectColumns([{ header: 'Job Type', accessorKey: 'job_type',
+    Edit: () => <Select placeholder="Select job type" value={value} options={[{ value: 'Full Time', label: 'Full Time' }]} />,
+    meta: { inlineDropdown: true } }]);
+  const html = renderToStaticMarkup(column.Edit({}));
+  expect(html).toContain('Select job type');
+  expect(html).toContain('text-muted-foreground');
+  expect(html).toContain('role="combobox"');
+});
+
 it('preserves adjacent cell content and avoids saving an unchanged selection', () => {
   const onChange = vi.fn();
   const [column] = inlineSelectColumns([{ header: 'Status', accessorKey: 'status',

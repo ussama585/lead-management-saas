@@ -58,7 +58,10 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
     emit([...new Set([...selected, ...values])]); setSearch(''); onSearch?.('');
   };
   if (inlineDropdown && !multiple && !labelInValue) return <TextField select fullWidth size="small" variant="standard"
-    className="table-inline-edit-editor" value={current ?? ''} disabled={disabled || loading}
+    className="table-inline-edit-editor" value={typeof current === 'string' && !current.trim() ? '' : current ?? ''} disabled={disabled || loading}
+    SelectProps={{ displayEmpty: true, renderValue: selectedValue => selectedValue === ''
+      ? <span className="text-muted-foreground font-normal">{placeholder}</span>
+      : allOptions.find(option => String(option.value) === String(selectedValue))?.label ?? selectedValue }}
     inputProps={{ 'aria-label': typeof placeholder === 'string' ? placeholder : name }}
     onBlur={onBlur} onFocus={onFocus} onClick={event => event.stopPropagation()}
     onChange={event => {
@@ -72,8 +75,9 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
       <DropdownMenuTrigger asChild>
         <Button data-slot="select-trigger" id={id} type="button" variant="outline" disabled={disabled} aria-invalid={status === 'error' || undefined}
           aria-label={typeof placeholder === 'string' ? placeholder : undefined} onFocus={onFocus}
-          className={cn('w-full min-w-0 justify-between font-normal', multiple && 'h-auto min-h-10 whitespace-normal', allowClear && selected.length > 0 && 'pr-9')}>
-          <span className={cn('min-w-0 text-left', !multiple && 'truncate', !selected.length && 'text-muted-foreground')}>
+          className={cn('w-full min-w-0 justify-between font-normal hover:bg-background dark:hover:bg-input/30', multiple && 'h-auto min-h-10 whitespace-normal', allowClear && selected.length > 0 && 'pr-9')}>
+          <span data-placeholder={!known.length} style={{ '--filter-text-weight': known.length ? 600 : 400 }}
+            className={cn('min-w-0 text-left', !multiple && 'truncate', !selected.length && 'text-muted-foreground')}>
             {known.length ? known.map((option, index) => <React.Fragment key={String(option.value)}>
               {index > 0 && ', '}{labelRender ? labelRender(option) : optionLabelProp ? option[optionLabelProp] ?? option.label : option.label}
             </React.Fragment>) : placeholder}

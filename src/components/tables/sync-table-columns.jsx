@@ -52,7 +52,25 @@ export function syncTableColumns(columns = []) {
   return tablePresentation(inlineSelectColumns([
     ...synced.filter(column => !isFinalActionColumn(column)),
     ...synced.filter(isFinalActionColumn),
-  ]));
+  ])).map(column => {
+    if (column.columns) return column;
+    const rowNumber = /^(#|no\.?|s\.?\s*no\.?|sr\.?\s*no\.?|serial(?: number)?|row (?:number|count))$/i.test(column.header || '')
+      || ['row_number', 'serial_number', 'mrt-row-numbers'].includes(column.id || column.accessorKey);
+    if (rowNumber) {
+      const cellProps = original => args => {
+        const props = typeof original === 'function' ? original(args) : original || {};
+        return { ...props, className: `${props.className || ''} table-row-number-cell`.trim() };
+      };
+      return { ...column, minSize: 60, size: column.size ?? 60,
+        muiTableHeadCellProps: cellProps(column.muiTableHeadCellProps),
+        muiTableBodyCellProps: cellProps(column.muiTableBodyCellProps) };
+    }
+    return {
+    ...column,
+    minSize: Math.max(150, column.minSize ?? 0),
+    size: Math.max(150, column.minSize ?? 0, column.size ?? 180),
+    };
+  });
 }
 
 function isFinalActionColumn(column) {
