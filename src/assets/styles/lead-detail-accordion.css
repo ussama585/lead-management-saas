@@ -1,0 +1,59 @@
+.lead-card.responsive-lead-card.lead-card--accordion { position: relative; }
+.lead-card.responsive-lead-card.lead-card--accordion .lead-card__basic-info { padding-right: 44px; }
+.lead-card--accordion .lead-card__collapse-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+.lead-card--accordion .lead-card__collapse-button:hover { background: #f1f5f9; }
+.lead-card--accordion .lead-card__collapse-button:focus-visible { outline: 2px solid #3e6a9f; outline-offset: 2px; }
+.lead-card--accordion .lead-card__accordion-toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lead-card--accordion .lead-card__accordion-toggle:focus-visible {
+  outline: 2px solid #3e6a9f;
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+.lead-card--accordion .lead-card__accordion-chevron { flex-shrink: 0; color: #64748b; }
+.lead-card--accordion [aria-expanded='true'] .lead-card__accordion-chevron { transform: rotate(180deg); }
+.lead-card.responsive-lead-card.lead-card--accordion .lead-card__detail-row {
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+}
+.lead-card.responsive-lead-card.lead-card--accordion .lead-card__contact-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+  gap: 20px 16px;
+}
+@container lead-details (max-width: 1000px) {
+  .lead-card.responsive-lead-card.lead-card--accordion .lead-card__contact-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.lead-card--accordion .lead-card__detail-row[hidden] { display: none !important; }
+.lead-card.responsive-lead-card.lead-card--accordion .lead-card__assignment { border-top: 0; padding-top: 0; }
+.lead-card.responsive-lead-card.lead-card--accordion:has(.lead-card__detail-row[hidden]) .lead-card__basic-info { margin-bottom: 0; }
+@container lead-details (max-width: 650px) {
+  .lead-card.responsive-lead-card.lead-card--accordion .lead-card__detail-row { grid-template-columns: minmax(0, 1fr); }
+}
+@container lead-details (max-width: 480px) {
+  .lead-card.responsive-lead-card.lead-card--accordion .lead-card__contact-info { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 767px) {
+  .lead-card.responsive-lead-card.lead-card--accordion .lead-card__detail-row { grid-template-columns: minmax(0, 1fr); }
+}

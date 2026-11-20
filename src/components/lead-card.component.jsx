@@ -2,10 +2,11 @@ import { leadOptionCompanyId } from '../pages/shared/utils/lead-option-company.j
 import { leadModalCompanyPayload } from '../pages/shared/utils/lead-modal-company.js';
 import { message } from './ui/notifications.jsx';
 import { Select } from './ui/app-select.jsx';
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useId } from "react";
 import '../assets/styles/legacy/lead-card-component.css';
 import '../assets/styles/legacy/common.css';
-import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as UploadOutlined, Phone, BriefcaseBusiness, Mail, Globe, Clock3, UserRound, Pencil } from 'lucide-react';
+import '../assets/styles/lead-detail-accordion.css';
+import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as UploadOutlined, Phone, BriefcaseBusiness, Mail, Globe, Clock3, UserRound, Pencil, ChevronDown } from 'lucide-react';
 import { Switch } from 'antd';
 
 import LeadEditModal from './LeadEditModal.jsx';
@@ -96,6 +97,8 @@ const STATUSES_REQUIRING_REMARKS = new Set([
 ]);
 
 const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
+  const [expanded, setExpanded] = useState(true);
+  const detailsId = useId();
   const [showModal, setShowModal] = useState(false);
   const [status, setStatus] = useState(lead?.status);
   const [assignedTo, setAssignedTo] = useState(lead?.assigned_to);
@@ -502,10 +505,12 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
   }, [user?.user_type, isAssignedToCurrentUser, isAssignedToExecutive, isDataLead, isWebsiteLead, isMetaLead]);
 
   return (
-    <div className="lead-card responsive-lead-card">
+    <div className="lead-card responsive-lead-card lead-card--accordion">
       {/* Header Section */}
       <div className="basic-info responsive-basic-info lead-card__basic-info">
-        <div className="lead-info responsive-lead-info">
+        <button type="button" className="lead-info responsive-lead-info lead-card__accordion-toggle"
+          id={`${detailsId}-toggle`} aria-expanded={expanded} aria-controls={detailsId}
+          onClick={() => setExpanded(current => !current)}>
           <div className="avatar responsive-avatar">{lead?.contact_person_name?.trim().charAt(0).toUpperCase() || '-'}</div>
           <div className="responsive-lead-name-company">
             <div className="lead-card__name-row">
@@ -515,7 +520,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
               {lead?.company_name || '-'}
             </p>
           </div>
-        </div>
+        </button>
 
         <div className="lead-card__header-actions">
           {canEdit && isDataLead && <>
@@ -599,8 +604,15 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
         </div>
       </div>
 
+      <button type="button" className="lead-card__collapse-button" aria-expanded={expanded}
+        aria-controls={detailsId} aria-label={expanded ? 'Collapse lead details' : 'Expand lead details'}
+        title={expanded ? 'Collapse lead details' : 'Expand lead details'}
+        onClick={() => setExpanded(current => !current)}>
+        <ChevronDown className="lead-card__accordion-chevron" size={20} aria-hidden="true" />
+      </button>
+
       {/* Details Section: Two Columns */}
-      <div className="lead-detail responsive-lead-detail lead-card__detail-row">
+      <div id={detailsId} role="region" aria-labelledby={`${detailsId}-toggle`} hidden={!expanded} className="lead-detail responsive-lead-detail lead-card__detail-row">
         <div className="div-1 responsive-div-1 lead-card__contact-info">
           <div className="lead-card__info-row"><span className="lead-card__info-icon"><Phone size={22} /></span>
             <div className="lead-card__info-text"><div className="lead-card__label">Phone</div><div className="lead-card__value">{lead?.phone_number || '-'}
@@ -619,10 +631,10 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                 catch { message.error('Failed to copy email'); }
               }}><CopyOutlined size={18} /></button></div></div>
           </div>
-        </div>
-        <div className="div-2 responsive-div-2 lead-card__meta-info">
           <div className="lead-card__info-row"><span className="lead-card__info-icon"><Globe size={22} /></span><div className="lead-card__info-text"><div className="lead-card__label">Source</div><div className="lead-card__value">{leadType}</div></div></div>
           <div className="lead-card__info-row"><span className="lead-card__info-icon"><Clock3 size={22} /></span><div className="lead-card__info-text"><div className="lead-card__label">Created At</div><div className="lead-card__value">{lead?.created_at ? formatDateUniversal(lead.created_at, true) : '-'}</div></div></div>
+        </div>
+        <div className="div-2 responsive-div-2 lead-card__meta-info">
           <div className="lead-card__assignment">
             {user?.user_type === 'super_admin' && <div className="mb-3">
               <div className="lead-card__label">Project Size</div>

@@ -6,9 +6,9 @@ import { Checkbox, Empty } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useFormik } from 'formik';
 import { useQuery, useQueryClient } from 'react-query';
+import dayjs from 'dayjs';
 import { followUpModalSchema } from '../pages/shared/schemas/follow-up.js';
 import DatePickerField from './DatePickerField.jsx';
-import AirDateTimeField from './air-date-time-field.jsx';
 import api from '../pages/shared/services/api.js';
 import '../assets/styles/legacy/follow-up-modal.css';
 
@@ -225,13 +225,17 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
         </div>
 
         {!formik.values.addFollowUp ? (
-          <AirDateTimeField
+          <DatePickerField
             label="Next Follow-up"
             name="followUpDate"
             value={formik.values.followUpDate}
-            onChange={(value) => formik.setFieldValue('followUpDate', value)}
+            onChange={(value) => formik.setFieldValue('followUpDate', value ? value.toDate() : null)}
             onBlur={() => formik.setFieldTouched('followUpDate', true, true)}
             disabled={readOnlyMode}
+            showTime
+            showTimeConfig={{ format: 'h:mm A', minuteStep: 5, use12Hours: true }}
+            format="DD MMM YYYY h:mm A"
+            disabledDate={(current) => current && current.startOf('day').isBefore(dayjs().startOf('day'))}
             error={formik.errors.followUpDate}
             touched={formik.touched.followUpDate}
           />
