@@ -4,8 +4,7 @@ import { Input } from './ui/app-controls.jsx';
 import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { Alert, Card, Descriptions, Space } from 'antd';
-import NewTableComponent from './tables/new-table.jsx';
-import { listingColumns } from './tables/listing-table-options.js';
+import SettingsChoiceCards from './settings-choice-cards.jsx';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
@@ -14,7 +13,7 @@ import { createProjectSize, deleteProjectSize, getProjectSize, projectSizeError,
 import SettingsDeleteModal from './settings-delete-modal.jsx';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 
-export function ProjectSizeManager({ user, companyId = null }) {
+export function ProjectSizeManager({ user, companyId = null, companyControl, companyError }) {
   const queryClient = useQueryClient();
   const needsCompany = isSuperAdmin(user.user_type) && !companyId;
   const queryKey = ['settingsProjectSizes', user.id, user.user_type, companyId];
@@ -52,33 +51,20 @@ export function ProjectSizeManager({ user, companyId = null }) {
     setValueError('');
     save.mutate(editor);
   }
-  const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
-    { title: 'Project size', dataIndex: 'value', key: 'value' },
-    { title: 'Actions', key: 'actions', width: 260, render: (_, row) => <Space wrap>
+  const renderActions = row => <Space wrap>
       <span title={needsCompany ? 'Select company first' : 'View project size'}><Button aria-label="View project size" icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Edit project size'}><Button aria-label="Edit project size" icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Delete project size'}><Button aria-label="Delete project size" danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} /></span>
-    </Space> },
-  ];
+    </Space>;
   return <>
-    <Card title='Project sizes' extra={<span title={needsCompany ? 'Select company first' : 'Add size'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add size</Button></span>}>
-      <p className='mb-4 text-sm text-muted-foreground'>Create and manage the available project size choices.</p>
+    <Card title='Project sizes'>
+      <div className="settings-choice-toolbar">
+        {companyControl}
+        <span className="settings-choice-toolbar__action" title={needsCompany ? 'Select company first' : 'Add size'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add size</Button></span>
+      </div>
+      {companyError}
       {list.isError ? <Alert type='error' showIcon message={projectSizeError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
-        <NewTableComponent mrtOptions={{
-          columns: listingColumns(columns), data: list.data || [],
-          getRowId: row => String(row.id),
-          manualPagination: false, manualSorting: false, manualFiltering: false,
-          initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
-          state: { isLoading: list.isLoading || list.isFetching },
-          enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
-          enableColumnActions: false, enableRowSelection: false, enableHiding: false,
-          enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
-          enableBottomToolbar: (list.data?.length || 0) > 10,
-          muiTableProps: { sx: { minWidth: 520 } },
-          muiPaginationProps: { rowsPerPageOptions: [10, 20, 50, 100] },
-          localization: { noRecordsToDisplay: 'No project sizes yet. Add a size to get started.' },
-        }} />}
+        <SettingsChoiceCards items={list.data || []} kind="size" loading={list.isLoading || list.isFetching} renderActions={renderActions} emptyMessage="No project sizes yet. Add a size to get started." />}
     </Card>
     <SettingsDeleteModal title='Delete project size' itemName={deleteTarget?.value} open={deleteTarget != null}
       loading={remove.isLoading} error={remove.isError ? projectSizeError(remove.error) : null}

@@ -203,10 +203,11 @@ const ManageAssigneesModal = ({
         </div>
       }
       open={visible}
+      className="manage-assignees-modal"
       onCancel={onClose}
       width={900}
       footer={[
-        <Button key="close" onClick={onClose}>
+        <Button key="close" className="manage-assignees-modal__close-button" onClick={onClose}>
           Close
         </Button>,
       ]}

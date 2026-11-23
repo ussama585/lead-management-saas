@@ -1,0 +1,11 @@
+.lead-job-detail-page { min-width: 0; max-width: 100%; }
+.lead-job-detail__heading { margin-bottom: 20px; min-width: 0; }
+.lead-job-detail__heading > h1 { font-size: 28px; line-height: 1.25; overflow-wrap: anywhere; }
+.lead-job-detail-page .ant-col { min-width: 0; }
+.lead-job-detail-page .job-form-section { min-width: 0; overflow-wrap: anywhere; }
+.lead-job-detail-page .lead-job-detail__field .form-label { display: block; margin-top: 0 !important; margin-bottom: 4px !important; line-height: 1.5; }
+.lead-job-detail-page .ant-tag { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 575px) {
+  .lead-job-detail__heading > h1 { font-size: 24px; }
+  .lead-job-detail-page .job-form-section { padding: 16px; }
+}

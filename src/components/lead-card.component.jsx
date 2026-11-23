@@ -6,7 +6,7 @@ import React, { useEffect, useState, useMemo, useId } from "react";
 import '../assets/styles/legacy/lead-card-component.css';
 import '../assets/styles/legacy/common.css';
 import '../assets/styles/lead-detail-accordion.css';
-import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as UploadOutlined, Phone, BriefcaseBusiness, Mail, Globe, Clock3, UserRound, Pencil, ChevronDown } from 'lucide-react';
+import { Copy as CopyOutlined, LoaderCircle as LoadingOutlined, Upload as UploadOutlined, Phone, BriefcaseBusiness, Mail, Globe, Clock3, Pencil, ChevronDown } from 'lucide-react';
 import { Switch } from 'antd';
 
 import LeadEditModal from './LeadEditModal.jsx';
@@ -644,7 +644,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
                 loading={projectSizeList.isLoading} disabled={projectSizeList.disabled || projectSizeMutation.isLoading || projectSizeList.isLoading} />
             </div>}
             <div className="lead-card__label">Assigned To</div>
-            <div className="lead-card__assigned-control"><UserRound className="lead-card__assigned-icon" size={22} aria-hidden="true" />          <div className="responsive-assigned-select lead-card__assigned-select-wrap">
+            <div className="lead-card__assigned-control"><div className="responsive-assigned-select lead-card__assigned-select-wrap">
             {canAssign ?
               <Select
                 value={assignedTo?.id || undefined}

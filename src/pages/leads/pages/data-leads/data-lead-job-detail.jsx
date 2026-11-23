@@ -2,6 +2,7 @@ import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React from "react";
 import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import "../../../../assets/styles/legacy/leads.generated.css";
+import '../../../../assets/styles/lead-job-detail.css';
 import { Alert, Tag, Divider, Row, Col } from 'antd';
 import { BookOpen as BookOutlined, Info as InfoCircleOutlined, MapPin as EnvironmentOutlined, DollarSign as DollarOutlined, User as UserOutlined, Zap as ThunderboltOutlined, FileText as FileTextOutlined, LayoutGrid as AppstoreOutlined } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -45,7 +46,7 @@ const fmt = (date) =>
   date && dayjs(date).isValid() ? dayjs(date).format("MMM DD, YYYY") : "—";
 
 const Field = ({ label, value, span = 6 }) => (
-  <Col span={span}>
+  <Col xs={24} sm={span === 24 ? 24 : 12} lg={span} className="lead-job-detail__field">
     <div style={{ marginBottom: 4 }}>
       <label className="form-label text-start mt-3 mb-1">{label}</label>
       <div style={{ padding: "6px 0", color: "#222", fontSize: 14, fontWeight: 500 }}>
@@ -63,7 +64,7 @@ const Section = ({ title, icon, children }) => (
         {title}
       </h3>
       <Divider className="job-form-section__divider" />
-      <Row gutter={[16, 0]}>
+      <Row gutter={[16, 12]}>
         {children}
       </Row>
     </div>
@@ -127,14 +128,14 @@ const DataLeadJobDetail = ({ jobSource = 'data' }) => {
       : null;
 
   return (
-    <div className="lead-job-page">
+    <div className="lead-job-page lead-job-detail-page">
       <BreadCrumb goBack={goBack} linkText="Job Detail" />
 
       <div className="">
         <div className="" style={{ paddingBottom: 60 }}>
 
           {/* Title & badges */}
-          <div className="row" style={{ marginBottom: 16, marginLeft: 16, flexDirection: "column" }}>
+          <div className="lead-job-detail__heading">
             <h1 style={{ marginBottom: 8 }}>{job?.job_title || "Job Detail"}</h1>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {job?.status && <Tag style={job.status === "Active" ? { background: "#eaf0f8", borderColor: "#3e6a9f", color: "#3e6a9f" } : {}}>{job.status}</Tag>}

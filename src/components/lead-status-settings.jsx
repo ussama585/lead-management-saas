@@ -4,8 +4,7 @@ import { Input } from './ui/app-controls.jsx';
 import { Button, Spin } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
 import { Alert, Card, Descriptions, Space } from 'antd';
-import NewTableComponent from './tables/new-table.jsx';
-import { listingColumns } from './tables/listing-table-options.js';
+import SettingsChoiceCards from './settings-choice-cards.jsx';
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
@@ -14,7 +13,7 @@ import { createLeadStatus, deleteLeadStatus, getLeadStatus, leadStatusError, lis
 import SettingsDeleteModal from './settings-delete-modal.jsx';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 
-export function LeadStatusManager({ user, companyId = null }) {
+export function LeadStatusManager({ user, companyId = null, companyControl, companyError }) {
   const queryClient = useQueryClient();
   const needsCompany = isSuperAdmin(user.user_type) && !companyId;
   const queryKey = ['settingsLeadStatuses', user.id, user.user_type, companyId];
@@ -56,33 +55,20 @@ export function LeadStatusManager({ user, companyId = null }) {
     setNameError('');
     save.mutate(editor);
   }
-  const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
-    { title: 'Status name', dataIndex: 'name', key: 'name' },
-    { title: 'Actions', key: 'actions', width: 260, render: (_, row) => <Space wrap>
+  const renderActions = row => <Space wrap>
       <span title={needsCompany ? 'Select company first' : 'View status'}><Button aria-label="View status" icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Edit status'}><Button aria-label="Edit status" icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Delete status'}><Button danger aria-label="Delete status" icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} /></span>
-    </Space> },
-  ];
+    </Space>;
   return <>
-    <Card title='Lead statuses' extra={<span title={needsCompany ? 'Select company first' : 'Add status'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add status</Button></span>}>
-      <p className='mb-4 text-sm text-muted-foreground'>Create and manage the statuses used for leads.</p>
+    <Card title='Lead statuses'>
+      <div className="settings-choice-toolbar">
+        {companyControl}
+        <span className="settings-choice-toolbar__action" title={needsCompany ? 'Select company first' : 'Add status'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add status</Button></span>
+      </div>
+      {companyError}
       {list.isError ? <Alert type='error' showIcon message={leadStatusError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
-        <NewTableComponent mrtOptions={{
-          columns: listingColumns(columns), data: statusesNewestFirst,
-          getRowId: row => String(row.id),
-          manualPagination: false, manualSorting: false, manualFiltering: false,
-          initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
-          state: { isLoading: list.isLoading || list.isFetching },
-          enableSorting: false, enableGlobalFilter: false, enableColumnFilters: false,
-          enableColumnActions: false, enableRowSelection: false, enableHiding: false,
-          enableTopToolbar: false, enableDensityToggle: false, enableFullScreenToggle: false,
-          enableBottomToolbar: statusesNewestFirst.length > 10,
-          muiTableProps: { sx: { minWidth: 520 } },
-          muiPaginationProps: { rowsPerPageOptions: [10, 20, 50, 100] },
-          localization: { noRecordsToDisplay: 'No lead statuses yet. Add a status to get started.' },
-        }} />}
+        <SettingsChoiceCards items={statusesNewestFirst} kind="status" loading={list.isLoading || list.isFetching} renderActions={renderActions} emptyMessage="No lead statuses yet. Add a status to get started." />}
     </Card>
     <SettingsDeleteModal title='Delete lead status' itemName={deleteTarget?.name} open={deleteTarget != null}
       loading={remove.isLoading} error={remove.isError ? leadStatusError(remove.error) : null}

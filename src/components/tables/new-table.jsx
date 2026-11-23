@@ -15,6 +15,23 @@ const theme = createTheme({
   typography: { fontFamily: 'Inter, sans-serif' },
   shape: { borderRadius: 8 },
   components: {
+    MuiSelect: {
+      defaultProps: {
+        autoWidth: true,
+        MenuProps: {
+          anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+          transformOrigin: { vertical: 'top', horizontal: 'left' },
+          PaperProps: {
+            sx: {
+              maxHeight: 'min(280px, 50dvh)',
+              maxWidth: 'min(320px, calc(100vw - 32px))',
+              overflowY: 'auto',
+              '& .MuiMenuItem-root': { whiteSpace: 'normal', overflowWrap: 'anywhere', minHeight: 36 },
+            },
+          },
+        },
+      },
+    },
     MuiSvgIcon: {
       styleOverrides: {
         root: {

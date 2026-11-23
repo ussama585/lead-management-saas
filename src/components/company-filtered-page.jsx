@@ -36,6 +36,7 @@ function FilterContents({ children, options, loading, error, retry, companyId, o
       <label htmlFor="overview-company-filter">Company</label>
       <div className="lead-company-filter__control">
       <Select id="overview-company-filter" aria-label="Company" placeholder="Filter by company"
+        selectedIconPosition="end"
         style={{ width: '100%', maxWidth: '100%' }} showSearch allowClear optionFilterProp="label"
         virtual={false} optionRender={option => <CompanySelectOption option={option} />}
         labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}

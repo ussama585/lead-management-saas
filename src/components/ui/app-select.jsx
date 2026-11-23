@@ -22,7 +22,7 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
   onBlur, onFocus, onClear, onDropdownVisibleChange, onOpenChange, mode, showSearch, allowClear,
   disabled, disabledReason, loading, placeholder, className, style, id, name, status,
   filterOption, optionFilterProp = 'label', optionLabelProp, optionRender, labelRender,
-  labelInValue, tokenSeparators = [], onInputKeyDown, notFoundContent, dropdownStyle }) {
+  labelInValue, tokenSeparators = [], onInputKeyDown, notFoundContent, dropdownStyle, selectedIconPosition = 'start' }) {
   placeholder = fieldPlaceholder({ placeholder, name }, 'Select');
   const [local, setLocal] = useState(defaultValue);
   const [search, setSearch] = useState('');
@@ -103,7 +103,7 @@ export function Select({ value, defaultValue, options, children, onChange, onSel
             return multiple ? <DropdownMenuCheckboxItem key={String(option.value)} checked={checked} disabled={option.disabled}
               onSelect={event => event.preventDefault()} onCheckedChange={() => choose(option)}>{content}</DropdownMenuCheckboxItem>
               : <DropdownMenuItem key={String(option.value)} disabled={option.disabled} onSelect={() => choose(option)}>
-                  {checked && <Check className="size-4" />}{content}
+                  {checked && <Check className={cn('size-4', selectedIconPosition === 'end' && 'order-last ml-auto')} />}{content}
                 </DropdownMenuItem>;
           })}
           {mode === 'tags' && search.trim() && !allOptions.some(option => String(option.value) === search.trim()) &&

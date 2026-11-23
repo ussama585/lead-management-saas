@@ -1308,7 +1308,7 @@ import { Tooltip, Spin, Button } from '../../../../components/ui/app-controls.js
         {isDashboard && assigneeAndStatusDropdowns}
         {/* Export selected button */}
         {Object.keys(rowSelection).filter((key) => rowSelection[key]).length > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px', paddingRight: '20px' }}>
+          <div className="lead-export-toolbar">
             <Button
               icon={<DownloadOutlined size="1em" className="app-icon" />}
               onClick={handleExportSelected}

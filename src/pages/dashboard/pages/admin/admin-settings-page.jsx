@@ -7,9 +7,10 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import api from '../../../shared/services/api.js';
 import { followUpDurationSchema } from '../schemas/follow-up-duration-schema.js';
-import { Alert, Card, Typography, InputNumber, Space } from 'antd';
+import { Alert, Card, InputNumber, Space } from 'antd';
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
-import { Clock, Pencil, Trash2 } from 'lucide-react';
+import { Clock, Plus } from 'lucide-react';
+import TableActionMenu from '../../../../components/tables/table-action-menu.jsx';
 // import { Palette, RefreshCw } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import formatDateUniversal from '../../../shared/utils/formatDate.js';
@@ -59,6 +60,7 @@ const durationError = error => error?.response?.data?.message || error?.response
 const AdminSettingsPage = () => {
   const { user } = useUserStore();
   const superAdmin = isSuperAdmin(user?.user_type);
+  const [createOpen, setCreateOpen] = useState(false);
   const [selectedCompanyId, setCompanyId] = useState(undefined);
   // const canManageAppearance = isSuperAdmin(user?.user_type);
   const showLeadSettings = canManageLeadStatuses(user?.user_type) || superAdmin;
@@ -81,6 +83,7 @@ const AdminSettingsPage = () => {
   const createMutation = useMutation((durationMinutes) => createCheckupDuration(durationMinutes, superAdmin ? companyId : null), {
     onSuccess: (res) => {
       message.success(res?.message || 'Created successfully');
+      setCreateOpen(false);
       queryClient.invalidateQueries(durationQueryKey);
     },
     onError: (err) => {
@@ -146,42 +149,44 @@ const AdminSettingsPage = () => {
         
 
         {showDurationSettings && <Card title="Check-up follow-up duration">
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            {superAdmin && <div>
-              <CompanySelect id="duration-company" options={companies.data || []}
+          <div className="settings-duration-content">
+            <div className="settings-choice-toolbar">
+            {superAdmin && <CompanySelect id="duration-company" options={companies.data || []}
                 value={companyId ?? undefined} loading={companies.isFetching}
                 disabled={createMutation.isLoading || updateMutation.isLoading || deleteMutation.isLoading}
-                onChange={value => { setCompanyId(value || null); createForm.resetForm(); setEditTarget(null); setDeleteTarget(null); }} />
-              {companies.isError && <Alert type="error" message="Could not load companies." action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}
-              {!companyId && <p className="mt-2 text-sm text-muted-foreground">Select a company to manage its follow-up duration.</p>}
-            </div>}
+                onChange={value => { setCompanyId(value || null); setCreateOpen(false); createForm.resetForm(); setEditTarget(null); setDeleteTarget(null); }} />}
+              {canCreateDuration && <span className="settings-choice-toolbar__action"><Button type="primary" icon={<Plus size={16} />} onClick={() => { createForm.resetForm(); setCreateOpen(true); }}>Add duration</Button></span>}
+            </div>
+            {superAdmin && companies.isError && <Alert type="error" message="Could not load companies." action={<Button onClick={() => companies.refetch()}>Retry</Button>} />}
+            {superAdmin && !companyId && <p className="text-sm text-muted-foreground">Select a company to manage its follow-up duration.</p>}
             {isError && <Alert type="error" showIcon message={error?.response?.data?.message || error?.message || 'Could not load durations.'}
               action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
             {isLoading || isFetching ? <p role="status" className="text-sm text-muted-foreground">Loading follow-up duration...</p> :
-              durations?.results?.length ? <div className="grid gap-3">
-                {durations.results.map(record => <div key={record.id} className="flex flex-wrap items-start justify-between gap-4 rounded-xl border bg-background p-5">
+              durations?.results?.length ? <div className="settings-choice-grid">
+                {durations.results.map(record => <div key={record.id} className="settings-choice-card">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="rounded-lg bg-blue-100 p-2 text-blue-700"><Clock size={22} /></span>
-                      <div><p className="text-sm text-muted-foreground" style={{ margin: 0 }}>Follow-up duration</p>
-                        <p className="text-xl font-semibold" style={{ margin: 0 }}>{record.duration_minutes} minutes</p></div>
+                    <div className="settings-choice-card__content">
+                      <span className="settings-choice-card__icon"><Clock size={22} /></span>
+                      <div><p className="settings-choice-card__label">Follow-up duration</p>
+                        <p className="settings-choice-card__title">{record.duration_minutes} minutes</p></div>
                     </div>
                     <div className="text-xs text-muted-foreground">
                       <p>Created: {record.created_at ? formatDateUniversal(record.created_at, true) : '-'}</p>
                       <p>Updated: {record.updated_at ? formatDateUniversal(record.updated_at, true) : '-'}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button type="text" title="Edit follow-up duration" aria-label="Edit follow-up duration"
-                      className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800"
-                      icon={<Pencil size={16} />} onClick={() => { updateMutation.reset(); editForm.resetForm(); setEditTarget(record); }} />
-                    <Button type="text" title="Delete follow-up duration" aria-label="Delete follow-up duration"
-                      className="bg-red-100 text-red-700 hover:bg-red-200 hover:text-red-800"
-                      icon={<Trash2 size={16} />} onClick={() => { deleteMutation.reset(); setDeleteTarget(record); }} />
-                  </div>
+                  <div className="settings-choice-card__actions"><TableActionMenu actions={[
+                    { label: 'Edit duration', disabled: updateMutation.isLoading || deleteMutation.isLoading, onClick: () => { updateMutation.reset(); editForm.resetForm(); setEditTarget(record); } },
+                    { label: 'Delete duration', disabled: updateMutation.isLoading || deleteMutation.isLoading, onClick: () => { deleteMutation.reset(); setDeleteTarget(record); } },
+                  ]} /></div>
                 </div>)}
               </div> : !isError && <p className="text-sm text-muted-foreground">No follow-up duration configured yet.</p>}
-                {canCreateDuration && <form onSubmit={createForm.handleSubmit} style={{ borderTop: 'none', paddingTop: 0 }}>
+
+          </div>
+        </Card>}
+        <Modal title="Add follow-up duration" open={createOpen && canCreateDuration} footer={null}
+          onCancel={() => { if (!createMutation.isLoading) setCreateOpen(false); }} confirmLoading={createMutation.isLoading}>
+                <form onSubmit={createForm.handleSubmit} style={{ borderTop: 'none', paddingTop: 0 }}>
                   <label htmlFor="create-duration-minutes">
                     Create duration (minutes)
                   </label>
@@ -214,9 +219,8 @@ const AdminSettingsPage = () => {
                   {createForm.touched.duration_minutes && createForm.errors.duration_minutes &&
                     <div id="duration-create-error" role="alert" className="text-sm text-destructive">{createForm.errors.duration_minutes}</div>}
                   {createForm.status && <div role="alert" className="text-sm text-destructive">{createForm.status}</div>}
-                </form>}
-          </Space>
-        </Card>}
+                </form>
+        </Modal>
         <Modal title="Edit follow-up duration" open={editTarget != null} onOk={() => editForm.handleSubmit()}
           onCancel={() => { if (!updateMutation.isLoading) setEditTarget(null); }} okText="Save changes"
           confirmLoading={updateMutation.isLoading} cancelButtonProps={{ disabled: updateMutation.isLoading }}

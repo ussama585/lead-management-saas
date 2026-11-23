@@ -6,6 +6,24 @@
 .job-listing-tabs { gap: 12px; }
 .job-listing-tabs > [data-slot='tabs-content'] { margin-top: 0; padding-top: 0; }
 .job-listing-tabs > [data-slot='tabs-content'] .table-wrapper.app-data-table { margin-top: 0; }
+.job-listing-tabs .app-data-table .MuiTableCell-body { vertical-align: middle; align-items: center; }
+.job-listing-tabs .table-inline-edit-editor .MuiInputBase-root:has(.MuiSelect-select) {
+  height: 40px;
+  min-height: 40px;
+  padding-block: 0;
+  align-items: center;
+  box-sizing: border-box;
+}
+.job-listing-tabs .table-inline-edit-editor .MuiSelect-select {
+  display: flex;
+  align-items: center;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box;
+}
+.job-listing-tabs [data-slot='select-trigger'] { align-items: center; }
 
 .button-style-tabs {
   display: flex;

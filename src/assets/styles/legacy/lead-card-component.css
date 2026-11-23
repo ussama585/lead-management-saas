@@ -49,10 +49,9 @@
 .lead-card.responsive-lead-card .lead-card__copy-button:hover { background: #f0f4f9; }
 .lead-card.responsive-lead-card .lead-card__copy-button:focus-visible { outline: 2px solid #3e6a9f; outline-offset: 2px; }
 .lead-card.responsive-lead-card .lead-card__assignment { border-top: 1px solid #e8edf5; padding-top: 12px; min-width: 0; }
-.lead-card.responsive-lead-card .lead-card__assigned-control { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 10px; min-width: 0; margin-top: 6px; padding-left: 14px; border: 1px solid #dce3ed; border-radius: 10px; }
-.lead-card.responsive-lead-card .lead-card__assigned-icon { position: static; transform: none; color: #64748b; pointer-events: none; }
+.lead-card.responsive-lead-card .lead-card__assigned-control { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; min-width: 0; margin-top: 6px; border: 1px solid #dce3ed; border-radius: 12px; }
 .lead-card.responsive-lead-card .lead-card__assigned-select-wrap { display: flex; width: 100%; max-width: 100%; min-width: 0; margin: 0; }
-.lead-card.responsive-lead-card .lead-card__assigned-control .lead-card__assigned-select-wrap > button { height: 40px !important; padding-left: 0 !important; padding-right: 12px; border: 0 !important; border-radius: 0 10px 10px 0; box-shadow: none !important; }
+.lead-card.responsive-lead-card .lead-card__assigned-control .lead-card__assigned-select-wrap > button { height: 40px !important; padding-inline: 16px !important; border: 0 !important; border-radius: 12px; box-shadow: none !important; }
 .lead-card.responsive-lead-card .lead-card__assigned-readonly { display: flex; align-items: center; width: 100%; min-height: 40px; padding: 8px 12px 8px 0; color: #111827; overflow-wrap: anywhere; }
 @container lead-details (max-width: 900px) {
   .lead-card.responsive-lead-card .lead-card__basic-info { align-items: flex-start; }

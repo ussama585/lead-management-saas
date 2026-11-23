@@ -255,18 +255,17 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
           ) : null}
         </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontWeight: 600, color: THEME_COLOR, marginBottom: 8 }}>
+        <section aria-label="Follow-ups Listing" style={{ marginTop: 20, marginBottom: 20, border: '1px solid var(--border)', borderRadius: 12, background: 'var(--background)', overflow: 'hidden' }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: THEME_COLOR, margin: 0, padding: '14px 16px', borderBottom: '1px solid var(--border)', background: 'var(--muted)' }}>
             Follow-ups Listing
-          </div>
+          </h3>
           <div
             style={{
-              border: '1px solid #f0f0f0',
-              borderRadius: 6,
               maxHeight: 180,
               overflowY: 'auto',
-              padding: 10,
-              backgroundColor: '#fafafa',
+              padding: 16,
+              display: 'grid',
+              gap: 12,
             }}
           >
             {loadingFollowUpListing ? (
@@ -278,9 +277,13 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
                 <div
                   key={item.id || `${index}-${item.currentFollowupDate}`}
                   style={{
-                    borderBottom: '1px solid #f0f0f0',
-                    paddingBottom: 8,
-                    marginBottom: 8,
+                    border: '1px solid var(--border)',
+                    borderRadius: 12,
+                    padding: 16,
+                    background: 'var(--muted)',
+                    display: 'grid',
+                    gap: 6,
+                    overflowWrap: 'anywhere',
                   }}
                 >
                   <div style={{ fontSize: 12, color: '#595959' }}>
@@ -304,7 +307,7 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
               <Empty description="No follow-ups found" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             )}
           </div>
-        </div>
+        </section>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
           {readOnlyMode ? (

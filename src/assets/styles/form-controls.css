@@ -22,6 +22,13 @@ html body :is(
 ) { padding-inline: var(--form-control-padding-x) !important; }
 
 /* Composite controls own their padding; avoid adding it again to inner inputs. */
+@layer base {
+  html body .ant-picker { padding-inline: 16px !important; }
+  html body .ant-picker .ant-picker-input > input {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
 html body :is(.ant-input-affix-wrapper, .ant-picker, .MuiInputBase-adornedStart, .MuiInputBase-adornedEnd, .MuiInputBase-multiline) > :is(input, textarea),
 html body .ant-picker-input > input { padding-inline: 0 !important; }
 html body .MuiInputBase-root:is(.MuiInputBase-adornedStart, .MuiInputBase-adornedEnd, .MuiInputBase-multiline) {

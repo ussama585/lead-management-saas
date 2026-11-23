@@ -1,0 +1,31 @@
+/* Resolve the Website Leads column width against the page, then inherit the
+   resulting length through cards and nested filter containers. */
+@property --company-filter-width {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 240px;
+}
+.sop-page-content {
+  container-name: company-filter-page;
+  container-type: inline-size;
+}
+.sop-page-content > * {
+  /* Website filters have 20px side padding, a 1px border, and 16px gaps. */
+  --company-filter-width: max(0px, calc((100cqw - 42px - 48px) / 4));
+}
+@container company-filter-page (max-width: 942px) {
+  .sop-page-content > * { --company-filter-width: max(0px, calc((100cqw - 42px - 16px) / 2)); }
+}
+@container company-filter-page (max-width: 522px) {
+  .sop-page-content > * { --company-filter-width: max(0px, calc(100cqw - 42px)); }
+}
+html body .lead-company-filter:has(#overview-company-filter, #sales-data-company-filter, #duration-company, [id^='settings-company-']) {
+  width: var(--company-filter-width) !important;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 1 auto !important;
+}
+html body .lead-company-filter > .lead-company-filter__control {
+  width: 100% !important;
+  max-width: 100%;
+}

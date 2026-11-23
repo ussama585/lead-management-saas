@@ -386,3 +386,13 @@ body:has(.lead-listing-filter-dropdowns) [data-select-options='true'] [data-slot
   border: 0 !important;
   box-shadow: none !important;
 }
+.lead-export-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+.lead-export-toolbar > button { margin-left: auto; max-width: 100%; }

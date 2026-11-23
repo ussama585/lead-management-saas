@@ -194,10 +194,9 @@ const TriggerComponent = typeof trigger === 'function' ? trigger({ onClick: hand
             <Input placeholder="Enter email" />
           </Form.Item>
 
-          <div style={{ textAlign: 'right', marginTop: 24 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 12, marginTop: 24 }}>
             <Button 
               onClick={() => setIsVisible(false)} 
-              style={{ marginRight: 8 }}
             >
               Cancel
             </Button>

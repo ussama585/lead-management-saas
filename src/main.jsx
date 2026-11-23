@@ -14,6 +14,7 @@ import './assets/styles/form-controls.css';
 import './assets/styles/validation-messages.css';
 import './assets/styles/field-appearance.css';
 import './assets/styles/dropdown-fields.css';
+import './assets/styles/company-filter-width.css';
 import './assets/styles/table-typography.css';
 
 const queryClient = new QueryClient();

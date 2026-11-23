@@ -1,6 +1,29 @@
 /* File-specific styles for ManageAssigneesModal.
    Static layout/color values previously inline; kept visually identical. */
 
+[data-slot='dialog-content'].manage-assignees-modal {
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  max-width: min(900px, calc(100vw - 32px)) !important;
+}
+.manage-assignees-modal > [data-slot='dialog-footer'] {
+  min-width: 0;
+  align-items: flex-end;
+}
+.manage-assignees-modal > [data-slot='dialog-footer'] > .manage-assignees-modal__close-button {
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 0 auto;
+  align-self: flex-end;
+}
+.manage-assignees-modal [data-slot='dialog-title'] > .flex-row { align-items: flex-start; min-width: 0; }
+.manage-assignees-modal [data-slot='dialog-title'] > .flex-row > span { min-width: 0; overflow-wrap: anywhere; }
+.manage-assignees-modal [data-slot='dialog-title'] svg { flex-shrink: 0; }
+.manage-assignees-modal [data-slot='dialog-body'] > div,
+.manage-assignees-modal .table-wrapper { min-width: 0; max-width: 100%; }
+.manage-assignees-modal .table-wrapper { width: 100%; }
+
 .manage-assignees-modal__body {
   padding: 24px;
 }
@@ -61,7 +84,9 @@
   border-radius: 8px;
   padding: 12px;
   background-color: #ffffff;
-  min-width: 220px;
+  min-width: min(220px, 100%);
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .manage-assignees-modal__selected-card-name {

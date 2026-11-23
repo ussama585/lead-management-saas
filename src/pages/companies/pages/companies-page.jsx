@@ -265,16 +265,16 @@ export default function CompaniesPage() {
   ];
   const detailReady = dialog?.id == null || (!detail.isFetching && !detail.isError && detail.data);
   return <>
-    <Tabs value={companyTab} onValueChange={value => { setCompanyTab(value); setPagination(previous => ({ ...previous, current: 1 })); }} style={{ marginBottom: 20 }}>
+    <div className="companies-listing-toolbar">
+    <Tabs value={companyTab} onValueChange={value => { setCompanyTab(value); setPagination(previous => ({ ...previous, current: 1 })); }}>
       <TabsList aria-label='Company listings' className='button-style-tabs'>
         <TabsTrigger value='active'>Active Companies</TabsTrigger>
         <TabsTrigger value='deleted'>Deleted Companies</TabsTrigger>
       </TabsList>
     </Tabs>
+      <Button type='primary' icon={<Plus size={16} />} disabled={busy} onClick={() => openDialog('create')}>Create company</Button>
+    </div>
     <div className="companies-listing">
-      <div className="companies-listing-toolbar">
-        <Button type='primary' icon={<Plus size={16} />} disabled={busy} onClick={() => openDialog('create')}>Create company</Button>
-      </div>
       {list.isError && <Alert type='error' showIcon message={companyError(list.error)} className='mb-4' action={<Button onClick={() => list.refetch()}>Retry</Button>} />}
       <NewTableComponent serverListing
         heading={companyTab === 'active' ? 'Active Companies' : 'Deleted Companies'}

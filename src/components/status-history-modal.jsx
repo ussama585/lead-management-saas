@@ -121,6 +121,7 @@ const StatusHistoryModal = ({
 
   return (
     <Modal
+      className="status-history-modal"
       title={modalTitle}
       open={open}
       onCancel={onClose}
@@ -185,12 +186,13 @@ const StatusHistoryModal = ({
                         padding: '12px',
                         borderBottom: '1px solid #e8e8e8',
                         display: 'flex',
+                        flexWrap: 'wrap',
                         justifyContent: 'space-between',
                         alignItems: 'flex-start',
                         gap: '12px',
                       }}
                     >
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: '1 1 180px', minWidth: 0, overflowWrap: 'anywhere' }}>
                         {isAuditItem ? (
                           <>
                             <div style={{ fontWeight: 600, fontSize: '14px', color: THEME_PRIMARY }}>
