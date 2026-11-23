@@ -554,7 +554,7 @@ const CommonLeadsFollowUp = () => {
           </span>
         </div>
 
-        <div className="table-container follow-up-content">
+        <div className="table-container follow-up-content" style={{ marginTop: "12px"}}>
           <NewTableComponent
             totalCount={data?.count || 0}
             columns={columns}

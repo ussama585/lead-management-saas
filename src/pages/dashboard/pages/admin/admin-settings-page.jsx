@@ -1,8 +1,7 @@
-import CompanySelectOption from '../../../../components/company-select-option.jsx';
+import CompanySelect from '../../../../components/company-select.jsx';
 import { message } from '../../../../components/ui/notifications.jsx';
 import { Modal } from '../../../../components/ui/app-modal.jsx';
 import { Button } from '../../../../components/ui/app-controls.jsx';
-import { Select } from '../../../../components/ui/app-select.jsx';
 import { getCompanies } from '../../../../components/company-filtered-page.jsx';
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
@@ -149,9 +148,7 @@ const AdminSettingsPage = () => {
         {showDurationSettings && <Card title="Check-up follow-up duration">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {superAdmin && <div>
-              <label htmlFor="duration-company" className="mb-2 block text-sm font-medium">Company</label>
-              <Select id="duration-company" optionRender={option => <CompanySelectOption option={option} />} placeholder="Select company" showSearch allowClear
-                style={{ width: 280, maxWidth: '100%' }} options={companies.data || []}
+              <CompanySelect id="duration-company" options={companies.data || []}
                 value={companyId ?? undefined} loading={companies.isFetching}
                 disabled={createMutation.isLoading || updateMutation.isLoading || deleteMutation.isLoading}
                 onChange={value => { setCompanyId(value || null); createForm.resetForm(); setEditTarget(null); setDeleteTarget(null); }} />

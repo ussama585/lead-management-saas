@@ -132,7 +132,7 @@ export default function DemoRequestsPage() {
 
   return <>
     <div className="listing-page-content demo-requests-page">
-      <Tabs value={status || 'all'} onValueChange={value => { setStatus(value === 'all' ? '' : value); resetPage(); }} className="mb-4">
+      <Tabs value={status || 'all'} onValueChange={value => { setStatus(value === 'all' ? '' : value); resetPage(); }} className="mb-0">
         <TabsList aria-label="Demo request status" className="button-style-tabs">
           {[['all', 'All', 'total'], ['pending', 'Pending', 'pending'], ['approved', 'Approved', 'approved'], ['rejected', 'Rejected', 'rejected']].map(([value, label, key]) =>
             <TabsTrigger key={value} value={value}>{label} ({counts.data?.[key] ?? '…'})</TabsTrigger>)}
@@ -146,7 +146,7 @@ export default function DemoRequestsPage() {
         <span>{listing.error?.message || 'Could not load demo requests.'}</span>
         <Button variant="outline" onClick={() => listing.refetch()}>Retry</Button>
       </div>}
-      <div className="table-container">
+      <div className="table-container" style={{ marginTop: "12px" }}>
         <NewTableComponent
           enableGlobalFilter={true}
           heading={`Demo Request (${data?.count ?? 0})`}
