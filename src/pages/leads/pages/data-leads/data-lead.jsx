@@ -754,13 +754,13 @@ const DataLead = () => {
 
   return (
     <>
-      <BreadCrumb linkText="Data Lead Jobs" goBack={() => {
+      <BreadCrumb className="lead-detail-heading" linkText="Data Lead Jobs" goBack={() => {
         const returnTo = navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo;
         returnTo ? navigate(returnTo) : navigate(-1);
       }} />
       <div className="leads">
         <div className="min-w-0 w-full">
-      <Box
+      <Box className="lead-detail-sections"
         sx={{
          
           minHeight: "calc(100vh - 120px)",

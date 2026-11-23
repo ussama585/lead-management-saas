@@ -1,0 +1,90 @@
+/* Shared dialog presentation, including custom forms and confirmation footers. */
+[data-slot='dialog-overlay'] {
+  background: rgb(15 23 42 / 48%);
+  backdrop-filter: blur(4px);
+}
+[data-slot='dialog-content'] {
+  --modal-edge: 24px;
+  gap: 24px;
+  padding: var(--modal-edge);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 24px 80px -20px rgb(15 23 42 / 40%), 0 8px 24px -12px rgb(15 23 42 / 16%);
+  background: var(--background);
+  width: calc(100% - 32px);
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+[data-slot='dialog-content'] > [data-slot='dialog-header']:not(.sr-only) {
+  margin: calc(-1 * var(--modal-edge)) calc(-1 * var(--modal-edge)) 0;
+  padding: 24px 64px 20px var(--modal-edge);
+  border-bottom: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--primary) 7%, var(--background)), var(--background));
+  text-align: start;
+}
+[data-slot='dialog-header'] [data-slot='dialog-title'] {
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+}
+[data-slot='dialog-body'] { min-width: 0; }
+[data-slot='dialog-content'] > [data-slot='dialog-close'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  top: 18px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--background);
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+[data-slot='dialog-content'] > [data-slot='dialog-close']:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+[data-slot='dialog-content'] > [data-slot='dialog-footer'] {
+  margin: 0 calc(-1 * var(--modal-edge)) calc(-1 * var(--modal-edge));
+  padding: 18px var(--modal-edge);
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 20px 20px;
+  background: color-mix(in srgb, var(--muted) 50%, var(--background));
+}
+/* Override the global blue action treatment only for modal dismissal actions. */
+[data-slot='dialog-content'] button[data-slot='button'][data-dialog-action='cancel'] {
+  background: #e2e8f0 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1;
+  box-shadow: none;
+}
+[data-slot='dialog-content'] button[data-slot='button'][data-dialog-action='cancel']:hover:not(:disabled) {
+  background: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+[data-slot='dialog-content'] [data-dialog-action='cancel'] .button-flight-icon {
+  background: #f8fafc;
+  box-shadow: none;
+}
+[data-slot='dialog-content'] [data-dialog-action='cancel'] .button-flight-icon svg { color: #475569; }
+.dark [data-slot='dialog-content'] button[data-slot='button'][data-dialog-action='cancel'] {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+  border-color: #475569;
+}
+.dark [data-slot='dialog-content'] button[data-slot='button'][data-dialog-action='cancel']:hover:not(:disabled) {
+  background: #475569 !important;
+}
+@media (max-width: 640px) {
+  [data-slot='dialog-content'] { --modal-edge: 20px; gap: 20px; }
+  [data-slot='dialog-footer'] > button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='dialog-content'], [data-slot='dialog-overlay'] { animation: none !important; }
+}

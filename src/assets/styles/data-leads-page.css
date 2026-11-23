@@ -328,7 +328,7 @@ body:has(.lead-listing-filter-dropdowns) [data-select-options='true'] [data-slot
   color: #334155 !important;
 }
 :is(.data-leads-topbar, .data-leads-ui.data-leads-local-toolbar):has(.lead-listing-filter-dropdowns) .lead-company-filter__control:has(button[aria-label='Clear selection']) button[aria-haspopup='menu'] {
-  padding-right: 56px !important;
+  padding-right: 16px !important;
 }
 :is(.data-leads-topbar, .data-leads-ui.data-leads-local-toolbar):has(.lead-listing-filter-dropdowns) .lead-company-filter__control:has(button[aria-label='Clear selection']) button[aria-haspopup='menu'] > svg {
   position: absolute;

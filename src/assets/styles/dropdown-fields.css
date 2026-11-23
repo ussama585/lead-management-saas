@@ -1,4 +1,21 @@
 /* Dropdown fields only; menu buttons and ordinary inputs are unaffected. */
+/* Important rules in earlier layers outrank legacy .px-4 (24px), even
+   when an unlayered selector is more specific. Own field geometry here. */
+@layer base {
+  html body :is(select, [data-slot='select-trigger'], .ant-select-selector,
+    .MuiOutlinedInput-root, .MuiOutlinedInput-notchedOutline) {
+    border-radius: 12px !important;
+  }
+  html body :is(select, [data-slot='select-trigger'], .ant-select-selector, .MuiSelect-select) {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  html body :is(.lead-company-filter__control, .lead-project-size-filter__control):has([data-slot='select-trigger']) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
 :is(select, [data-slot='select-trigger'], .ant-select, .ant-select-selector,
   .MuiOutlinedInput-root:has(.MuiSelect-select), .MuiAutocomplete-root .MuiOutlinedInput-root) {
   height: 40px !important;

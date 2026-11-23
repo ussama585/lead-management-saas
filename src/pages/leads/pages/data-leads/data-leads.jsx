@@ -21,7 +21,6 @@ import {
   Box,
   Typography,
   Button,
-  Link,
 } from "@mui/material";
 import { getDataLeadsStats, getDataLeadsListCount as fetchDataLeadsListCount } from "../../../shared/services/data-leads-service.js";
 import StatusFilterTabs from "../../../../components/status-filter-tabs.jsx";
@@ -29,8 +28,9 @@ import { Ruler, Plus } from 'lucide-react';
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { alpha } from "@mui/material/styles";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { useLocation, useNavigate, Link as RouterLink, useSearchParams } from "react-router-dom";
-import { Avatar as AntAvatar, Alert as AntAlert, Space } from 'antd';
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Alert as AntAlert, Space } from 'antd';
+import { Avatar, AvatarFallback } from '../../../../components/ui/avatar.jsx';
 import { Info as InfoCircleOutlined, Upload as UploadOutlined, Minus as MinusOutlined } from 'lucide-react';
 import DuplicateLeadModal from '../../../../components/duplicate-lead-modal.component.jsx';
 import { useDuplicateLead } from '../../../../components/hooks/useDuplicateLead.js';
@@ -721,22 +721,21 @@ const DataLeads = () => {
 
 
   return (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AntAvatar
-                size={40}
-                style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', flexShrink: 0 }}
-                aria-hidden='true'
-              >
-                {Array.from(String(cell.getValue() || '').trim())[0]?.toUpperCase() || '?'}
-              </AntAvatar>
-              <span className="min-w-0">
-                <span className="flex items-center gap-2">
-                  {user?.user_type === 'marketing_manager' ? name : <Link component={RouterLink} to={`/data-lead/${lead.id}`}
-                    state={{ leadListingReturnTo: `${location.pathname}${location.search}` }} underline="always" sx={{ color: '#3E6A9F', fontWeight: 600 }}>{name}</Link>}
-                  {delayedInfoIcon}{duplicateIcon}</span>
-                <span data-table-secondary className="block text-xs text-muted-foreground">{lead.email || '-'}</span>
-              </span>
-            </span>
+            <div className="flex items-center gap-3">
+              <Avatar className="size-10 shrink-0" aria-hidden="true">
+                <AvatarFallback className="bg-primary text-primary-foreground">{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  {user?.user_type === 'marketing_manager' ? name : <AntTooltip title="View lead details">
+                    <a className="cursor-pointer" href={`/data-lead/${lead.id}`}
+                      style={{ textDecoration: 'underline', color: '#3E6A9F', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      onClick={event => { event.preventDefault(); navigate(`/data-lead/${lead.id}`, { state: { leadListingReturnTo: `${location.pathname}${location.search}` } }); }}>{name}</a>
+                  </AntTooltip>}
+                  {delayedInfoIcon}{duplicateIcon}</div>
+                <div data-table-secondary className="text-xs text-muted-foreground">{lead.email || '-'}</div>
+              </div>
+            </div>
           );
         },
       },

@@ -768,13 +768,13 @@ const getMetaLeadUrl = () => {
 
   return (
     <>
-     <BreadCrumb 
+     <BreadCrumb className="lead-detail-heading"
   linkText="Meta Lead Jobs" 
   goBack={() => navigate(navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo || getMetaLeadUrl())}
 />
       <div className="leads">
         <div className="min-w-0 w-full">
-     <Box
+     <Box className="lead-detail-sections"
         sx={{
           padding: "0rem",
           minHeight: "calc(100vh - 120px)",

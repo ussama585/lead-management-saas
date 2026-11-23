@@ -70,8 +70,8 @@ export default function JobListingTabs({ children, source, leadId, fetchDeletedJ
         icon={<RotateCcw size={16} />} disabled={restore.isLoading}
         onClick={() => { restore.reset(); setRestoreTarget(row.original); }} />,
     }] : [])];
-  return <Tabs value={tab} onValueChange={setTab} className="w-full min-w-0">
-    <div className="mb-3 flex flex-wrap items-center justify-between gap-3" style={{ alignItems: 'center' }}>
+  return <Tabs value={tab} onValueChange={setTab} className="job-listing-tabs w-full min-w-0">
+    <div className="flex flex-wrap items-center justify-between gap-3" style={{ alignItems: 'center' }}>
     <TabsList aria-label="Job listings" className="button-style-tabs">
       <TabsTrigger value="active">Active Jobs</TabsTrigger>
       <TabsTrigger value="deleted">Deleted Jobs</TabsTrigger>

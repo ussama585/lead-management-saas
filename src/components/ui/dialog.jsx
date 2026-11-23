@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from 'lucide-react';
 import { cn } from '@/components/lib/utils.js';
+import '../../assets/styles/app-modal.css';
 const Dialog = React.forwardRef(function Dialog({ ...props }, ref) {
     props.ref = ref;
 

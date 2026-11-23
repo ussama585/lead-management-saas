@@ -31,7 +31,7 @@ const buttonVariants = cva("inline-flex items-center justify-center gap-2 whites
             link: 'text-primary underline-offset-4 hover:underline',
         },
         size: {
-            default: 'h-9 px-4 py-2 has-[>svg]:px-3',
+            default: 'h-9 px-3 py-2 has-[>svg]:px-3',
             sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
             lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
             icon: 'size-9',
@@ -47,6 +47,8 @@ const Button = React.forwardRef(function Button({ className, variant, size, asCh
 
     const Comp = asChild ? Slot : 'button';
     const parts = flattenContent(children);
+    const actionLabel = parts.filter(part => typeof part === 'string').join(' ').trim();
+    const dismissAction = /^(cancel|close|no|go back|back|dismiss)$/i.test(actionLabel);
     const hasText = parts.some(part => typeof part === 'string' && part.trim());
     const animate = !asChild && hasText && size !== 'icon' && !props['aria-haspopup']
         && props['aria-pressed'] == null && props['aria-expanded'] == null && !props['aria-controls']
@@ -60,7 +62,7 @@ const Button = React.forwardRef(function Button({ className, variant, size, asCh
         content = <><span className="button-flight-icon" aria-hidden="true"><span className="svg-wrapper">{icon}</span></span>
             <span className="button-flight-label">{parts.filter((_, index) => index !== iconIndex)}</span></>;
     }
-    return (<Comp data-slot='button' className={cn(buttonVariants({ variant, size, className }), animate && 'button-flight')} {...props}>{content}</Comp>);
+    return (<Comp data-slot='button' data-dialog-action={dismissAction ? 'cancel' : undefined} className={cn(buttonVariants({ variant, size, className }), animate && 'button-flight')} {...props}>{content}</Comp>);
 
 });
 export { Button, buttonVariants };

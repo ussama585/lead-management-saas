@@ -35,6 +35,9 @@
 .app-data-table .Mui-TableHeadCell-Content-Wrapper,
 .app-shared-document-table th { font-size: 14px !important; }
 .app-data-table .MuiTypography-h6 { font-size: 14px !important; }
+.app-data-table > .MuiPaper-root > .MuiBox-root:first-child {
+  padding-left: 0 !important;
+}
 .app-data-table .MuiTableCell-root,
 .app-shared-document-table,
 .app-shared-document-table :is(th, td) { border-color: #d3d3d3 !important; }

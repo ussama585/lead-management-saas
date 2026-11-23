@@ -261,7 +261,7 @@ function ConfiguredTable({
               }}
               muiTopToolbarProps={{
                   sx: {
-                      padding: '6px 12px',         // reduced padding
+                      padding: '6px 12px 6px 0',
                       minHeight: '40px',           // reduce overall height
                       backgroundColor: '#fff',
                       alignItems: 'center',
@@ -307,7 +307,7 @@ function ConfiguredTable({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     width: '100%',
-                    padding: '10px 20px',
+                    padding: '10px 20px 10px 0',
                   }}
                 >
                   <Typography
@@ -382,7 +382,7 @@ function ServerListingTable({
     muiTableBodyRowProps: ({ row }) => ({
       className: row.index % 2 === 0 ? 'table-body-row-odd' : 'table-body-row',
     }),
-    renderTopToolbarCustomActions: () => <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '10px 20px' }}>
+    renderTopToolbarCustomActions: () => <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '10px 20px 10px 0' }}>
       <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '14px', color: 'black', display: 'flex', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%', alignItems: 'center' }}>
         {heading} ({totalCount})
       </Typography>

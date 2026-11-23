@@ -1,8 +1,59 @@
 /* Shared form dimensions across legacy, Ant Design, MUI, and shadcn forms. */
 :root {
   --form-control-height: 40px;
+  --form-control-radius: 12px;
+  --form-control-padding-x: 16px;
   --form-label-size: 14px;
   --form-label-gap: 8px;
+}
+
+/* Apply field geometry outside forms too, including filters and table editors. */
+html body :is(
+  input:not([type='hidden']):not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):not([type='color']):not([type='button']):not([type='submit']):not([type='reset']),
+  textarea, select, [data-slot='select-trigger'], .date-range-trigger,
+  .ant-input-affix-wrapper, .ant-input-number, .ant-picker, .ant-select-selector,
+  .MuiOutlinedInput-root, .MuiOutlinedInput-notchedOutline
+) { border-radius: var(--form-control-radius) !important; }
+
+html body :is(
+  input:not([type='hidden']):not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):not([type='color']):not([type='button']):not([type='submit']):not([type='reset']),
+  textarea, select, [data-slot='select-trigger'], .date-range-trigger,
+  .ant-input-affix-wrapper, .ant-picker, .ant-select-selector
+) { padding-inline: var(--form-control-padding-x) !important; }
+
+/* Composite controls own their padding; avoid adding it again to inner inputs. */
+html body :is(.ant-input-affix-wrapper, .ant-picker, .MuiInputBase-adornedStart, .MuiInputBase-adornedEnd, .MuiInputBase-multiline) > :is(input, textarea),
+html body .ant-picker-input > input { padding-inline: 0 !important; }
+html body .MuiInputBase-root:is(.MuiInputBase-adornedStart, .MuiInputBase-adornedEnd, .MuiInputBase-multiline) {
+  padding-inline: var(--form-control-padding-x) !important;
+}
+html body .MuiSelect-select {
+  padding-left: var(--form-control-padding-x) !important;
+  padding-right: 40px !important;
+}
+html body :is(.MuiInputBase-adornedStart, .MuiInputBase-adornedEnd) .MuiSelect-select { padding-left: 0 !important; }
+html body .ant-select-selector { padding-right: 36px !important; }
+
+/* Keep text clear of embedded icons and dismissal controls. */
+html body input[data-slot='input'].pl-9 { padding-left: 36px !important; }
+html body input[data-slot='input'].pr-9 { padding-right: 36px !important; }
+html body .lead-date-range-field__controls:has(.lead-date-range-field__clear) .date-range-trigger {
+  padding-right: 40px !important;
+}
+
+/* Dropdown borders enclose one inset, never a padded wrapper plus a trigger. */
+html body :is(.lead-company-filter__control, .lead-project-size-filter__control):has([data-slot='select-trigger']) {
+  padding-inline: 0 !important;
+}
+html body [data-slot='select-trigger'] { padding-inline: 16px !important; }
+html body .relative:has(> button[aria-label='Clear selection']) > [data-slot='select-trigger'] > span {
+  max-width: calc(100% - 56px);
+}
+html body .relative:has(> button[aria-label='Clear selection']) > [data-slot='select-trigger'] > svg {
+  margin-right: 24px;
+}
+html body .lead-company-filter__control:has(button[aria-label='Clear selection']) [data-slot='select-trigger'] > svg {
+  margin-right: 0;
 }
 
 :is(form, .form-grid, .ant-modal-body, .MuiDialogContent-root, .sop-field)

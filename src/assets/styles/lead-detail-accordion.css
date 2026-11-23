@@ -1,3 +1,13 @@
+/* Match the 20px section spacing on website, data, and meta lead listings. */
+.lead-detail-heading { margin-bottom: 20px; }
+.lead-detail-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.lead-detail-sections > .lead-card.responsive-lead-card { margin-bottom: 0; }
+.lead-detail-jobs { min-width: 0; }
 .lead-card.responsive-lead-card.lead-card--accordion { position: relative; }
 .lead-card.responsive-lead-card.lead-card--accordion .lead-card__basic-info { padding-right: 44px; }
 .lead-card--accordion .lead-card__collapse-button {

@@ -798,18 +798,20 @@ export default function MetaLeadsStandard() {
         
         return (
           <div className="flex items-center gap-3">
-            <Avatar className="size-10 shrink-0">
-              <AvatarFallback className="bg-primary text-primary-foreground">{String(name).trim().charAt(0).toUpperCase()}</AvatarFallback>
+            <Avatar className="size-10 shrink-0" aria-hidden="true">
+              <AvatarFallback className="bg-primary text-primary-foreground">{Array.from(String(name || '').trim())[0]?.toUpperCase() || '?'}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <a className="flex flex-col text-[#3E6A9F] underline" href={`${metaLeadDetailBasePath}/meta-leads/${lead.id}`}
+                <Tooltip title="View lead details">
+                <a className="cursor-pointer" style={{ textDecoration: 'underline', color: '#3E6A9F', display: 'flex', alignItems: 'center', gap: '6px' }} href={`${metaLeadDetailBasePath}/meta-leads/${lead.id}`}
                   onClick={event => {
                     event.preventDefault();
                     navigate(`${metaLeadDetailBasePath}/meta-leads/${lead.id}`, { state: { leadListingReturnTo: `${location.pathname}${location.search}` } });
                   }}>
-                  <span>{name}</span>
+                  {name}
                 </a>
+                </Tooltip>
                 {delayedInfoIcon}{duplicateIcon}
               </div>
               <div data-table-secondary className="text-xs text-muted-foreground">{lead.work_email || lead.email || '-'}</div>

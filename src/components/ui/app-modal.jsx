@@ -27,10 +27,10 @@ export function Modal({ open, visible, onCancel, onOk, children, title, footer, 
       onPointerDownOutside={event => { if (!maskClosable || confirmLoading) event.preventDefault(); }}
       onEscapeKeyDown={event => { if (!keyboard || confirmLoading) event.preventDefault(); }}>
       <DialogHeader className={!title ? 'sr-only' : undefined}><DialogTitle>{title || 'Dialog'}</DialogTitle></DialogHeader>
-      <div style={{ ...bodyStyle, ...styles?.body }}>{children}</div>
+      <div data-slot="dialog-body" style={{ ...bodyStyle, ...styles?.body }}>{children}</div>
       {footer !== null && <DialogFooter>
         {footer === undefined ? <>
-          <Button {...cancelButtonProps} disabled={confirmLoading || cancelButtonProps?.disabled} onClick={onCancel}>{cancelText}</Button>
+          <Button {...cancelButtonProps} data-dialog-action="cancel" disabled={confirmLoading || cancelButtonProps?.disabled} onClick={onCancel}>{cancelText}</Button>
           <Button type="primary" {...okButtonProps} loading={confirmLoading} onClick={onOk}>{okText}</Button>
         </> : footer}
       </DialogFooter>}

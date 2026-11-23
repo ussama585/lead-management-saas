@@ -726,8 +726,8 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
 
     return (
         <>
-            <BreadCrumb goBack={goBack} linkText="Lead" />
-            <div className="min-w-0 w-full">
+            <BreadCrumb goBack={goBack} linkText="Lead" className="lead-detail-heading" />
+            <div className="lead-detail-sections min-w-0 w-full">
              
                     
                         {isLoading ? <div className="py-6 text-center"><Spin /></div> : detailError
@@ -735,8 +735,8 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
                             : <LeadCard lead={lead} leadType="Website Lead" refetchLeadDetail={refetchDetail} />}
                    
                
-                <div className="row">
-                    <div className="col-12 mt-2">
+                <div className="lead-detail-jobs">
+                    <div className="min-w-0 w-full">
                       <JobListingTabs source="website" leadId={id} onRestored={refetchJobs} activeColumns={columns}
                         actions={!isReadOnlyLead && (
                             <Button type="primary" onClick={() => {
