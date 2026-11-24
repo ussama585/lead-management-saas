@@ -1,3 +1,4 @@
+import BackButton from './back-button.jsx';
 import { leadOptionCompanyId } from '../pages/shared/utils/lead-option-company.js';
 import { leadModalCompanyPayload } from '../pages/shared/utils/lead-modal-company.js';
 import { message } from './ui/notifications.jsx';
@@ -96,7 +97,7 @@ const STATUSES_REQUIRING_REMARKS = new Set([
   "Irrelevant Lead",
 ]);
 
-const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
+const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail, onBack }) => {
   const [expanded, setExpanded] = useState(true);
   const detailsId = useId();
   const [showModal, setShowModal] = useState(false);
@@ -508,6 +509,8 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
     <div className="lead-card responsive-lead-card lead-card--accordion">
       {/* Header Section */}
       <div className="basic-info responsive-basic-info lead-card__basic-info">
+        <div className="lead-card__identity">
+          {onBack && <BackButton onClick={onBack} />}
         <button type="button" className="lead-info responsive-lead-info lead-card__accordion-toggle"
           id={`${detailsId}-toggle`} aria-expanded={expanded} aria-controls={detailsId}
           onClick={() => setExpanded(current => !current)}>
@@ -521,6 +524,7 @@ const LeadCard = ({ lead, leadType = 'Lead Generated', refetchLeadDetail }) => {
             </p>
           </div>
         </button>
+        </div>
 
         <div className="lead-card__header-actions">
           {canEdit && isDataLead && <>

@@ -8,6 +8,7 @@
 }
 .lead-detail-sections > .lead-card.responsive-lead-card { margin-bottom: 0; }
 .lead-detail-jobs { min-width: 0; }
+.lead-card__identity { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
 .lead-card.responsive-lead-card.lead-card--accordion { position: relative; }
 .lead-card.responsive-lead-card.lead-card--accordion .lead-card__basic-info { padding-right: 44px; }
 .lead-card--accordion .lead-card__collapse-button {

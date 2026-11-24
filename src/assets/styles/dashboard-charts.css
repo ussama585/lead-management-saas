@@ -50,4 +50,17 @@
 }
 @media (max-width: 600px) {
   .admin-dashboard-page [class$='-chart-container'] { padding: 16px; }
+  .admin-dashboard-page [class$='-chart-filters'] { width: 100%; min-width: 0; }
+  .admin-dashboard-page [class$='-chart-filters'] .lead-date-range-field { width: 100%; }
+  .admin-dashboard-page [class$='-chart-filters'] .lead-date-range-field .date-range-trigger {
+    height: auto !important;
+    min-height: 40px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  .admin-dashboard-page [class$='-chart-filters'] .date-range-trigger__text {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
 }

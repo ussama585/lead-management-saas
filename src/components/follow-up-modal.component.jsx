@@ -225,20 +225,24 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
         </div>
 
         {!formik.values.addFollowUp ? (
-          <DatePickerField
-            label="Next Follow-up"
-            name="followUpDate"
-            value={formik.values.followUpDate}
-            onChange={(value) => formik.setFieldValue('followUpDate', value ? value.toDate() : null)}
-            onBlur={() => formik.setFieldTouched('followUpDate', true, true)}
-            disabled={readOnlyMode}
-            showTime
-            showTimeConfig={{ format: 'h:mm A', minuteStep: 5, use12Hours: true }}
-            format="DD MMM YYYY h:mm A"
-            disabledDate={(current) => current && current.startOf('day').isBefore(dayjs().startOf('day'))}
-            error={formik.errors.followUpDate}
-            touched={formik.touched.followUpDate}
-          />
+          <div style={{ marginBottom: 16 }}>
+            <label htmlFor="next-follow-up-date" className="form-label">Next Follow-up</label>
+            <Input
+              id="next-follow-up-date"
+              name="followUpDate"
+              type="datetime-local"
+              value={formik.values.followUpDate ? dayjs(formik.values.followUpDate).format('YYYY-MM-DDTHH:mm') : ''}
+              min={dayjs().startOf('day').format('YYYY-MM-DDTHH:mm')}
+              onChange={event => formik.setFieldValue('followUpDate', event.target.value ? new Date(event.target.value) : null)}
+              onBlur={() => formik.setFieldTouched('followUpDate', true, true)}
+              disabled={readOnlyMode}
+              aria-required="true"
+              status={formik.touched.followUpDate && formik.errors.followUpDate ? 'error' : undefined}
+              aria-describedby={formik.touched.followUpDate && formik.errors.followUpDate ? 'next-follow-up-date-error' : undefined}
+            />
+            {formik.touched.followUpDate && formik.errors.followUpDate &&
+              <div id="next-follow-up-date-error" role="alert" className="text-red">{formik.errors.followUpDate}</div>}
+          </div>
         ) : null}
 
         <div style={{ marginBottom: 8 }}>

@@ -6,7 +6,7 @@ import { Select } from '../../../../components/ui/app-select.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Spin, Button } from '../../../../components/ui/app-controls.jsx';
 import React, { useMemo, useState, useEffect } from 'react';
-import BreadCrumb from '../../../../components/breadcrumb.component.jsx';
+import BackButton from '../../../../components/back-button.jsx';
 import "../../../../assets/styles/legacy/leads.generated.css";
 import { Alert, Row, Col } from 'antd';
 import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
@@ -726,13 +726,13 @@ const canDeleteJob = (isSuperAdmin(user?.user_type) || ['company_admin', 'sales_
 
     return (
         <>
-            <BreadCrumb goBack={goBack} linkText="Lead" className="lead-detail-heading" />
+            {(isLoading || detailError) && <BackButton onClick={goBack} />}
             <div className="lead-detail-sections min-w-0 w-full">
              
                     
                         {isLoading ? <div className="py-6 text-center"><Spin /></div> : detailError
                             ? <Alert type="error" showIcon message={detailRequestError?.message || 'Could not load lead details.'} action={<Button onClick={() => refetchDetail()}>Retry</Button>} />
-                            : <LeadCard lead={lead} leadType="Website Lead" refetchLeadDetail={refetchDetail} />}
+                            : <LeadCard onBack={goBack} lead={lead} leadType="Website Lead" refetchLeadDetail={refetchDetail} />}
                    
                
                 <div className="lead-detail-jobs">

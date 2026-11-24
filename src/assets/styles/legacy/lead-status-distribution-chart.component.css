@@ -34,6 +34,22 @@
 .lead-status-distribution-chart-dropdown {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  .lead-status-distribution-chart-dropdown { width: 100%; }
+  .lead-status-distribution-chart-dropdown > :is(.lead-date-range-field, .relative) { width: 100% !important; min-width: 0; }
+  .lead-status-distribution-chart-dropdown .lead-date-range-field .date-range-trigger {
+    height: auto !important;
+    min-height: 40px;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  .lead-status-distribution-chart-dropdown .date-range-trigger__text { white-space: normal; overflow: visible; text-overflow: clip; }
 }
 
 .lead-status-distribution-chart-loading,

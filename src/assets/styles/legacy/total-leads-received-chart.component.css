@@ -34,6 +34,11 @@
   gap: 12px;
 }
 
+@media (max-width: 767px) {
+  .total-leads-received-chart-filters { width: 100%; min-width: 0; flex-wrap: wrap; }
+  .total-leads-received-chart-filters .lead-date-range-field { width: 100%; }
+}
+
 .total-leads-received-kpi {
   display: flex;
   flex-direction: column;

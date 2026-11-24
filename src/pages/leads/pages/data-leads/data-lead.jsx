@@ -15,7 +15,6 @@ import { useMaterialReactTable } from "material-react-table";
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
 import { deleteDataLeadJobWithRemarks } from '../../../shared/services/lead-job-lifecycle.js';
-import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
 import DeleteJobDialog from '../shared/delete-job-dialog.jsx';
 import StatusHistoryModal, { createStatusHistoryColumn } from '../../../../components/status-history-modal.jsx';
@@ -754,10 +753,6 @@ const DataLead = () => {
 
   return (
     <>
-      <BreadCrumb className="lead-detail-heading" linkText="Data Lead Jobs" goBack={() => {
-        const returnTo = navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo;
-        returnTo ? navigate(returnTo) : navigate(-1);
-      }} />
       <div className="leads">
         <div className="min-w-0 w-full">
       <Box className="lead-detail-sections"
@@ -766,7 +761,10 @@ const DataLead = () => {
           minHeight: "calc(100vh - 120px)",
         }}
       >
-        {leadForCard && <LeadCard lead={leadForCard} leadType="Data Lead" refetchLeadDetail={refetchLeadDetail} />}
+        {leadForCard && <LeadCard onBack={() => {
+          const returnTo = navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo;
+          returnTo ? navigate(returnTo) : navigate(-1);
+        }} lead={leadForCard} leadType="Data Lead" refetchLeadDetail={refetchLeadDetail} />}
             <JobListingTabs source="data" leadId={dataLeadId} onRestored={refetchJobs} activeColumns={columns} actions={(!isReadOnlyLead || isSuperAdmin(user?.user_type)) && <AntButton type="primary" onClick={handleCreateJob} disabled={!dataLeadId}>Add New Job</AntButton>}><NewTableComponent table={table} /></JobListingTabs>
           </Box>
         </div>

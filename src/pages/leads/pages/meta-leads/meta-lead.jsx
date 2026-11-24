@@ -15,7 +15,6 @@ import { Trash2 as DeleteOutlined, Pencil } from 'lucide-react';
 import { useMaterialReactTable } from "material-react-table";
 import NewTableComponent from '../../../../components/tables/new-table.jsx';
 import JobListingTabs from '../../../../components/job-listing-tabs.jsx';
-import BreadCrumb from "../../../../components/breadcrumb.component.jsx";
 import LeadCard from "../../../../components/lead-card.component.jsx";
 import StatusHistoryModal, { createStatusHistoryColumn } from "../../../../components/status-history-modal.jsx";
 import { ConfirmationModal } from "../../../clients/components/LazyModals.jsx";
@@ -768,10 +767,6 @@ const getMetaLeadUrl = () => {
 
   return (
     <>
-     <BreadCrumb className="lead-detail-heading"
-  linkText="Meta Lead Jobs" 
-  goBack={() => navigate(navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo || getMetaLeadUrl())}
-/>
       <div className="leads">
         <div className="min-w-0 w-full">
      <Box className="lead-detail-sections"
@@ -780,7 +775,7 @@ const getMetaLeadUrl = () => {
           minHeight: "calc(100vh - 120px)",
         }}
       >
-        {leadForCard && <LeadCard lead={leadForCard} leadType="Meta Lead" refetchLeadDetail={refetchLeadDetail} />}
+        {leadForCard && <LeadCard onBack={() => navigate(navigationState?.followUpReturnTo || navigationState?.leadListingReturnTo || getMetaLeadUrl())} lead={leadForCard} leadType="Meta Lead" refetchLeadDetail={refetchLeadDetail} />}
             <JobListingTabs source="meta" leadId={leadId} onRestored={refetchJobs} activeColumns={columns} actions={true && <JobActionButton type="primary" onClick={handleCreateJob} disabled={!leadId || isReadOnlyLead}>Add New Job</JobActionButton>}><NewTableComponent table={table} /></JobListingTabs>
           </Box>
         </div>

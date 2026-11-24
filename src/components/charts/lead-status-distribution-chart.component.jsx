@@ -116,7 +116,7 @@ const LeadStatusDistributionChart = ({
           <h2 className="lead-status-distribution-chart-title">{title}</h2>
           <p className="lead-status-distribution-chart-subtitle">Pipeline health - Where leads get stuck</p>
         </div>
-        <div className="lead-status-distribution-chart-dropdown">
+        <div className="lead-status-distribution-chart-dropdown lead-status-distribution-chart-filters">
           <BootstrapDateRangeModal
             value={activeDateRange}
             onChange={onDateRangeChange}

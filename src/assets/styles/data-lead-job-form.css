@@ -47,6 +47,16 @@
   box-sizing: border-box;
 }
 .data-job-form .data-job-field textarea { resize: vertical; }
+.data-job-form input[type='datetime-local'] { position: relative; }
+.data-job-form input[type='datetime-local']::-webkit-datetime-edit { flex: 1; min-width: 0; }
+.data-job-form input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  cursor: pointer;
+}
 .data-job-field > label {
   display: block;
   margin-bottom: 4px;
@@ -57,14 +67,19 @@
 .data-job-field :is(.ant-input-number, .ant-select) { width: 100%; max-width: 100%; min-width: 0; }
 .data-job-field :is(input, textarea, .ant-select-selector) { border-radius: 6px; }
 .data-job-help { margin: 4px 0 0; color: var(--muted-foreground); font-size: 12px; }
-.data-job-working-days { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.data-job-working-days .ant-select { flex: 1; min-width: 0; }
+.data-job-working-days { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 8px 12px; min-width: 0; }
+.data-job-working-days > :is(.relative, .ant-select) { width: 100%; min-width: 0; }
+.data-job-working-days [data-slot='select-trigger'] > span { white-space: normal; overflow: visible; text-overflow: clip; }
 .data-job-skill-row { align-items: end; padding: 12px; border: 1px solid var(--border); border-radius: 6px; }
 .data-job-span-all { grid-column: 1 / -1; }
 @container (min-width: 600px) {
   .data-job-grid, .data-job-nature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .data-job-span-two { grid-column: span 2; }
+  .data-job-working-days-field { grid-column: span 2; }
   .data-job-skill-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 400px) {
+  .data-job-working-days { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
 }
 @container (min-width: 800px) {
   .data-job-paired-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
