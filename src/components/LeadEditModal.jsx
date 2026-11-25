@@ -135,6 +135,7 @@ const TriggerComponent = typeof trigger === 'function' ? trigger({ onClick: hand
       
       <Modal
         title="Edit Lead Information"
+        className="edit-lead-modal"
         open={isVisible}
         onCancel={() => {
           setIsVisible(false);

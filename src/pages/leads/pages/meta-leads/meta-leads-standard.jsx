@@ -22,7 +22,6 @@ import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button, Tooltip } from '../../../../components/ui/app-controls.jsx';
 import { Avatar, AvatarFallback } from '../../../../components/ui/avatar.jsx';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Space } from 'antd';
 import { Upload as UploadOutlined, Info as InfoCircleOutlined, Minus as MinusOutlined, UserPlus as UserAddOutlined } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -939,9 +938,9 @@ export default function MetaLeadsStandard() {
         <>
             {/* Date Range Filter */}
 <LeadTopActions>
-        {canAssign && <div className="flex justify-end" style={{ marginBottom: 20 }}>
+        {canAssign && <div className="meta-lead-top-actions" style={{ marginBottom: 20 }}>
   
-  <Space>
+  <div className="meta-lead-top-actions__buttons">
     {['super_admin', 'company_admin'].includes(user?.user_type) && (
       <Button
         className="website-manage-assignees-button"
@@ -958,7 +957,7 @@ export default function MetaLeadsStandard() {
         refetchMetaLeadsCount();
       }} />
     )}
-  </Space>
+  </div>
 </div> }
 </LeadTopActions>
 <LeadTopFiltersAccordion portalAware projectSize={projectSizeFilter} dateRange={dateRange}>          <div className="lead-filter-toolbar data-leads-ui data-leads-local-toolbar">

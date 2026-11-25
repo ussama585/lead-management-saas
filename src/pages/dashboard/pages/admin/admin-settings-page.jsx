@@ -7,13 +7,13 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import api from '../../../shared/services/api.js';
 import { followUpDurationSchema } from '../schemas/follow-up-duration-schema.js';
-import { Alert, Card, InputNumber, Space } from 'antd';
+import { Alert, InputNumber, Space } from 'antd';
+import SettingsSection from '../../../../components/settings-section.jsx';
 import SettingsDeleteModal from '../../../../components/settings-delete-modal.jsx';
-import { Clock, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import TableActionMenu from '../../../../components/tables/table-action-menu.jsx';
 // import { Palette, RefreshCw } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import formatDateUniversal from '../../../shared/utils/formatDate.js';
 // import AppearanceSettings from '../../../../components/appearance-settings.jsx';
 import LeadStatusSettings from '../../../../components/lead-status-settings.jsx';
 import ProjectSizeSettings from '../../../../components/project-size-settings.jsx';
@@ -148,7 +148,7 @@ const AdminSettingsPage = () => {
         {showProjectSizeSettings && (superAdmin ? <CompanyLeadSettingsList key="project-size" type="project-size" /> : <ProjectSizeSettings />)}
         
 
-        {showDurationSettings && <Card title="Check-up follow-up duration">
+        {showDurationSettings && <SettingsSection title="Check-up follow-up duration">
           <div className="settings-duration-content">
             <div className="settings-choice-toolbar">
             {superAdmin && <CompanySelect id="duration-company" options={companies.data || []}
@@ -163,18 +163,8 @@ const AdminSettingsPage = () => {
               action={<Button onClick={() => refetch()} loading={isFetching}>Retry</Button>} />}
             {isLoading || isFetching ? <p role="status" className="text-sm text-muted-foreground">Loading follow-up duration...</p> :
               durations?.results?.length ? <div className="settings-choice-grid">
-                {durations.results.map(record => <div key={record.id} className="settings-choice-card">
-                  <div className="space-y-2">
-                    <div className="settings-choice-card__content">
-                      <span className="settings-choice-card__icon"><Clock size={22} /></span>
-                      <div><p className="settings-choice-card__label">Follow-up duration</p>
-                        <p className="settings-choice-card__title">{record.duration_minutes} minutes</p></div>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      <p>Created: {record.created_at ? formatDateUniversal(record.created_at, true) : '-'}</p>
-                      <p>Updated: {record.updated_at ? formatDateUniversal(record.updated_at, true) : '-'}</p>
-                    </div>
-                  </div>
+                {durations.results.map(record => <div key={record.id} className="settings-choice-card settings-choice-card--compact">
+                  <p className="settings-choice-card__title">{record.duration_minutes} minutes</p>
                   <div className="settings-choice-card__actions"><TableActionMenu actions={[
                     { label: 'Edit duration', disabled: updateMutation.isLoading || deleteMutation.isLoading, onClick: () => { updateMutation.reset(); editForm.resetForm(); setEditTarget(record); } },
                     { label: 'Delete duration', disabled: updateMutation.isLoading || deleteMutation.isLoading, onClick: () => { deleteMutation.reset(); setDeleteTarget(record); } },
@@ -183,7 +173,7 @@ const AdminSettingsPage = () => {
               </div> : !isError && <p className="text-sm text-muted-foreground">No follow-up duration configured yet.</p>}
 
           </div>
-        </Card>}
+        </SettingsSection>}
         <Modal title="Add follow-up duration" open={createOpen && canCreateDuration} footer={null}
           onCancel={() => { if (!createMutation.isLoading) setCreateOpen(false); }} confirmLoading={createMutation.isLoading}>
                 <form onSubmit={createForm.handleSubmit} style={{ borderTop: 'none', paddingTop: 0 }}>

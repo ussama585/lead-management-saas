@@ -10,6 +10,7 @@ import { getMetaLeadDuplicateLeads } from '../pages/shared/services/metaLeads.js
 import { getLeadGenerationDuplicateLeads } from '../pages/shared/services/leads.js';
 import { getDataLeadDuplicateLeads } from '../pages/shared/services/data-leads-service.js';
 import formatDateUniversal from '../pages/shared/utils/formatDate.js';
+import '../assets/styles/duplicate-lead-modal.css';
 
 const { Title } = Typography;
 
@@ -92,8 +93,8 @@ function LeadCard({ lead: L, leadType, title, isFirst, duplicateOf }) {
 
   return (
     <div style={{ marginBottom: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <Title level={5} style={{ margin: 0, color: '#666' }}>{title}</Title>
+      <div className="duplicate-lead-modal__lead-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        {title && <Title level={5} style={{ margin: 0, color: '#666' }}>{title}</Title>}
         <Button
           type="primary"
           size="small"
@@ -131,7 +132,7 @@ function LeadCard({ lead: L, leadType, title, isFirst, duplicateOf }) {
         <Descriptions.Item label="Status">{L.status || '-'}</Descriptions.Item>
         <Descriptions.Item label="Assigned To">
           {L.assigned_to_name ? (
-            <Space>
+            <Space wrap>
               <span>{L.assigned_to_name}</span>
               {L.assigned_to_type && (
                 <span style={{ color: '#666' }}>
@@ -175,6 +176,7 @@ export default function DuplicateLeadModal({ visible, lead, onClose, leadType = 
 
   return (
     <Modal
+      className="duplicate-lead-modal"
       title={
         <Space>
           <InfoCircleOutlined size="1em" className="app-icon" style={{ color: '#faad14' }} />
@@ -191,7 +193,7 @@ export default function DuplicateLeadModal({ visible, lead, onClose, leadType = 
       width={700}
     >
       <div style={{ padding: '8px 0' }}>
-        <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fffbe6', borderRadius: '4px', border: '1px solid #ffe58f' }}>
+        <div className="duplicate-lead-modal__information" style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fffbe6', borderRadius: '4px', border: '1px solid #ffe58f' }}>
           <Title level={5} style={{ margin: '0 0 8px 0', color: '#ad6800' }}>
             Duplicate Information
           </Title>
@@ -202,7 +204,6 @@ export default function DuplicateLeadModal({ visible, lead, onClose, leadType = 
         <LeadCard
           lead={lead}
           leadType={leadType}
-          title={`Current Lead (ID: ${lead?.id ?? lead?.lead_id ?? '—'})`}
           isFirst
         />
 
@@ -239,14 +240,11 @@ export default function DuplicateLeadModal({ visible, lead, onClose, leadType = 
                 shown.add(id);
               }
 
-              const title = `Duplicate Lead (ID: ${id ?? '—'})`;
-
               return (
                 <LeadCard
                   key={id ?? index}
                   lead={L}
                   leadType={leadType}
-                  title={title}
                   isFirst={false}
                   duplicateOf={undefined}
                 />

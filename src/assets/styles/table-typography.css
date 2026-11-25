@@ -1,4 +1,11 @@
 /* Shared typography for native, Material and Ant Design table cells. */
+@layer base {
+  html body table thead th { text-align: left !important; }
+  html body table thead :is(.Mui-TableHeadCell-Content, .Mui-TableHeadCell-Content-Labels, .Mui-TableHeadCell-Content-Wrapper, .MuiTableSortLabel-root, .ant-table-column-sorters) {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+}
 /* Navigation values remain visibly linked inside shared UI containers. */
 html body table td :is(a[href]:not([data-slot="button"]), .link-style, .sop-brand-table-link) {
   text-decoration: underline;

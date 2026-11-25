@@ -109,9 +109,9 @@ it('honors row-level and table-level permission checks with visible selects', ()
   expect(column.Cell({ row: { original: {} }, table: { options: { enableEditing: () => false } } }).props.disabled).toBe(true);
 });
 
-it('centers arbitrary select headings while retaining header metadata', () => {
+it('left-aligns arbitrary select headings while retaining header metadata', () => {
   const [column] = inlineSelectColumns([{ header: 'Department', accessorKey: 'department', muiTableHeadCellProps: { title: 'Department' }, Cell: () => <Select /> }]);
   const row = { getAllCells: () => [{ column: { id: 'department' } }] };
   expect(column.muiTableHeadCellProps({ table: { getPrePaginationRowModel: () => ({ flatRows: [row] }) } }))
-    .toMatchObject({ title: 'Department', align: 'center' });
+    .toMatchObject({ title: 'Department', align: 'left' });
 });

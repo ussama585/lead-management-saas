@@ -1056,13 +1056,7 @@ const DataLeads = () => {
 
       <div className="leads data-leads-ui">
         <div className="min-w-0">
-      <Box
-        sx={{
-         
-         
-          minHeight: "calc(100vh - 120px)",
-        }}
-      >
+      <Box>
         {/* Date Range Filter and Add New Lead button */}
 
 <LeadTopActions>{user?.user_type !== 'marketing_manager' && <div className="flex justify-end" style={{ marginBottom: 20 }}>

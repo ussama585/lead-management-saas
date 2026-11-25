@@ -8,6 +8,7 @@ export default function CompanySelect({ id, ...props }) {
     <label htmlFor={id}>Company</label>
     <div className="lead-company-filter__control">
       <Select id={id} placeholder="Filter by company" showSearch allowClear optionFilterProp="label"
+        selectedIconPosition="end"
         style={{ width: '100%', maxWidth: '100%' }}
         optionRender={option => <CompanySelectOption option={option} />}
         labelRender={({ label }) => <span style={{ fontWeight: 600 }}>{label}</span>}

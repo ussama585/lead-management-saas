@@ -1,30 +1,26 @@
 import { message } from './ui/notifications.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Input } from './ui/app-controls.jsx';
-import { Button, Spin } from './ui/app-controls.jsx';
+import { Button } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Alert, Card, Descriptions, Space } from 'antd';
+import { Alert, Space } from 'antd';
+import SettingsSection from './settings-section.jsx';
 import SettingsChoiceCards from './settings-choice-cards.jsx';
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
 import { canManageProjectSizes, isSuperAdmin } from '../pages/auth/role-access.js';
-import { createProjectSize, deleteProjectSize, getProjectSize, projectSizeError, listProjectSizes, updateProjectSize } from '../pages/shared/services/project-size-service.js';
+import { createProjectSize, deleteProjectSize, projectSizeError, listProjectSizes, updateProjectSize } from '../pages/shared/services/project-size-service.js';
 import SettingsDeleteModal from './settings-delete-modal.jsx';
-import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 
 export function ProjectSizeManager({ user, companyId = null, companyControl, companyError }) {
   const queryClient = useQueryClient();
   const needsCompany = isSuperAdmin(user.user_type) && !companyId;
   const queryKey = ['settingsProjectSizes', user.id, user.user_type, companyId];
   const [editor, setEditor] = useState(null);
-  const [viewId, setViewId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [valueError, setValueError] = useState('');
   const list = useQuery(queryKey, () => listProjectSizes(companyId ? { company_id: companyId } : undefined), { refetchOnWindowFocus: false, retry: 1 });
-  const detail = useQuery([...queryKey, 'detail', viewId], () => getProjectSize(viewId, companyId), {
-    enabled: viewId != null && !needsCompany, refetchOnWindowFocus: false, retry: 1,
-  });
   const save = useMutation(({ id, value }) => id == null ? createProjectSize(value, companyId) : updateProjectSize(id, value, companyId), {
     onSuccess: async result => {
       message.success(result?.message || 'Project size saved.');
@@ -52,12 +48,11 @@ export function ProjectSizeManager({ user, companyId = null, companyControl, com
     save.mutate(editor);
   }
   const renderActions = row => <Space wrap>
-      <span title={needsCompany ? 'Select company first' : 'View project size'}><Button aria-label="View project size" icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Edit project size'}><Button aria-label="Edit project size" icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Delete project size'}><Button aria-label="Delete project size" danger icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} /></span>
     </Space>;
   return <>
-    <Card title='Project sizes'>
+    <SettingsSection title='Project sizes'>
       <div className="settings-choice-toolbar">
         {companyControl}
         <span className="settings-choice-toolbar__action" title={needsCompany ? 'Select company first' : 'Add size'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add size</Button></span>
@@ -65,7 +60,7 @@ export function ProjectSizeManager({ user, companyId = null, companyControl, com
       {companyError}
       {list.isError ? <Alert type='error' showIcon message={projectSizeError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
         <SettingsChoiceCards items={list.data || []} kind="size" loading={list.isLoading || list.isFetching} renderActions={renderActions} emptyMessage="No project sizes yet. Add a size to get started." />}
-    </Card>
+    </SettingsSection>
     <SettingsDeleteModal title='Delete project size' itemName={deleteTarget?.value} open={deleteTarget != null}
       loading={remove.isLoading} error={remove.isError ? projectSizeError(remove.error) : null}
       onCancel={() => setDeleteTarget(null)} onConfirm={() => { if (deleteTarget && !remove.isLoading) remove.mutate(deleteTarget.id); }} />
@@ -76,15 +71,6 @@ export function ProjectSizeManager({ user, companyId = null, companyControl, com
         {valueError && <p id='project-size-value-error' role='alert' className='text-sm text-destructive'>{valueError}</p>}
         {save.isError && <Alert type='error' showIcon message={projectSizeError(save.error)} />}
       </form>
-    </Modal>
-    <Modal title='Project size details' open={viewId != null} onCancel={() => setViewId(null)} footer={<Button onClick={() => setViewId(null)}>Close</Button>}>
-      {detail.isLoading ? <div className='py-6 text-center'><Spin /></div> : detail.isError ? <Alert type='error' showIcon message={projectSizeError(detail.error)} action={<Button onClick={() => detail.refetch()}>Retry</Button>} /> : detail.data &&
-        <Descriptions column={1} bordered size='small' className='mt-4' items={[
-          { key: 'id', label: 'ID', children: detail.data.id },
-          { key: 'value', label: 'Value', children: detail.data.value },
-          { key: 'created', label: 'Created', children: detail.data.created_at ? formatDateUniversal(detail.data.created_at, true) : '—' },
-          { key: 'updated', label: 'Updated', children: detail.data.updated_at ? formatDateUniversal(detail.data.updated_at, true) : '—' },
-        ]} />}
     </Modal>
   </>;
 }

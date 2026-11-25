@@ -123,12 +123,12 @@ export default function DataLeadDialog({ mode, id, onClose, onSaved, statuses = 
     if (key === 'remarks') return <Input.TextArea placeholder="Enter remarks" {...common} rows={3} onChange={formik.handleChange} />;
     return <Input placeholder={`Enter ${labels[key]?.toLowerCase() || 'a value'}`} {...common} type={key === 'email' ? 'email' : key === 'followup_date' ? 'date' : 'text'} onChange={formik.handleChange} />;
   }
-  return <Modal title={mode === 'view' ? 'Data lead details' : mode === 'edit' ? 'Edit data lead' : 'Create data lead'} open width={800} style={{ width: 'calc(100% - 32px)' }} onCancel={close}
+  return <Modal className={mode === 'edit' ? 'edit-lead-modal' : undefined} title={mode === 'view' ? 'Data lead details' : mode === 'edit' ? 'Edit data lead' : 'Create data lead'} open width={800} style={{ width: 'calc(100% - 32px)' }} onCancel={close}
     onOk={formik.submitForm} okText={mode === 'edit' ? 'Save changes' : 'Create lead'} confirmLoading={pending} okButtonProps={{ disabled: loading || detailError }}
     cancelButtonProps={{ disabled: pending }} closable={!pending} maskClosable={!pending} keyboard={!pending} footer={mode === 'view' ? <Button onClick={close}>Close</Button> : undefined}>
     {loading ? <div className='py-6 text-center'><Spin /></div> : detailError ? <Alert type='error' showIcon message={dataLeadError(detail.error)} action={<Button onClick={() => detail.refetch()}>Retry</Button>} /> : mode === 'view' ?
       <Descriptions column={1} bordered size='small' items={Object.entries(labels).map(([field, title]) => { const key = field === 'assigned_to' ? 'assigned_to_name' : field; const label = field === 'assigned_to' ? 'Assigned to' : title; return ({ key, label, children: String(detail.data?.[key] ?? '—') }); })} /> :
-      <form onSubmit={formik.handleSubmit} noValidate className='mt-4 grid gap-x-6 gap-y-6 sm:grid-cols-2'>
+      <form onSubmit={formik.handleSubmit} noValidate className='mt-1 grid gap-x-6 gap-y-6 sm:grid-cols-2'>
         {(mode === 'edit' ? dataLeadEditFields.map(key => [key, labels[key]]) : [...(superAdmin ? [['company', 'Company']] : []), ...Object.entries(labels).filter(([key]) => !['status', 'followup_date', 'remarks'].includes(key))]).map(([key, label]) => <div key={key} className={key === 'remarks' ? 'sm:col-span-2' : undefined}>
           <label htmlFor={`data-lead-${key}`} className='mb-2 block text-sm font-medium'>{label}{requiredFields.has(key) && <span className="text-destructive"> *</span>}</label>{control(key)}
           {formik.touched[key] && formik.errors[key] && <p id={`data-lead-${key}-error`} role='alert' className='mt-1 text-sm text-destructive'>{formik.errors[key]}</p>}

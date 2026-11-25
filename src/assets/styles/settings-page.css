@@ -28,6 +28,19 @@
   color: var(--primary-foreground);
 }
 .settings-panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; min-width: 0; width: 100%; }
+.settings-section { min-width: 0; width: 100%; border: 1px solid var(--border); border-radius: 12px; background: var(--background); }
+.settings-section__heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; font-size: 16px; font-weight: 600; line-height: 24px; list-style: none; cursor: pointer; }
+.settings-section__heading::-webkit-details-marker { display: none; }
+.settings-section__heading > svg { flex-shrink: 0; transition: transform 150ms ease; }
+.settings-section[open] > .settings-section__heading { border-bottom: 1px solid var(--border); }
+.settings-section[open] > .settings-section__heading > svg { transform: rotate(180deg); }
+.settings-section__heading:focus-visible { outline: 2px solid var(--primary); outline-offset: -3px; border-radius: 12px; }
+.settings-section__body { min-width: 0; padding: 24px; }
+@media (max-width: 640px) {
+  .settings-section__heading { padding: 14px 16px; }
+  .settings-section__body { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .settings-section__heading > svg { transition: none; } }
 .settings-panel > [data-slot='card'],
 .settings-panel > .ant-card { width: 100%; max-width: none; margin-bottom: 0; }
 .settings-panel .ant-table-wrapper { overflow-x: auto; }
@@ -42,6 +55,11 @@
 .settings-choice-card__label { margin: 0; font-size: 12px; color: var(--muted-foreground); }
 .settings-choice-card__title { margin: 4px 0; font-size: 16px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
 .settings-choice-card__actions { flex-shrink: 0; }
+.settings-choice-grid > li.settings-choice-card,
+.settings-choice-card--compact { padding: 10px 16px; align-items: center; }
+.settings-choice-grid > li.settings-choice-card .settings-choice-card__title,
+.settings-choice-card--compact .settings-choice-card__title { margin: 0; }
+.settings-choice-grid > .settings-choice-card--compact { width: 100%; max-width: 320px; box-sizing: border-box; }
 .settings-choice-card__actions .table-action-menu__trigger { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer; }
 .settings-choice-card__actions .table-action-menu__trigger:hover { background: var(--muted); color: var(--foreground); }
 .settings-choice-card__actions .table-action-menu__trigger > svg { width: 20px; height: 20px; }

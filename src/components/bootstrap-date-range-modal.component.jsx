@@ -1,4 +1,3 @@
-import { Tooltip } from './ui/app-controls.jsx';
 import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -16,13 +15,11 @@ import '../assets/styles/legacy/bootstrap-date-range-modal.css';
 
 // Constants
 const MOBILE_BREAKPOINT = 1050;
-const MIN_WIDTH_BREAKPOINT = 450;
 const DEBOUNCE_DELAY = 150;
 
 const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onDone, triggerStyle, placeholder = 'Filter by date range' }) => {
   const withinDateField = useContext(DateRangeFieldContext);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isBelowMinWidth, setIsBelowMinWidth] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < MOBILE_BREAKPOINT);
 
   // Helper function to normalize dates
   const normalizeDate = useCallback((date) => date?.toDate ? date.toDate() : date, []);
@@ -68,8 +65,6 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
       timeoutId = setTimeout(() => {
         const width = window.innerWidth;
         setIsMobile(width < MOBILE_BREAKPOINT);
-        setIsBelowMinWidth(width < MIN_WIDTH_BREAKPOINT);
-        if (width < MIN_WIDTH_BREAKPOINT) setShowModal(false);
       }, DEBOUNCE_DELAY);
     };
 
@@ -117,8 +112,8 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
   }, []);
 
   const handleTriggerClick = useCallback(() => {
-    if (!isBelowMinWidth) setShowModal(true);
-  }, [isBelowMinWidth, setShowModal]);
+    setShowModal(true);
+  }, [setShowModal]);
 
   const handleClose = useCallback(() => setShowModal(false), [setShowModal]);
 
@@ -133,19 +128,14 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
     return placeholder;
   }, [selection, placeholder]);
 
-  const trigger = <Tooltip
-        title={isBelowMinWidth ? 'Date range picker is not available on mobile' : ''}
-        placement="top"
-      >
-        <div
-          className={`rounded-pill bg-light d-inline-block cursor-pointer px-3 py-2 date-range-trigger ${isBelowMinWidth ? 'disabled' : ''}`}
+  const trigger = <button type="button" aria-haspopup="dialog" aria-expanded={Boolean(showModal)}
+          className="rounded-pill bg-light d-inline-block cursor-pointer px-3 py-2 date-range-trigger"
           onClick={handleTriggerClick}
           style={triggerStyle}
         >
           <span className="date-range-trigger__text" data-placeholder={!selection[0]?.startDate || !selection[0]?.endDate}
             style={{ '--filter-text-weight': selection[0]?.startDate && selection[0]?.endDate ? 600 : 400 }}>{displayText}</span><ChevronDown className="date-range-trigger__arrow" aria-hidden="true" />
-        </div>
-      </Tooltip>;
+        </button>;
 
   return (
     <>
@@ -165,6 +155,10 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
             data-bs-keyboard="false"
             tabIndex="-1"
             role="dialog"
+            aria-modal="true"
+            aria-label="Select date range"
+            onClick={handleClose}
+            onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); handleClose(); } }}
           >
             <div
               className="modal-dialog modal-dialog-centered modal-dialog-custom"
@@ -186,7 +180,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
                 <div className="modal-header modal-header-custom">
                   <h5 className="modal-title modal-title-custom">Select Date Range</h5>
                 </div>
-                <div className="modal-body p-3 modal-body-custom">
+                <div className="modal-body modal-body-custom">
                   <DateRangePicker
                     onChange={handleRangeChange}
                     moveRangeOnFirstSelection={false}
@@ -194,7 +188,7 @@ const BootstrapDateRangeModal = ({ value, onChange, showModal, setShowModal, onD
                     locale={enUS}
                     showDateDisplay={true}
                     ranges={selection}
-                    months={2}
+                    months={isMobile ? 1 : 2}
                     direction={isMobile ? 'vertical' : 'horizontal'}
                     showMonthAndYearPickers={true}
                     rangeColors={["#3e6a9f"]}

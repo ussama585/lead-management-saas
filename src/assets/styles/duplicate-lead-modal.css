@@ -1,0 +1,32 @@
+.duplicate-lead-modal__lead-heading { flex-wrap: wrap; gap: 12px; min-width: 0; }
+.duplicate-lead-modal__lead-heading > h5 { min-width: 0; overflow-wrap: anywhere; }
+.duplicate-lead-modal__lead-heading > button { max-width: 100%; }
+.duplicate-lead-modal__lead-heading > button:only-child { margin-left: auto; }
+@media (max-width: 600px) {
+  .duplicate-lead-modal [data-slot='dialog-header'] [data-slot='dialog-title'] { font-size: 12px; }
+  .duplicate-lead-modal [data-slot='dialog-title'] .ant-space { align-items: flex-start; }
+  .duplicate-lead-modal [data-slot='dialog-body'] { font-size: 12px; }
+  .duplicate-lead-modal .duplicate-lead-modal__information > h5 { font-size: 12px; }
+  .duplicate-lead-modal .duplicate-lead-modal__lead-heading > h5 { font-size: 14px; }
+  .duplicate-lead-modal .duplicate-lead-modal__information > p { font-size: 12px; }
+  .duplicate-lead-modal .ant-descriptions { font-size: 12px; min-width: 0; }
+  .duplicate-lead-modal .ant-descriptions-view table,
+  .duplicate-lead-modal .ant-descriptions-view tbody { display: block; width: 100%; }
+  .duplicate-lead-modal .ant-descriptions-view { border: 1px solid var(--field-border-color, #d2d2d2); border-radius: 12px; overflow: hidden; background: #fff; }
+  .duplicate-lead-modal .ant-descriptions-view .ant-descriptions-row { display: flex; flex-direction: column; width: 100%; padding: 12px 16px; box-sizing: border-box; border-bottom: 0; background: #fff; }
+  .duplicate-lead-modal .ant-descriptions-view .ant-descriptions-row:not(:last-child) { border-bottom: 1px solid #e2e8f0; }
+  .duplicate-lead-modal .ant-descriptions-view :is(.ant-descriptions-item-label, .ant-descriptions-item-content) {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+    font-size: 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .duplicate-lead-modal .ant-descriptions-view .ant-descriptions-item-label { margin-bottom: 6px; font-weight: 600; color: #475569; }
+  .duplicate-lead-modal .ant-descriptions-view .ant-descriptions-item-content { color: #0f172a; line-height: 1.6; }
+}

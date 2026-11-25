@@ -594,6 +594,14 @@ const DataEntryTable = () => {
         </DialogContent>
       </Dialog>
       <div className="listing-page-content sales-data-page">
+        {(superAdmin || user?.user_type === 'company_admin') && (
+          <div className="mb-3 flex w-full justify-end">
+            <Button type="button" onClick={handleExportAll}>
+              <DownloadOutlined size={16} aria-hidden="true" />
+              Export All to CSV
+            </Button>
+          </div>
+        )}
         <LeadTopFiltersAccordion company={(companies.data || []).find(company => String(company.id) === String(companyId))?.name} dateRange={dateRange}>
           <div className="lead-company-date-toolbar lead-company-date-toolbar--compact data-leads-ui data-leads-topbar sales-data-filter-toolbar"
             data-filter-columns={1 + (superAdmin ? 1 : 0) + (canViewUserTabs && (!statusFilter || statusFilter === 'All' || statusFilter === 'assigned') ? 1 : 0)}>
@@ -679,14 +687,6 @@ const DataEntryTable = () => {
             </div>
           )}
 
-        {(superAdmin || user?.user_type === 'company_admin') && (
-          <div className="mb-3 flex w-full justify-end">
-            <Button type="button" onClick={handleExportAll}>
-              <DownloadOutlined size={16} aria-hidden="true" />
-              Export All to CSV
-            </Button>
-          </div>
-        )}
         <div className="table-container">
           <NewTableComponent
             totalCount={data?.count || 0}

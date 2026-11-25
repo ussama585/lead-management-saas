@@ -66,5 +66,13 @@
   .lead-card.responsive-lead-card.lead-card--accordion .lead-card__contact-info { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 767px) {
+  .lead-card.responsive-lead-card.lead-card--accordion .lead-card__basic-info { padding-right: 0; }
+  .lead-card.responsive-lead-card .lead-card__identity { width: 100%; flex: 0 1 auto; gap: 8px; padding-right: 24px; box-sizing: border-box; }
+  .lead-card__identity > .app-back-button { width: 32px; height: 32px; flex-basis: 32px; padding: 4px; }
+  .lead-card.responsive-lead-card .responsive-lead-info { gap: 10px; }
+  .lead-card.responsive-lead-card .lead-info .responsive-avatar { width: 44px; height: 44px; flex-basis: 44px; font-size: 22px; }
+  .lead-card.responsive-lead-card .responsive-lead-name-company { flex: 1; }
+  .lead-card.responsive-lead-card .lead-card__name-heading { font-size: 18px; }
+  .lead-card.responsive-lead-card .lead-card__company-name { font-size: 14px; }
   .lead-card.responsive-lead-card.lead-card--accordion .lead-card__detail-row { grid-template-columns: minmax(0, 1fr); }
 }

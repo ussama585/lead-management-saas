@@ -277,7 +277,6 @@ const DataLeadJobDetail = ({ jobSource = 'data' }) => {
               {job?.followup_date && <Field label="Follow-up Date" value={fmt(job.followup_date)} />}
               {job?.last_followup_date && <Field label="Last Follow-up Date" value={fmt(job.last_followup_date)} />}
               {job?.delete_reason && <Field label="Delete Reason" value={job.delete_reason} />}
-              <Field label="Project ID" value={job?.project} />
             </Section>}
 
           </Row>

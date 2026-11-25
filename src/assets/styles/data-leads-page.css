@@ -396,3 +396,10 @@ body:has(.lead-listing-filter-dropdowns) [data-select-options='true'] [data-slot
   box-sizing: border-box;
 }
 .lead-export-toolbar > button { margin-left: auto; max-width: 100%; }
+.meta-lead-top-actions { display: flex; justify-content: flex-end; width: 100%; min-width: 0; }
+.meta-lead-top-actions__buttons { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; min-width: 0; max-width: 100%; }
+.meta-lead-top-actions__buttons .import-leads-button__actions { display: contents; }
+@media (max-width: 600px) {
+  .meta-lead-top-actions__buttons { flex-direction: column; align-items: stretch; width: 100%; }
+  .meta-lead-top-actions__buttons button { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+}

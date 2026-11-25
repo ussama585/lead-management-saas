@@ -49,25 +49,15 @@ export function tablePresentation(columns = []) {
     const numeric = numericColumn(column);
     const followUps = /^follow[\s_-]*ups?$/i.test(column.header || '')
       || /^follow_up(?:_icon|_actions)?$/.test(key);
-    const select = column.editVariant === 'select' || /^(status|project_size|assigned_to(?:_name)?|job_type|job_nature|currency|country|city)$/.test(key);
     const originalCell = column.Cell;
     const originalHeadProps = column.muiTableHeadCellProps;
     const originalBodyProps = column.muiTableBodyCellProps;
-    const textColumn = /(^|_)(name|title|email|designation|industry|address|city|country|currency|status|description|notes)(_|$)/i.test(key)
-      || ['project_size', 'assigned_to', 'assigned_to_name'].includes(key);
     return {
       ...column,
       meta: { ...column.meta, sharedTablePresentation: true },
       muiTableHeadCellProps: args => {
           const props = typeof originalHeadProps === 'function' ? originalHeadProps(args) : originalHeadProps || {};
-          const sample = args.table?.getPrePaginationRowModel?.().flatRows
-            ?.map(row => row.getAllCells().find(cell => cell.column.id === (column.id || column.accessorKey))?.getValue())
-            .find(value => value != null && value !== '');
-          const centered = followUps || numeric || numericColumn(column, sample);
-          const left = !centered && (textColumn || alphabetical(sample));
-          if (!centered && !left && !select) return props;
-          const align = left ? 'left' : 'center';
-          return { ...props, align, sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: align, '& .Mui-TableHeadCell-Content': { justifyContent: left ? 'flex-start' : 'center' } }] };
+          return { ...props, align: 'left', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'left', '& .Mui-TableHeadCell-Content': { justifyContent: 'flex-start' } }] };
       },
       muiTableBodyCellProps: args => {
         const props = typeof originalBodyProps === 'function' ? originalBodyProps(args) : originalBodyProps || {};

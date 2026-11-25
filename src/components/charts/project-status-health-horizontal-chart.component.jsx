@@ -156,12 +156,17 @@ const ProjectStatusHealthHorizontalChart = ({
       ) : !hasData ? (
         <div className="project-status-health-chart-empty">{emptyMessage}</div>
       ) : (
+        <div className="status-health-chart-scroll" role="region" aria-label={`${title.trim()} graph; scroll horizontally on mobile`} tabIndex={0}>
+        <div className="status-health-chart-plot">
         <Chart
           options={options}
           series={series}
           type="bar"
           height={Math.max(200, normalizedData.length * 48 + 80)}
+          width="100%"
         />
+        </div>
+        </div>
       )}
     </div>
   );

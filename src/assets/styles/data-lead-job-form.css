@@ -28,6 +28,15 @@
 }
 .data-job-stack { display: grid; gap: 12px; min-width: 0; }
 .data-job-field { min-width: 0; }
+html body .data-job-form :is(input, textarea)::placeholder {
+  color: var(--muted-foreground, #64748b) !important;
+  opacity: 1 !important;
+}
+html body .data-job-form :is([data-placeholder='true'], .ant-select-selection-placeholder),
+html body .data-job-form input[type='datetime-local'][data-empty='true']::-webkit-datetime-edit {
+  color: var(--muted-foreground, #64748b) !important;
+  opacity: 1 !important;
+}
 .data-job-form .data-job-multiselect > button {
   height: 40px !important;
   min-height: 40px;

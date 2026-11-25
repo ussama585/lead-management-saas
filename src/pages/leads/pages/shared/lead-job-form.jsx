@@ -198,7 +198,7 @@ export default function LeadJobForm() {
     const value = getIn(formik.values, key);
     const error = fieldError(key);
     const props = { id: key, name: key, disabled: save.isLoading, onBlur: () => formik.setFieldTouched(key, true),
-      ...(dates.includes(key) ? { min: earliestCvDeadline() } : {}),
+      ...(dates.includes(key) ? { min: earliestCvDeadline(), 'data-empty': !value } : {}),
       status: typeof error === 'string' ? 'error' : undefined, 'aria-describedby': `${key}-error` };
     let control;
     if (key === 'working_hours') control = <Input {...props} type="text" placeholder={label} value={value ?? ''}

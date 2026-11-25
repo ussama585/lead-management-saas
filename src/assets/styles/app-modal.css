@@ -103,3 +103,12 @@
 @media (prefers-reduced-motion: reduce) {
   [data-slot='dialog-content'], [data-slot='dialog-overlay'] { animation: none !important; }
 }
+[data-slot='dialog-content'].edit-lead-modal [data-slot='dialog-title'] { font-size: 14px; }
+.edit-lead-modal { --form-label-gap: 4px; }
+.edit-lead-modal .ant-form-vertical .ant-form-item-label { padding-bottom: 4px !important; }
+.edit-lead-modal .ant-form-item { margin-bottom: 14px; }
+.edit-lead-modal form.grid { row-gap: 14px; }
+@layer base {
+  .edit-lead-modal .ant-form-item .ant-form-item-label > label { margin-bottom: 0 !important; }
+  .edit-lead-modal label[for^='data-lead-'] { margin-bottom: 4px !important; }
+}

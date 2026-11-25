@@ -1,30 +1,26 @@
 import { message } from './ui/notifications.jsx';
 import { Modal } from './ui/app-modal.jsx';
 import { Input } from './ui/app-controls.jsx';
-import { Button, Spin } from './ui/app-controls.jsx';
+import { Button } from './ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { Alert, Card, Descriptions, Space } from 'antd';
+import { Alert, Space } from 'antd';
+import SettingsSection from './settings-section.jsx';
 import SettingsChoiceCards from './settings-choice-cards.jsx';
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useUserStore from '../pages/shared/store/user-store.js';
 import { canManageLeadStatuses, isSuperAdmin } from '../pages/auth/role-access.js';
-import { createLeadStatus, deleteLeadStatus, getLeadStatus, leadStatusError, listLeadStatuses, updateLeadStatus } from '../pages/shared/services/lead-status-service.js';
+import { createLeadStatus, deleteLeadStatus, leadStatusError, listLeadStatuses, updateLeadStatus } from '../pages/shared/services/lead-status-service.js';
 import SettingsDeleteModal from './settings-delete-modal.jsx';
-import formatDateUniversal from '../pages/shared/utils/formatDate.js';
 
 export function LeadStatusManager({ user, companyId = null, companyControl, companyError }) {
   const queryClient = useQueryClient();
   const needsCompany = isSuperAdmin(user.user_type) && !companyId;
   const queryKey = ['settingsLeadStatuses', user.id, user.user_type, companyId];
   const [editor, setEditor] = useState(null);
-  const [viewId, setViewId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [nameError, setNameError] = useState('');
   const list = useQuery(queryKey, () => listLeadStatuses(companyId ? { company_id: companyId } : undefined), { refetchOnWindowFocus: false, retry: 1 });
-  const detail = useQuery([...queryKey, 'detail', viewId], () => getLeadStatus(viewId, companyId), {
-    enabled: viewId != null && !needsCompany, refetchOnWindowFocus: false, retry: 1,
-  });
   const save = useMutation(({ id, name }) => id == null ? createLeadStatus(name, companyId) : updateLeadStatus(id, name, companyId), {
     onSuccess: async result => {
       message.success(result?.message || 'Lead status saved.');
@@ -56,12 +52,11 @@ export function LeadStatusManager({ user, companyId = null, companyControl, comp
     save.mutate(editor);
   }
   const renderActions = row => <Space wrap>
-      <span title={needsCompany ? 'Select company first' : 'View status'}><Button aria-label="View status" icon={<Eye size={16} />} onClick={() => setViewId(row.id)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Edit status'}><Button aria-label="Edit status" icon={<Pencil size={16} />} onClick={() => openEditor(row)} disabled={busy} /></span>
       <span title={needsCompany ? 'Select company first' : 'Delete status'}><Button danger aria-label="Delete status" icon={<Trash2 size={16} />} disabled={busy} onClick={() => { remove.reset(); setDeleteTarget(row); }} /></span>
     </Space>;
   return <>
-    <Card title='Lead statuses'>
+    <SettingsSection title='Lead statuses'>
       <div className="settings-choice-toolbar">
         {companyControl}
         <span className="settings-choice-toolbar__action" title={needsCompany ? 'Select company first' : 'Add status'}><Button type='primary' icon={<Plus size={16} />} onClick={() => openEditor()} disabled={busy}>Add status</Button></span>
@@ -69,7 +64,7 @@ export function LeadStatusManager({ user, companyId = null, companyControl, comp
       {companyError}
       {list.isError ? <Alert type='error' showIcon message={leadStatusError(list.error)} action={<Button onClick={() => list.refetch()} loading={list.isFetching}>Retry</Button>} /> :
         <SettingsChoiceCards items={statusesNewestFirst} kind="status" loading={list.isLoading || list.isFetching} renderActions={renderActions} emptyMessage="No lead statuses yet. Add a status to get started." />}
-    </Card>
+    </SettingsSection>
     <SettingsDeleteModal title='Delete lead status' itemName={deleteTarget?.name} open={deleteTarget != null}
       loading={remove.isLoading} error={remove.isError ? leadStatusError(remove.error) : null}
       onCancel={() => setDeleteTarget(null)} onConfirm={() => { if (deleteTarget && !remove.isLoading) remove.mutate(deleteTarget.id); }} />
@@ -80,16 +75,6 @@ export function LeadStatusManager({ user, companyId = null, companyControl, comp
         {nameError && <p id='lead-status-name-error' role='alert' className='text-sm text-destructive'>{nameError}</p>}
         {save.isError && <Alert type='error' showIcon message={leadStatusError(save.error)} />}
       </form>
-    </Modal>
-    <Modal title='Lead status details' open={viewId != null} onCancel={() => setViewId(null)} footer={<Button onClick={() => setViewId(null)}>Close</Button>}>
-      {detail.isLoading ? <div className='py-6 text-center'><Spin /></div> : detail.isError ? <Alert type='error' showIcon message={leadStatusError(detail.error)} action={<Button onClick={() => detail.refetch()}>Retry</Button>} /> : detail.data &&
-        <Descriptions column={1} bordered size='small' className='mt-4' items={[
-          { key: 'id', label: 'ID', children: detail.data.id },
-          { key: 'name', label: 'Name', children: detail.data.name },
-          { key: 'company', label: 'Company', children: detail.data.company_name ?? '—' },
-          { key: 'created', label: 'Created', children: detail.data.created_at ? formatDateUniversal(detail.data.created_at, true) : '—' },
-          { key: 'updated', label: 'Updated', children: detail.data.updated_at ? formatDateUniversal(detail.data.updated_at, true) : '—' },
-        ]} />}
     </Modal>
   </>;
 }

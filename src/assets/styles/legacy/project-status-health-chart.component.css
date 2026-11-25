@@ -65,3 +65,9 @@
     flex-wrap: wrap;
   }
 }
+.status-health-chart-scroll { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; }
+.status-health-chart-plot { width: 100%; }
+@media (max-width: 600px) {
+  .project-status-health-chart-container:has(.status-health-chart-scroll) { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  .status-health-chart-plot { min-width: 520px; }
+}

@@ -60,8 +60,25 @@
   flex: 1;
   min-width: 0;
 }
+.manage-assignees-modal__select [data-slot='select-trigger'] {
+  height: 40px;
+  white-space: nowrap;
+}
+.manage-assignees-modal__select [data-slot='select-trigger'] > span {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.manage-assignees-modal input[aria-label='Search assigned users'] {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 @media (max-width: 600px) {
+  .manage-assignees-modal [data-slot='dialog-header'] [data-slot='dialog-title'] { font-size: 12px; }
   .manage-assignees-modal__compact { flex-direction: column; }
   .manage-assignees-modal__select,
   .manage-assignees-modal__add-button { width: 100%; }

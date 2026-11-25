@@ -47,7 +47,7 @@ export function inlineSelectColumns(columns = []) {
           const cell = row.getAllCells().find(item => item.column.id === (column.id || column.accessorKey));
           return cell && getSelect({ ...args, cell, row });
         });
-        return hasSelect ? { ...props, align: 'center', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'center', '& .Mui-TableHeadCell-Content': { justifyContent: 'center' } }] } : props;
+        return hasSelect ? { ...props, align: 'left', sx: [...(Array.isArray(props.sx) ? props.sx : [props.sx || {}]), { textAlign: 'left', '& .Mui-TableHeadCell-Content': { justifyContent: 'flex-start' } }] } : props;
       },
       Cell: args => {
         const element = originalCell(args);

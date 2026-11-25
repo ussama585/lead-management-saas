@@ -3,15 +3,26 @@
   font-weight: 600;
 }
 
-.follow-up-theme #next-follow-up-date { position: relative; }
-.follow-up-theme #next-follow-up-date::-webkit-datetime-edit { flex: 1; min-width: 0; }
-.follow-up-theme #next-follow-up-date::-webkit-calendar-picker-indicator {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  margin: 0;
-  cursor: pointer;
+.follow-up-datetime-popup .ant-picker-panel-container {
+  border: 1px solid var(--field-border-color, #d2d2d2);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: calc(100vw - 24px);
+  max-height: 75dvh;
+  overflow-y: auto;
+}
+.follow-up-datetime-popup .ant-picker-cell-selected .ant-picker-cell-inner,
+.follow-up-datetime-popup .ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+  background: var(--primary, #3e6a9f) !important;
+  color: var(--primary-foreground, #fff) !important;
+}
+.follow-up-datetime-popup .ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: var(--primary, #3e6a9f) !important;
+}
+@media (max-width: 600px) {
+  .follow-up-datetime-popup .ant-picker-datetime-panel { flex-direction: column; }
+  .follow-up-datetime-popup .ant-picker-time-panel { margin: 0; border-left: 0; border-top: 1px solid var(--border); }
+  .follow-up-datetime-popup .ant-picker-time-panel .ant-picker-content { height: 160px; }
 }
 
 .follow-up-theme-checkbox .ant-checkbox-checked .ant-checkbox-inner,

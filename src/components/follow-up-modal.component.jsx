@@ -2,7 +2,7 @@ import { Modal } from './ui/app-modal.jsx';
 import { Input } from './ui/app-controls.jsx';
 import { Button, Spin } from './ui/app-controls.jsx';
 import React from 'react';
-import { Checkbox, Empty } from 'antd';
+import { Checkbox, DatePicker, Empty } from 'antd';
 import { LoaderCircle as LoadingOutlined } from 'lucide-react';
 import { useFormik } from 'formik';
 import { useQuery, useQueryClient } from 'react-query';
@@ -227,13 +227,26 @@ const FollowUpModal = ({ open, onClose, lead, onSubmit, leadType = 'website', re
         {!formik.values.addFollowUp ? (
           <div style={{ marginBottom: 16 }}>
             <label htmlFor="next-follow-up-date" className="form-label">Next Follow-up</label>
-            <Input
+            <DatePicker
               id="next-follow-up-date"
               name="followUpDate"
-              type="datetime-local"
-              value={formik.values.followUpDate ? dayjs(formik.values.followUpDate).format('YYYY-MM-DDTHH:mm') : ''}
-              min={dayjs().startOf('day').format('YYYY-MM-DDTHH:mm')}
-              onChange={event => formik.setFieldValue('followUpDate', event.target.value ? new Date(event.target.value) : null)}
+              style={{ width: '100%' }}
+              showTime={{ format: 'hh:mm A', use12Hours: true }}
+              format="DD MMM YYYY hh:mm A"
+              placeholder="Select next follow-up"
+              popupClassName="follow-up-datetime-popup"
+              value={formik.values.followUpDate ? dayjs(formik.values.followUpDate) : null}
+              disabledDate={date => date && date.startOf('day').isBefore(dayjs().startOf('day'))}
+              onChange={value => formik.setFieldValue('followUpDate', value ? value.toDate() : null)}
+              onFocus={event => {
+                const input = event.target;
+                requestAnimationFrame(() => {
+                  if (document.activeElement === input && typeof input.setSelectionRange === 'function') {
+                    const end = input.value.length;
+                    input.setSelectionRange(end, end);
+                  }
+                });
+              }}
               onBlur={() => formik.setFieldTouched('followUpDate', true, true)}
               disabled={readOnlyMode}
               aria-required="true"

@@ -64,3 +64,9 @@
     text-overflow: clip;
   }
 }
+@media (max-width: 360px) {
+  .admin-dashboard-page [class$='-chart-filters'] .date-range-trigger__text,
+  .project-status-health-chart-container .date-range-trigger__text {
+    font-size: 11px !important;
+  }
+}

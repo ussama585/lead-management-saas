@@ -23,10 +23,18 @@ const theme = createTheme({
           transformOrigin: { vertical: 'top', horizontal: 'left' },
           PaperProps: {
             sx: {
+              border: '1px solid var(--field-border-color, #d2d2d2)',
+              borderRadius: '12px',
+              boxSizing: 'border-box',
+              minWidth: 'min(160px, calc(100vw - 32px))',
               maxHeight: 'min(280px, 50dvh)',
               maxWidth: 'min(320px, calc(100vw - 32px))',
               overflowY: 'auto',
-              '& .MuiMenuItem-root': { whiteSpace: 'normal', overflowWrap: 'anywhere', minHeight: 36 },
+              '& .MuiMenuItem-root': {
+                whiteSpace: 'normal', overflowWrap: 'anywhere', minHeight: 40,
+                padding: '8px 16px', fontSize: '14px', lineHeight: 1.5,
+                '@media (max-width: 600px)': { minHeight: 44 },
+              },
             },
           },
         },
