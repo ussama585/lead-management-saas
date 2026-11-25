@@ -3,6 +3,7 @@ import { Select } from '../../../../components/ui/app-select.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
+import { CalendarDays } from 'lucide-react';
 import { useFormik, getIn, setIn } from 'formik';
 import { Alert, InputNumber, Space } from 'antd';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -201,7 +202,12 @@ export default function LeadJobForm() {
       ...(dates.includes(key) ? { min: earliestCvDeadline(), 'data-empty': !value } : {}),
       status: typeof error === 'string' ? 'error' : undefined, 'aria-describedby': `${key}-error` };
     let control;
-    if (key === 'working_hours') control = <Input {...props} type="text" placeholder={label} value={value ?? ''}
+    if (dates.includes(key)) control = <div className="data-job-datetime-field">
+      <Input {...props} type="datetime-local" value={value ?? ''} onChange={formik.handleChange} />
+      {!value && <span className="data-job-datetime-field__placeholder" aria-hidden="true">Select date and time</span>}
+      <CalendarDays className="data-job-datetime-field__icon" size={18} aria-hidden="true" />
+    </div>;
+    else if (key === 'working_hours') control = <Input {...props} type="text" placeholder={label} value={value ?? ''}
       onChange={event => formik.setFieldValue(key, event.target.value.replace(/\p{L}/gu, ''))} />;
     else if (tagChoices[key]) control = <Select {...props} className="data-job-multiselect" mode="tags" style={{ width: '100%' }} value={splitTags(value)} options={tagChoices[key]}
       placeholder={`Select or enter ${key === 'department' ? 'departments' : key === 'languages_required' ? 'languages' : 'nationalities'}`} tokenSeparators={[',']}

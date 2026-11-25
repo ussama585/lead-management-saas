@@ -56,8 +56,40 @@ html body .data-job-form input[type='datetime-local'][data-empty='true']::-webki
   box-sizing: border-box;
 }
 .data-job-form .data-job-field textarea { resize: vertical; }
-.data-job-form input[type='datetime-local'] { position: relative; }
-.data-job-form input[type='datetime-local']::-webkit-datetime-edit { flex: 1; min-width: 0; }
+.data-job-datetime-field { position: relative; width: 100%; min-width: 0; max-width: 100%; }
+.data-job-form .data-job-datetime-field input[type='datetime-local'] {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: left;
+}
+.data-job-form input[type='datetime-local']::-webkit-datetime-edit { min-width: 0; padding: 0; }
+.data-job-form input[type='datetime-local']::-webkit-date-and-time-value { text-align: left; min-height: 20px; }
+.data-job-form .data-job-datetime-field input[data-empty='true'] {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+}
+.data-job-datetime-field__placeholder {
+  position: absolute;
+  inset: 0 48px 0 16px;
+  display: flex;
+  align-items: center;
+  color: var(--muted-foreground, #64748b);
+  font-size: 14px;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.data-job-datetime-field__icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--muted-foreground, #64748b); pointer-events: none; }
+@layer base {
+  html body .data-job-form .data-job-datetime-field input { padding-right: 48px !important; }
+}
 .data-job-form input[type='datetime-local']::-webkit-calendar-picker-indicator {
   position: absolute;
   right: 16px;
@@ -65,6 +97,7 @@ html body .data-job-form input[type='datetime-local'][data-empty='true']::-webki
   transform: translateY(-50%);
   margin: 0;
   cursor: pointer;
+  opacity: 0;
 }
 .data-job-field > label {
   display: block;
