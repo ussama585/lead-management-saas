@@ -68,9 +68,13 @@ html body .data-job-form input[type='datetime-local'][data-empty='true']::-webki
   appearance: none;
   -webkit-appearance: none;
   text-align: left;
+  color: #000;
+  -webkit-text-fill-color: #000;
+  line-height: 38px;
+  padding-block: 0;
 }
-.data-job-form input[type='datetime-local']::-webkit-datetime-edit { min-width: 0; padding: 0; }
-.data-job-form input[type='datetime-local']::-webkit-date-and-time-value { text-align: left; min-height: 20px; }
+.data-job-form input[type='datetime-local']::-webkit-datetime-edit { display: inline-flex; align-items: center; height: 100%; min-width: 0; padding: 0; }
+.data-job-form input[type='datetime-local']::-webkit-date-and-time-value { text-align: left; margin: 0; min-height: 20px; line-height: 38px; }
 .data-job-form .data-job-datetime-field input[data-empty='true'] {
   color: transparent !important;
   -webkit-text-fill-color: transparent;
@@ -87,8 +91,13 @@ html body .data-job-form input[type='datetime-local'][data-empty='true']::-webki
   overflow: hidden;
 }
 .data-job-datetime-field__icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--muted-foreground, #64748b); pointer-events: none; }
+.data-job-datetime-field__clear { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--muted-foreground, #64748b); cursor: pointer; }
+.data-job-datetime-field__clear:hover { background: var(--muted); }
+.data-job-datetime-field__clear:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.data-job-datetime-field__clear:disabled { cursor: default; opacity: .5; }
 @layer base {
   html body .data-job-form .data-job-datetime-field input { padding-right: 48px !important; }
+  html body .data-job-form .data-job-datetime-field[data-has-value='true'] input { padding-right: 72px !important; }
 }
 .data-job-form input[type='datetime-local']::-webkit-calendar-picker-indicator {
   position: absolute;

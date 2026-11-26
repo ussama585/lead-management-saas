@@ -3,7 +3,7 @@ import { Select } from '../../../../components/ui/app-select.jsx';
 import { Input } from '../../../../components/ui/app-controls.jsx';
 import { Button, Spin } from '../../../../components/ui/app-controls.jsx';
 import React, { useState } from 'react';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, X } from 'lucide-react';
 import { useFormik, getIn, setIn } from 'formik';
 import { Alert, InputNumber, Space } from 'antd';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -202,9 +202,14 @@ export default function LeadJobForm() {
       ...(dates.includes(key) ? { min: earliestCvDeadline(), 'data-empty': !value } : {}),
       status: typeof error === 'string' ? 'error' : undefined, 'aria-describedby': `${key}-error` };
     let control;
-    if (dates.includes(key)) control = <div className="data-job-datetime-field">
-      <Input {...props} type="datetime-local" value={value ?? ''} onChange={formik.handleChange} />
+    if (dates.includes(key)) control = <div className="data-job-datetime-field" data-has-value={Boolean(value)}>
+      <Input {...props} type="datetime-local" value={value ?? ''} onChange={formik.handleChange}
+        onInput={event => formik.setFieldValue(key, event.currentTarget.value)} />
       {!value && <span className="data-job-datetime-field__placeholder" aria-hidden="true">Select date and time</span>}
+      {value && <button type="button" className="data-job-datetime-field__clear" aria-label={`Clear ${label}`} title={`Clear ${label}`}
+        disabled={save.isLoading} onClick={() => { formik.setFieldValue(key, ''); formik.setFieldTouched(key, true, false); }}>
+        <X size={16} aria-hidden="true" />
+      </button>}
       <CalendarDays className="data-job-datetime-field__icon" size={18} aria-hidden="true" />
     </div>;
     else if (key === 'working_hours') control = <Input {...props} type="text" placeholder={label} value={value ?? ''}
